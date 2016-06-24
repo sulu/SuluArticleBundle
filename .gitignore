@@ -1,0 +1,31 @@
+# PHPUnit
+/app/phpunit.xml
+/phpunit.xml
+
+# composer
+/composer.phar
+/composer.lock
+/auth.json
+/vendor
+
+# Backup entities generated with doctrine:generate:entities command
+*/Entity/*~
+
+# IDEs
+.idea/*
+*.iml
+*~
+
+# System files
+.DS_Store
+
+# Frontend Caches
+bower_components/
+.tmp/
+.sass-cache/
+node_modules/
+npm-debug.log
+
+# tests
+Tests/app/cache
+Tests/app/logs

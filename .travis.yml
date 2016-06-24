@@ -1,0 +1,24 @@
+sudo: false
+
+language: php
+
+cache:
+  directories:
+    - "$HOME/.composer/cache"
+
+matrix:
+  include:
+    - php: 5.5
+    - php: 7.0
+
+before_install:
+  - composer self-update
+
+install:
+  - travis_retry composer install --no-interaction
+  - composer info -i
+  - ./Tests/app/console doctrine:database:create
+  - ./Tests/app/console doctrine:schema:update --force
+
+script:
+  - ./vendor/bin/phpunit

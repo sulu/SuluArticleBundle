@@ -1,0 +1,34 @@
+{
+    "name": "sulu/article-bundle",
+    "description": "Sulu Bundle for managing articles",
+    "type": "sulu-bundle",
+    "license": "MIT",
+    "require": {
+        "php": "^5.5 || ^7.0",
+        "sulu/sulu": "dev-develop",
+        "sulu/document-manager": "@dev"
+    },
+    "require-dev": {
+        "zendframework/zend-stdlib": "2.3.1 as 2.0.0rc5",
+        "zendframework/zendsearch": "2.*@dev",
+        "symfony/monolog-bundle": "2.4.*",
+        "doctrine/doctrine-bundle": "1.4.*",
+        "jackalope/jackalope-doctrine-dbal": "^1.2.5",
+        "phpunit/phpunit": ">=4.8"
+    },
+    "keywords": [
+        "articles"
+    ],
+    "authors": [
+        {
+            "name": "Sulu Article",
+            "homepage": "https://github.com/sulu/SuluArticleBundle/contributors"
+        }
+    ],
+    "homepage": "https://github.com/sulu/SuluArticleBundle",
+    "autoload": {
+        "psr-4": {
+            "Sulu\\Bundle\\ArticleBundle\\": ""
+        }
+    }
+}
