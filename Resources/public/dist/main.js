@@ -1,0 +1,1 @@
+require.config({paths:{suluarticle:"../../suluarticle/dist",suluarticlecss:"../../suluarticle/css"}}),define(function(){"use strict";return{name:"Sulu Article Bundle",initialize:function(a){a.components.addSource("suluarticle","/bundles/suluarticle/dist/components")}}});
