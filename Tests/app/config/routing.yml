@@ -2,3 +2,7 @@ sulu_content_api:
     type: rest
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
     prefix: /api
+
+sulu_content:
+    resource: "@SuluArticleBundle/Resources/config/routing.xml"
+    prefix: /articles

@@ -18,6 +18,10 @@
                 <source>sulu_article.list.changer</source>
                 <target>Modifié by</target>
             </trans-unit>
+            <trans-unit id="5" resname="sulu_article.list.type">
+                <source>sulu_article.list.type</source>
+                <target>Type</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -15,7 +15,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\FuzzyQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
@@ -88,9 +88,9 @@ class ArticleController extends RestController implements ClassResourceInterface
             foreach ($restHelper->getSearchFields() as $searchField) {
                 $search->addQuery(new FuzzyQuery($searchField, $searchPattern));
             }
-        } else {
-            $search->addQuery(new MatchAllQuery());
         }
+
+        $search->addQuery(new TermQuery('type', $request->get('type', 'default')));
 
         $count = $repository->count($search);
 

@@ -16,10 +16,17 @@
             <tag name="sulu_admin.content_navigation" alias="article"/>
             <tag name="sulu.context" context="admin"/>
         </service>
+        <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
+            <argument type="service" id="sulu.content.structure_manager"/>
+
+            <tag name="sulu.js_config"/>
+            <tag name="sulu.context" context="admin"/>
+        </service>
 
         <!-- elastic-search -->
         <service id="sulu_article.elastic_search.article_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
+            <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="es.manager"/>
         </service>
@@ -46,6 +53,12 @@
 
             <!-- This needs to happen after the content repository has been initialized !-->
             <tag name="sulu_document_manager.initializer" priority="-127"/>
+        </service>
+        <service id="sulu_article.serializer.type" class="Sulu\Bundle\ArticleBundle\Document\Serializer\TypeSubscriber">
+            <argument type="service" id="sulu.content.structure_manager"/>
+
+            <tag name="jms_serializer.event_subscriber" />
+            <tag name="sulu.context" context="admin"/>
         </service>
     </services>
 </container>

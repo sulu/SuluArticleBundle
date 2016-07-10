@@ -53,7 +53,7 @@ define(['jquery', 'underscore'], function($, _) {
                         template: {
                             options: {
                                 dropdownOptions: {
-                                    url: '/admin/content/template?type=article',
+                                    url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
                                     callback: function(item) {
                                         this.template = item.template;
                                         this.sandbox.emit('sulu.tab.template-change', item);
@@ -84,12 +84,24 @@ define(['jquery', 'underscore'], function($, _) {
             }.bind(this));
         },
 
-        toEdit: function(locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + this.options.id);
+        toEdit: function(locale, id) {
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id), true, true);
         },
 
         toList: function() {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
+            if (this.options.config.types.length === 1) {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
+            } else {
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.type) + '/' + this.options.locale);
+            }
+        },
+
+        toAdd: function() {
+            if (this.options.config.types.length === 1) {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
+            } else {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.type), true, true);
+            }
         },
 
         save: function(action) {
@@ -146,11 +158,11 @@ define(['jquery', 'underscore'], function($, _) {
             this.sandbox.emit('sulu.header.saved', data);
 
             if (action === 'back') {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
+                this.toList();
             } else if (action === 'new') {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add');
+                this.toAdd();
             } else if (!this.options.id) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/edit:' + data.id);
+                this.toEdit(this.options.locale, data.id);
             }
         },
 

@@ -46,6 +46,13 @@ class ArticleOngrDocument
      *
      * @Property(type="string")
      */
+    protected $type;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
     protected $changer;
 
     /**
@@ -145,6 +152,30 @@ class ArticleOngrDocument
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Returns type.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set type.
+     *
+     * @param string $type
+     *
+     * @return self
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
 
         return $this;
     }
