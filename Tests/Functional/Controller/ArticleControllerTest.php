@@ -16,6 +16,8 @@ use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
 class ArticleControllerTest extends SuluTestCase
 {
+    private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
+
     /**
      * {@inheritdoc}
      */
@@ -26,15 +28,17 @@ class ArticleControllerTest extends SuluTestCase
         $this->initPhpcr();
     }
 
-    public function testPost($title = 'Test-Article')
+    public function testPost($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
-        $client->request('POST', '/api/articles?locale=de', ['title' => $title, 'template' => 'default']);
+        $client->request('POST', '/api/articles?locale=de', ['title' => $title, 'template' => $template]);
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
+        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals($template, $response['template']);
 
         return $response;
     }
@@ -86,6 +90,8 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
+        $this->assertEquals('simple', $response['template']);
+        $this->assertEquals(self::$typeMap['simple'], $response['type']);
         $this->assertEquals($description, $response['description']);
     }
 
@@ -117,7 +123,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de');
+        $client->request('GET', '/api/articles?locale=de&type=blog');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -147,7 +153,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=awesome');
+        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=awesome&type=blog');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -169,7 +175,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&sortBy=title&sortOrder=desc');
+        $client->request('GET', '/api/articles?locale=de&sortBy=title&sortOrder=desc&type=blog');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -181,6 +187,96 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
         $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['id']);
         $this->assertEquals($article1['title'], $response['_embedded']['articles'][1]['title']);
+    }
+
+    public function testCGetTypes()
+    {
+        $this->purgeIndex();
+
+        $article1 = $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome', 'simple');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function ($item) {
+                return [$item['id'], $item['title']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $article1['title']], $items);
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&type=video');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function ($item) {
+                return [$item['id'], $item['title']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article2['id'], $article2['title']], $items);
+    }
+
+    public function testDelete()
+    {
+        $this->purgeIndex();
+
+        $article = $this->testPost('Sulu');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('DELETE', '/api/articles/' . $article['id']);
+        $this->flush();
+
+        $this->assertHttpStatusCode(204, $client->getResponse());
+
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(0, $response['total']);
+        $this->assertCount(0, $response['_embedded']['articles']);
+    }
+
+    public function testCDelete()
+    {
+        $this->purgeIndex();
+
+        $article1 = $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome', 'simple');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('DELETE', '/api/articles?ids=' . implode(',', [$article1['id'], $article2['id']]));
+        $this->flush();
+
+        $this->assertHttpStatusCode(204, $client->getResponse());
+
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(0, $response['total']);
+        $this->assertCount(0, $response['_embedded']['articles']);
     }
 
     private function purgeIndex()

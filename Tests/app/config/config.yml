@@ -17,3 +17,8 @@ ongr_elasticsearch:
             connection: default
             mappings:
                 - SuluArticleBundle
+# Sulu Routing
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            route_schema: /articles/{object.getTitle()}

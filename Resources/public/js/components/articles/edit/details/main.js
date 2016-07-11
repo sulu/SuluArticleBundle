@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore', 'jquery'], function(_, $) {
+define(['underscore', 'jquery', 'config'], function(_, $, Config) {
 
     'use strict';
 
@@ -108,9 +108,13 @@ define(['underscore', 'jquery'], function(_, $) {
 
         loadFormTemplate: function(template) {
             if (!!template) {
-                this.template = template;
                 this.setDirty();
+            } else {
+                var types = Config.get('sulu_article.types');
+                template = types[(this.options.type || this.data.type)];
             }
+
+            this.template = template;
             this.formId = '#content-form-container';
             this.$container = this.sandbox.dom.createElement('<div id="content-form-container"/>');
             this.html(this.$container);

@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(function() {
+define(['underscore'], function(_) {
 
     'use strict';
 
@@ -18,6 +18,7 @@ define(function() {
 
         templates: {
             list: [
+                '<div class="tabs-container"></div>',
                 '<div class="list-toolbar-container"></div>',
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
@@ -35,15 +36,57 @@ define(function() {
         defaults: defaults,
 
         header: function() {
+            var types = this.options.config.types,
+                button = {
+                    icon: 'plus-circle',
+                    title: 'public.add-new'
+                },
+                tabs = false,
+                items;
+
+            if (types.length === 1) {
+                button.callback = function() {
+                    this.toAdd(types[0]);
+                }.bind(this);
+            } else {
+                button.dropdownItems = _.map(types, function(item) {
+                    return {
+                        title: item,
+                        callback: function() {
+                            this.toAdd(item);
+                        }.bind(this)
+                    };
+                }.bind(this));
+
+                items = _.map(types, function(type) {
+                    return {
+                        id: type,
+                        name: type,
+                        key: type
+                    };
+                });
+
+                tabs = {
+                    componentOptions: {
+                        callback: this.typeChange.bind(this),
+                        preselector: 'name',
+                        preselect: this.options.type
+                    },
+                    data: items
+                };
+            }
+
             return {
                 title: this.translations.headline,
                 underline: false,
 
                 noBack: true,
 
+                tabs: tabs,
+
                 toolbar: {
                     buttons: {
-                        add: {},
+                        addArticle: {options: button},
                         deleteSelected: {}
                     },
 
@@ -90,7 +133,7 @@ define(function() {
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: '/admin/api/articles?locale=' + this.options.locale,
+                    url: '/admin/api/articles?locale=' + this.options.locale + '&type=' + this.options.type,
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
@@ -111,8 +154,8 @@ define(function() {
             this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + id);
         },
 
-        toAdd: function(locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/add');
+        toAdd: function(type, locale) {
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/add' + (this.options.config.types.length > 1 ? (':' + type) : ''));
         },
 
         toList: function(locale) {
@@ -120,27 +163,26 @@ define(function() {
         },
 
         deleteItems: function(ids) {
-            for (var i = 0, length = ids.length; i < length; i++) {
-                this.deleteItem(ids[i]);
-            }
-        },
-
-        deleteItem: function(id) {
-            this.sandbox.util.save('/admin/api/articles/' + id, 'DELETE').then(function() {
-                this.sandbox.emit('husky.datagrid.news.record.remove', id);
+            this.sandbox.util.save('/admin/api/articles?ids=' + ids.join(','), 'DELETE').then(function() {
+                _.each(ids, function(id) {
+                    this.sandbox.emit('husky.datagrid.articles.record.remove', id);
+                }.bind(this));
             }.bind(this));
         },
 
-        bindCustomEvents: function() {
-            this.sandbox.on('sulu.toolbar.add', this.toAdd.bind(this));
+        typeChange: function(item) {
+            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.id});
+            this.sandbox.emit('sulu.router.navigate', 'articles:' + item.id + '/' + this.options.locale, false, false);
+        },
 
-            this.sandbox.on('husky.datagrid.news.number.selections', function(number) {
+        bindCustomEvents: function() {
+            this.sandbox.on('husky.datagrid.articles.number.selections', function(number) {
                 var postfix = number > 0 ? 'enable' : 'disable';
                 this.sandbox.emit('sulu.header.toolbar.item.' + postfix, 'deleteSelected', false);
             }.bind(this));
 
             this.sandbox.on('sulu.toolbar.delete', function() {
-                this.sandbox.emit('husky.datagrid.news.items.get-selected', this.deleteItems.bind(this));
+                this.sandbox.emit('husky.datagrid.articles.items.get-selected', this.deleteItems.bind(this));
             }.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {

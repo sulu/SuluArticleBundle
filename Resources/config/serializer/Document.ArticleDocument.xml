@@ -12,6 +12,7 @@
         <property name="uuid" serialized-name="id" type="string" groups="defaultPage,smallPage,preview"/>
         <property name="nodeName" type="string"/>
         <property name="path" type="string"/>
+        <property name="routePath" serialized-name="route" type="string" groups="defaultPage,smallPage,preview"/>
 
         <property name="locale" type="string" groups="preview"/>
         <property name="originalLocale" type="string" groups="preview"/>
