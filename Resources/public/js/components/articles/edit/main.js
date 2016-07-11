@@ -28,6 +28,27 @@ define(['jquery', 'underscore'], function($, _) {
         },
 
         header: function() {
+            var buttons = {
+                save: {
+                    parent: 'saveWithOptions'
+                },
+                template: {
+                    options: {
+                        dropdownOptions: {
+                            url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
+                            callback: function(item) {
+                                this.template = item.template;
+                                this.sandbox.emit('sulu.tab.template-change', item);
+                            }.bind(this)
+                        }
+                    }
+                }
+            };
+
+            if (!!this.options.id) {
+                buttons.delete = {};
+            }
+
             return {
                 tabs: {
                     url: '/admin/content-navigations?alias=article',
@@ -46,22 +67,7 @@ define(['jquery', 'underscore'], function($, _) {
                 },
 
                 toolbar: {
-                    buttons: {
-                        save: {
-                            parent: 'saveWithOptions'
-                        },
-                        template: {
-                            options: {
-                                dropdownOptions: {
-                                    url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
-                                    callback: function(item) {
-                                        this.template = item.template;
-                                        this.sandbox.emit('sulu.tab.template-change', item);
-                                    }.bind(this)
-                                }
-                            }
-                        }
-                    }
+                    buttons: buttons
                 }
             };
         },
@@ -76,11 +82,18 @@ define(['jquery', 'underscore'], function($, _) {
             this.sandbox.on('sulu.header.back', this.toList.bind(this));
             this.sandbox.on('sulu.tab.dirty', this.enableSave.bind(this));
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
+            this.sandbox.on('sulu.toolbar.delete', this.deleteItem.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toEdit(item.id);
+            }.bind(this));
+        },
+
+        deleteItem: function() {
+            this.sandbox.util.save('/admin/api/articles/' + this.options.id, 'DELETE').then(function() {
+                this.toList();
             }.bind(this));
         },
 

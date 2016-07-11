@@ -163,14 +163,10 @@ define(['underscore'], function(_) {
         },
 
         deleteItems: function(ids) {
-            for (var i = 0, length = ids.length; i < length; i++) {
-                this.deleteItem(ids[i]);
-            }
-        },
-
-        deleteItem: function(id) {
-            this.sandbox.util.save('/admin/api/articles/' + id, 'DELETE').then(function() {
-                this.sandbox.emit('husky.datagrid.news.record.remove', id);
+            this.sandbox.util.save('/admin/api/articles?ids=' + ids.join(','), 'DELETE').then(function() {
+                _.each(ids, function(id) {
+                    this.sandbox.emit('husky.datagrid.articles.record.remove', id);
+                }.bind(this));
             }.bind(this));
         },
 
@@ -180,13 +176,13 @@ define(['underscore'], function(_) {
         },
 
         bindCustomEvents: function() {
-            this.sandbox.on('husky.datagrid.news.number.selections', function(number) {
+            this.sandbox.on('husky.datagrid.articles.number.selections', function(number) {
                 var postfix = number > 0 ? 'enable' : 'disable';
                 this.sandbox.emit('sulu.header.toolbar.item.' + postfix, 'deleteSelected', false);
             }.bind(this));
 
             this.sandbox.on('sulu.toolbar.delete', function() {
-                this.sandbox.emit('husky.datagrid.news.items.get-selected', this.deleteItems.bind(this));
+                this.sandbox.emit('husky.datagrid.articles.items.get-selected', this.deleteItems.bind(this));
             }.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {

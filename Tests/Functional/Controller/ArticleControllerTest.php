@@ -237,6 +237,48 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article2['id'], $article2['title']], $items);
     }
 
+    public function testDelete()
+    {
+        $this->purgeIndex();
+
+        $article = $this->testPost('Sulu');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('DELETE', '/api/articles/' . $article['id']);
+        $this->flush();
+
+        $this->assertHttpStatusCode(204, $client->getResponse());
+
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(0, $response['total']);
+        $this->assertCount(0, $response['_embedded']['articles']);
+    }
+
+    public function testCDelete()
+    {
+        $this->purgeIndex();
+
+        $article1 = $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome', 'simple');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('DELETE', '/api/articles?ids=' . implode(',', [$article1['id'], $article2['id']]));
+        $this->flush();
+
+        $this->assertHttpStatusCode(204, $client->getResponse());
+
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(0, $response['total']);
+        $this->assertCount(0, $response['_embedded']['articles']);
+    }
+
     private function purgeIndex()
     {
         /** @var IndexerInterface $indexer */

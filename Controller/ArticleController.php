@@ -206,6 +206,44 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
+     * Deletes multiple documents.
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function cdeleteAction(Request $request)
+    {
+        $ids = array_filter(explode(',', $request->get('ids', '')));
+
+        $documentManager = $this->getDocumentManager();
+        foreach ($ids as $id) {
+            $document = $documentManager->find($id);
+            $documentManager->remove($document);
+        }
+        $documentManager->flush();
+
+        return $this->handleView($this->view(null));
+    }
+
+    /**
+     * Deletes multiple documents.
+     *
+     * @param string $id
+     *
+     * @return Response
+     */
+    public function deleteAction($id)
+    {
+        $documentManager = $this->getDocumentManager();
+        $document = $documentManager->find($id);
+        $documentManager->remove($document);
+        $documentManager->flush();
+
+        return $this->handleView($this->view(null));
+    }
+
+    /**
      * Persists the document using the given information.
      *
      * @param array $data
