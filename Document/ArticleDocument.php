@@ -12,6 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
+use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
@@ -35,7 +37,8 @@ class ArticleDocument implements
     StructureBehavior,
     LocalizedStructureBehavior,
     LocalizedAuditableBehavior,
-    DateShardingBehavior
+    DateShardingBehavior,
+    RoutableInterface
 {
     /**
      * @var string
@@ -61,6 +64,16 @@ class ArticleDocument implements
      * @var string
      */
     private $title;
+
+    /**
+     * @var RouteInterface
+     */
+    private $route;
+
+    /**
+     * @var string
+     */
+    private $routePath;
 
     /**
      * @var string
@@ -116,6 +129,16 @@ class ArticleDocument implements
     }
 
     /**
+     * Set uuid.
+     *
+     * @param string $uuid
+     */
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getNodeName()
@@ -161,6 +184,47 @@ class ArticleDocument implements
     public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * Returns route.
+     *
+     * @return RouteInterface
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * Set route.
+     *
+     * @param RouteInterface $route
+     */
+    public function setRoute(RouteInterface $route)
+    {
+        $this->route = $route;
+        $this->routePath = $route->getPath();
+    }
+
+    /**
+     * Returns route-path.
+     *
+     * @return string
+     */
+    public function getRoutePath()
+    {
+        return $this->routePath;
+    }
+
+    /**
+     * Set route-path.
+     *
+     * @param string $routePath
+     */
+    public function setRoutePath($routePath)
+    {
+        $this->routePath = $routePath;
     }
 
     /**
@@ -249,5 +313,15 @@ class ArticleDocument implements
     public function getChanged()
     {
         return $this->changed;
+    }
+
+    /**
+     * Returns identifier.
+     *
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->getUuid();
     }
 }
