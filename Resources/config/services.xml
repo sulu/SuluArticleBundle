@@ -5,10 +5,47 @@
     <services>
         <!-- sulu-admin -->
         <service id="sulu_article.admin" class="Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin" public="false">
+            <argument type="service" id="sulu_security.security_checker"/>
             <argument>%sulu_admin.name%</argument>
 
             <tag name="sulu.admin"/>
             <tag name="sulu.context" context="admin"/>
+        </service>
+        <service id="sulu_article.navigation_provider.article"
+                 class="Sulu\Bundle\ArticleBundle\Admin\ArticleContententNavigationProvider">
+            <tag name="sulu_admin.content_navigation" alias="article"/>
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
+        <!-- elastic-search -->
+        <service id="sulu_article.elastic_search.article_indexer"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
+            <argument type="service" id="sulu_security.user_manager"/>
+            <argument type="service" id="es.manager"/>
+        </service>
+
+        <!-- document -->
+        <service id="sulu_article.subscriber.date_sharding"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\DateShardingSubscriber">
+            <argument type="service" id="sulu_document_manager.path_builder"/>
+            <argument type="service" id="sulu_document_manager.node_manager"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.subscriber.article"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber">
+            <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.initializer"
+                 class="Sulu\Bundle\ArticleBundle\Document\Initializer\ArticleInitializer">
+            <argument type="service" id="sulu_document_manager.node_manager"/>
+            <argument type="service" id="sulu_document_manager.path_builder"/>
+            <argument type="service" id="sulu.phpcr.session"/>
+
+            <!-- This needs to happen after the content repository has been initialized !-->
+            <tag name="sulu_document_manager.initializer" priority="-127"/>
         </service>
     </services>
 </container>

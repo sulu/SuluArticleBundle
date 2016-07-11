@@ -2,6 +2,9 @@ sudo: false
 
 language: php
 
+services:
+  - elasticsearch
+
 cache:
   directories:
     - "$HOME/.composer/cache"
@@ -19,6 +22,7 @@ install:
   - composer info -i
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
+  - ./Tests/app/console sulu:document:initialize
 
 script:
   - ./vendor/bin/phpunit

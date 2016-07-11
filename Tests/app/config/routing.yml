@@ -1,0 +1,4 @@
+sulu_content_api:
+    type: rest
+    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
+    prefix: /api

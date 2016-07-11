@@ -1,0 +1,19 @@
+sulu_core:
+    content:
+        structure:
+            default_type:
+                article: "default"
+            paths:
+                article:
+                    path: "%kernel.root_dir%/Resources/articles"
+                    type: "article"
+
+ongr_elasticsearch:
+    connections:
+        default:
+            index_name: su_articles
+    managers:
+        default:
+            connection: default
+            mappings:
+                - SuluArticleBundle

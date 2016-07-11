@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="de" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1" resname="sulu_article.title">
+                <source>sulu_article.title</source>
+                <target>Article</target>
+            </trans-unit>
+            <trans-unit id="2" resname="sulu_article.list.title">
+                <source>sulu_article.list.title</source>
+                <target>Article</target>
+            </trans-unit>
+            <trans-unit id="3" resname="sulu_article.list.creator">
+                <source>sulu_article.list.creator</source>
+                <target>Created by</target>
+            </trans-unit>
+            <trans-unit id="4" resname="sulu_article.list.changer">
+                <source>sulu_article.list.changer</source>
+                <target>Changed by</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
