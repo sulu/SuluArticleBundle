@@ -8,6 +8,13 @@ Install bundle over composer:
 composer require sulu/article-bundle
 ```
 
+Add bundle to AbstractKernel:
+
+```php
+new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
+new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+```
+
 Create required phpcr nodes:
 
 ```bash
@@ -16,7 +23,7 @@ app/console sulu:document:init
 
 Configure the bundle:
 
-```
+```yml
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
@@ -35,6 +42,6 @@ ongr_elasticsearch:
 
 Create elasticsearch index:
 
-```
+```bash
 bin/console ongr:es:index:create
 ```

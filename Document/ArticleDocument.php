@@ -18,6 +18,7 @@ use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
+use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
@@ -41,7 +42,8 @@ class ArticleDocument implements
     LocalizedAuditableBehavior,
     DateShardingBehavior,
     RoutableInterface,
-    ExtensionBehavior
+    ExtensionBehavior,
+    WorkflowStageBehavior
 {
     /**
      * @var string
@@ -124,6 +126,20 @@ class ArticleDocument implements
      * @var ExtensionContainer
      */
     protected $extensions;
+
+    /**
+     * Workflow Stage currently Test or Published.
+     *
+     * @var int
+     */
+    protected $workflowStage;
+
+    /**
+     * Is Document is published.
+     *
+     * @var bool
+     */
+    protected $published;
 
     public function __construct()
     {
@@ -358,5 +374,29 @@ class ArticleDocument implements
     public function setExtension($name, $data)
     {
         $this->extensions[$name] = $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkflowStage()
+    {
+        return $this->workflowStage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setWorkflowStage($workflowStage)
+    {
+        $this->workflowStage = $workflowStage;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublished()
+    {
+        return $this->published;
     }
 }
