@@ -27,6 +27,9 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
     {
         parent::buildForm($builder, $options);
 
+        // extensions
+        $builder->add('extensions', TextType::class, ['property_path' => 'extensionsData']);
+
         // TODO: Fix the admin interface to not send this junk (not required for articles)
         $builder->add('redirectType', TextType::class, ['mapped' => false]);
         $builder->add('resourceSegment', TextType::class, ['mapped' => false]);

@@ -98,7 +98,7 @@ define(['jquery', 'underscore'], function($, _) {
         },
 
         toEdit: function(locale, id) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id), true, true);
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/details', true, true);
         },
 
         toList: function() {
