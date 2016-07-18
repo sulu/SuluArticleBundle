@@ -74,6 +74,60 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
     }
 
+    public function testPutExtensions(
+        $title = 'Sulu is awesome',
+        $extensions = [
+            'seo' => [
+                'title' => 'Seo title',
+                'description' => 'Seo description',
+                'keywords' => 'Seo keywords',
+                'canonicalUrl' => 'http://canonical.lo',
+                'hideInSitemap' => true,
+                'noFollow' => false,
+                'noIndex' => true,
+            ],
+            'excerpt' => [
+                'title' => 'Excerpt title',
+                'description' => 'Excerpt title',
+                'more' => 'Excerpt more',
+                'categories' => [1],
+                'icon' => [
+                    'displayOption' => 'top',
+                    'ids' => [1],
+                ],
+                'tags' => [
+                    'Excerpt',
+                    'Tags',
+                ],
+                'images' => [
+                    'displayOption' => 'top',
+                    'ids' => [1],
+                ],
+            ],
+        ]
+    ) {
+        $article = $this->testPost();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=de',
+            [
+                'title' => $title,
+                'template' => 'default',
+                'ext' => $extensions,
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertNotEquals($article['title'], $response['title']);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals($extensions['seo'], $response['ext']['seo']);
+        $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
+    }
+
     public function testPutDifferentTemplate($title = 'Sulu', $description = 'Sulu is awesome')
     {
         $article = $this->testPost();

@@ -62,7 +62,7 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
 
             var data = this.sandbox.form.getData(this.formId);
             data.template = this.template;
-            $.ajax(this.options.url(), {method: (!this.data.id ? 'POST' : 'PUT'), data: data}).then(function(data) {
+            this.sandbox.util.save(this.options.url(), !this.data.id ? 'POST' : 'PUT', data).then(function(data) {
                 this.data = data;
                 this.sandbox.emit('sulu.tab.saved', data);
             }.bind(this));

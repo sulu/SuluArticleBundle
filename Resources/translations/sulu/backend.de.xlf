@@ -22,6 +22,10 @@
                 <source>sulu_article.list.type</source>
                 <target>Typ</target>
             </trans-unit>
+            <trans-unit id="6" resname="sulu_article.edit.details">
+                <source>sulu_article.edit.details</source>
+                <target>Details</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

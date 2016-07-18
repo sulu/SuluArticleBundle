@@ -99,7 +99,7 @@ define(['underscore', 'config'], function(_, Config) {
             }
 
             app.sandbox.mvc.routes.push({
-                route: 'articles/:locale/edit::id',
+                route: 'articles/:locale/edit::id/:content',
                 callback: function(locale, id) {
                     return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
                 }

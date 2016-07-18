@@ -29,6 +29,20 @@ class ArticleContententNavigationProvider implements ContentNavigationProviderIn
         $details->setPosition(10);
         $details->setComponent('articles/edit/details@suluarticle');
 
-        return [$details];
+        $seo = new ContentNavigationItem('content-navigation.contents.seo');
+        $seo->setId('seo');
+        $seo->setPosition(20);
+        $seo->setAction('seo');
+        $seo->setComponent('articles/edit/seo@suluarticle');
+        $seo->setDisplay(['edit']);
+
+        $excerpt = new ContentNavigationItem('content-navigation.contents.excerpt');
+        $excerpt->setId('excerpt');
+        $excerpt->setPosition(30);
+        $excerpt->setAction('excerpt');
+        $excerpt->setComponent('articles/edit/excerpt@suluarticle');
+        $excerpt->setDisplay(['edit']);
+
+        return [$details, $seo, $excerpt];
     }
 }

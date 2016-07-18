@@ -14,9 +14,11 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
+use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\LocalizedTitleBehavior;
@@ -38,7 +40,8 @@ class ArticleDocument implements
     LocalizedStructureBehavior,
     LocalizedAuditableBehavior,
     DateShardingBehavior,
-    RoutableInterface
+    RoutableInterface,
+    ExtensionBehavior
 {
     /**
      * @var string
@@ -115,9 +118,17 @@ class ArticleDocument implements
      */
     private $changed;
 
+    /**
+     * Document's extensions ie seo, ...
+     *
+     * @var ExtensionContainer
+     */
+    protected $extensions;
+
     public function __construct()
     {
         $this->structure = new Structure();
+        $this->extensions = new ExtensionContainer();
     }
 
     /**
@@ -323,5 +334,29 @@ class ArticleDocument implements
     public function getId()
     {
         return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionsData()
+    {
+        return $this->extensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtensionsData($extensions)
+    {
+        $this->extensions = $extensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtension($name, $data)
+    {
+        $this->extensions[$name] = $data;
     }
 }

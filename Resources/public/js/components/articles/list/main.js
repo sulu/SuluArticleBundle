@@ -151,7 +151,7 @@ define(['underscore'], function(_) {
         },
 
         toEdit: function(id, locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + id);
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + id + '/details');
         },
 
         toAdd: function(type, locale) {
