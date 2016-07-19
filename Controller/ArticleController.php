@@ -159,10 +159,12 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function postAction(Request $request)
     {
+        $action = $request->get('action');
         $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
         $locale = $this->getRequestParameter($request, 'locale', true);
 
         $this->persistDocument($request->request->all(), $document, $locale);
+        $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
         return $this->handleView(
@@ -183,6 +185,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     public function putAction(Request $request, $uuid)
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
+        $action = $request->get('action');
 
         $document = $this->getDocumentManager()->find(
             $uuid,
@@ -196,6 +199,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
 
         $this->persistDocument($request->request->all(), $document, $locale);
+        $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
         return $this->handleView(
@@ -287,5 +291,21 @@ class ArticleController extends RestController implements ClassResourceInterface
     protected function getDocumentManager()
     {
         return $this->get('sulu_document_manager.document_manager');
+    }
+
+    /**
+     * Delegates actions by given actionParameter, which can be retrieved from the request.
+     *
+     * @param string $actionParameter
+     * @param object $document
+     * @param string $locale
+     */
+    private function handleActionParameter($actionParameter, $document, $locale)
+    {
+        switch ($actionParameter) {
+            case 'publish':
+                $this->getDocumentManager()->publish($document, $locale);
+                break;
+        }
     }
 }

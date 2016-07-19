@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'underscore'], function($, _) {
+define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function($, _, UserManager) {
 
     'use strict';
 
@@ -23,14 +23,15 @@ define(['jquery', 'underscore'], function($, _) {
             },
 
             translations: {
-                headline: 'sulu_article.edit.title'
+                headline: 'sulu_article.edit.title',
+                draftLabel: 'sulu-document-manager.draft-label'
             }
         },
 
         header: function() {
             var buttons = {
                 save: {
-                    parent: 'saveWithOptions'
+                    parent: 'saveWithDraft'
                 },
                 template: {
                     options: {
@@ -76,14 +77,17 @@ define(['jquery', 'underscore'], function($, _) {
             this.saveState = 'disabled';
 
             this.bindCustomEvents();
+            this.showDraftLabel();
         },
 
         bindCustomEvents: function() {
             this.sandbox.on('sulu.header.back', this.toList.bind(this));
-            this.sandbox.on('sulu.tab.dirty', this.enableSave.bind(this));
+            this.sandbox.on('sulu.tab.dirty', this.setHeaderBar.bind(this));
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.toolbar.delete', this.deleteItem.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
+            this.sandbox.on('sulu.articles.save', this.saveArticle.bind(this));
+            this.sandbox.on('sulu.tab.saved', this.showDraftLabel.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
@@ -120,7 +124,7 @@ define(['jquery', 'underscore'], function($, _) {
         save: function(action) {
             this.loadingSave();
 
-            this.saveTab().then(function(data) {
+            this.saveTab(action).then(function(data) {
                 this.afterSave(action, data);
             }.bind(this));
         },
@@ -129,7 +133,7 @@ define(['jquery', 'underscore'], function($, _) {
             this.data = data;
         },
 
-        saveTab: function() {
+        saveTab: function(action) {
             var promise = $.Deferred();
 
             this.sandbox.once('sulu.tab.saved', function(savedData) {
@@ -138,27 +142,33 @@ define(['jquery', 'underscore'], function($, _) {
                 promise.resolve(savedData);
             }.bind(this));
 
-            this.sandbox.emit('sulu.tab.save');
+            this.sandbox.emit('sulu.tab.save', action);
 
             return promise;
         },
 
-        enableSave: function(force) {
-            if (!force && this.saveState === 'loading') {
-                return;
-            }
-
-            this.saveState = 'enabled';
-            this.sandbox.emit('sulu.header.toolbar.item.enable', 'save', false);
+        saveArticle: function(data, action) {
+            return this.sandbox.util.save(this.getUrl(action), !this.data.id ? 'POST' : 'PUT', data).then(function(data) {
+                this.data = data;
+                this.sandbox.emit('sulu.tab.saved', data);
+            }.bind(this));
         },
 
-        disableSave: function(force) {
-            if (!force && this.saveState === 'loading') {
-                return;
-            }
+        setHeaderBar: function(saved) {
+            var saveDraft = !saved,
+                savePublish = !saved,
+                publish = !!saved && !this.data.publishedState;
 
-            this.saveState = 'disabled';
-            this.sandbox.emit('sulu.header.toolbar.item.disable', 'save', true);
+            this.setSaveToolbarItems.call(this, 'saveDraft', saveDraft);
+            this.setSaveToolbarItems.call(this, 'savePublish', savePublish);
+            this.setSaveToolbarItems.call(this, 'publish', publish);
+            this.setSaveToolbarItems.call(this, 'save', (!!saveDraft || !!savePublish || !!publish));
+
+            this.saved = saved;
+        },
+
+        setSaveToolbarItems: function(item, value) {
+            this.sandbox.emit('sulu.header.toolbar.item.' + (!!value ? 'enable' : 'disable'), item, false);
         },
 
         loadingSave: function() {
@@ -167,7 +177,7 @@ define(['jquery', 'underscore'], function($, _) {
         },
 
         afterSave: function(action, data) {
-            this.disableSave(true);
+            this.setHeaderBar(true);
             this.sandbox.emit('sulu.header.saved', data);
 
             if (action === 'back') {
@@ -179,6 +189,42 @@ define(['jquery', 'underscore'], function($, _) {
             }
         },
 
+        showDraftLabel: function() {
+            this.sandbox.emit('sulu.header.tabs.label.hide');
+
+            if (!this.data.id || !!this.data.publishedState) {
+                return;
+            }
+
+            this.setHeaderBar(true);
+
+            UserManager.find(this.data.changer).then(function(response) {
+                this.sandbox.emit(
+                    'sulu.header.tabs.label.show',
+                    this.sandbox.util.sprintf(
+                        this.sandbox.translate(this.translations.draftLabel),
+                        {
+                            changed: this.sandbox.date.format(this.data.changed, true),
+                            user: response.username
+                        }
+                    )
+                );
+            }.bind(this));
+        },
+
+        getUrl: function(action) {
+            var url = _.template(this.defaults.templates.url, {
+                id: this.options.id,
+                locale: this.options.locale
+            });
+
+            if (action) {
+                url += '&action=' + action;
+            }
+
+            return url;
+        },
+
         loadComponentData: function() {
             var promise = $.Deferred();
 
@@ -188,10 +234,7 @@ define(['jquery', 'underscore'], function($, _) {
                 return promise;
             }
 
-            this.sandbox.util.load(_.template(this.defaults.templates.url, {
-                id: this.options.id,
-                locale: this.options.locale
-            })).done(function(data) {
+            this.sandbox.util.load(this.getUrl()).done(function(data) {
                 promise.resolve(data);
             });
 

@@ -25,6 +25,7 @@
         <property name="created" type="DateTime" groups="defaultPage"/>
         <property name="changed" type="DateTime" groups="defaultPage"/>
 
+        <property name="published" type="DateTime" groups="defaultPage,smallPage"/>
         <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultPage,preview"/>
     </class>
 </serializer>

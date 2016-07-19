@@ -29,10 +29,7 @@ define(function() {
             var content = this.options.data();
             content.ext.seo = data;
 
-            this.sandbox.util.save(this.options.url(), !content.id ? 'POST' : 'PUT', content).then(function(data) {
-                this.data = data;
-                this.sandbox.emit('sulu.tab.saved', data);
-            }.bind(this));
+            this.sandbox.emit('sulu.articles.save', data, action);
         }
     };
 });
