@@ -28,11 +28,18 @@ class ArticleJsConfig implements JsConfigInterface
     private $structureManager;
 
     /**
-     * @param StructureManagerInterface $structureManager
+     * @var array
      */
-    public function __construct(StructureManagerInterface $structureManager)
+    private $typeConfiguration;
+
+    /**
+     * @param StructureManagerInterface $structureManager
+     * @param $typeConfiguration
+     */
+    public function __construct(StructureManagerInterface $structureManager, $typeConfiguration)
     {
         $this->structureManager = $structureManager;
+        $this->typeConfiguration = $typeConfiguration;
     }
 
     /**
@@ -44,7 +51,10 @@ class ArticleJsConfig implements JsConfigInterface
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());
             if (!array_key_exists($type, $types)) {
-                $types[$type] = $structure->getKey();
+                $types[$type] = [
+                    'default' => $structure->getKey(),
+                    'title' => $this->getTitle($type),
+                ];
             }
         }
 
@@ -57,5 +67,21 @@ class ArticleJsConfig implements JsConfigInterface
     public function getName()
     {
         return 'sulu_article.types';
+    }
+
+    /**
+     * Returns title for given type.
+     *
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getTitle($type)
+    {
+        if (!array_key_exists($type, $this->typeConfiguration)) {
+            return ucfirst($type);
+        }
+
+        return $this->typeConfiguration[$type]['translation_key'];
     }
 }
