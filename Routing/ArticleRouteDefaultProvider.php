@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
-use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactory;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 /**
@@ -27,17 +27,17 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     private $documentManager;
 
     /**
-     * @var StructureMetadataFactory
+     * @var StructureMetadataFactoryInterface
      */
     private $structureMetadataFactory;
 
     /**
      * @param DocumentManagerInterface $documentManager
-     * @param StructureMetadataFactory $structureMetadataFactory
+     * @param StructureMetadataFactoryInterface $structureMetadataFactory
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
-        StructureMetadataFactory $structureMetadataFactory
+        StructureMetadataFactoryInterface $structureMetadataFactory
     ) {
         $this->documentManager = $documentManager;
         $this->structureMetadataFactory = $structureMetadataFactory;
@@ -62,6 +62,18 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             '_cacheLifetime' => $metadata->cacheLifetime,
             '_controller' => $metadata->controller,
         ];
+    }
+
+    /**
+     * If article is not published the document will be of typ unknown-document.
+     *
+     * {@inheritdoc}
+     */
+    public function isPublished($entityClass, $id, $locale)
+    {
+        $object = $this->documentManager->find($id, $locale);
+
+        return $object instanceof ArticleDocument;
     }
 
     /**
