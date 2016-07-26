@@ -18,6 +18,17 @@ define(['underscore', 'config'], function(_, Config) {
 
     'use strict';
 
+    var getContentLocales = function () {
+        var config = Config.get('sulu-content').locales,
+            locales = [];
+
+        _.each(config, function (item) {
+            locales = locales.concat(Object.keys(item));
+        });
+
+        return locales;
+    };
+
     return {
 
         name: 'Sulu Article Bundle',
@@ -26,7 +37,7 @@ define(['underscore', 'config'], function(_, Config) {
             app.components.addSource('suluarticle', '/bundles/suluarticle/js/components');
 
             // set config for this bundle
-            var locales = Object.keys(Config.get('sulu-content').locales),
+            var locales = getContentLocales(),
                 config = {
                     defaultLocale: locales[0],
                     locales: locales,
