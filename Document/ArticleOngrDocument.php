@@ -77,6 +77,20 @@ class ArticleOngrDocument
     protected $created;
 
     /**
+     * @var array
+     *
+     * @Property(type="integer")
+     */
+    protected $categories;
+
+    /**
+     * @var array
+     *
+     * @Property(type="integer")
+     */
+    protected $tags;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -272,6 +286,54 @@ class ArticleOngrDocument
     public function setCreated($created)
     {
         $this->created = $created;
+
+        return $this;
+    }
+
+    /**
+     * Returns categories.
+     *
+     * @return array
+     */
+    public function getCategories()
+    {
+        return $this->categories;
+    }
+
+    /**
+     * Set categories.
+     *
+     * @param array $categories
+     *
+     * @return self
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+
+        return $this;
+    }
+
+    /**
+     * Returns tags.
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Set tags.
+     *
+     * @param array $tags
+     *
+     * @return self
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
 
         return $this;
     }

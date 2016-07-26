@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -41,15 +42,26 @@ class ArticleIndexer implements IndexerInterface
     private $manager;
 
     /**
+     * @var TagManagerInterface
+     */
+    private $tagManager;
+
+    /**
      * @param StructureManagerInterface $structureManager
      * @param UserManager $userManager
      * @param Manager $manager
+     * @param TagManagerInterface $tagManager
      */
-    public function __construct(StructureManagerInterface $structureManager, UserManager $userManager, Manager $manager)
-    {
+    public function __construct(
+        StructureManagerInterface $structureManager,
+        UserManager $userManager,
+        Manager $manager,
+        TagManagerInterface $tagManager
+    ) {
         $this->structureManager = $structureManager;
         $this->userManager = $userManager;
         $this->manager = $manager;
+        $this->tagManager = $tagManager;
     }
 
     /**
@@ -78,6 +90,10 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanger($this->userManager->getFullNameByUserId($document->getChanger()));
         $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structure->getStructure()));
+
+        $excerpt = $document->getExtensionsData()->toArray()['excerpt'];
+        $article->setCategories($excerpt['categories']);
+        $article->setTags($this->tagManager->resolveTagNames($excerpt['tags']));
 
         $this->manager->persist($article);
     }
