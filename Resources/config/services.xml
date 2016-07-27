@@ -30,6 +30,7 @@
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="es.manager"/>
+            <argument type="service" id="sulu_tag.tag_manager"/>
         </service>
 
         <!-- document -->
