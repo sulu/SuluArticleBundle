@@ -91,13 +91,13 @@ class ArticleControllerTest extends SuluTestCase
                 'description' => 'Excerpt title',
                 'more' => 'Excerpt more',
                 'categories' => [1],
-                'icon' => [
-                    'displayOption' => 'top',
-                    'ids' => [1],
-                ],
                 'tags' => [
                     'Excerpt',
                     'Tags',
+                ],
+                'icon' => [
+                    'displayOption' => 'top',
+                    'ids' => [1],
                 ],
                 'images' => [
                     'displayOption' => 'top',

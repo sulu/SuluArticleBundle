@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
+use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
@@ -34,6 +35,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $indexer;
 
     /**
+     * @var IndexerInterface
+     */
+    private $liveIndexer;
+
+    /**
      * @var RouteManagerInterface
      */
     private $routeManager;
@@ -50,17 +56,20 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * @param IndexerInterface $indexer
+     * @param IndexerInterface $liveIndexer
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         IndexerInterface $indexer,
+        IndexerInterface $liveIndexer,
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
         EntityManagerInterface $entityManager
     ) {
         $this->indexer = $indexer;
+        $this->liveIndexer = $liveIndexer;
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
@@ -74,8 +83,10 @@ class ArticleSubscriber implements EventSubscriberInterface
         return [
             Events::HYDRATE => [['handleHydrate', -500]],
             Events::PERSIST => [['handleRoute', 0], ['handleIndex', -500]],
-            Events::REMOVE => [['handleRemove', -500]],
+            Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
+            Events::PUBLISH => 'handleIndexLive',
+            Events::UNPUBLISH => 'handleRemoveLive',
         ];
     }
 
@@ -116,9 +127,9 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Indexes for article-document.
      *
-     * @param PersistEvent $event
+     * @param AbstractMappingEvent $event
      */
-    public function handleIndex(PersistEvent $event)
+    public function handleIndex(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -127,6 +138,22 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->indexer->index($document);
         $this->indexer->flush();
+    }
+
+    /**
+     * Indexes for article-document in live index.
+     *
+     * @param AbstractMappingEvent $event
+     */
+    public function handleIndexLive(AbstractMappingEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->index($document);
+        $this->liveIndexer->flush();
     }
 
     /**
@@ -143,6 +170,22 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->indexer->remove($document);
         $this->indexer->flush();
+    }
+
+    /**
+     * Removes article-document.
+     *
+     * @param RemoveEvent $event
+     */
+    public function handleRemoveLive(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->remove($document);
+        $this->liveIndexer->flush();
     }
 
     /**

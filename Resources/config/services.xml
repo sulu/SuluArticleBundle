@@ -24,12 +24,19 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
-        <!-- elastic-search -->
+        <!-- ongr -->
         <service id="sulu_article.elastic_search.article_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu_security.user_manager"/>
-            <argument type="service" id="es.manager"/>
+            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_tag.tag_manager"/>
+        </service>
+        <service id="sulu_article.elastic_search.article_live_indexer"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_security.user_manager"/>
+            <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_tag.tag_manager"/>
         </service>
 
@@ -44,6 +51,7 @@
         <service id="sulu_article.subscriber.article"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber">
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
+            <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
@@ -71,6 +79,17 @@
             <argument type="service" id="sulu_content.structure.factory"/>
 
             <tag name="sulu_route.defaults_provider"/>
+        </service>
+
+        <!-- content -->
+        <service id="sulu_article.content.data_provider.proxy_factory"
+                 class="ProxyManager\Factory\LazyLoadingValueHolderFactory"/>
+        <service id="sulu_article.content.data_provider" class="Sulu\Bundle\ArticleBundle\Content\ArticleDataProvider">
+            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+
+            <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
     </services>
 </container>

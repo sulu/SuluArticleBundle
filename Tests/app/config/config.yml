@@ -12,9 +12,15 @@ ongr_elasticsearch:
     connections:
         default:
             index_name: su_articles
+        live:
+            index_name: su_articles_live
     managers:
         default:
             connection: default
+            mappings:
+                - SuluArticleBundle
+        live:
+            connection: live
             mappings:
                 - SuluArticleBundle
 # Sulu Routing
