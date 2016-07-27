@@ -95,6 +95,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
+        $container->setParameter('sulu_articles.types', $config['types']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');

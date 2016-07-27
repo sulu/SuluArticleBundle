@@ -106,7 +106,7 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
         },
 
         toList: function() {
-            if (this.options.config.types.length === 1) {
+            if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
             } else {
                 this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.type) + '/' + this.options.locale);
@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
         },
 
         toAdd: function() {
-            if (this.options.config.types.length === 1) {
+            if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
             } else {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.type), true, true);

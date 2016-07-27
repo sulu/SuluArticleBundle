@@ -107,8 +107,7 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
 
         loadFormTemplate: function(template) {
             if (!template) {
-                var types = Config.get('sulu_article.types');
-                template = types[(this.options.type || this.data.type)];
+                template = this.options.config.types[(this.options.type || this.data.type)].default;
             }
 
             this.template = template;

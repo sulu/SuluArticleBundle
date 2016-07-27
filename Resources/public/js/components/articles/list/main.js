@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore'], function(_) {
+define(['underscore', 'config'], function(_, Config) {
 
     'use strict';
 
@@ -37,6 +37,7 @@ define(['underscore'], function(_) {
 
         header: function() {
             var types = this.options.config.types,
+                typeNames = this.options.config.typeNames,
                 button = {
                     icon: 'plus-circle',
                     title: 'public.add-new'
@@ -44,24 +45,24 @@ define(['underscore'], function(_) {
                 tabs = false,
                 items;
 
-            if (types.length === 1) {
+            if (typeNames.length === 1) {
                 button.callback = function() {
-                    this.toAdd(types[0]);
+                    this.toAdd(typeNames[0]);
                 }.bind(this);
             } else {
-                button.dropdownItems = _.map(types, function(item) {
+                button.dropdownItems = _.map(typeNames, function(type) {
                     return {
-                        title: item,
+                        title: types[type].title,
                         callback: function() {
-                            this.toAdd(item);
+                            this.toAdd(type);
                         }.bind(this)
                     };
                 }.bind(this));
 
-                items = _.map(types, function(type) {
+                items = _.map(typeNames, function(type) {
                     return {
                         id: type,
-                        name: type,
+                        name: types[type].title,
                         key: type
                     };
                 });
@@ -77,9 +78,6 @@ define(['underscore'], function(_) {
             }
 
             return {
-                title: this.translations.headline,
-                underline: false,
-
                 noBack: true,
 
                 tabs: tabs,
@@ -155,7 +153,7 @@ define(['underscore'], function(_) {
         },
 
         toAdd: function(type, locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/add' + (this.options.config.types.length > 1 ? (':' + type) : ''));
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/add' + (this.options.config.typeNames.length > 1 ? (':' + type) : ''));
         },
 
         toList: function(locale) {
