@@ -89,7 +89,9 @@ class ArticleController extends RestController implements ClassResourceInterface
             }
         }
 
-        $search->addQuery(new TermQuery('type', $request->get('type', 'default')));
+        if (null !== ($type = $request->get('type'))) {
+            $search->addQuery(new TermQuery('type', $type));
+        }
 
         $count = $repository->count($search);
 

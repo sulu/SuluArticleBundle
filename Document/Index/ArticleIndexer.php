@@ -88,6 +88,7 @@ class ArticleIndexer implements IndexerInterface
         $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
 
         $article->setTitle($document->getTitle());
+        $article->setRoutePath($document->getRoutePath());
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());

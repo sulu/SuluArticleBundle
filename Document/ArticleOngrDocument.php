@@ -49,6 +49,13 @@ class ArticleOngrDocument
      *
      * @Property(type="string")
      */
+    protected $routePath;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
     protected $type;
 
     /**
@@ -185,6 +192,26 @@ class ArticleOngrDocument
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * Returns route-path.
+     *
+     * @return string
+     */
+    public function getRoutePath()
+    {
+        return $this->routePath;
+    }
+
+    /**
+     * Set route-path.
+     *
+     * @param string $routePath
+     */
+    public function setRoutePath($routePath)
+    {
+        $this->routePath = $routePath;
     }
 
     /**
