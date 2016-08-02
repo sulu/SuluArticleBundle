@@ -14,6 +14,9 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
+use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
+use Sulu\Bundle\ArticleBundle\Document\MediaCollectionOngrObject;
+use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
 use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
@@ -91,9 +94,9 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structure->getStructure()));
 
-        $excerpt = $document->getExtensionsData()->toArray()['excerpt'];
-        $article->setCategories($excerpt['categories']);
-        $article->setTags($this->tagManager->resolveTagNames($excerpt['tags']));
+        $extensions = $document->getExtensionsData()->toArray();
+        $article->setExcerpt($this->createExcerptObject($extensions['excerpt']));
+        $article->setSeo($this->createSeoObject($extensions['seo']));
 
         $this->manager->persist($article);
     }
@@ -104,6 +107,9 @@ class ArticleIndexer implements IndexerInterface
     public function remove($document)
     {
         $article = $this->manager->find(ArticleOngrDocument::class, $document->getUuid());
+        if (null === $article) {
+            return;
+        }
 
         $this->manager->remove($article);
     }
@@ -114,5 +120,60 @@ class ArticleIndexer implements IndexerInterface
     public function flush()
     {
         $this->manager->commit();
+    }
+
+    /**
+     * Create a seo object by given data.
+     *
+     * @param array $data
+     *
+     * @return SeoOngrObject
+     */
+    private function createSeoObject(array $data)
+    {
+        $seo = new SeoOngrObject();
+        $seo->title = $data['title'];
+        $seo->description = $data['description'];
+        $seo->keywords = $data['keywords'];
+        $seo->canonicalUrl = $data['canonicalUrl'];
+        $seo->noIndex = $data['noIndex'];
+        $seo->noFollow = $data['noFollow'];
+
+        return $seo;
+    }
+
+    /**
+     * Create a excerpt object by given data.
+     *
+     * @param array $data
+     *
+     * @return ExcerptOngrObject
+     */
+    private function createExcerptObject(array $data)
+    {
+        $excerpt = new ExcerptOngrObject();
+        $excerpt->title = $data['title'];
+        $excerpt->more = $data['more'];
+        $excerpt->description = $data['description'];
+        $excerpt->categories = $data['categories'];
+        $excerpt->tags = $this->tagManager->resolveTagNames($data['tags']);
+        $excerpt->title = $data['title'];
+        $excerpt->icon = $this->createMediaCollectionObject($data['icon']);
+        $excerpt->images = $this->createMediaCollectionObject($data['images']);
+
+        return $excerpt;
+    }
+
+    private function createMediaCollectionObject(array $data)
+    {
+        $mediaCollection = new MediaCollectionOngrObject();
+        if (array_key_exists('ids', $data)) {
+            $mediaCollection->ids = $data['ids'];
+        }
+        if (array_key_exists('displayOption', $data)) {
+            $mediaCollection->displayOption = $data['displayOption'];
+        }
+
+        return $mediaCollection;
     }
 }

@@ -80,7 +80,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $restHelper = new ListRestHelper($request);
 
         /** @var Manager $manager */
-        $manager = $this->get('es.manager');
+        $manager = $this->get('es.manager.default');
         $repository = $manager->getRepository(ArticleOngrDocument::class);
         $search = $repository->createSearch();
 

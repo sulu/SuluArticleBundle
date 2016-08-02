@@ -12,10 +12,13 @@
 namespace Sulu\Bundle\ArticleBundle\Document;
 
 use ONGR\ElasticsearchBundle\Annotation\Document;
+use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 
 /**
+ * Indexable document for articles.
+ *
  * @Document(type="article")
  */
 class ArticleOngrDocument
@@ -77,18 +80,18 @@ class ArticleOngrDocument
     protected $created;
 
     /**
-     * @var array
+     * @var ExcerptOngrObject
      *
-     * @Property(type="integer")
+     * @Embedded(class="SuluArticleBundle:ExcerptOngrObject")
      */
-    protected $categories;
+    protected $excerpt;
 
     /**
-     * @var array
+     * @var SeoOngrObject
      *
-     * @Property(type="integer")
+     * @Embedded(class="SuluArticleBundle:SeoOngrObject")
      */
-    protected $tags;
+    protected $seo;
 
     /**
      * @param string $uuid
@@ -291,49 +294,49 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns categories.
+     * Returns excerpt.
      *
-     * @return array
+     * @return ExcerptOngrObject
      */
-    public function getCategories()
+    public function getExcerpt()
     {
-        return $this->categories;
+        return $this->excerpt;
     }
 
     /**
-     * Set categories.
+     * Set excerpt.
      *
-     * @param array $categories
+     * @param ExcerptOngrObject $excerpt
      *
      * @return self
      */
-    public function setCategories($categories)
+    public function setExcerpt(ExcerptOngrObject $excerpt)
     {
-        $this->categories = $categories;
+        $this->excerpt = $excerpt;
 
         return $this;
     }
 
     /**
-     * Returns tags.
+     * Returns seo.
      *
-     * @return array
+     * @return SeoOngrObject
      */
-    public function getTags()
+    public function getSeo()
     {
-        return $this->tags;
+        return $this->seo;
     }
 
     /**
-     * Set tags.
+     * Set seo.
      *
-     * @param array $tags
+     * @param SeoOngrObject $seo
      *
      * @return self
      */
-    public function setTags($tags)
+    public function setSeo($seo)
     {
-        $this->tags = $tags;
+        $this->seo = $seo;
 
         return $this;
     }

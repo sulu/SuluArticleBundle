@@ -30,6 +30,7 @@ class ReindexCommand extends ContainerAwareCommand
     {
         $this->setName('sulu:article:index-rebuild')
             ->addArgument('locale', InputArgument::REQUIRED)
+            ->addOption('live', 'l', InputOption::VALUE_NONE)
             ->addOption('clear', null, InputOption::VALUE_NONE);
     }
 
@@ -38,7 +39,12 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
+        $id = 'sulu_article.elastic_search.article_indexer';
+        if ($input->getOption('live')) {
+            $id = 'sulu_article.elastic_search.article_live_indexer';
+        }
+
+        $indexer = $this->getContainer()->get($id);
         $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $query = $documentManager->createQuery(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article"'
