@@ -85,7 +85,7 @@
         <service id="sulu_article.content.data_provider.proxy_factory"
                  class="ProxyManager\Factory\LazyLoadingValueHolderFactory"/>
         <service id="sulu_article.content.data_provider" class="Sulu\Bundle\ArticleBundle\Content\ArticleDataProvider">
-            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
 

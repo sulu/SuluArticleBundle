@@ -21,6 +21,7 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
+use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\SmartContent\Configuration\Builder;
 use Sulu\Component\SmartContent\DataProviderInterface;
@@ -81,7 +82,7 @@ class ArticleDataProvider implements DataProviderInterface
      */
     public function getDefaultPropertyParameter()
     {
-        return [];
+        return ['type' => new PropertyParameter('type', null)];
     }
 
     /**
@@ -95,6 +96,10 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
+        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
+            $filters['type'] = $type;
+        }
+
         $result = [];
         $uuids = [];
         /** @var ArticleOngrDocument $document */
@@ -117,6 +122,10 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
+        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
+            $filters['type'] = $type;
+        }
+
         $result = [];
         $uuids = [];
         /** @var ArticleOngrDocument $document */
@@ -166,6 +175,11 @@ class ArticleDataProvider implements DataProviderInterface
         $this->addBoolQuery('categories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteCategoriesOperator', 'or');
         $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
+
+        if (array_key_exists('type', $filters)) {
+            $query->add(new TermQuery('type', $filters['type']));
+            ++$queriesCount;
+        }
 
         if (0 === $queriesCount) {
             $search->addQuery(new MatchAllQuery());
