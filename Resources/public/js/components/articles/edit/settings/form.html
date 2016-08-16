@@ -1,0 +1,39 @@
+<form id="settings-form" class="grid">
+    <div class="grid-row">
+        <div class="grid-col-6 form-group">
+            <label for="authored"><%= translations.authored %></label>
+
+            <div id="authored"
+                 data-mapper-property="authored"
+                 data-aura-component="input@husky"
+                 data-aura-skin="date"
+                 data-aura-instance-name="authored"
+                 data-aura-input-id="authored"
+                 data-type="husky-input"
+                 data-form="true"
+                 class="trigger-save-button"/>
+        </div>
+    </div>
+
+    <div class="grid-row section m-top-40" id="changelog-container" style="display: none;">
+        <h2 class="divider m-bottom-20" title="Shadow Section">
+            <%= translations.changelog %>
+        </h2>
+
+        <div class="grid">
+            <div class="grid-row">
+                <div class="grid-col-2"><%= translations.changed %></div>
+                <div class="grid-col-10" id="changed">
+                    <span class="name">...</span> (<span class="date">...</span>)
+                </div>
+            </div>
+
+            <div class="grid-row">
+                <div class="grid-col-2"><%= translations.created %></div>
+                <div class="grid-col-10" id="created">
+                    <span class="name">...</span> (<span class="date">...</span>)
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

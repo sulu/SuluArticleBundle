@@ -90,6 +90,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setTitle($document->getTitle());
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
+        $article->setAuthored($document->getAuthored());
         $article->setChanger($this->userManager->getFullNameByUserId($document->getChanger()));
         $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structure->getStructure()));

@@ -268,6 +268,9 @@ class ArticleController extends RestController implements ClassResourceInterface
             ]
         );
         $form->submit($data, false);
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
 
         if (!$form->isValid()) {
             throw new InvalidFormException($form);

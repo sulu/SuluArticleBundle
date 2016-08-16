@@ -141,6 +141,13 @@ class ArticleDocument implements
      */
     protected $published;
 
+    /**
+     * Timestamp of authoring (can be set by user).
+     *
+     * @var \DateTime
+     */
+    protected $authored;
+
     public function __construct()
     {
         $this->structure = new Structure();
@@ -398,5 +405,29 @@ class ArticleDocument implements
     public function getPublished()
     {
         return $this->published;
+    }
+
+    /**
+     * Set authored date-time.
+     *
+     * @param \DateTime $authored
+     *
+     * @return $this
+     */
+    public function setAuthored($authored)
+    {
+        $this->authored = $authored;
+
+        return $this;
+    }
+
+    /**
+     * Returns date-time of authoring this article.
+     *
+     * @return \DateTime
+     */
+    public function getAuthored()
+    {
+        return $this->authored;
     }
 }

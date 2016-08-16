@@ -31,7 +31,7 @@ class ArticleControllerTest extends SuluTestCase
     public function testPost($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
-        $client->request('POST', '/api/articles?locale=de', ['title' => $title, 'template' => $template]);
+        $client->request('POST', '/api/articles?locale=de', ['title' => $title, 'template' => $template, 'authored' => '2016-01-01']);
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -39,6 +39,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(self::$typeMap[$template], $response['type']);
         $this->assertEquals($template, $response['template']);
+        $this->assertEquals('2016-01-01T00:00:00+0100', $response['authored']);
 
         return $response;
     }
@@ -53,7 +54,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals($article, $response);
+
+        foreach ($article as $name => $value) {
+            $this->assertEquals($value, $response[$name]);
+        }
     }
 
     public function testPut($title = 'Sulu is awesome')
@@ -64,7 +68,7 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=de',
-            ['title' => $title, 'template' => 'default']
+            ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01']
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -72,6 +76,7 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
+        $this->assertEquals('2016-01-01T00:00:00+0100', $response['authored']);
     }
 
     public function testPutExtensions(

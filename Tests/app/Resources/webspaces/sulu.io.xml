@@ -31,9 +31,6 @@
         <portal>
             <name>Sulu CMF AT</name>
             <key>sulucmf_at</key>
-            <resource-locator>
-                <strategy>tree</strategy>
-            </resource-locator>
 
             <environments>
                 <environment type="prod">
