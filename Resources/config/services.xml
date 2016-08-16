@@ -81,6 +81,17 @@
             <tag name="sulu_route.defaults_provider"/>
         </service>
 
+        <!-- route-generator -->
+        <service id="sulu_article.route_generator.by_type"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByType">
+            <argument type="service" id="sulu_route.route_generator.by_schema"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+        </service>
+        <service id="sulu_article.route_generator.by_template"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByTemplate">
+            <argument type="service" id="sulu_route.route_generator.by_schema"/>
+        </service>
+
         <!-- content -->
         <service id="sulu_article.content.data_provider.proxy_factory"
                  class="ProxyManager\Factory\LazyLoadingValueHolderFactory"/>
