@@ -22,6 +22,7 @@ define([
         },
         translations: {
             authored: 'sulu_article.authored',
+            authors: 'sulu_article.authors',
             changelog: 'sulu.content.form.settings.changelog',
             changed: 'sulu.content.form.settings.changelog.changed',
             created: 'sulu.content.form.settings.changelog.created',
@@ -41,7 +42,16 @@ define([
          * @param {object} data
          */
         parseData: function(data) {
-            return data;
+            return {
+                authored: data.authored,
+                authors: _.map(data.authors, function(item) {
+                    return 'c' + item;
+                }),
+                creator: data.creator,
+                changer: data.changer,
+                created: data.created,
+                changed: data.changed
+            };
         },
 
         /**
@@ -80,6 +90,10 @@ define([
          * @param {object} action
          */
         save: function(data, action) {
+            data.authors = _.map(data.authors, function(item) {
+                return item.substr(1);
+            });
+
             this.sandbox.emit('sulu.articles.save', data, action);
         },
 
@@ -92,7 +106,7 @@ define([
          * @param {object} data
          */
         saved: function(data) {
-            this.data = data;
+            this.data = this.parseData(data);
         },
 
         /**
@@ -111,6 +125,7 @@ define([
 
         listenForChange: function() {
             this.sandbox.dom.on(this.formId, 'change keyup', this.setDirty.bind(this));
+            this.sandbox.on('sulu.content.changed', this.setDirty.bind(this));
             this.sandbox.on('husky.ckeditor.changed', this.setDirty.bind(this));
 
             this.updateChangelog(this.data);

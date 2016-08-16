@@ -28,10 +28,14 @@ class ArticleControllerTest extends SuluTestCase
         $this->initPhpcr();
     }
 
-    public function testPost($title = 'Test-Article', $template = 'default')
+    public function testPostWithoutAuthors($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
-        $client->request('POST', '/api/articles?locale=de', ['title' => $title, 'template' => $template, 'authored' => '2016-01-01']);
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            ['title' => $title, 'template' => $template, 'authored' => '2016-01-01']
+        );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -39,7 +43,29 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(self::$typeMap[$template], $response['type']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals('2016-01-01T00:00:00+0100', $response['authored']);
+        $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
+        $this->assertEquals([$this->getTestUserId()], $response['authors']);
+
+        return $response;
+    }
+
+    public function testPost($title = 'Test-Article', $template = 'default')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            ['title' => $title, 'template' => $template, 'authored' => '2016-01-01', 'authors' => [1, 2, 3]]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals($template, $response['template']);
+        $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
+        $this->assertEquals([1, 2, 3], $response['authors']);
 
         return $response;
     }
@@ -68,7 +94,7 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=de',
-            ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01']
+            ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01', 'authors' => [1, 3]]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -76,7 +102,8 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01T00:00:00+0100', $response['authored']);
+        $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
+        $this->assertEquals([1, 3], $response['authors']);
     }
 
     public function testPutExtensions(

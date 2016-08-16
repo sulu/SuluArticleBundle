@@ -14,6 +14,23 @@
                  class="trigger-save-button"/>
         </div>
     </div>
+    <div class="grid-row">
+        <div class="grid-col-12 form-group">
+            <label for="authors"><%= translations.authors %></label>
+
+            <div id="authors"
+                 data-mapper-property="authors"
+                 data-form="true"
+                 data-type="contact-selection"
+                 data-type-instance-name="authors"
+                 data-aura-component="contact-selection@sulucontact"
+                 data-aura-instance-name="authors"
+                 data-aura-contact="true"
+                 data-aura-account="false"
+                 data-aura-url="/admin/api/customers"
+                 data-aura-contact-url="/admin/api/contacts?flat=true&sortBy=lastName"/>
+        </div>
+    </div>
 
     <div class="grid-row section m-top-40" id="changelog-container" style="display: none;">
         <h2 class="divider m-bottom-20" title="Shadow Section">

@@ -101,6 +101,13 @@ class ArticleOngrDocument
     protected $authored;
 
     /**
+     * @var int[]
+     *
+     * @Property(type="integer")
+     */
+    protected $authors;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -368,6 +375,30 @@ class ArticleOngrDocument
     public function setAuthored(\DateTime $authored = null)
     {
         $this->authored = $authored;
+
+        return $this;
+    }
+
+    /**
+     * Returns authors.
+     *
+     * @return int[]
+     */
+    public function getAuthors()
+    {
+        return $this->authors;
+    }
+
+    /**
+     * Set authors.
+     *
+     * @param int[] $authors
+     *
+     * @return $this
+     */
+    public function setAuthors($authors)
+    {
+        $this->authors = $authors;
 
         return $this;
     }

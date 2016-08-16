@@ -148,6 +148,13 @@ class ArticleDocument implements
      */
     protected $authored;
 
+    /**
+     * Array of contact-ids which has authored this article.
+     *
+     * @var int[]
+     */
+    protected $authors = [];
+
     public function __construct()
     {
         $this->structure = new Structure();
@@ -414,7 +421,7 @@ class ArticleDocument implements
      *
      * @return $this
      */
-    public function setAuthored($authored)
+    public function setAuthored(\DateTime $authored = null)
     {
         $this->authored = $authored;
 
@@ -429,5 +436,29 @@ class ArticleDocument implements
     public function getAuthored()
     {
         return $this->authored;
+    }
+
+    /**
+     * Returns id of authors.
+     *
+     * @return int[]
+     */
+    public function getAuthors()
+    {
+        return $this->authors;
+    }
+
+    /**
+     * Set authors.
+     *
+     * @param int[] $authors
+     *
+     * @return $this
+     */
+    public function setAuthors($authors)
+    {
+        $this->authors = $authors;
+
+        return $this;
     }
 }
