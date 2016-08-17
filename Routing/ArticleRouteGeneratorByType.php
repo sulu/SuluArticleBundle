@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Routing;
 
+use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
 use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -54,7 +55,7 @@ class ArticleRouteGeneratorByType implements RouteGeneratorInterface
         );
 
         if (!array_key_exists($type, $options)) {
-            throw new \Exception(sprintf('Route-schema for type "%s" not configured!', $type));
+            throw new RouteSchemaNotFoundException($type, array_keys($options));
         }
 
         return $this->routeGenerator->generate($entity, ['route_schema' => $options[$type]]);
