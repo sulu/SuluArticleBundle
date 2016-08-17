@@ -94,6 +94,20 @@ class ArticleOngrDocument
     protected $seo;
 
     /**
+     * @var \DateTime
+     *
+     * @Property(type="date")
+     */
+    protected $authored;
+
+    /**
+     * @var int[]
+     *
+     * @Property(type="integer")
+     */
+    protected $authors;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -337,6 +351,54 @@ class ArticleOngrDocument
     public function setSeo($seo)
     {
         $this->seo = $seo;
+
+        return $this;
+    }
+
+    /**
+     * Returns authored.
+     *
+     * @return \DateTime
+     */
+    public function getAuthored()
+    {
+        return $this->authored;
+    }
+
+    /**
+     * Set authored date.
+     *
+     * @param \DateTime $authored
+     *
+     * @return $this
+     */
+    public function setAuthored(\DateTime $authored = null)
+    {
+        $this->authored = $authored;
+
+        return $this;
+    }
+
+    /**
+     * Returns authors.
+     *
+     * @return int[]
+     */
+    public function getAuthors()
+    {
+        return $this->authors;
+    }
+
+    /**
+     * Set authors.
+     *
+     * @param int[] $authors
+     *
+     * @return $this
+     */
+    public function setAuthors($authors)
+    {
+        $this->authors = $authors;
 
         return $this;
     }

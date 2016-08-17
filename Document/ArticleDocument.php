@@ -141,6 +141,20 @@ class ArticleDocument implements
      */
     protected $published;
 
+    /**
+     * Timestamp of authoring (can be set by user).
+     *
+     * @var \DateTime
+     */
+    protected $authored;
+
+    /**
+     * Array of contact-ids which has authored this article.
+     *
+     * @var int[]
+     */
+    protected $authors = [];
+
     public function __construct()
     {
         $this->structure = new Structure();
@@ -398,5 +412,53 @@ class ArticleDocument implements
     public function getPublished()
     {
         return $this->published;
+    }
+
+    /**
+     * Set authored date-time.
+     *
+     * @param \DateTime $authored
+     *
+     * @return $this
+     */
+    public function setAuthored(\DateTime $authored = null)
+    {
+        $this->authored = $authored;
+
+        return $this;
+    }
+
+    /**
+     * Returns date-time of authoring this article.
+     *
+     * @return \DateTime
+     */
+    public function getAuthored()
+    {
+        return $this->authored;
+    }
+
+    /**
+     * Returns id of authors.
+     *
+     * @return int[]
+     */
+    public function getAuthors()
+    {
+        return $this->authors;
+    }
+
+    /**
+     * Set authors.
+     *
+     * @param int[] $authors
+     *
+     * @return $this
+     */
+    public function setAuthors($authors)
+    {
+        $this->authors = $authors;
+
+        return $this;
     }
 }

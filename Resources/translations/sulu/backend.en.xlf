@@ -26,6 +26,14 @@
                 <source>sulu_article.edit.details</source>
                 <target>Details</target>
             </trans-unit>
+            <trans-unit id="7" resname="sulu_article.authored">
+                <source>sulu_article.authored</source>
+                <target>Authored at</target>
+            </trans-unit>
+            <trans-unit id="8" resname="sulu_article.authors">
+                <source>sulu_article.authors</source>
+                <target>Authors</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

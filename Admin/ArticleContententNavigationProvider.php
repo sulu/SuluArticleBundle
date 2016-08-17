@@ -43,6 +43,13 @@ class ArticleContententNavigationProvider implements ContentNavigationProviderIn
         $excerpt->setComponent('articles/edit/excerpt@suluarticle');
         $excerpt->setDisplay(['edit']);
 
-        return [$details, $seo, $excerpt];
+        $settings = new ContentNavigationItem('content-navigation.contents.settings');
+        $settings->setId('settings');
+        $settings->setPosition(40);
+        $settings->setAction('settings');
+        $settings->setComponent('articles/edit/settings@suluarticle');
+        $settings->setDisplay(['edit']);
+
+        return [$details, $seo, $excerpt, $settings];
     }
 }

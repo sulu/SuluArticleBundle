@@ -24,7 +24,6 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
-use Sulu\Component\Rest\ListBuilder\ListRestHelper;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,7 +76,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function cgetAction(Request $request)
     {
-        $restHelper = new ListRestHelper($request);
+        $restHelper = $this->get('sulu_core.list_rest_helper');
 
         /** @var Manager $manager */
         $manager = $this->get('es.manager.default');
@@ -269,6 +268,11 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
         $form->submit($data, false);
 
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
+        $document->setAuthors($this->getAuthors($data));
+
         if (!$form->isValid()) {
             throw new InvalidFormException($form);
         }
@@ -281,6 +285,22 @@ class ArticleController extends RestController implements ClassResourceInterface
                 'clear_missing_content' => false,
             ]
         );
+    }
+
+    /**
+     * Returns authors or current user.
+     *
+     * @param array $data
+     *
+     * @return int[]
+     */
+    private function getAuthors(array $data)
+    {
+        if (!array_key_exists('authors', $data)) {
+            return [$this->getUser()->getContact()->getId()];
+        }
+
+        return $data['authors'];
     }
 
     /**
