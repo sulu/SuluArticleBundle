@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore', 'config'], function(_, Config) {
+define(['underscore'], function(_) {
 
     'use strict';
 
@@ -18,7 +18,6 @@ define(['underscore', 'config'], function(_, Config) {
 
         templates: {
             list: [
-                '<div class="tabs-container"></div>',
                 '<div class="list-toolbar-container"></div>',
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
