@@ -27,4 +27,6 @@ ongr_elasticsearch:
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            route_schema: /articles/{object.getTitle()}
+            service_id: sulu_route.route_generator.by_schema
+            options:
+                route_schema: /articles/{object.getTitle()}
