@@ -15,6 +15,7 @@ matrix:
     - php: 7.0
 
 before_install:
+  - phpenv config-add Tests/travis.php.ini
   - composer self-update
 
 install:
@@ -23,6 +24,8 @@ install:
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
   - ./Tests/app/console sulu:document:initialize
+  - ./Tests/app/console ongr:es:index:create -m default
   - ./Tests/app/console ongr:es:index:create -m live
+
 script:
   - ./vendor/bin/phpunit

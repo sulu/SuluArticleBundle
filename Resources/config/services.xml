@@ -91,5 +91,19 @@
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
+        <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
+            <argument type="service" id="es.manager.live"/>
+
+            <tag name="sulu.teaser.provider" alias="article"/>
+        </service>
+
+        <!-- serialization -->
+        <service id="sulu_article.serializer.event_subscriber"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\ArticleOngrDocumentSerializeSubscriber">
+            <argument>%sulu_articles.types%</argument>
+
+            <tag name="jms_serializer.event_subscriber" />
+            <tag name="sulu.context" context="admin"/>
+        </service>
     </services>
 </container>

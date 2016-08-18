@@ -34,6 +34,10 @@
                 <source>sulu_article.authors</source>
                 <target>Autoren</target>
             </trans-unit>
+            <trans-unit id="9" resname="sulu_article.teaser">
+                <source>sulu_article.teaser</source>
+                <target>Artikel</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

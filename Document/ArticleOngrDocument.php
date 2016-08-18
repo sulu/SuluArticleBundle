@@ -49,6 +49,13 @@ class ArticleOngrDocument
      *
      * @Property(type="string")
      */
+    protected $routePath;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
     protected $type;
 
     /**
@@ -106,6 +113,20 @@ class ArticleOngrDocument
      * @Property(type="integer")
      */
     protected $authors;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
+    protected $teaserDescription = '';
+
+    /**
+     * @var int
+     *
+     * @Property(type="integer")
+     */
+    protected $teaserMediaId;
 
     /**
      * @param string $uuid
@@ -185,6 +206,26 @@ class ArticleOngrDocument
         $this->title = $title;
 
         return $this;
+    }
+
+    /**
+     * Returns route-path.
+     *
+     * @return string
+     */
+    public function getRoutePath()
+    {
+        return $this->routePath;
+    }
+
+    /**
+     * Set route-path.
+     *
+     * @param string $routePath
+     */
+    public function setRoutePath($routePath)
+    {
+        $this->routePath = $routePath;
     }
 
     /**
@@ -401,5 +442,51 @@ class ArticleOngrDocument
         $this->authors = $authors;
 
         return $this;
+    }
+
+    /**
+     * Returns teaser-description.
+     *
+     * @return string
+     */
+    public function getTeaserDescription()
+    {
+        return $this->teaserDescription;
+    }
+
+    /**
+     * Set teaser-description.
+     *
+     * @param string $teaserDescription
+     *
+     * @return $this
+     */
+    public function setTeaserDescription($teaserDescription)
+    {
+        $this->teaserDescription = $teaserDescription;
+
+        return $this;
+    }
+
+    /**
+     * Returns teaser-media-id.
+     *
+     * @return int
+     */
+    public function getTeaserMediaId()
+    {
+        return $this->teaserMediaId;
+    }
+
+    /**
+     * Set teaser-media-id.
+     *
+     * @param int $teaserMediaId
+     *
+     * @return int
+     */
+    public function setTeaserMediaId($teaserMediaId)
+    {
+        $this->teaserMediaId = $teaserMediaId;
     }
 }

@@ -26,7 +26,7 @@ class MediaCollectionOngrObject
      *
      * @Property(type="integer")
      */
-    public $ids;
+    public $ids = [];
 
     /**
      * @var string
