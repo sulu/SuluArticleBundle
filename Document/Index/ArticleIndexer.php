@@ -17,7 +17,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\MediaCollectionOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
-use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -27,7 +27,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleIndexer implements IndexerInterface
 {
-    use TypeTrait;
+    use ArticleTypeTrait;
 
     /**
      * @var StructureManagerInterface

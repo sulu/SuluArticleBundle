@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Exception;
 
 /**
- * Will be thrown when the requested schema is not configured
+ * Will be thrown when the requested schema is not configured.
  */
 class RouteSchemaNotFoundException extends \Exception
 {

@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\JsConfigInterface;
-use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleJsConfig implements JsConfigInterface
 {
-    use TypeTrait;
+    use ArticleTypeTrait;
 
     /**
      * @var StructureManagerInterface

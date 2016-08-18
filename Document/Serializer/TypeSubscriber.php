@@ -15,7 +15,7 @@ use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -23,7 +23,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class TypeSubscriber implements EventSubscriberInterface
 {
-    use TypeTrait;
+    use ArticleTypeTrait;
 
     /**
      * @var StructureManagerInterface

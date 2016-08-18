@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Routing;
 
 use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
-use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,7 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticleRouteGeneratorByType implements RouteGeneratorInterface
 {
-    use TypeTrait;
+    use ArticleTypeTrait;
 
     /**
      * @var RouteGeneratorInterface
