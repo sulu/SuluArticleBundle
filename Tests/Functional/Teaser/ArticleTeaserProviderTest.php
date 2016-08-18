@@ -35,28 +35,48 @@ class ArticleTeaserProviderTest extends SuluTestCase
 
     public function testFind()
     {
-        $item1 = $this->createArticle();
-        $item2 = $this->createArticle();
+        $item1 = $this->createArticle('1');
+        $item2 = $this->createArticle('2');
 
         /** @var TeaserProviderInterface $provider */
         $provider = $this->getContainer()->get('sulu_article.teaser.provider');
 
-        $result = $provider->find([$item2['id'], $item1['id']], 'de');
+        $result = $provider->find([$item1['id'], $item2['id']], 'de');
 
         $this->assertCount(2, $result);
-        $this->assertEquals($item2['id'], $result[0]->getId());
-        $this->assertEquals($item2['title'], $result[0]->getTitle());
-        $this->assertEquals($item1['id'], $result[1]->getId());
+        $this->assertEquals($item1['id'], $result[0]->getId());
+        $this->assertEquals($item1['title'], $result[0]->getTitle());
+        $this->assertEquals($item2['id'], $result[1]->getId());
         $this->assertEquals($item2['title'], $result[1]->getTitle());
     }
 
-    private function createArticle($title = 'Test-Article', $template = 'default')
+    public function testFindWithFallback()
+    {
+        $item = $this->createArticle(
+            '1',
+            'default_fallback',
+            ['medias' => ['ids' => [5, 4, 3], 'display_options' => 'top'], 'description' => 'Sulu is awesome']
+        );
+
+        /** @var TeaserProviderInterface $provider */
+        $provider = $this->getContainer()->get('sulu_article.teaser.provider');
+
+        $result = $provider->find([$item['id']], 'de');
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($item['id'], $result[0]->getId());
+        $this->assertEquals($item['title'], $result[0]->getTitle());
+        $this->assertEquals($item['description'], $result[0]->getDescription());
+        $this->assertEquals(5, $result[0]->getMediaId());
+    }
+
+    private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
-            ['title' => $title, 'template' => $template]
+            array_merge($data, ['title' => $title, 'template' => $template])
         );
 
         return json_decode($client->getResponse()->getContent(), true);

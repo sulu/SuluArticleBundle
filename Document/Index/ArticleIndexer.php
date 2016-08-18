@@ -100,6 +100,20 @@ class ArticleIndexer implements IndexerInterface
         $article->setExcerpt($this->createExcerptObject($extensions['excerpt']));
         $article->setSeo($this->createSeoObject($extensions['seo']));
 
+        if ($structure->hasTag('sulu.teaser.description')) {
+            $descriptionProperty = $structure->getPropertyByTagName('sulu.teaser.description');
+            $article->setTeaserDescription(
+                $document->getStructure()->getProperty($descriptionProperty->getName())->getValue()
+            );
+        }
+        if ($structure->hasTag('sulu.teaser.media')) {
+            $mediaProperty = $structure->getPropertyByTagName('sulu.teaser.media');
+            $mediaData = $document->getStructure()->getProperty($mediaProperty->getName())->getValue();
+            if (null !== $mediaData && array_key_exists('ids', $mediaData)) {
+                $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
+            }
+        }
+
         $this->manager->persist($article);
     }
 

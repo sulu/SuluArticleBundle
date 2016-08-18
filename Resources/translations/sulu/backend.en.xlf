@@ -30,10 +30,10 @@
                 <source>sulu_article.authored</source>
                 <target>Authored at</target>
             </trans-unit>
-            </trans-unit>
             <trans-unit id="8" resname="sulu_article.authors">
                 <source>sulu_article.authors</source>
                 <target>Authors</target>
+            </trans-unit>
             <trans-unit id="9" resname="sulu_article.teaser">
                 <source>sulu_article.teaser</source>
                 <target>Article</target>

@@ -85,10 +85,10 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 $item->getType(),
                 $item->getLocale(),
                 ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
-                $excerpt->description,
+                ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
                 $excerpt->more,
                 $item->getRoutePath(),
-                reset($excerpt->images->ids) ?: null
+                reset($excerpt->images->ids) ?: $item->getTeaserMediaId()
             );
         }
 
