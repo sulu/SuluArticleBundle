@@ -87,13 +87,13 @@
             <argument type="service" id="route.generator.route_generator"/>
             <argument type="service" id="sulu_content.structure.factory"/>
 
-            <tag name="sulu.route_generator" alias="by_type"/>
+            <tag name="sulu.route_generator" alias="type"/>
         </service>
         <service id="sulu_article.route_generator.by_template"
                  class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByTemplate">
             <argument type="service" id="route.generator.route_generator"/>
 
-            <tag name="sulu.route_generator" alias="by_template"/>
+            <tag name="sulu.route_generator" alias="template"/>
         </service>
 
         <!-- content -->
