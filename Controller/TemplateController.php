@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
-use Sulu\Bundle\ArticleBundle\Util\TypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class TemplateController extends Controller
 {
-    use TypeTrait;
+    use ArticleTypeTrait;
 
     /**
      * Returns template for given article type.

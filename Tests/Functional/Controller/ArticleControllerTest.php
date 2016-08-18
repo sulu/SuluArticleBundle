@@ -80,7 +80,6 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
-
         foreach ($article as $name => $value) {
             $this->assertEquals($value, $response[$name]);
         }

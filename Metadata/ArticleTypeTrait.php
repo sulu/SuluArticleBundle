@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Util;
+namespace Sulu\Bundle\ArticleBundle\Metadata;
 
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -17,7 +17,7 @@ use Sulu\Component\Content\Metadata\StructureMetadata;
 /**
  * Encapsulates function to extract the type from structure-metadata.
  */
-trait TypeTrait
+trait ArticleTypeTrait
 {
     /**
      * Returns type for given structure-metadata.
