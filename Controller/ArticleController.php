@@ -14,8 +14,8 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\FuzzyQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
@@ -83,9 +83,9 @@ class ArticleController extends RestController implements ClassResourceInterface
         $repository = $manager->getRepository(ArticleOngrDocument::class);
         $search = $repository->createSearch();
 
-        if (null !== ($searchPattern = $restHelper->getSearchPattern())) {
+        if (!empty($searchPattern = $restHelper->getSearchPattern())) {
             foreach ($restHelper->getSearchFields() as $searchField) {
-                $search->addQuery(new FuzzyQuery($searchField, $searchPattern));
+                $search->addQuery(new WildcardQuery($searchField, '*' . $searchPattern . '*'));
             }
         }
 

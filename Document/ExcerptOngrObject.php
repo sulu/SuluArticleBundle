@@ -25,21 +25,45 @@ class ExcerptOngrObject
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $title;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $more;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $description;
 

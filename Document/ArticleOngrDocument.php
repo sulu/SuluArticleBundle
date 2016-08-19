@@ -40,14 +40,30 @@ class ArticleOngrDocument
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     protected $title;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     protected $routePath;
 
@@ -61,14 +77,30 @@ class ArticleOngrDocument
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     protected $changer;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     protected $creator;
 
