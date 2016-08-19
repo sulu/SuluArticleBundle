@@ -82,7 +82,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             $excerpt = $item->getExcerpt();
             $result[] = new Teaser(
                 $item->getUuid(),
-                $item->getType(),
+                'article',
                 $item->getLocale(),
                 ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
                 ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
