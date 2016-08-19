@@ -24,28 +24,60 @@ class SeoOngrObject
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $title;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $description;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $keywords;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
     public $canonicalUrl;
 
