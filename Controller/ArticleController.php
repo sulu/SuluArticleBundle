@@ -270,6 +270,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
         $form->submit($data, false);
 
+        $document->setAuthored(new \DateTime());
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
         }
