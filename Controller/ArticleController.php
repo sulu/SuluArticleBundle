@@ -52,6 +52,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'changer' => new FieldDescriptor('changer', 'sulu_article.list.changer', false, false),
             'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
             'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
+            'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
         ];
     }
 
