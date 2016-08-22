@@ -88,7 +88,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
                 $excerpt->more,
                 $item->getRoutePath(),
-                reset($excerpt->images->ids) ?: $item->getTeaserMediaId()
+                reset($excerpt->images->ids) ?: $item->getTeaserMediaId(),
+                [
+                    'structureType' => $item->getStructureType(),
+                    'type' => $item->getType(),
+                ]
             );
         }
 

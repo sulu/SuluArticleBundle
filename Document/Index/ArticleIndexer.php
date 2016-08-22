@@ -95,6 +95,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanger($this->userManager->getFullNameByUserId($document->getChanger()));
         $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structure->getStructure()));
+        $article->setStructureType($document->getStructureType());
 
         $extensions = $document->getExtensionsData()->toArray();
         $article->setExcerpt($this->createExcerptObject($extensions['excerpt']));

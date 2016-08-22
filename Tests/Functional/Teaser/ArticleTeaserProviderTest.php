@@ -36,7 +36,7 @@ class ArticleTeaserProviderTest extends SuluTestCase
     public function testFind()
     {
         $item1 = $this->createArticle('1');
-        $item2 = $this->createArticle('2');
+        $item2 = $this->createArticle('2', 'simple');
 
         /** @var TeaserProviderInterface $provider */
         $provider = $this->getContainer()->get('sulu_article.teaser.provider');
@@ -48,6 +48,9 @@ class ArticleTeaserProviderTest extends SuluTestCase
         $this->assertEquals($item1['title'], $result[0]->getTitle());
         $this->assertEquals($item2['id'], $result[1]->getId());
         $this->assertEquals($item2['title'], $result[1]->getTitle());
+
+        $this->assertEquals(['structureType' => 'default', 'type' => 'blog'], $result[0]->getAttributes());
+        $this->assertEquals(['structureType' => 'simple', 'type' => 'video'], $result[1]->getAttributes());
     }
 
     public function testFindWithFallback()

@@ -87,6 +87,21 @@ class ArticleOngrDocument
      *    }
      * )
      */
+    protected $structureType;
+
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
+     */
     protected $changer;
 
     /**
@@ -280,6 +295,30 @@ class ArticleOngrDocument
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Returns structure-type.
+     *
+     * @return string
+     */
+    public function getStructureType()
+    {
+        return $this->structureType;
+    }
+
+    /**
+     * Set structure-type.
+     *
+     * @param string $structureType
+     *
+     * @return $this
+     */
+    public function setStructureType($structureType)
+    {
+        $this->structureType = $structureType;
 
         return $this;
     }
