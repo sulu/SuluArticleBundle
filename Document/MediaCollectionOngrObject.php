@@ -34,4 +34,9 @@ class MediaCollectionOngrObject
      * @Property(type="string")
      */
     public $displayOption;
+
+    public function getFirst()
+    {
+        return reset($this->ids) ?: null;
+    }
 }
