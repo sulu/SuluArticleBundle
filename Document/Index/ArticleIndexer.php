@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\MediaCollectionOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -50,21 +51,29 @@ class ArticleIndexer implements IndexerInterface
     private $tagManager;
 
     /**
+     * @var MediaManagerInterface
+     */
+    private $mediaManager;
+
+    /**
      * @param StructureManagerInterface $structureManager
      * @param UserManager $userManager
      * @param Manager $manager
      * @param TagManagerInterface $tagManager
+     * @param MediaManagerInterface $mediaManager
      */
     public function __construct(
         StructureManagerInterface $structureManager,
         UserManager $userManager,
         Manager $manager,
-        TagManagerInterface $tagManager
+        TagManagerInterface $tagManager,
+        MediaManagerInterface $mediaManager
     ) {
         $this->structureManager = $structureManager;
         $this->userManager = $userManager;
         $this->manager = $manager;
         $this->tagManager = $tagManager;
+        $this->mediaManager = $mediaManager;
     }
 
     /**
@@ -99,7 +108,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setStructureType($document->getStructureType());
 
         $extensions = $document->getExtensionsData()->toArray();
-        $article->setExcerpt($this->createExcerptObject($extensions['excerpt']));
+        $article->setExcerpt($this->createExcerptObject($extensions['excerpt'], $document->getLocale()));
         $article->setSeo($this->createSeoObject($extensions['seo']));
 
         if ($structure->hasTag('sulu.teaser.description')) {
@@ -164,10 +173,11 @@ class ArticleIndexer implements IndexerInterface
      * Create a excerpt object by given data.
      *
      * @param array $data
+     * @param string $locale
      *
      * @return ExcerptOngrObject
      */
-    private function createExcerptObject(array $data)
+    private function createExcerptObject(array $data, $locale)
     {
         $excerpt = new ExcerptOngrObject();
         $excerpt->title = $data['title'];
@@ -176,21 +186,18 @@ class ArticleIndexer implements IndexerInterface
         $excerpt->categories = $data['categories'];
         $excerpt->tags = $this->tagManager->resolveTagNames($data['tags']);
         $excerpt->title = $data['title'];
-        $excerpt->icon = $this->createMediaCollectionObject($data['icon']);
-        $excerpt->images = $this->createMediaCollectionObject($data['images']);
+        $excerpt->icon = $this->createMediaCollectionObject($data['icon'], $locale);
+        $excerpt->images = $this->createMediaCollectionObject($data['images'], $locale);
 
         return $excerpt;
     }
 
-    private function createMediaCollectionObject(array $data)
+    private function createMediaCollectionObject(array $data, $locale)
     {
+        $medias = $this->mediaManager->getByIds($data['ids'], $locale);
+
         $mediaCollection = new MediaCollectionOngrObject();
-        if (array_key_exists('ids', $data)) {
-            $mediaCollection->ids = $data['ids'];
-        }
-        if (array_key_exists('displayOption', $data)) {
-            $mediaCollection->displayOption = $data['displayOption'];
-        }
+        $mediaCollection->setData($medias, $data['displayOption']);
 
         return $mediaCollection;
     }

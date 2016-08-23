@@ -82,14 +82,14 @@ class ExcerptOngrObject
     public $tags;
 
     /**
-     * @var MediaCollectionOngrObject
+     * @var MediaCollectionOngrObject|MediaOngrObject[]
      *
      * @Embedded(class="SuluArticleBundle:MediaCollectionOngrObject")
      */
     public $icon;
 
     /**
-     * @var MediaCollectionOngrObject
+     * @var MediaCollectionOngrObject|MediaOngrObject[]
      *
      * @Embedded(class="SuluArticleBundle:MediaCollectionOngrObject")
      */
