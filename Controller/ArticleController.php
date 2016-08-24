@@ -164,8 +164,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $action = $request->get('action');
         $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
         $locale = $this->getRequestParameter($request, 'locale', true);
+        $data = $request->request->all();
 
-        $this->persistDocument($request->request->all(), $document, $locale);
+        $document->setAuthored(new \DateTime());
+        $document->setAuthors($this->getAuthors($data));
+
+        $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
@@ -226,8 +230,8 @@ class ArticleController extends RestController implements ClassResourceInterface
         foreach ($ids as $id) {
             $document = $documentManager->find($id);
             $documentManager->remove($document);
+            $documentManager->flush();
         }
-        $documentManager->flush();
 
         return $this->handleView($this->view(null));
     }
@@ -270,12 +274,6 @@ class ArticleController extends RestController implements ClassResourceInterface
             ]
         );
         $form->submit($data, false);
-
-        $document->setAuthored(new \DateTime());
-        if (array_key_exists('authored', $data)) {
-            $document->setAuthored(new \DateTime($data['authored']));
-        }
-        $document->setAuthors($this->getAuthors($data));
 
         if (!$form->isValid()) {
             throw new InvalidFormException($form);
