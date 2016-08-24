@@ -167,6 +167,9 @@ class ArticleController extends RestController implements ClassResourceInterface
         $data = $request->request->all();
 
         $document->setAuthored(new \DateTime());
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
         $document->setAuthors($this->getAuthors($data));
 
         $this->persistDocument($data, $document, $locale);
@@ -192,6 +195,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
+        $data = $request->request->all();
 
         $document = $this->getDocumentManager()->find(
             $uuid,
@@ -204,7 +208,12 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
 
-        $this->persistDocument($request->request->all(), $document, $locale);
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
+        $document->setAuthors($this->getAuthors($data));
+
+        $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
@@ -299,7 +308,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getAuthors(array $data)
     {
         if (!array_key_exists('authors', $data)) {
-            return [$this->getUser()->getContact()->getId()];
+            return [$this->getUser()->getId()];
         }
 
         return $data['authors'];
