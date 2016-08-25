@@ -194,10 +194,12 @@ class ArticleIndexer implements IndexerInterface
 
     private function createMediaCollectionObject(array $data, $locale)
     {
-        $medias = $this->mediaManager->getByIds($data['ids'], $locale);
-
         $mediaCollection = new MediaCollectionOngrObject();
-        $mediaCollection->setData($medias, $data['displayOption']);
+
+        if (array_key_exists('ids', $data)) {
+            $medias = $this->mediaManager->getByIds($data['ids'], $locale);
+            $mediaCollection->setData($medias, $data['displayOption']);
+        }
 
         return $mediaCollection;
     }

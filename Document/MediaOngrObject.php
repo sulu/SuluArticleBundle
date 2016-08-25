@@ -58,7 +58,11 @@ class MediaOngrObject
     public $url;
 
     /**
+     * Set data.
+     *
      * @param Media $media
+     *
+     * @return $this
      */
     public function setData(Media $media)
     {
@@ -67,9 +71,13 @@ class MediaOngrObject
         $this->setFormats($media->getFormats());
         $this->url = $media->getUrl();
         $this->copyright = $media->getCopyright();
+
+        return $this;
     }
 
     /**
+     * Get formats.
+     *
      * @return string
      */
     public function getFormats()
@@ -78,6 +86,8 @@ class MediaOngrObject
     }
 
     /**
+     * Set formats.
+     *
      * @param \string[] $formats
      *
      * @return $this
@@ -94,6 +104,8 @@ class MediaOngrObject
     }
 
     /**
+     * Get thumbnails.
+     *
      * @return array
      */
     public function getThumbnails()

@@ -12,6 +12,12 @@
 namespace Functional\Controller;
 
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
+use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
+use Sulu\Bundle\MediaBundle\Entity\Collection;
+use Sulu\Bundle\MediaBundle\Entity\CollectionType;
+use Sulu\Bundle\MediaBundle\Entity\Media;
+use Sulu\Bundle\MediaBundle\Entity\MediaType;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
 class ArticleControllerTest extends SuluTestCase
@@ -26,6 +32,11 @@ class ArticleControllerTest extends SuluTestCase
         parent::setUp();
 
         $this->initPhpcr();
+
+        $collectionTypes = new LoadCollectionTypes();
+        $collectionTypes->load($this->getEntityManager());
+        $mediaTypes = new LoadMediaTypes();
+        $mediaTypes->load($this->getEntityManager());
     }
 
     public function testPostWithoutAuthors($title = 'Test-Article', $template = 'default')
@@ -44,7 +55,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(self::$typeMap[$template], $response['type']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals([$this->getTestUserId()], $response['authors']);
+        $this->assertEquals([$this->getTestUser()->getContact()->getId()], $response['authors']);
 
         return $response;
     }
@@ -137,6 +148,11 @@ class ArticleControllerTest extends SuluTestCase
             ],
         ]
     ) {
+        $media = $this->createMedia();
+
+        $extensions['excerpt']['icon']['ids'] = [$media->getId()];
+        $extensions['excerpt']['images']['ids'] = [$media->getId()];
+
         $article = $this->testPost();
 
         $client = $this->createAuthenticatedClient();
@@ -362,6 +378,24 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
+    }
+
+    /**
+     * @return Media
+     */
+    private function createMedia()
+    {
+        $collection = new Collection();
+        $collection->setType($this->getEntityManager()->getReference(CollectionType::class, 1));
+        $media = new Media();
+        $media->setType($this->getEntityManager()->getReference(MediaType::class, 1));
+        $media->setCollection($collection);
+
+        $this->getEntityManager()->persist($collection);
+        $this->getEntityManager()->persist($media);
+        $this->getEntityManager()->flush();
+
+        return $media;
     }
 
     private function purgeIndex()
