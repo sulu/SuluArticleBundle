@@ -31,6 +31,7 @@
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="es.manager.default"/>
             <argument type="service" id="sulu_tag.tag_manager"/>
+            <argument type="service" id="sulu_media.media_manager"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -38,6 +39,7 @@
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_tag.tag_manager"/>
+            <argument type="service" id="sulu_media.media_manager"/>
         </service>
 
         <!-- document -->
