@@ -66,7 +66,7 @@ class MediaCollectionOngrObject implements \Iterator, \ArrayAccess
         $this->medias = new Collection();
 
         foreach ($medias as $media) {
-            $this->ids = $media->getId();
+            $this->ids[] = $media->getId();
 
             $mediaObject = new MediaOngrObject();
             $mediaObject->setData($media);
