@@ -17,6 +17,7 @@ use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
+use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
@@ -82,11 +83,12 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         return [
             Events::HYDRATE => [['handleHydrate', -500]],
-            Events::PERSIST => [['handleRoute', 0], ['handleIndex', -500]],
+            Events::PERSIST => [['handleRoute', 0], ['handleRouteUpdate', 0], ['handleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::PUBLISH => 'handleIndexLive',
             Events::UNPUBLISH => 'handleRemoveLive',
+            Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
 
@@ -120,6 +122,27 @@ class ArticleSubscriber implements EventSubscriberInterface
         $document->setUuid($event->getNode()->getIdentifier());
 
         $route = $this->routeManager->create($document);
+        $this->entityManager->persist($route);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Update route for article-document if route-path was changed.
+     *
+     * @param PersistEvent $event
+     */
+    public function handleRouteUpdate(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument
+            || null === $document->getRoute()
+            || null === ($routePath = $event->getOption('route_path'))
+        ) {
+            return;
+        }
+
+        $route = $this->routeManager->update($document, $routePath);
+        $document->setRoutePath($route->getPath());
         $this->entityManager->persist($route);
         $this->entityManager->flush();
     }
@@ -221,5 +244,16 @@ class ArticleSubscriber implements EventSubscriberInterface
                 'property' => 'authors',
             ]
         );
+    }
+
+    /**
+     * Add route-path to options.
+     *
+     * @param ConfigureOptionsEvent $event
+     */
+    public function configureOptions(ConfigureOptionsEvent $event)
+    {
+        $options = $event->getOptions();
+        $options->setDefaults(['route_path' => null]);
     }
 }

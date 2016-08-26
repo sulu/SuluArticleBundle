@@ -153,6 +153,11 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
                 options: this.options
             }));
 
+            if (!this.data.id) {
+                // route-path will be generator on post-request
+                this.$find('#routePath').parent().remove();
+            }
+
             this.createForm(this.data).then(function() {
                 this.changeTemplateDropdownHandler();
             }.bind(this));
