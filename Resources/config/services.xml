@@ -69,11 +69,12 @@
             <!-- This needs to happen after the content repository has been initialized !-->
             <tag name="sulu_document_manager.initializer" priority="-127"/>
         </service>
-        <service id="sulu_article.serializer.type" class="Sulu\Bundle\ArticleBundle\Document\Serializer\TypeSubscriber">
+        <service id="sulu_article.serializer.type"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu.content.type_manager"/>
 
             <tag name="jms_serializer.event_subscriber" />
-            <tag name="sulu.context" context="admin"/>
         </service>
         <service id="sulu_article.routing.default_provider"
                  class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider">
