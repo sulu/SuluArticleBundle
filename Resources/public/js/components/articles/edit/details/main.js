@@ -215,8 +215,6 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             }.bind(this));
 
             this.sandbox.dom.on(this.formId, 'form-add', function(e, propertyName, data, index) {
-                this.createConfiguration(e.currentTarget);
-
                 var $elements = this.sandbox.dom.children(this.$find('[data-mapper-property="' + propertyName + '"]')),
                     $element = (index !== undefined && $elements.length > index) ? $elements[index] : this.sandbox.dom.last($elements);
 
