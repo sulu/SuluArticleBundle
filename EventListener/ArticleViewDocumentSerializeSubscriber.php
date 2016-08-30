@@ -14,12 +14,12 @@ namespace Sulu\Bundle\ArticleBundle\EventListener;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 
 /**
- * Append type translation to serialized article-ongr document.
+ * Append type translation to serialized article-view document.
  */
-class ArticleOngrDocumentSerializeSubscriber implements EventSubscriberInterface
+class ArticleViewDocumentSerializeSubscriber implements EventSubscriberInterface
 {
     /**
      * @var array
@@ -59,7 +59,7 @@ class ArticleOngrDocumentSerializeSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!($article instanceof ArticleOngrDocumentInterface)) {
+        if (!($article instanceof ArticleViewDocumentInterface)) {
             return;
         }
 

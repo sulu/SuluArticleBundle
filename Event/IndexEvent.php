@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Event;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -23,21 +23,21 @@ class IndexEvent extends Event
     /**
      * @var ArticleDocument
      */
-    private $article;
+    private $document;
 
     /**
-     * @var ArticleOngrDocumentInterface
+     * @var ArticleViewDocumentInterface
      */
-    private $ongrDocument;
+    private $viewDocument;
 
     /**
-     * @param ArticleDocument $article
-     * @param ArticleOngrDocumentInterface $ongrDocument
+     * @param ArticleDocument $document
+     * @param ArticleViewDocumentInterface $viewDocument
      */
-    public function __construct(ArticleDocument $article, ArticleOngrDocumentInterface $ongrDocument)
+    public function __construct(ArticleDocument $document, ArticleViewDocumentInterface $viewDocument)
     {
-        $this->article = $article;
-        $this->ongrDocument = $ongrDocument;
+        $this->document = $document;
+        $this->viewDocument = $viewDocument;
     }
 
     /**
@@ -45,18 +45,18 @@ class IndexEvent extends Event
      *
      * @return ArticleDocument
      */
-    public function getArticle()
+    public function getDocument()
     {
-        return $this->article;
+        return $this->document;
     }
 
     /**
-     * Returns ongr-document.
+     * Returns view-document.
      *
-     * @return ArticleOngrDocumentInterface
+     * @return ArticleViewDocumentInterface
      */
-    public function getOngrDocument()
+    public function getViewDocument()
     {
-        return $this->ongrDocument;
+        return $this->viewDocument;
     }
 }

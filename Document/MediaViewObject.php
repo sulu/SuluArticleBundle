@@ -20,7 +20,7 @@ use Sulu\Bundle\MediaBundle\Api\Media;
  *
  * @Object
  */
-class MediaOngrObject
+class MediaViewObject
 {
     /**
      * @var int

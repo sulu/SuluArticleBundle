@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 /**
  * Interface for indexable article-document.
  */
-interface ArticleOngrDocumentInterface
+interface ArticleViewDocumentInterface
 {
     /**
      * Returns uuid.
@@ -179,30 +179,30 @@ interface ArticleOngrDocumentInterface
     /**
      * Returns excerpt.
      *
-     * @return ExcerptOngrObject
+     * @return ExcerptViewObject
      */
     public function getExcerpt();
 
     /**
      * Set excerpt.
      *
-     * @param ExcerptOngrObject $excerpt
+     * @param ExcerptViewObject $excerpt
      *
      * @return $this
      */
-    public function setExcerpt(ExcerptOngrObject $excerpt);
+    public function setExcerpt(ExcerptViewObject $excerpt);
 
     /**
      * Returns seo.
      *
-     * @return SeoOngrObject
+     * @return SeoViewObject
      */
     public function getSeo();
 
     /**
      * Set seo.
      *
-     * @param SeoOngrObject $seo
+     * @param SeoViewObject $seo
      *
      * @return $this
      */

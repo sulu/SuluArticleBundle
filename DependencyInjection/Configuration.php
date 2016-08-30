@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -31,10 +31,10 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('documents')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('ongr')
+                        ->arrayNode('article')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('model')->defaultValue(ArticleOngrDocument::class)->end()
+                                ->scalarNode('view')->defaultValue(ArticleViewDocument::class)->end()
                             ->end()
                         ->end()
                     ->end()

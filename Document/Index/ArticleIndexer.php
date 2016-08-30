@@ -13,9 +13,9 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
-use Sulu\Bundle\ArticleBundle\Document\MediaCollectionOngrObject;
-use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
+use Sulu\Bundle\ArticleBundle\Document\ExcerptViewObject;
+use Sulu\Bundle\ArticleBundle\Document\MediaCollectionViewObject;
+use Sulu\Bundle\ArticleBundle\Document\SeoViewObject;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
@@ -107,9 +107,9 @@ class ArticleIndexer implements IndexerInterface
      */
     public function index(ArticleDocument $document)
     {
-        $article = $this->manager->find($this->documentFactory->getArticleDocumentClass(), $document->getUuid());
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
         if (!$article) {
-            $article = $this->documentFactory->createArticleDocument();
+            $article = $this->documentFactory->create('article');
             $article->setUuid($document->getUuid());
         }
 
@@ -157,7 +157,7 @@ class ArticleIndexer implements IndexerInterface
      */
     public function remove($document)
     {
-        $article = $this->manager->find($this->documentFactory->getArticleDocumentClass(), $document->getUuid());
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
         if (null === $article) {
             return;
         }
@@ -178,11 +178,11 @@ class ArticleIndexer implements IndexerInterface
      *
      * @param array $data
      *
-     * @return SeoOngrObject
+     * @return SeoViewObject
      */
     private function createSeoObject(array $data)
     {
-        $seo = new SeoOngrObject();
+        $seo = new SeoViewObject();
         $seo->title = $data['title'];
         $seo->description = $data['description'];
         $seo->keywords = $data['keywords'];
@@ -199,11 +199,11 @@ class ArticleIndexer implements IndexerInterface
      * @param array $data
      * @param string $locale
      *
-     * @return ExcerptOngrObject
+     * @return ExcerptViewObject
      */
     private function createExcerptObject(array $data, $locale)
     {
-        $excerpt = new ExcerptOngrObject();
+        $excerpt = new ExcerptViewObject();
         $excerpt->title = $data['title'];
         $excerpt->more = $data['more'];
         $excerpt->description = $data['description'];
@@ -217,7 +217,7 @@ class ArticleIndexer implements IndexerInterface
 
     private function createMediaCollectionObject(array $data, $locale)
     {
-        $mediaCollection = new MediaCollectionOngrObject();
+        $mediaCollection = new MediaCollectionViewObject();
         if (array_key_exists('ids', $data)) {
             $medias = $this->mediaManager->getByIds($data['ids'], $locale);
             $mediaCollection->setData($medias, $data['displayOption']);

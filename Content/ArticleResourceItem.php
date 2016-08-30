@@ -12,9 +12,9 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
-use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
-use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ExcerptViewObject;
+use Sulu\Bundle\ArticleBundle\Document\SeoViewObject;
 use Sulu\Component\SmartContent\ResourceItemInterface;
 
 /**
@@ -23,7 +23,7 @@ use Sulu\Component\SmartContent\ResourceItemInterface;
 class ArticleResourceItem implements ResourceItemInterface
 {
     /**
-     * @var ArticleOngrDocument
+     * @var ArticleViewDocumentInterface
      */
     private $article;
 
@@ -33,10 +33,10 @@ class ArticleResourceItem implements ResourceItemInterface
     private $resource;
 
     /**
-     * @param ArticleOngrDocumentInterface $article
+     * @param ArticleViewDocumentInterface $article
      * @param ArticleDocument $resource
      */
-    public function __construct(ArticleOngrDocumentInterface $article, ArticleDocument $resource)
+    public function __construct(ArticleViewDocumentInterface $article, ArticleDocument $resource)
     {
         $this->article = $article;
         $this->resource = $resource;
@@ -125,7 +125,7 @@ class ArticleResourceItem implements ResourceItemInterface
     /**
      * Returns excerpt.
      *
-     * @return ExcerptOngrObject
+     * @return ExcerptViewObject
      */
     public function getExcerpt()
     {
@@ -135,7 +135,7 @@ class ArticleResourceItem implements ResourceItemInterface
     /**
      * Returns seo.
      *
-     * @return SeoOngrObject
+     * @return SeoViewObject
      */
     public function getSeo()
     {

@@ -80,9 +80,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         /** @var Manager $manager */
         $manager = $this->get('es.manager.default');
-        $repository = $manager->getRepository(
-            $this->get('sulu_article.elastic_search.document_factory')->getArticleDocumentClass()
-        );
+        $repository = $manager->getRepository($this->get('sulu_article.view_document.factory')->getClass('article'));
         $search = $repository->createSearch();
 
         if (!empty($searchPattern = $restHelper->getSearchPattern())) {

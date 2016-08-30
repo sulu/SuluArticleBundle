@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 
 /**
  * Interface for document-factory.
@@ -21,14 +21,18 @@ interface DocumentFactoryInterface
     /**
      * Returns class of article-document.
      *
+     * @param string $type
+     *
      * @return string
      */
-    public function getArticleDocumentClass();
+    public function getClass($type);
 
     /**
      * Create a new indexable article-document.
      *
-     * @return ArticleOngrDocumentInterface
+     * @param string $type
+     *
+     * @return ArticleViewDocumentInterface
      */
-    public function createArticleDocument();
+    public function create($type);
 }

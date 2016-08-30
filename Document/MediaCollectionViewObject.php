@@ -22,7 +22,7 @@ use Sulu\Bundle\MediaBundle\Api\Media;
  *
  * @Object
  */
-class MediaCollectionOngrObject implements \Iterator, \ArrayAccess
+class MediaCollectionViewObject implements \Iterator, \ArrayAccess
 {
     /**
      * @var int[]
@@ -32,9 +32,9 @@ class MediaCollectionOngrObject implements \Iterator, \ArrayAccess
     public $ids = [];
 
     /**
-     * @var MediaOngrObject[]|Collection
+     * @var MediaViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:MediaOngrObject", multiple=true)
+     * @Embedded(class="SuluArticleBundle:MediaViewObject", multiple=true)
      */
     public $medias;
 
@@ -45,9 +45,6 @@ class MediaCollectionOngrObject implements \Iterator, \ArrayAccess
      */
     public $displayOption;
 
-    /**
-     * MediaCollectionOngrObject constructor.
-     */
     public function __construct()
     {
         $this->medias = new Collection();
@@ -68,7 +65,7 @@ class MediaCollectionOngrObject implements \Iterator, \ArrayAccess
         foreach ($medias as $media) {
             $this->ids[] = $media->getId();
 
-            $mediaObject = new MediaOngrObject();
+            $mediaObject = new MediaViewObject();
             $mediaObject->setData($media);
 
             $this->medias[] = $mediaObject;

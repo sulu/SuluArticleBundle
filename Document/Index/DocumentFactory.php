@@ -17,31 +17,33 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 class DocumentFactory implements DocumentFactoryInterface
 {
     /**
-     * @var string
+     * @var array
      */
-    private $articleDocumentClass;
+    private $documents;
 
     /**
-     * @param string $articleDocumentClass
+     * @param array $documents
      */
-    public function __construct($articleDocumentClass)
+    public function __construct($documents)
     {
-        $this->articleDocumentClass = $articleDocumentClass;
+        $this->documents = $documents;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getArticleDocumentClass()
+    public function getClass($type)
     {
-        return $this->articleDocumentClass;
+        return $this->documents[$type]['view'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createArticleDocument()
+    public function create($type)
     {
-        return new $this->articleDocumentClass();
+        $class = $this->getClass($type);
+
+        return new $class();
     }
 }

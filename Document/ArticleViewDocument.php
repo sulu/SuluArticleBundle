@@ -21,7 +21,7 @@ use ONGR\ElasticsearchBundle\Annotation\Property;
  *
  * @Document(type="article")
  */
-class ArticleOngrDocument implements ArticleOngrDocumentInterface
+class ArticleViewDocument implements ArticleViewDocumentInterface
 {
     /**
      * @var string
@@ -134,16 +134,16 @@ class ArticleOngrDocument implements ArticleOngrDocumentInterface
     protected $created;
 
     /**
-     * @var ExcerptOngrObject
+     * @var ExcerptViewObject
      *
-     * @Embedded(class="SuluArticleBundle:ExcerptOngrObject")
+     * @Embedded(class="SuluArticleBundle:ExcerptViewObject")
      */
     protected $excerpt;
 
     /**
-     * @var SeoOngrObject
+     * @var SeoViewObject
      *
-     * @Embedded(class="SuluArticleBundle:SeoOngrObject")
+     * @Embedded(class="SuluArticleBundle:SeoViewObject")
      */
     protected $seo;
 
@@ -372,7 +372,7 @@ class ArticleOngrDocument implements ArticleOngrDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setExcerpt(ExcerptOngrObject $excerpt)
+    public function setExcerpt(ExcerptViewObject $excerpt)
     {
         $this->excerpt = $excerpt;
 

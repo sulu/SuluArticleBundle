@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\SmartContent\ItemInterface;
 
 /**
@@ -30,16 +30,16 @@ class ArticleDataItem implements ItemInterface
     private $title;
 
     /**
-     * @var ArticleOngrDocumentInterface
+     * @var ArticleViewDocumentInterface
      */
     private $resource;
 
     /**
      * @param string $id
      * @param string $title
-     * @param ArticleOngrDocumentInterface $resource
+     * @param ArticleViewDocumentInterface $resource
      */
-    public function __construct($id, $title, ArticleOngrDocumentInterface $resource)
+    public function __construct($id, $title, ArticleViewDocumentInterface $resource)
     {
         $this->id = $id;
         $this->title = $title;

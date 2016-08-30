@@ -20,7 +20,7 @@ use ONGR\ElasticsearchDSL\Search;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\SmartContent\Configuration\Builder;
@@ -110,7 +110,7 @@ class ArticleDataProvider implements DataProviderInterface
 
         $result = [];
         $uuids = [];
-        /** @var ArticleOngrDocumentInterface $document */
+        /** @var ArticleViewDocumentInterface $document */
         foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
@@ -136,7 +136,7 @@ class ArticleDataProvider implements DataProviderInterface
 
         $result = [];
         $uuids = [];
-        /** @var ArticleOngrDocumentInterface $document */
+        /** @var ArticleViewDocumentInterface $document */
         foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleResourceItem(
