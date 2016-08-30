@@ -12,7 +12,7 @@
         <property name="uuid" serialized-name="id" type="string" groups="defaultPage,smallPage,preview"/>
         <property name="nodeName" type="string"/>
         <property name="path" type="string"/>
-        <property name="routePath" serialized-name="route" type="string" groups="defaultPage,smallPage,preview"/>
+        <property name="routePath" serialized-name="route" type="string" groups="website,defaultPage,smallPage,preview"/>
 
         <property name="locale" type="string" groups="preview"/>
         <property name="originalLocale" type="string" groups="preview"/>
@@ -20,14 +20,14 @@
         <property name="structureType" type="string" groups="preview"/>
 
         <property name="title" type="string" groups="defaultPage,smallPage"/>
-        <property name="creator" type="integer" groups="defaultPage"/>
-        <property name="changer" type="integer" groups="defaultPage"/>
-        <property name="created" type="DateTime" groups="defaultPage"/>
-        <property name="changed" type="DateTime" groups="defaultPage"/>
+        <property name="creator" type="integer" groups="website,defaultPage"/>
+        <property name="changer" type="integer" groups="website,defaultPage"/>
+        <property name="created" type="DateTime" groups="website,defaultPage"/>
+        <property name="changed" type="DateTime" groups="website,defaultPage"/>
 
-        <property name="published" type="DateTime" groups="defaultPage,smallPage"/>
-        <property name="authored" type="DateTime" groups="defaultPage,smallPage"/>
-        <property name="authors" groups="defaultPage,smallPage">
+        <property name="published" type="DateTime" groups="website,defaultPage,smallPage"/>
+        <property name="authored" type="DateTime" groups="website,defaultPage,smallPage"/>
+        <property name="authors" groups="website,defaultPage,smallPage">
             <type><![CDATA[array<integer>]]></type>
         </property>
         <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultPage,preview"/>
