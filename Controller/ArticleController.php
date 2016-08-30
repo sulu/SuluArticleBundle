@@ -294,6 +294,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             [
                 'user' => $this->getUser()->getId(),
                 'clear_missing_content' => false,
+                'route_path' => array_key_exists('routePath', $data) ? $data['routePath'] : null,
             ]
         );
     }
