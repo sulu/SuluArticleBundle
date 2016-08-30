@@ -11,16 +11,15 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Object;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 
 /**
- * Contains excerpt information for articles.
+ * Contains seo information for articles.
  *
  * @Object
  */
-class ExcerptOngrObject
+class SeoViewObject
 {
     /**
      * @var string
@@ -50,7 +49,7 @@ class ExcerptOngrObject
      *    }
      * )
      */
-    public $more;
+    public $description;
 
     /**
      * @var string
@@ -65,33 +64,34 @@ class ExcerptOngrObject
      *    }
      * )
      */
-    public $description;
+    public $keywords;
 
     /**
-     * @var int[]
+     * @var string
      *
-     * @Property(type="integer")
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
      */
-    public $categories;
+    public $canonicalUrl;
 
     /**
-     * @var int[]
+     * @var bool
      *
-     * @Property(type="integer")
+     * @Property(type="boolean")
      */
-    public $tags;
+    public $noIndex;
 
     /**
-     * @var MediaCollectionOngrObject|MediaOngrObject[]
+     * @var bool
      *
-     * @Embedded(class="SuluArticleBundle:MediaCollectionOngrObject")
+     * @Property(type="boolean")
      */
-    public $icon;
-
-    /**
-     * @var MediaCollectionOngrObject|MediaOngrObject[]
-     *
-     * @Embedded(class="SuluArticleBundle:MediaCollectionOngrObject")
-     */
-    public $images;
+    public $noFollow;
 }

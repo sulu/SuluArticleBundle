@@ -20,7 +20,7 @@ use ONGR\ElasticsearchDSL\Search;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\SmartContent\Configuration\Builder;
@@ -48,18 +48,26 @@ class ArticleDataProvider implements DataProviderInterface
     private $proxyFactory;
 
     /**
+     * @var string
+     */
+    private $articleDocumentClass;
+
+    /**
      * @param Manager $searchManager
      * @param DocumentManagerInterface $documentManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @param $articleDocumentClass
      */
     public function __construct(
         Manager $searchManager,
         DocumentManagerInterface $documentManager,
-        LazyLoadingValueHolderFactory $proxyFactory
+        LazyLoadingValueHolderFactory $proxyFactory,
+        $articleDocumentClass
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
         $this->proxyFactory = $proxyFactory;
+        $this->articleDocumentClass = $articleDocumentClass;
     }
 
     /**
@@ -102,7 +110,7 @@ class ArticleDataProvider implements DataProviderInterface
 
         $result = [];
         $uuids = [];
-        /** @var ArticleOngrDocument $document */
+        /** @var ArticleViewDocumentInterface $document */
         foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
@@ -128,7 +136,7 @@ class ArticleDataProvider implements DataProviderInterface
 
         $result = [];
         $uuids = [];
-        /** @var ArticleOngrDocument $document */
+        /** @var ArticleViewDocumentInterface $document */
         foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleResourceItem(
@@ -160,7 +168,7 @@ class ArticleDataProvider implements DataProviderInterface
      */
     private function getSearchResult(array $filters, $limit, $page, $pageSize)
     {
-        $repository = $this->searchManager->getRepository(ArticleOngrDocument::class);
+        $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
 
         $query = new BoolQuery();

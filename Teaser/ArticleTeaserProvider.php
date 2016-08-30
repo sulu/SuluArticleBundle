@@ -13,7 +13,6 @@ namespace Sulu\Bundle\ArticleBundle\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
 use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\ContentBundle\Teaser\Teaser;
@@ -29,11 +28,18 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     private $searchManager;
 
     /**
-     * @param Manager $searchManager
+     * @var string
      */
-    public function __construct(Manager $searchManager)
+    private $articleDocumentClass;
+
+    /**
+     * @param Manager $searchManager
+     * @param $articleDocumentClass
+     */
+    public function __construct(Manager $searchManager, $articleDocumentClass)
     {
         $this->searchManager = $searchManager;
+        $this->articleDocumentClass = $articleDocumentClass;
     }
 
     /**
@@ -72,12 +78,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             return [];
         }
 
-        $repository = $this->searchManager->getRepository(ArticleOngrDocument::class);
+        $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($ids));
 
         $result = [];
-        /** @var ArticleOngrDocument $item */
         foreach ($repository->execute($search) as $item) {
             $excerpt = $item->getExcerpt();
             $result[] = new Teaser(

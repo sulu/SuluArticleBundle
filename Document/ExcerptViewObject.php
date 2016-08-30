@@ -11,15 +11,16 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Object;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 
 /**
- * Contains seo information for articles.
+ * Contains excerpt information for articles.
  *
  * @Object
  */
-class SeoOngrObject
+class ExcerptViewObject
 {
     /**
      * @var string
@@ -49,49 +50,48 @@ class SeoOngrObject
      *    }
      * )
      */
+    public $more;
+
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"},
+     *            "value"={"type"="string"}
+     *        }
+     *    }
+     * )
+     */
     public $description;
 
     /**
-     * @var string
+     * @var int[]
      *
-     * @Property(
-     *     type="string",
-     *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
-     * )
+     * @Property(type="integer")
      */
-    public $keywords;
+    public $categories;
 
     /**
-     * @var string
+     * @var int[]
      *
-     * @Property(
-     *     type="string",
-     *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
-     * )
+     * @Property(type="integer")
      */
-    public $canonicalUrl;
+    public $tags;
 
     /**
-     * @var bool
+     * @var MediaCollectionViewObject|MediaViewObject[]
      *
-     * @Property(type="boolean")
+     * @Embedded(class="SuluArticleBundle:MediaCollectionViewObject")
      */
-    public $noIndex;
+    public $icon;
 
     /**
-     * @var bool
+     * @var MediaCollectionViewObject|MediaViewObject[]
      *
-     * @Property(type="boolean")
+     * @Embedded(class="SuluArticleBundle:MediaCollectionViewObject")
      */
-    public $noFollow;
+    public $images;
 }
