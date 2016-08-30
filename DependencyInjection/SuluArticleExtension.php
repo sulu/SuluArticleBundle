@@ -96,6 +96,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
         $container->setParameter('sulu_articles.types', $config['types']);
+        $container->setParameter('sulu_articles.ongr_article.class', $config['documents']['ongr']['model']);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');

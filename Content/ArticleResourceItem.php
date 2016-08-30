@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
 use Sulu\Component\SmartContent\ResourceItemInterface;
@@ -33,10 +33,10 @@ class ArticleResourceItem implements ResourceItemInterface
     private $resource;
 
     /**
-     * @param ArticleOngrDocument $article
+     * @param ArticleOngrDocumentInterface $article
      * @param ArticleDocument $resource
      */
-    public function __construct(ArticleOngrDocument $article, ArticleDocument $resource)
+    public function __construct(ArticleOngrDocumentInterface $article, ArticleDocument $resource)
     {
         $this->article = $article;
         $this->resource = $resource;

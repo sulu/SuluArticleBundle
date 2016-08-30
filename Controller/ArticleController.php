@@ -17,7 +17,6 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -81,7 +80,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         /** @var Manager $manager */
         $manager = $this->get('es.manager.default');
-        $repository = $manager->getRepository(ArticleOngrDocument::class);
+        $repository = $manager->getRepository(
+            $this->get('sulu_article.elastic_search.document_factory')->getArticleDocumentClass()
+        );
         $search = $repository->createSearch();
 
         if (!empty($searchPattern = $restHelper->getSearchPattern())) {
@@ -309,7 +310,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getAuthors(array $data)
     {
         if (!array_key_exists('authors', $data)) {
-            return [$this->getUser()->getId()];
+            return [$this->getUser()->getContact()->getId()];
         }
 
         return $data['authors'];

@@ -21,7 +21,7 @@ use ONGR\ElasticsearchBundle\Annotation\Property;
  *
  * @Document(type="article")
  */
-class ArticleOngrDocument
+class ArticleOngrDocument implements ArticleOngrDocumentInterface
 {
     /**
      * @var string
@@ -184,9 +184,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns uuid.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getUuid()
     {
@@ -194,11 +192,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set uuid.
-     *
-     * @param string $uuid
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setUuid($uuid)
     {
@@ -208,9 +202,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns locale.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLocale()
     {
@@ -218,11 +210,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set locale.
-     *
-     * @param string $locale
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setLocale($locale)
     {
@@ -232,9 +220,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns title.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getTitle()
     {
@@ -242,11 +228,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set title.
-     *
-     * @param string $title
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setTitle($title)
     {
@@ -256,9 +238,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns route-path.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getRoutePath()
     {
@@ -266,9 +246,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set route-path.
-     *
-     * @param string $routePath
+     * {@inheritdoc}
      */
     public function setRoutePath($routePath)
     {
@@ -276,9 +254,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns type.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getType()
     {
@@ -286,11 +262,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set type.
-     *
-     * @param string $type
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setType($type)
     {
@@ -300,9 +272,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns structure-type.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getStructureType()
     {
@@ -310,11 +280,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set structure-type.
-     *
-     * @param string $structureType
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setStructureType($structureType)
     {
@@ -324,9 +290,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns changer.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getChanger()
     {
@@ -334,11 +298,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set changer.
-     *
-     * @param string $changer
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setChanger($changer)
     {
@@ -348,9 +308,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns creator.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getCreator()
     {
@@ -358,11 +316,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set creator.
-     *
-     * @param string $creator
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setCreator($creator)
     {
@@ -372,9 +326,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Return changed.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getChanged()
     {
@@ -382,11 +334,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set changed.
-     *
-     * @param \DateTime $changed
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setChanged($changed)
     {
@@ -396,9 +344,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns created.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getCreated()
     {
@@ -406,11 +352,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set created.
-     *
-     * @param \DateTime $created
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setCreated($created)
     {
@@ -420,9 +362,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns excerpt.
-     *
-     * @return ExcerptOngrObject
+     * {@inheritdoc}
      */
     public function getExcerpt()
     {
@@ -430,11 +370,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set excerpt.
-     *
-     * @param ExcerptOngrObject $excerpt
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setExcerpt(ExcerptOngrObject $excerpt)
     {
@@ -444,9 +380,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns seo.
-     *
-     * @return SeoOngrObject
+     * {@inheritdoc}
      */
     public function getSeo()
     {
@@ -454,11 +388,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set seo.
-     *
-     * @param SeoOngrObject $seo
-     *
-     * @return self
+     * {@inheritdoc}
      */
     public function setSeo($seo)
     {
@@ -468,9 +398,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns authored.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getAuthored()
     {
@@ -478,11 +406,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set authored date.
-     *
-     * @param \DateTime $authored
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setAuthored(\DateTime $authored = null)
     {
@@ -492,9 +416,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns authors.
-     *
-     * @return int[]
+     * {@inheritdoc}
      */
     public function getAuthors()
     {
@@ -502,11 +424,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set authors.
-     *
-     * @param int[] $authors
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setAuthors($authors)
     {
@@ -516,9 +434,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns teaser-description.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getTeaserDescription()
     {
@@ -526,11 +442,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set teaser-description.
-     *
-     * @param string $teaserDescription
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setTeaserDescription($teaserDescription)
     {
@@ -540,9 +452,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Returns teaser-media-id.
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function getTeaserMediaId()
     {
@@ -550,11 +460,7 @@ class ArticleOngrDocument
     }
 
     /**
-     * Set teaser-media-id.
-     *
-     * @param int $teaserMediaId
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function setTeaserMediaId($teaserMediaId)
     {

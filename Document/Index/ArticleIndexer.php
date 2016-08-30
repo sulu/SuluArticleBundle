@@ -13,15 +13,17 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleOngrDocument;
 use Sulu\Bundle\ArticleBundle\Document\ExcerptOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\MediaCollectionOngrObject;
 use Sulu\Bundle\ArticleBundle\Document\SeoOngrObject;
+use Sulu\Bundle\ArticleBundle\Event\Events;
+use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
-use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides methods to index articles.
@@ -31,9 +33,9 @@ class ArticleIndexer implements IndexerInterface
     use ArticleTypeTrait;
 
     /**
-     * @var StructureManagerInterface
+     * @var StructureMetadataFactoryInterface
      */
-    private $structureManager;
+    private $structureMetadataFactory;
 
     /**
      * @var UserManager
@@ -56,24 +58,40 @@ class ArticleIndexer implements IndexerInterface
     private $mediaManager;
 
     /**
-     * @param StructureManagerInterface $structureManager
+     * @var DocumentFactoryInterface
+     */
+    private $documentFactory;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
+     * @param DocumentFactoryInterface $documentFactory
      * @param Manager $manager
      * @param TagManagerInterface $tagManager
      * @param MediaManagerInterface $mediaManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        StructureManagerInterface $structureManager,
+        StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
+        DocumentFactoryInterface $documentFactory,
         Manager $manager,
         TagManagerInterface $tagManager,
-        MediaManagerInterface $mediaManager
+        MediaManagerInterface $mediaManager,
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->structureManager = $structureManager;
+        $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
+        $this->documentFactory = $documentFactory;
         $this->manager = $manager;
         $this->tagManager = $tagManager;
         $this->mediaManager = $mediaManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -89,12 +107,16 @@ class ArticleIndexer implements IndexerInterface
      */
     public function index(ArticleDocument $document)
     {
-        $article = $this->manager->find(ArticleOngrDocument::class, $document->getUuid());
+        $article = $this->manager->find($this->documentFactory->getArticleDocumentClass(), $document->getUuid());
         if (!$article) {
-            $article = new ArticleOngrDocument($document->getUuid());
+            $article = $this->documentFactory->createArticleDocument();
+            $article->setUuid($document->getUuid());
         }
 
-        $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
+        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article',
+            $document->getStructureType()
+        );
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
@@ -104,26 +126,28 @@ class ArticleIndexer implements IndexerInterface
         $article->setAuthors($document->getAuthors());
         $article->setChanger($this->userManager->getFullNameByUserId($document->getChanger()));
         $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
-        $article->setType($this->getType($structure->getStructure()));
+        $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
 
         $extensions = $document->getExtensionsData()->toArray();
         $article->setExcerpt($this->createExcerptObject($extensions['excerpt'], $document->getLocale()));
         $article->setSeo($this->createSeoObject($extensions['seo']));
 
-        if ($structure->hasTag('sulu.teaser.description')) {
-            $descriptionProperty = $structure->getPropertyByTagName('sulu.teaser.description');
+        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
+            $descriptionProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.description');
             $article->setTeaserDescription(
                 $document->getStructure()->getProperty($descriptionProperty->getName())->getValue()
             );
         }
-        if ($structure->hasTag('sulu.teaser.media')) {
-            $mediaProperty = $structure->getPropertyByTagName('sulu.teaser.media');
+        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.media')) {
+            $mediaProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.media');
             $mediaData = $document->getStructure()->getProperty($mediaProperty->getName())->getValue();
             if (null !== $mediaData && array_key_exists('ids', $mediaData)) {
                 $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
             }
         }
+
+        $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
 
         $this->manager->persist($article);
     }
@@ -133,7 +157,7 @@ class ArticleIndexer implements IndexerInterface
      */
     public function remove($document)
     {
-        $article = $this->manager->find(ArticleOngrDocument::class, $document->getUuid());
+        $article = $this->manager->find($this->documentFactory->getArticleDocumentClass(), $document->getUuid());
         if (null === $article) {
             return;
         }
@@ -185,7 +209,6 @@ class ArticleIndexer implements IndexerInterface
         $excerpt->description = $data['description'];
         $excerpt->categories = $data['categories'];
         $excerpt->tags = $this->tagManager->resolveTagNames($data['tags']);
-        $excerpt->title = $data['title'];
         $excerpt->icon = $this->createMediaCollectionObject($data['icon'], $locale);
         $excerpt->images = $this->createMediaCollectionObject($data['images'], $locale);
 
@@ -195,7 +218,6 @@ class ArticleIndexer implements IndexerInterface
     private function createMediaCollectionObject(array $data, $locale)
     {
         $mediaCollection = new MediaCollectionOngrObject();
-
         if (array_key_exists('ids', $data)) {
             $medias = $this->mediaManager->getByIds($data['ids'], $locale);
             $mediaCollection->setData($medias, $data['displayOption']);

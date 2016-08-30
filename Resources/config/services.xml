@@ -25,21 +25,29 @@
         </service>
 
         <!-- ongr -->
+        <service id="sulu_article.elastic_search.document_factory"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory">
+            <argument type="string">%sulu_articles.ongr_article.class%</argument>
+        </service>
         <service id="sulu_article.elastic_search.article_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
-            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
+            <argument type="service" id="sulu_article.elastic_search.document_factory"/>
             <argument type="service" id="es.manager.default"/>
             <argument type="service" id="sulu_tag.tag_manager"/>
             <argument type="service" id="sulu_media.media_manager"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
-            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
+            <argument type="service" id="sulu_article.elastic_search.document_factory"/>
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_tag.tag_manager"/>
             <argument type="service" id="sulu_media.media_manager"/>
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <!-- document -->
@@ -106,11 +114,13 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="string">%sulu_articles.ongr_article.class%</argument>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
         <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
             <argument type="service" id="es.manager.live"/>
+            <argument type="string">%sulu_articles.ongr_article.class%</argument>
 
             <tag name="sulu.teaser.provider" alias="article"/>
         </service>
