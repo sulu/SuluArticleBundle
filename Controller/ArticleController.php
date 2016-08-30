@@ -212,9 +212,6 @@ class ArticleController extends RestController implements ClassResourceInterface
             $document->setAuthored(new \DateTime($data['authored']));
         }
         $document->setAuthors($this->getAuthors($data));
-        if (array_key_exists('routePath', $data)) {
-            $document->setRoutePath($data['routePath']);
-        }
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
