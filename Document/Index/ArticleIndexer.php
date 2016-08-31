@@ -13,15 +13,12 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ExcerptViewObject;
-use Sulu\Bundle\ArticleBundle\Document\MediaCollectionViewObject;
-use Sulu\Bundle\ArticleBundle\Document\SeoViewObject;
+use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
+use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
-use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
-use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -43,24 +40,24 @@ class ArticleIndexer implements IndexerInterface
     private $userManager;
 
     /**
+     * @var DocumentFactoryInterface
+     */
+    private $documentFactory;
+
+    /**
      * @var Manager
      */
     private $manager;
 
     /**
-     * @var TagManagerInterface
+     * @var ExcerptFactory
      */
-    private $tagManager;
+    private $excerptFactory;
 
     /**
-     * @var MediaManagerInterface
+     * @var SeoFactory
      */
-    private $mediaManager;
-
-    /**
-     * @var DocumentFactoryInterface
-     */
-    private $documentFactory;
+    private $seoFactory;
 
     /**
      * @var EventDispatcherInterface
@@ -68,12 +65,14 @@ class ArticleIndexer implements IndexerInterface
     private $eventDispatcher;
 
     /**
+     * ArticleIndexer constructor.
+     *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
-     * @param DocumentFactoryInterface $documentFactory
      * @param Manager $manager
-     * @param TagManagerInterface $tagManager
-     * @param MediaManagerInterface $mediaManager
+     * @param ExcerptFactory $excerptFactory
+     * @param SeoFactory $seoFactory
+     * @param DocumentFactoryInterface $documentFactory
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
@@ -81,16 +80,16 @@ class ArticleIndexer implements IndexerInterface
         UserManager $userManager,
         DocumentFactoryInterface $documentFactory,
         Manager $manager,
-        TagManagerInterface $tagManager,
-        MediaManagerInterface $mediaManager,
+        ExcerptFactory $excerptFactory,
+        SeoFactory $seoFactory,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
         $this->documentFactory = $documentFactory;
         $this->manager = $manager;
-        $this->tagManager = $tagManager;
-        $this->mediaManager = $mediaManager;
+        $this->excerptFactory = $excerptFactory;
+        $this->seoFactory = $seoFactory;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -130,8 +129,8 @@ class ArticleIndexer implements IndexerInterface
         $article->setStructureType($document->getStructureType());
 
         $extensions = $document->getExtensionsData()->toArray();
-        $article->setExcerpt($this->createExcerptObject($extensions['excerpt'], $document->getLocale()));
-        $article->setSeo($this->createSeoObject($extensions['seo']));
+        $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
+        $article->setSeo($this->seoFactory->create($extensions['seo']));
 
         if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
             $descriptionProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.description');
@@ -171,58 +170,5 @@ class ArticleIndexer implements IndexerInterface
     public function flush()
     {
         $this->manager->commit();
-    }
-
-    /**
-     * Create a seo object by given data.
-     *
-     * @param array $data
-     *
-     * @return SeoViewObject
-     */
-    private function createSeoObject(array $data)
-    {
-        $seo = new SeoViewObject();
-        $seo->title = $data['title'];
-        $seo->description = $data['description'];
-        $seo->keywords = $data['keywords'];
-        $seo->canonicalUrl = $data['canonicalUrl'];
-        $seo->noIndex = $data['noIndex'];
-        $seo->noFollow = $data['noFollow'];
-
-        return $seo;
-    }
-
-    /**
-     * Create a excerpt object by given data.
-     *
-     * @param array $data
-     * @param string $locale
-     *
-     * @return ExcerptViewObject
-     */
-    private function createExcerptObject(array $data, $locale)
-    {
-        $excerpt = new ExcerptViewObject();
-        $excerpt->title = $data['title'];
-        $excerpt->more = $data['more'];
-        $excerpt->description = $data['description'];
-        $excerpt->categories = $data['categories'];
-        $excerpt->tags = $this->tagManager->resolveTagNames($data['tags']);
-        $excerpt->icon = $this->createMediaCollectionObject($data['icon'], $locale);
-        $excerpt->images = $this->createMediaCollectionObject($data['images'], $locale);
-
-        return $excerpt;
-    }
-
-    private function createMediaCollectionObject(array $data, $locale)
-    {
-        $mediaCollection = new MediaCollectionViewObject();
-        if (array_key_exists('ids', $data)) {
-            $medias = $this->mediaManager->getByIds($data['ids'], $locale);
-            $mediaCollection->setData($medias, $data['displayOption']);
-        }
-
-        return $mediaCollection;
     }
 }

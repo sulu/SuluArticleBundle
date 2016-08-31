@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Object;
 use ONGR\ElasticsearchBundle\Annotation\Property;
+use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Contains excerpt information for articles.
@@ -68,16 +69,16 @@ class ExcerptViewObject
     public $description;
 
     /**
-     * @var int[]
+     * @var CategoryViewObject[]|Collection
      *
-     * @Property(type="integer")
+     * @Embedded(class="SuluArticleBundle:CategoryViewObject", multiple=true)
      */
     public $categories;
 
     /**
-     * @var int[]
+     * @var TagViewObject[]|Collection
      *
-     * @Property(type="integer")
+     * @Embedded(class="SuluArticleBundle:TagViewObject", multiple=true)
      */
     public $tags;
 
@@ -94,4 +95,10 @@ class ExcerptViewObject
      * @Embedded(class="SuluArticleBundle:MediaCollectionViewObject")
      */
     public $images;
+
+    public function __construct()
+    {
+        $this->tags = new Collection();
+        $this->categories = new Collection();
+    }
 }

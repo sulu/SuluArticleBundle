@@ -35,8 +35,8 @@
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
             <argument type="service" id="es.manager.default"/>
-            <argument type="service" id="sulu_tag.tag_manager"/>
-            <argument type="service" id="sulu_media.media_manager"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
@@ -45,9 +45,39 @@
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
             <argument type="service" id="es.manager.live"/>
-            <argument type="service" id="sulu_tag.tag_manager"/>
-            <argument type="service" id="sulu_media.media_manager"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="sulu_article.elastic_search.factory.seo"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory"/>
+
+        <service id="sulu_article.elastic_search.factory.media"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\MediaFactory">
+            <argument type="service" id="sulu_media.media_manager"/>
+        </service>
+
+        <service id="sulu_article.elastic_search.factory.media_collection"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\MediaCollectionFactory">
+            <argument type="service" id="sulu_media.media_manager"/>
+        </service>
+
+        <service id="sulu_article.elastic_search.factory.tag_collection"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\TagCollectionFactory">
+            <argument type="service" id="sulu_tag.tag_manager"/>
+        </service>
+
+        <service id="sulu_article.elastic_search.factory.category_collection"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\CategoryCollectionFactory">
+            <argument type="service" id="sulu_category.category_repository"/>
+        </service>
+
+        <service id="sulu_article.elastic_search.factory.excerpt"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory">
+            <argument type="service" id="sulu_article.elastic_search.factory.category_collection"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.tag_collection"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.media_collection"/>
         </service>
 
         <!-- document -->
