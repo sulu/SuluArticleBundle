@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Index\Factory;
 
 use ONGR\ElasticsearchBundle\Collection\Collection;
-use Sulu\Bundle\ArticleBundle\Document\MediaCollectionViewObject;
 use Sulu\Bundle\ArticleBundle\Document\MediaViewObject;
 use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 
