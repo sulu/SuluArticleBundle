@@ -42,9 +42,14 @@ class MediaFactory
      */
     public function create($id, $locale)
     {
+        $mediaViewObject = new MediaViewObject();
+
+        if (!$id) {
+            return $mediaViewObject;
+        }
+
         $media = $this->mediaManager->getById($id, $locale);
 
-        $mediaViewObject = new MediaViewObject();
         $mediaViewObject->setData($media);
 
         return $mediaViewObject;

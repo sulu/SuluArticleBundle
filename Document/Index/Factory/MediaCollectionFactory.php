@@ -42,12 +42,17 @@ class MediaCollectionFactory
      *
      * @return MediaCollectionViewObject
      */
-    public function create(array $data, $locale)
+    public function create($data, $locale)
     {
         $mediaCollection = new MediaCollectionViewObject();
+
+        if (empty($data)) {
+            return $mediaCollection;
+        }
+
         if (array_key_exists('ids', $data)) {
             $medias = $this->mediaManager->getByIds($data['ids'], $locale);
-            $mediaCollection->setData($medias, $data['displayOption']);
+            $mediaCollection->setData($medias, isset($data['displayOption']) ? $data['displayOption'] : 'top');
         }
 
         return $mediaCollection;

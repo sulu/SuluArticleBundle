@@ -25,9 +25,14 @@ class SeoFactory
      *
      * @return SeoViewObject
      */
-    public function create(array $data)
+    public function create($data)
     {
         $seo = new SeoViewObject();
+
+        if (empty($data)) {
+            return $seo;
+        }
+
         $seo->title = $data['title'];
         $seo->description = $data['description'];
         $seo->keywords = $data['keywords'];

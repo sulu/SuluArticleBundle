@@ -58,9 +58,14 @@ class ExcerptFactory
      *
      * @return ExcerptViewObject
      */
-    public function create(array $data, $locale)
+    public function create($data, $locale)
     {
         $excerpt = new ExcerptViewObject();
+
+        if (empty($data)) {
+            return $excerpt;
+        }
+
         $excerpt->title = $data['title'];
         $excerpt->more = $data['more'];
         $excerpt->description = $data['description'];

@@ -56,6 +56,8 @@ class TagCollectionFactory
             $tag = new TagViewObject();
             $tag->name = $tagName;
             $tag->id = $tagEntity->getId();
+
+            $collection[] = $tag;
         }
 
         return $collection;

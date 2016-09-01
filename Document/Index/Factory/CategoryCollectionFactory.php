@@ -44,7 +44,7 @@ class CategoryCollectionFactory
      *
      * @return Collection
      */
-    public function create(array $categoryIds, $locale)
+    public function create($categoryIds, $locale)
     {
         if (empty($categoryIds)) {
             return new Collection();
@@ -52,7 +52,7 @@ class CategoryCollectionFactory
 
         // Load category with keywords
         $queryBuilder = $this->categoryRepository->createQueryBuilder('category')
-            ->select(['category.id', 'translate.translation as name', 'keyword.keyword'])
+            ->select(['category.id', 'category.key', 'translate.translation as name', 'keyword.keyword'])
             ->leftJoin('category.translations', 'translate', Join::WITH, 'translate.locale = :locale')
             ->setParameter('locale', $locale)
             ->leftJoin('translate.keywords', 'keyword');
@@ -67,6 +67,7 @@ class CategoryCollectionFactory
             if (!isset($categories[$id])) {
                 $categories[$id] = new CategoryViewObject();
                 $categories[$id]->id = $id;
+                $categories[$id]->key = $categoryData['key'];
                 $categories[$id]->name = $categoryData['name'];
             }
 
