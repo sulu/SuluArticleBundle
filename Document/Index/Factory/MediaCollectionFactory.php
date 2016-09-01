@@ -11,7 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index\Factory;
 
-use Sulu\Bundle\ArticleBundle\Document\MediaCollectionViewObject;
+use ONGR\ElasticsearchBundle\Collection\Collection;
+use Sulu\Bundle\ArticleBundle\Document\MediaViewObject;
 use Sulu\Bundle\MediaBundle\Media\Manager\MediaManagerInterface;
 
 /**
@@ -40,11 +41,11 @@ class MediaCollectionFactory
      * @param array $data
      * @param $locale
      *
-     * @return MediaCollectionViewObject
+     * @return MediaViewObject[]|Collection
      */
     public function create($data, $locale)
     {
-        $mediaCollection = new MediaCollectionViewObject();
+        $mediaCollection = new Collection();
 
         if (empty($data)) {
             return $mediaCollection;
@@ -52,7 +53,13 @@ class MediaCollectionFactory
 
         if (array_key_exists('ids', $data)) {
             $medias = $this->mediaManager->getByIds($data['ids'], $locale);
-            $mediaCollection->setData($medias, isset($data['displayOption']) ? $data['displayOption'] : 'top');
+
+            foreach ($medias as $media) {
+                $mediaViewObject = new MediaViewObject();
+                $mediaViewObject->setData($media);
+
+                $mediaCollection[] = $mediaViewObject;
+            }
         }
 
         return $mediaCollection;

@@ -102,7 +102,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      *    }
      * )
      */
-    protected $changer;
+    protected $changerFullName;
 
     /**
      * @var string
@@ -117,7 +117,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      *    }
      * )
      */
-    protected $creator;
+    protected $creatorFullName;
 
     /**
      * @var \DateTime
@@ -292,17 +292,17 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getChanger()
+    public function getChangerFullName()
     {
-        return $this->changer;
+        return $this->changerFullName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setChanger($changer)
+    public function setChangerFullName($changerFullName)
     {
-        $this->changer = $changer;
+        $this->changerFullName = $changerFullName;
 
         return $this;
     }
@@ -310,17 +310,17 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getCreator()
+    public function getCreatorFullName()
     {
-        return $this->creator;
+        return $this->creatorFullName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setCreator($creator)
+    public function setCreatorFullName($creatorFullName)
     {
-        $this->creator = $creator;
+        $this->creatorFullName = $creatorFullName;
 
         return $this;
     }

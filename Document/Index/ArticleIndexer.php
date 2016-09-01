@@ -123,8 +123,8 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
         $article->setAuthors($document->getAuthors());
-        $article->setChanger($this->userManager->getFullNameByUserId($document->getChanger()));
-        $article->setCreator($this->userManager->getFullNameByUserId($document->getCreator()));
+        $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
+        $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
 
