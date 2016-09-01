@@ -83,16 +83,16 @@ class ExcerptViewObject
     public $tags;
 
     /**
-     * @var MediaCollectionViewObject|MediaViewObject[]
+     * @var MediaViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:MediaCollectionViewObject")
+     * @Embedded(class="SuluArticleBundle:MediaViewObject", multiple=true)
      */
     public $icon;
 
     /**
-     * @var MediaCollectionViewObject|MediaViewObject[]
+     * @var MediaViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:MediaCollectionViewObject")
+     * @Embedded(class="SuluArticleBundle:MediaViewObject", multiple=true)
      */
     public $images;
 
@@ -100,5 +100,7 @@ class ExcerptViewObject
     {
         $this->tags = new Collection();
         $this->categories = new Collection();
+        $this->icon = new Collection();
+        $this->images = new Collection();
     }
 }

@@ -113,36 +113,36 @@ interface ArticleViewDocumentInterface
     public function setStructureType($structureType);
 
     /**
-     * Returns changer.
+     * Returns changer full name.
      *
      * @return string
      */
-    public function getChanger();
+    public function getChangerFullName();
 
     /**
-     * Set changer.
+     * Set changer full name.
      *
-     * @param string $changer
+     * @param string $changerFullName
      *
      * @return $this
      */
-    public function setChanger($changer);
+    public function setChangerFullName($changerFullName);
 
     /**
-     * Returns creator.
+     * Returns creator full name.
      *
      * @return string
      */
-    public function getCreator();
+    public function getCreatorFullName();
 
     /**
-     * Set creator.
+     * Set creator full name.
      *
-     * @param string $creator
+     * @param string $creatorFullName
      *
      * @return $this
      */
-    public function setCreator($creator);
+    public function setCreatorFullName($creatorFullName);
 
     /**
      * Return changed.
