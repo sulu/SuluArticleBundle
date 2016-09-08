@@ -85,7 +85,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (!empty($searchPattern = $restHelper->getSearchPattern())) {
             foreach ($restHelper->getSearchFields() as $searchField) {
-                $search->addQuery(new WildcardQuery($searchField, '*' . $searchPattern . '*'));
+                $search->addQuery(new WildcardQuery($searchField, '*' . strtolower($searchPattern) . '*'));
             }
         }
 
