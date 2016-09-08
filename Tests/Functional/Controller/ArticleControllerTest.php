@@ -266,6 +266,28 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
+    public function testCGetSearchCaseInsensitive()
+    {
+        $this->purgeIndex();
+
+        $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=AwEsoMe&type=blog');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
+    }
+
     public function testCGetSort()
     {
         $this->purgeIndex();
