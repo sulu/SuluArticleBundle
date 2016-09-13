@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -98,7 +99,25 @@ class ArticleIndexer implements IndexerInterface
      */
     public function clear()
     {
-        $this->manager->dropAndCreateIndex();
+        $pageSize = 500;
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
+        $search = $repository->createSearch()
+            ->addQuery(new MatchAllQuery())
+            ->setSize($pageSize);
+
+        $count = $repository->count($repository->createSearch()->addQuery(new MatchAllQuery()));
+        $maxPage = ceil($count / $pageSize);
+        for ($page = 1; $page <= $maxPage; ++$page) {
+            $search->setFrom(($page - 1) * $pageSize);
+            foreach ($repository->execute($search) as $document) {
+                $this->manager->remove($document);
+            }
+
+            $this->manager->commit();
+        }
+
+        $this->manager->clearCache();
+        $this->manager->flush();
     }
 
     /**
