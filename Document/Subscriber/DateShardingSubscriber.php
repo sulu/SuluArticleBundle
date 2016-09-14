@@ -68,7 +68,11 @@ class DateShardingSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $date = new \DateTime();
+        $date = $event->getDocument()->getCreated();
+        if (null === $date) {
+            $date = new \DateTime();
+        }
+
         $path = $this->pathBuilder->build(['%base%', '%articles%', $date->format('Y'), $date->format('m')]);
 
         $event->setParentNode($this->nodeManager->createPath($path));

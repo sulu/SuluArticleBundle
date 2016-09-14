@@ -11,9 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
+use Sulu\Component\DocumentManager\Behavior\Audit\TimestampBehavior;
+
 /**
  * The PHPCR nodes of objects implementing this behavior will be sharded on their creation date.
  */
-interface DateShardingBehavior
+interface DateShardingBehavior extends TimestampBehavior
 {
 }
