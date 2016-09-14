@@ -94,4 +94,11 @@ class SeoViewObject
      * @Property(type="boolean")
      */
     public $noFollow;
+
+    /**
+     * @var bool
+     *
+     * @Property(type="boolean")
+     */
+    public $hideInSitemap;
 }
