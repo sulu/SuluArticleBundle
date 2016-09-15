@@ -39,6 +39,7 @@ class SeoFactory
         $seo->canonicalUrl = $data['canonicalUrl'];
         $seo->noIndex = $data['noIndex'];
         $seo->noFollow = $data['noFollow'];
+        $seo->hideInSitemap = $data['hideInSitemap'];
 
         return $seo;
     }

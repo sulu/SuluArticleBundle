@@ -172,5 +172,13 @@
             <tag name="jms_serializer.event_subscriber" />
             <tag name="sulu.context" context="admin"/>
         </service>
+
+        <!-- sitemap -->
+        <service id="sulu_article.sitemap.articles" class="Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_article.view_document.factory"/>
+
+            <tag name="sulu.sitemap.provider" alias="articles"/>
+        </service>
     </services>
 </container>
