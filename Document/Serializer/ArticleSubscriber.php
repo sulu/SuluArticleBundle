@@ -14,6 +14,8 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -37,15 +39,23 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $contentTypeManager;
 
     /**
+     * @var LazyLoadingValueHolderFactory
+     */
+    private $proxyFactory;
+
+    /**
      * @param StructureManagerInterface $structureManager
      * @param ContentTypeManagerInterface $contentTypeManager
+     * @param LazyLoadingValueHolderFactory $proxyFactory
      */
     public function __construct(
         StructureManagerInterface $structureManager,
-        ContentTypeManagerInterface $contentTypeManager
+        ContentTypeManagerInterface $contentTypeManager,
+        LazyLoadingValueHolderFactory $proxyFactory
     ) {
         $this->structureManager = $structureManager;
         $this->contentTypeManager = $contentTypeManager;
+        $this->proxyFactory = $proxyFactory;
     }
 
     /**
@@ -122,19 +132,58 @@ class ArticleSubscriber implements EventSubscriberInterface
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $structure->setDocument($article);
 
-        $content = [];
-        $view = [];
-
         $data = $article->getStructure()->toArray();
-        foreach ($structure->getProperties(true) as $child) {
-            if (array_key_exists($child->getName(), $data)) {
-                $child->setValue($data[$child->getName()]);
-            }
 
-            $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-            $content[$child->getName()] = $contentType->getContentData($child);
-            $view[$child->getName()] = $contentType->getViewData($child);
-        }
+        $content = $this->proxyFactory->createProxy(
+            \ArrayObject::class,
+            function (
+                &$wrappedObject,
+                LazyLoadingInterface $proxy,
+                $method,
+                array $parameters,
+                & $initializer
+            ) use ($structure, $data) {
+                $content = [];
+                foreach ($structure->getProperties(true) as $child) {
+                    if (array_key_exists($child->getName(), $data)) {
+                        $child->setValue($data[$child->getName()]);
+                    }
+
+                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
+                    $content[$child->getName()] = $contentType->getContentData($child);
+                }
+
+                $initializer = null;
+                $wrappedObject = new \ArrayObject($content);
+
+                return true;
+            }
+        );
+        $view = $this->proxyFactory->createProxy(
+            \ArrayObject::class,
+            function (
+                &$wrappedObject,
+                LazyLoadingInterface $proxy,
+                $method,
+                array $parameters,
+                & $initializer
+            ) use ($structure, $data) {
+                $view = [];
+                foreach ($structure->getProperties(true) as $child) {
+                    if (array_key_exists($child->getName(), $data)) {
+                        $child->setValue($data[$child->getName()]);
+                    }
+
+                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
+                    $view[$child->getName()] = $contentType->getViewData($child);
+                }
+
+                $initializer = null;
+                $wrappedObject = new \ArrayObject($view);
+
+                return true;
+            }
+        );
 
         return ['content' => $content, 'view' => $view];
     }
