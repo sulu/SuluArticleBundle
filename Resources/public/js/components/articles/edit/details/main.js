@@ -64,7 +64,11 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             var data = this.sandbox.form.getData(this.formId);
             data.template = this.template;
 
-            this.sandbox.emit('sulu.articles.save', data, action);
+            _.each(data, function(value, key) {
+                this.data[key] = value;
+            }.bind(this));
+
+            this.sandbox.emit('sulu.articles.save', this.data, action);
         },
 
         render: function() {

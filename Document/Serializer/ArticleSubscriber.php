@@ -141,7 +141,7 @@ class ArticleSubscriber implements EventSubscriberInterface
                 LazyLoadingInterface $proxy,
                 $method,
                 array $parameters,
-                & $initializer
+                &$initializer
             ) use ($structure, $data) {
                 $content = [];
                 foreach ($structure->getProperties(true) as $child) {
@@ -166,7 +166,7 @@ class ArticleSubscriber implements EventSubscriberInterface
                 LazyLoadingInterface $proxy,
                 $method,
                 array $parameters,
-                & $initializer
+                &$initializer
             ) use ($structure, $data) {
                 $view = [];
                 foreach ($structure->getProperties(true) as $child) {
