@@ -184,5 +184,14 @@
 
             <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticleDocument"/>
         </service>
+
+        <!-- link -->
+        <service id="sulu_article.markup.link_provider" class="Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument>%sulu_article.types%</argument>
+
+            <tag name="sulu.link.provider" alias="article"/>
+        </service>
     </services>
 </container>

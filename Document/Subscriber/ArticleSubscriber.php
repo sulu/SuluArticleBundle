@@ -18,9 +18,7 @@ use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
-use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
-use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -97,9 +95,9 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Load route for article-document.
      *
-     * @param HydrateEvent $event
+     * @param AbstractMappingEvent $event
      */
-    public function handleHydrate(HydrateEvent $event)
+    public function handleHydrate(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument || null === $document->getRoutePath()) {
@@ -112,9 +110,9 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Generate route for article-document.
      *
-     * @param PersistEvent $event
+     * @param AbstractMappingEvent $event
      */
-    public function handleRoute(PersistEvent $event)
+    public function handleRoute(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument || null !== $document->getRoutePath()) {
@@ -131,9 +129,9 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Update route for article-document if route-path was changed.
      *
-     * @param PersistEvent $event
+     * @param AbstractMappingEvent $event
      */
-    public function handleRouteUpdate(PersistEvent $event)
+    public function handleRouteUpdate(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument
@@ -218,9 +216,9 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Removes article-document.
      *
-     * @param RemoveEvent $event
+     * @param RemoveEvent|UnpublishEvent $event
      */
-    public function handleRemoveLive(RemoveEvent $event)
+    public function handleRemoveLive($event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {

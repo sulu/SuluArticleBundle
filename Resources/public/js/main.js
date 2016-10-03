@@ -10,7 +10,9 @@
 require.config({
     paths: {
         suluarticle: '../../suluarticle/js',
-        suluarticlecss: '../../suluarticle/css'
+        suluarticlecss: '../../suluarticle/css',
+
+        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager'
     }
 });
 

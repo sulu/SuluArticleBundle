@@ -42,6 +42,10 @@
                 <source>search-overlay.index.article.title</source>
                 <target>Artikel</target>
             </trans-unit>
+            <trans-unit id="11" resname="sulu_article.ckeditor.link">
+                <source>sulu_article.ckeditor.link</source>
+                <target>Artikel</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
