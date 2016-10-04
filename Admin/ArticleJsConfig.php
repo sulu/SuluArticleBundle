@@ -33,13 +33,24 @@ class ArticleJsConfig implements JsConfigInterface
     private $typeConfiguration;
 
     /**
-     * @param StructureManagerInterface $structureManager
-     * @param $typeConfiguration
+     * @var boolean
      */
-    public function __construct(StructureManagerInterface $structureManager, $typeConfiguration)
+    private $displayTabAll;
+
+    /**
+     * @param StructureManagerInterface $structureManager
+     * @param array $typeConfiguration
+     * @param boolean $displayTabAll
+     */
+    public function __construct(
+        StructureManagerInterface $structureManager,
+        array $typeConfiguration,
+        $displayTabAll
+    )
     {
         $this->structureManager = $structureManager;
         $this->typeConfiguration = $typeConfiguration;
+        $this->displayTabAll = $displayTabAll;
     }
 
     /**
@@ -47,18 +58,22 @@ class ArticleJsConfig implements JsConfigInterface
      */
     public function getParameters()
     {
-        $types = [];
+        $config = [];
+
+        $config['types'] = [];
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());
-            if (!array_key_exists($type, $types)) {
-                $types[$type] = [
+            if (!array_key_exists($type, $config['types'])) {
+                $config['types'][$type] = [
                     'default' => $structure->getKey(),
                     'title' => $this->getTitle($type),
                 ];
             }
         }
 
-        return $types;
+        $config['displayTabAll'] = $this->displayTabAll;
+
+        return $config;
     }
 
     /**
@@ -66,7 +81,7 @@ class ArticleJsConfig implements JsConfigInterface
      */
     public function getName()
     {
-        return 'sulu_article.types';
+        return 'sulu_article';
     }
 
     /**

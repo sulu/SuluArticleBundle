@@ -42,7 +42,8 @@ define(['underscore'], function(_) {
                     title: 'public.add-new'
                 },
                 tabs = false,
-                items;
+                tabItems,
+                tabPreselect = null;
 
             if (typeNames.length === 1) {
                 button.callback = function() {
@@ -58,21 +59,40 @@ define(['underscore'], function(_) {
                     };
                 }.bind(this));
 
-                items = _.map(typeNames, function(type) {
-                    return {
-                        id: type,
-                        name: types[type].title,
-                        key: type
-                    };
-                });
+                tabItems = [];
+
+                // add tab item 'all' if parameter is true
+                if (this.options.config.displayTabAll === true) {
+                    tabItems.push(
+                        {
+                            name: 'public.all',
+                            key: null
+                        }
+                    );
+                }
+
+                // add tab item for each type
+                _.each(typeNames, function(type) {
+                    tabItems.push(
+                        {
+                            id: type,
+                            name: types[type].title,
+                            key: type
+                        }
+                    );
+
+                    if (type === this.options.type) {
+                        tabPreselect = types[type].title;
+                    }
+                }.bind(this));
 
                 tabs = {
                     componentOptions: {
                         callback: this.typeChange.bind(this),
                         preselector: 'name',
-                        preselect: this.options.type
+                        preselect: tabPreselect
                     },
-                    data: items
+                    data: tabItems
                 };
             }
 
@@ -130,7 +150,7 @@ define(['underscore'], function(_) {
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: '/admin/api/articles?locale=' + this.options.locale + '&type=' + this.options.type,
+                    url: '/admin/api/articles?locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
@@ -168,8 +188,18 @@ define(['underscore'], function(_) {
         },
 
         typeChange: function(item) {
-            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.id});
-            this.sandbox.emit('sulu.router.navigate', 'articles:' + item.id + '/' + this.options.locale, false, false);
+            var type = null;
+            var url = 'articles';
+
+            if (!!item.key) {
+                type = item.key;
+                url += ':' + item.key;
+            }
+
+            url += '/' + this.options.locale;
+
+            this.sandbox.emit('husky.datagrid.articles.url.update', {type: type});
+            this.sandbox.emit('sulu.router.navigate', url, false, false);
         },
 
         bindCustomEvents: function() {

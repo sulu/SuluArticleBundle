@@ -10,6 +10,19 @@ Install bundle over composer:
 composer require sulu/article-bundle
 ```
 
+Possible bundle configurations:
+
+```yml
+sulu_article:
+    documents:
+        article:
+            view: AppBundle\Document\ArticleViewDocument
+    types:
+        <TYPENAME>:
+            translation_key: '<TRANSLATION-KEY>'
+    display_tab_all: <BOOLEAN>
+```
+
 Configure the bundles:
 
 ```yml

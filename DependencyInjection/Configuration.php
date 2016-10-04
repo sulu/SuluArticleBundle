@@ -47,6 +47,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('display_tab_all')->defaultTrue()->end()
             ->end();
 
         return $treeBuilder;
