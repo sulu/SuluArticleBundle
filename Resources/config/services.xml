@@ -12,7 +12,7 @@
             <tag name="sulu.context" context="admin"/>
         </service>
         <service id="sulu_article.navigation_provider.article"
-                 class="Sulu\Bundle\ArticleBundle\Admin\ArticleContententNavigationProvider">
+                 class="Sulu\Bundle\ArticleBundle\Admin\ArticleContentNavigationProvider">
             <tag name="sulu_admin.content_navigation" alias="article"/>
             <tag name="sulu.context" context="admin"/>
         </service>
