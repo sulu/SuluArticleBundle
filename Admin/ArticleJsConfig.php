@@ -33,21 +33,20 @@ class ArticleJsConfig implements JsConfigInterface
     private $typeConfiguration;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $displayTabAll;
 
     /**
      * @param StructureManagerInterface $structureManager
      * @param array $typeConfiguration
-     * @param boolean $displayTabAll
+     * @param bool $displayTabAll
      */
     public function __construct(
         StructureManagerInterface $structureManager,
         array $typeConfiguration,
         $displayTabAll
-    )
-    {
+    ) {
         $this->structureManager = $structureManager;
         $this->typeConfiguration = $typeConfiguration;
         $this->displayTabAll = $displayTabAll;
