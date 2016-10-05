@@ -193,10 +193,9 @@ define(['underscore'], function(_) {
         },
 
         typeChange: function(item) {
-            var type = !!item.key ? item.key : null;
-            var url = this.templates.route({type: type, locale: this.options.locale});
+            var url = this.templates.route({type: item.key, locale: this.options.locale});
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {type: type});
+            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
             this.sandbox.emit('sulu.router.navigate', url, false, false);
         },
 
