@@ -16,11 +16,15 @@ Possible bundle configurations:
 sulu_article:
     documents:
         article:
-            view: AppBundle\Document\ArticleViewDocument
+            view: Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
     types:
-        <TYPENAME>:
-            translation_key: '<TRANSLATION-KEY>'
-    display_tab_all: <BOOLEAN>
+
+        # Prototype
+        name:
+            translation_key:      ~
+
+    # Display tab 'all' in list view
+    display_tab_all:      true
 ```
 
 Configure the bundles:
