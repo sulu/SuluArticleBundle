@@ -17,7 +17,7 @@ use Sulu\Bundle\AdminBundle\Navigation\ContentNavigationProviderInterface;
 /**
  * Provides tabs for article-form.
  */
-class ArticleContententNavigationProvider implements ContentNavigationProviderInterface
+class ArticleContentNavigationProvider implements ContentNavigationProviderInterface
 {
     /**
      * {@inheritdoc}

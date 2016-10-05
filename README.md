@@ -24,10 +24,10 @@ sulu_core:
     content:
         structure:
             default_type:
-                article: "default"
+                article: "article_default"
             paths:
-                homepage:
-                    path: "%kernel.root_dir%/Resources/articles"
+                article:
+                    path: "%kernel.root_dir%/Resources/templates/articles"
                     type: "article"
                     
 ongr_elasticsearch:
@@ -45,6 +45,30 @@ ongr_elasticsearch:
             connection: live
             mappings:
                 - SuluArticleBundle
+```
+
+Add xml template for structure in configured folder:
+
+```
+%kernel.root_dir%/Resources/templates/articles/article_default.xml
+```
+
+Example is located in Bundle:
+
+```
+Resources/doc/article_default.xml
+```
+
+Add template for article type in configured folder:
+
+```
+%kernel.root_dir%/Resources/views/articles/article_default.html.twig
+```
+
+Example is located in Bundle:
+
+```
+Resources/doc/article_default.html.twig
 ```
 
 Configure the routing
