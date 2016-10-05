@@ -47,6 +47,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('display_tab_all')->defaultTrue()->info("Display tab 'all' in list view")->end()
             ->end();
 
         return $treeBuilder;

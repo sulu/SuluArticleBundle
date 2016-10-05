@@ -45,8 +45,9 @@ define(['underscore', 'config'], function(_, Config) {
                         return {id: locale, title: locale};
                     }),
                     settingsKey: 'articleLanguage',
-                    typeNames: Object.keys(Config.get('sulu_article.types')),
-                    types: Config.get('sulu_article.types')
+                    typeNames: Object.keys(Config.get('sulu_article').types),
+                    types: Config.get('sulu_article').types,
+                    displayTabAll: Config.get('sulu_article').displayTabAll
                 };
             Config.set('sulu_article', config);
 
@@ -59,14 +60,14 @@ define(['underscore', 'config'], function(_, Config) {
                 return app.sandbox.sulu.getUserSetting(config.settingsKey) || config.defaultLocale;
             };
 
-            if (config.typeNames.length === 1) {
-                app.sandbox.mvc.routes.push({
-                    route: 'articles',
-                    callback: function() {
-                        return app.sandbox.emit('sulu.router.navigate', 'articles/' + getLocale());
-                    }
-                });
+            app.sandbox.mvc.routes.push({
+                route: 'articles',
+                callback: function() {
+                    return app.sandbox.emit('sulu.router.navigate', 'articles/' + getLocale());
+                }
+            });
 
+            if (1 === config.typeNames.length) {
                 app.sandbox.mvc.routes.push({
                     route: 'articles/:locale',
                     callback: function(locale) {
@@ -81,12 +82,24 @@ define(['underscore', 'config'], function(_, Config) {
                     }
                 });
             } else {
-                app.sandbox.mvc.routes.push({
-                    route: 'articles',
-                    callback: function() {
-                        return app.sandbox.emit('sulu.router.navigate', 'articles:' + config.typeNames[0] + '/' + getLocale());
-                    }
-                });
+                if (!config.displayTabAll) {
+                    // overwrite route if first tab isn't display all
+                    app.sandbox.mvc.routes.push({
+                        route: 'articles(/:locale)',
+                        callback: function() {
+                            return app.sandbox.emit('sulu.router.navigate', 'articles:' + config.typeNames[0] + '/' + getLocale());
+                        }
+                    });
+                }
+
+                if (config.displayTabAll === true) {
+                    app.sandbox.mvc.routes.push({
+                        route: 'articles/:locale',
+                        callback: function(locale) {
+                            return '<div data-aura-component="articles/list@suluarticle" data-aura-locale="' + locale + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                        }
+                    });
+                }
 
                 app.sandbox.mvc.routes.push({
                     route: 'articles::type',

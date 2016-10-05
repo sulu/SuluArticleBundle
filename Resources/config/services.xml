@@ -18,7 +18,8 @@
         </service>
         <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
             <argument type="service" id="sulu.content.structure_manager"/>
-            <argument>%sulu_articles.types%</argument>
+            <argument>%sulu_article.types%</argument>
+            <argument>%sulu_article.display_tab_all%</argument>
 
             <tag name="sulu.js_config"/>
             <tag name="sulu.context" context="admin"/>
@@ -27,7 +28,7 @@
         <!-- view -->
         <service id="sulu_article.view_document.factory"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory">
-            <argument type="string">%sulu_articles.documents%</argument>
+            <argument type="string">%sulu_article.documents%</argument>
         </service>
         <service id="sulu_article.elastic_search.article_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -153,13 +154,13 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
-            <argument type="string">%sulu_articles.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
         <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
             <argument type="service" id="es.manager.live"/>
-            <argument type="string">%sulu_articles.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.teaser.provider" alias="article"/>
         </service>
@@ -167,7 +168,7 @@
         <!-- serialization -->
         <service id="sulu_article.serializer.event_subscriber"
                  class="Sulu\Bundle\ArticleBundle\EventListener\ArticleViewDocumentSerializeSubscriber">
-            <argument>%sulu_articles.types%</argument>
+            <argument>%sulu_article.types%</argument>
 
             <tag name="jms_serializer.event_subscriber" />
             <tag name="sulu.context" context="admin"/>

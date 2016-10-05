@@ -22,6 +22,11 @@ define(['underscore'], function(_) {
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
                 '<div class="dialog"></div>'
+            ].join(''),
+            route: [
+                'articles',
+                '<% if (!!type) { %>:<%=type%><% } %>',
+                '/<%=locale%>'
             ].join('')
         },
 
@@ -42,9 +47,10 @@ define(['underscore'], function(_) {
                     title: 'public.add-new'
                 },
                 tabs = false,
-                items;
+                tabItems,
+                tabPreselect = null;
 
-            if (typeNames.length === 1) {
+            if (1 === typeNames.length) {
                 button.callback = function() {
                     this.toAdd(typeNames[0]);
                 }.bind(this);
@@ -58,21 +64,40 @@ define(['underscore'], function(_) {
                     };
                 }.bind(this));
 
-                items = _.map(typeNames, function(type) {
-                    return {
-                        id: type,
-                        name: types[type].title,
-                        key: type
-                    };
-                });
+                tabItems = [];
+
+                // add tab item 'all' if parameter is true
+                if (this.options.config.displayTabAll === true) {
+                    tabItems.push(
+                        {
+                            name: 'public.all',
+                            key: null
+                        }
+                    );
+                }
+
+                // add tab item for each type
+                _.each(typeNames, function(type) {
+                    tabItems.push(
+                        {
+                            id: type,
+                            name: types[type].title,
+                            key: type
+                        }
+                    );
+
+                    if (type === this.options.type) {
+                        tabPreselect = types[type].title;
+                    }
+                }.bind(this));
 
                 tabs = {
                     componentOptions: {
                         callback: this.typeChange.bind(this),
                         preselector: 'name',
-                        preselect: this.options.type
+                        preselect: tabPreselect
                     },
-                    data: items
+                    data: tabItems
                 };
             }
 
@@ -130,7 +155,7 @@ define(['underscore'], function(_) {
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: '/admin/api/articles?locale=' + this.options.locale + '&type=' + this.options.type,
+                    url: '/admin/api/articles?locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
@@ -168,8 +193,10 @@ define(['underscore'], function(_) {
         },
 
         typeChange: function(item) {
-            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.id});
-            this.sandbox.emit('sulu.router.navigate', 'articles:' + item.id + '/' + this.options.locale, false, false);
+            var url = this.templates.route({type: item.key, locale: this.options.locale});
+
+            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
+            this.sandbox.emit('sulu.router.navigate', url, false, false);
         },
 
         bindCustomEvents: function() {
