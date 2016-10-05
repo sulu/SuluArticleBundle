@@ -22,6 +22,11 @@ define(['underscore'], function(_) {
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
                 '<div class="dialog"></div>'
+            ].join(''),
+            route: [
+                'articles',
+                '<% if (!!type) { %>:<%=type%><% } %>',
+                '/<%=locale%>'
             ].join('')
         },
 
@@ -45,7 +50,7 @@ define(['underscore'], function(_) {
                 tabItems,
                 tabPreselect = null;
 
-            if (typeNames.length === 1) {
+            if (1 === typeNames.length) {
                 button.callback = function() {
                     this.toAdd(typeNames[0]);
                 }.bind(this);
@@ -188,15 +193,8 @@ define(['underscore'], function(_) {
         },
 
         typeChange: function(item) {
-            var type = null;
-            var url = 'articles';
-
-            if (!!item.key) {
-                type = item.key;
-                url += ':' + item.key;
-            }
-
-            url += '/' + this.options.locale;
+            var type = !!item.key ? item.key : null;
+            var url = this.templates.route({type: type, locale: this.options.locale});
 
             this.sandbox.emit('husky.datagrid.articles.url.update', {type: type});
             this.sandbox.emit('sulu.router.navigate', url, false, false);

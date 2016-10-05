@@ -67,7 +67,7 @@ define(['underscore', 'config'], function(_, Config) {
                 }
             });
 
-            if (config.typeNames.length === 1) {
+            if (1 === config.typeNames.length) {
                 app.sandbox.mvc.routes.push({
                     route: 'articles/:locale',
                     callback: function(locale) {
@@ -82,7 +82,7 @@ define(['underscore', 'config'], function(_, Config) {
                     }
                 });
             } else {
-                if (config.displayTabAll === false) {
+                if (!config.displayTabAll) {
                     // overwrite route if first tab isn't display all
                     app.sandbox.mvc.routes.push({
                         route: 'articles(/:locale)',

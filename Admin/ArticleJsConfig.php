@@ -57,9 +57,11 @@ class ArticleJsConfig implements JsConfigInterface
      */
     public function getParameters()
     {
-        $config = [];
+        $config = [
+            'types' => [],
+            'displayTabAll' => $this->displayTabAll,
+        ];
 
-        $config['types'] = [];
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());
             if (!array_key_exists($type, $config['types'])) {
@@ -69,8 +71,6 @@ class ArticleJsConfig implements JsConfigInterface
                 ];
             }
         }
-
-        $config['displayTabAll'] = $this->displayTabAll;
 
         return $config;
     }
