@@ -84,7 +84,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
      */
     public function createSitemap($alias)
     {
-        return new Sitemap($alias);
+        return new Sitemap($alias, $this->getMaxPage());
     }
 
     /**
