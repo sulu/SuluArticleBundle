@@ -15,7 +15,7 @@
         <title lang="de">Standard</title>
     </meta>
 
-    <tag name="sulu.type" type="article"/>
+    <tag name="sulu_article.type" type="article"/>
 
     <properties>
         <section name="highlight">

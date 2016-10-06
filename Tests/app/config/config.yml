@@ -1,3 +1,8 @@
+# Doctrine Configuration
+doctrine:
+    dbal:
+        dbname:   "su_articles_test"
+
 sulu_core:
     content:
         structure:

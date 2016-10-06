@@ -9,7 +9,7 @@
     <controller>SuluWebsiteBundle:Default:index</controller>
     <cacheLifetime>2400</cacheLifetime>
 
-    <tag name="sulu.type" type="video"/>
+    <tag name="sulu_article.type" type="video"/>
 
     <properties>
         <property name="title" type="text_line" mandatory="true"/>

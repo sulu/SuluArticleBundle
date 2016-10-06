@@ -1,6 +1,6 @@
 {
     "name": "sulu/article-bundle",
-    "description": "Sulu Bundle for managing articles",
+    "description": "Sulu bundle for managing articles",
     "type": "sulu-bundle",
     "license": "MIT",
     "require": {
