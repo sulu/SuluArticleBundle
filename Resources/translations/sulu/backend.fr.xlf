@@ -38,6 +38,10 @@
                 <source>sulu_article.teaser</source>
                 <target>Article</target>
             </trans-unit>
+            <trans-unit id="10" resname="search-overlay.index.article.title">
+                <source>search-overlay.index.article.title</source>
+                <target>Article</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

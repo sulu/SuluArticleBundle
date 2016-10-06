@@ -13,14 +13,16 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
 
     return {
 
-        layout: {
-            extendExisting: true,
+        layout: function() {
+            return {
+                extendExisting: true,
 
-            content: {
-                width: 'fixed',
-                rightSpace: false,
-                leftSpace: false
-            }
+                content: {
+                    width: (!!this.options.preview) ? 'fixed' : 'max',
+                    rightSpace: false,
+                    leftSpace: false
+                }
+            };
         },
 
         initialize: function() {
@@ -56,9 +58,14 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             this.sandbox.emit('sulu.tab.dirty');
         },
 
+        /**
+         * @param {Object} action
+         */
         save: function(action) {
             if (!this.sandbox.form.validate(this.formId)) {
-                return this.sandbox.emit('sulu.tab.dirty', true);
+                this.sandbox.emit('sulu.tab.dirty', true);
+
+                return;
             }
 
             var data = this.sandbox.form.getData(this.formId);
@@ -75,6 +82,9 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             this.checkRenderTemplate(this.data.template || null);
         },
 
+        /**
+         * @param {String} template
+         */
         checkRenderTemplate: function(template) {
             if (!!template && this.template === template) {
                 return this.sandbox.emit('sulu.header.toolbar.item.enable', 'template', false);
@@ -89,6 +99,9 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             }
         },
 
+        /**
+         * @param {String} template
+         */
         showRenderTemplateDialog: function(template) {
             // show warning dialog
             this.sandbox.emit('sulu.overlay.show-warning',
@@ -109,6 +122,9 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             );
         },
 
+        /**
+         * @param {String} template
+         */
         loadFormTemplate: function(template) {
             if (!template) {
                 template = this.options.config.types[(this.options.type || this.data.type)].default;
@@ -134,6 +150,11 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             }.bind(this));
         },
 
+        /**
+         * @param {String} template
+         *
+         * @returns {String}
+         */
         getTemplateUrl: function(template) {
             var url = 'text!/admin/content/template/form';
             if (!!template) {
@@ -150,6 +171,9 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             return url;
         },
 
+        /**
+         * @param {String} template
+         */
         renderFormTemplate: function(template) {
             this.sandbox.dom.html(this.formId, this.sandbox.util.template(template, {
                 translate: this.sandbox.translate,
@@ -174,6 +198,11 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             this.sandbox.emit('sulu.header.toolbar.item.enable', 'template', false);
         },
 
+        /**
+         * @param {Object} data
+         *
+         * @returns {Object}
+         */
         createForm: function(data) {
             var formObject = this.sandbox.form.create(this.formId),
                 deferred = this.sandbox.data.deferred();
@@ -183,8 +212,14 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
                     this.sandbox.start(this.$el, {reset: true}).then(function() {
                         this.initSortableBlock();
                         this.bindFormEvents();
-
                         deferred.resolve();
+
+                        if (!!this.options.preview) {
+                            this.options.preview.bindDomEvents(this.$el);
+                            var data = this.data;
+                            data.template = this.template;
+                            this.options.preview.updateContext({template: this.template}, data);
+                        }
                     }.bind(this));
                 }.bind(this));
             }.bind(this));
@@ -207,18 +242,24 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
                 this.sandbox.dom.unbind(sortable, 'sortupdate');
 
                 sortable.bind('sortupdate', function(event) {
+                    // update preview
+                    this.updatePreviewProperty(event.currentTarget, null);
+
                     this.sandbox.emit('sulu.content.changed');
                 }.bind(this));
             }
         },
 
         bindFormEvents: function() {
-            this.sandbox.dom.on(this.formId, 'form-remove', function() {
+            this.sandbox.dom.on(this.formId, 'form-remove', function(event, propertyName) {
                 this.initSortableBlock();
                 this.setDirty();
+
+                // update preview
+                this.updatePreviewProperty(event.currentTarget, propertyName);
             }.bind(this));
 
-            this.sandbox.dom.on(this.formId, 'form-add', function(e, propertyName, data, index) {
+            this.sandbox.dom.on(this.formId, 'form-add', function(event, propertyName, data, index) {
                 var $elements = this.sandbox.dom.children(this.$find('[data-mapper-property="' + propertyName + '"]')),
                     $element = (index !== undefined && $elements.length > index) ? $elements[index] : this.sandbox.dom.last($elements);
 
@@ -230,6 +271,9 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
 
                 // reinit sorting
                 this.initSortableBlock();
+
+                // update preview
+                this.updatePreviewProperty(event.currentTarget, propertyName);
             }.bind(this));
 
             this.sandbox.dom.on(this.formId, 'init-sortable', function(e) {
@@ -244,6 +288,23 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             promise.resolve(this.options.data());
 
             return promise;
+        },
+
+        /**
+         * @param {Object} target
+         * @param {String} propertyName
+         */
+        updatePreviewProperty: function(target, propertyName)
+        {
+            if (!!this.options.preview) {
+                var data = this.sandbox.form.getData(this.formId);
+
+                if (!propertyName && !!target) {
+                    propertyName = this.sandbox.dom.data(target, 'mapperProperty');
+                }
+
+                this.options.preview.updateProperty(propertyName, data[propertyName]);
+            }
         }
     };
 });
