@@ -22,7 +22,7 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
  */
 class ArticleAdmin extends Admin
 {
-    const STRUCTURE_TAG_TYPE = 'sulu.type';
+    const STRUCTURE_TAG_TYPE = 'sulu_article.type';
     const SECURITY_CONTEXT = 'sulu.modules.articles';
 
     /**

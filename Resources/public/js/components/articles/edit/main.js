@@ -7,7 +7,12 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function($, _, UserManager) {
+define([
+    'jquery',
+    'underscore',
+    'sulusecurity/services/user-manager',
+    'services/sulupreview/preview'
+], function($, _, UserManager, Preview) {
 
     'use strict';
 
@@ -26,6 +31,18 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
                 headline: 'sulu_article.edit.title',
                 draftLabel: 'sulu-document-manager.draft-label'
             }
+        },
+
+        layout: function(){
+            return {
+                navigation: {
+                    collapsed: true
+                },
+                content: {
+                    shrinkable: !!this.options.id
+                },
+                sidebar: (!!this.options.id) ? 'max' : false
+            };
         },
 
         header: function() {
@@ -60,7 +77,8 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
                         url: function() {
                             return this.templates.url({id: this.options.id, locale: this.options.locale});
                         }.bind(this),
-                        config: this.options.config
+                        config: this.options.config,
+                        preview: this.preview
                     },
                     componentOptions: {
                         values: this.data
@@ -74,8 +92,6 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
         },
 
         initialize: function() {
-            this.saveState = 'disabled';
-
             this.bindCustomEvents();
             this.showDraftLabel();
         },
@@ -172,7 +188,6 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
         },
 
         loadingSave: function() {
-            this.saveState = 'loading';
             this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
         },
 
@@ -235,10 +250,24 @@ define(['jquery', 'underscore', 'sulusecurity/services/user-manager'], function(
             }
 
             this.sandbox.util.load(this.getUrl()).done(function(data) {
+                this.preview = Preview.initialize({});
+                this.preview.start(
+                    'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
+                    this.options.id,
+                    this.options.locale,
+                    data
+                );
+
                 promise.resolve(data);
-            });
+            }.bind(this));
 
             return promise;
+        },
+
+        destroy: function() {
+            if (!!this.preview) {
+                Preview.destroy(this.preview);
+            }
         }
     };
 });
