@@ -16,8 +16,8 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\QueryStringQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
-use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
@@ -93,11 +93,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $search = $repository->createSearch();
 
         if (!empty($searchPattern = $restHelper->getSearchPattern())) {
-            foreach ($restHelper->getSearchFields() as $searchField) {
-                $search->addQuery(
-                    new WildcardQuery($this->uncamelize($searchField), '*' . strtolower($searchPattern) . '*')
-                );
-            }
+            $search->addQuery(new QueryStringQuery($searchPattern . '*'));
         }
 
         if (null !== ($type = $request->get('type'))) {
