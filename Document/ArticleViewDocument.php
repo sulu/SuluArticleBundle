@@ -43,11 +43,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
      * )
      */
     protected $title;
@@ -58,11 +58,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
      * )
      */
     protected $routePath;
@@ -70,7 +70,12 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "analyzer":"keyword"
+     *     }
+     * )
      */
     protected $type;
 
@@ -80,11 +85,8 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
+     *         "analyzer":"keyword"
+     *     }
      * )
      */
     protected $structureType;
@@ -95,11 +97,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
      * )
      */
     protected $changerFullName;
@@ -110,11 +112,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
-     *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
-     *        }
-     *    }
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
      * )
      */
     protected $creatorFullName;
