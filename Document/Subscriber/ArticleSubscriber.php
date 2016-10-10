@@ -22,6 +22,7 @@ use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -87,7 +88,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::PUBLISH => 'handleIndexLive',
-            Events::UNPUBLISH => 'handleRemoveLive',
+            Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
@@ -201,6 +202,22 @@ class ArticleSubscriber implements EventSubscriberInterface
      * @param RemoveEvent $event
      */
     public function handleRemoveLive(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->remove($document);
+        $this->liveIndexer->flush();
+    }
+
+    /**
+     * Unpublish article-document.
+     *
+     * @param UnpublishEvent $event
+     */
+    public function handleUnpublish(UnpublishEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {

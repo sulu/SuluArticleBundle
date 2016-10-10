@@ -18,7 +18,7 @@ define([], function() {
             var content = this.options.data();
             content.ext.excerpt = data;
 
-            this.sandbox.emit('sulu.articles.save', content, action);
+            this.sandbox.emit('sulu.article.save', content, action);
         }
     };
 });

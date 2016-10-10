@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
@@ -18,14 +19,17 @@ use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
+use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
+use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -264,6 +268,54 @@ class ArticleController extends RestController implements ClassResourceInterface
         $documentManager->flush();
 
         return $this->handleView($this->view(null));
+    }
+
+    /**
+     * Trigger a action for given article specified over get-action parameter.
+     *
+     * @Post("/articles/{uuid}")
+     *
+     * @param string $uuid
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function postTriggerAction($uuid, Request $request)
+    {
+        // extract parameter
+        $action = $this->getRequestParameter($request, 'action', true);
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
+        // prepare vars
+        $view = null;
+        $data = null;
+
+        try {
+            switch ($action) {
+                case 'unpublish':
+                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                    $this->getDocumentManager()->unpublish($document, $locale);
+                    $this->getDocumentManager()->flush();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    break;
+                case 'remove-draft':
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $this->getDocumentManager()->removeDraft($data, $locale);
+                    $this->getDocumentManager()->flush();
+                    break;
+                default:
+                    throw new RestException('Unrecognized action: ' . $action);
+            }
+
+            // prepare view
+            $view = $this->view($data, $data !== null ? 200 : 204);
+            $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+        } catch (RestException $exc) {
+            $view = $this->view($exc->toArray(), 400);
+        }
+
+        return $this->handleView($view);
     }
 
     /**

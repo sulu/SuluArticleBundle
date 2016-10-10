@@ -94,7 +94,7 @@ define([
                 return item.substr(1);
             });
 
-            this.sandbox.emit('sulu.articles.save', data, action);
+            this.sandbox.emit('sulu.article.save', data, action);
         },
 
         /**

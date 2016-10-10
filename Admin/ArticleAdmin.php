@@ -67,6 +67,10 @@ class ArticleAdmin extends Admin
                 'Global' => [
                     self::SECURITY_CONTEXT => [
                         PermissionTypes::VIEW,
+                        PermissionTypes::ADD,
+                        PermissionTypes::EDIT,
+                        PermissionTypes::DELETE,
+                        PermissionTypes::LIVE,
                     ],
                 ],
             ],

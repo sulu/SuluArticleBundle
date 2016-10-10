@@ -45,6 +45,10 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
             }.bind(this));
 
             this.sandbox.on('sulu.tab.save', this.save.bind(this));
+
+            this.sandbox.on('sulu.header.saved', function(data) {
+                this.data = data;
+            }, this);
         },
 
         listenForChange: function() {
@@ -75,7 +79,7 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
                 this.data[key] = value;
             }.bind(this));
 
-            this.sandbox.emit('sulu.articles.save', this.data, action);
+            this.sandbox.emit('sulu.article.save', this.data, action);
         },
 
         render: function() {
