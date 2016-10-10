@@ -11,7 +11,7 @@ define([
     'underscore',
     'jquery',
     'sulusecurity/components/users/models/user',
-    'text!./form.html'
+    'text!/admin/articles/template/settings.html'
 ], function(_, $, User, form) {
 
     'use strict';
