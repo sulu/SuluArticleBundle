@@ -160,8 +160,6 @@ define([
             this.sandbox.on('sulu.tab.dirty', this.setHeaderBar.bind(this));
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
-            this.sandbox.on('sulu.article.save', this.saveArticle.bind(this));
-            this.sandbox.on('sulu.tab.saved', this.articleSaved.bind(this));
             this.sandbox.on('sulu.article.delete', this.deleteArticle.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
@@ -203,8 +201,8 @@ define([
         save: function(action) {
             this.loadingSave();
 
-            this.saveTab(action).then(function(id) {
-                this.afterSaveAction(action, !id);
+            this.saveTab(action).then(function(data) {
+                this.saved(data.id, data, action);
             }.bind(this));
         },
 
@@ -215,38 +213,16 @@ define([
         saveTab: function(action) {
             var promise = $.Deferred();
 
-            this.sandbox.once('sulu.tab.saved', function(savedData) {
-                promise.resolve(savedData);
+            // Display loading animation.
+            this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
+
+            this.sandbox.once('sulu.tab.saved', function(id, data) {
+                promise.resolve(data);
             }.bind(this));
 
             this.sandbox.emit('sulu.tab.save', action);
 
             return promise;
-        },
-
-        saveArticle: function(data, action) {
-            this.sandbox.util.save(this.getUrl(action), !this.data.id ? 'POST' : 'PUT', data).then(function(data) {
-                this.setData(data);
-                this.sandbox.emit('sulu.tab.saved', data.id, data);
-            }.bind(this));
-
-            // Display loading animation.
-            this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
-
-            ArticleManager.save(
-                data,
-                this.options.locale,
-                {
-                    action: action
-                },
-                function(response) {
-                    this.setData(response);
-                    this.sandbox.emit('sulu.tab.saved', response.id, response);
-                }.bind(this),
-                function(xhr) {
-                    this.sandbox.emit('sulu.content.contents.error', xhr.status, data);
-                }.bind(this)
-            );
         },
 
         setHeaderBar: function(saved) {
@@ -257,7 +233,7 @@ define([
             this.setSaveToolbarItems.call(this, 'saveDraft', saveDraft);
             this.setSaveToolbarItems.call(this, 'savePublish', savePublish);
             this.setSaveToolbarItems.call(this, 'publish', publish);
-            this.setSaveToolbarItems.call(this, 'unpublish', !!this.data.publishedState);
+            this.setSaveToolbarItems.call(this, 'unpublish', !!this.data.published);
 
             if (!!saveDraft || !!savePublish || !!publish) {
                 this.sandbox.emit('sulu.header.toolbar.item.enable', 'save', false);
@@ -265,9 +241,7 @@ define([
                 this.sandbox.emit('sulu.header.toolbar.item.disable', 'save', false);
             }
 
-            this.showState(!!this.data.publishedState);
-
-            this.saved = saved;
+            this.showState(!!this.data.published);
         },
 
         setSaveToolbarItems: function(item, value) {
@@ -332,24 +306,24 @@ define([
 
                     this.sandbox.emit('husky.label.header.loading');
 
-                    ArticleManager.removeDraft(this.data.id, this.options.locale)
-                        .then(function (response) {
-                            this.sandbox.emit(
-                                'sulu.router.navigate',
-                                this.sandbox.mvc.history.fragment,
-                                true,
-                                true
-                            );
-                            this.sandbox.emit('sulu.tab.saved', response.id, response);
-                        }.bind(this))
-                        .fail(function () {
-                            this.sandbox.emit('husky.label.header.reset');
-                            this.sandbox.emit(
-                                'sulu.labels.error.show',
-                                'labels.error.remove-draft-desc',
-                                'labels.error'
-                            );
-                        }.bind(this))
+                    ArticleManager.removeDraft(this.data.id, this.options.locale).always(function () {
+                        this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
+                    }.bind(this)).then(function (response) {
+                        this.sandbox.emit(
+                            'sulu.router.navigate',
+                            this.sandbox.mvc.history.fragment,
+                            true,
+                            true
+                        );
+                        this.saved(response.id, response);
+                    }.bind(this)).fail(function () {
+                        this.sandbox.emit('husky.label.header.reset');
+                        this.sandbox.emit(
+                            'sulu.labels.error.show',
+                            'labels.error.remove-draft-desc',
+                            'labels.error'
+                        );
+                    }.bind(this));
                 }.bind(this),
                 this.sandbox.translate(this.defaults.translations.deleteDraftConfirmTitle),
                 this.sandbox.translate(this.defaults.translations.deleteDraftConfirmText)
@@ -421,25 +395,23 @@ define([
                     }
 
                     this.sandbox.emit('sulu.header.toolbar.item.loading', 'edit');
-                    ArticleManager.unpublish(this.data.id, this.options.locale)
-                        .always(function () {
-                            this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
-                        }.bind(this))
-                        .then(function (response) {
-                            this.sandbox.emit(
-                                'sulu.labels.success.show',
-                                'labels.success.content-unpublish-desc',
-                                'labels.success'
-                            );
-                            this.sandbox.emit('sulu.tab.saved', response.id, response);
-                        }.bind(this))
-                        .fail(function () {
-                            this.sandbox.emit(
-                                'sulu.labels.error.show',
-                                'labels.error.content-unpublish-desc',
-                                'labels.error'
-                            );
-                        }.bind(this));
+
+                    ArticleManager.unpublish(this.data.id, this.options.locale).always(function () {
+                        this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
+                    }.bind(this)).then(function (response) {
+                        this.sandbox.emit(
+                            'sulu.labels.success.show',
+                            'labels.success.content-unpublish-desc',
+                            'labels.success'
+                        );
+                        this.saved(response.id, response);
+                    }.bind(this)).fail(function () {
+                        this.sandbox.emit(
+                            'sulu.labels.error.show',
+                            'labels.error.content-unpublish-desc',
+                            'labels.error'
+                        );
+                    }.bind(this));
                 }.bind(this),
                 title: this.defaults.translations.unpublishConfirmTitle,
                 description: !!this.hasDraft(this.data)?
@@ -448,7 +420,7 @@ define([
             });
         },
 
-        articleSaved: function(id, data, action) {
+        saved: function(id, data, action) {
             if (!this.options.id) {
                 this.sandbox.sulu.viewStates.justSaved = true;
             } else {

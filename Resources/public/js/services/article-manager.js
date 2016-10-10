@@ -7,13 +7,13 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery'], function ($) {
+define(['jquery', 'services/husky/util'], function ($, Util) {
     'use strict';
 
     var baseUrl = '/admin/api/articles';
 
     return {
-        save: function(data, locale, options, successCallback, errorCallback) {
+        save: function(data, locale, action) {
             var method = 'POST', url = baseUrl, requestParameters = [];
 
             if (!!data.id) {
@@ -21,62 +21,31 @@ define(['jquery'], function ($) {
                 url += '/' + data.id;
             }
 
-            if (!!locale) {
-                requestParameters.push('locale=' + locale);
+            requestParameters.push('locale=' + locale);
+
+            if (!!action) {
+                requestParameters.push('action=' + action);
             }
 
-            if (!!options.action) {
-                requestParameters.push('action=' + options.action);
-            }
-
-            $.ajax(
+            return Util.save(
                 url + '?' + requestParameters.join('&'),
-                {
-                    method: method,
-                    data: JSON.stringify(data),
-                    contentType: 'application/json; charset=utf-8',
-                    success: successCallback,
-                    error: errorCallback
-                }
+                method,
+                data
             );
         },
 
         unpublish: function(id, locale) {
-            var deferred = $.Deferred();
-            $.ajax(
+            return Util.save(
                 [baseUrl, '/', id, '?action=unpublish&locale=' + locale].join(''),
-                {
-                    method: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function(response) {
-                        deferred.resolve(response);
-                    },
-                    error: function(xhr) {
-                        deferred.reject(xhr);
-                    }
-                }
+                'POST'
             );
-
-            return deferred.promise();
         },
 
         removeDraft: function(id, locale) {
-            var deferred = $.Deferred();
-            $.ajax(
+            return Util.save(
                 [baseUrl, '/', id, '?action=remove-draft&locale=' + locale].join(''),
-                {
-                    method: 'POST',
-                    contentType: 'application/json; charset=utf-8',
-                    success: function(response) {
-                        deferred.resolve(response);
-                    },
-                    error: function(xhr) {
-                        deferred.reject(xhr);
-                    }
-                }
+                'POST'
             );
-
-            return deferred.promise();
         }
     }
 });
