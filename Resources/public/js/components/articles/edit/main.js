@@ -65,6 +65,7 @@ define([
                 }
 
                 buttons.save = {
+                    parent: 'saveWithDraft',
                     options: {
                         callback: function() {
                             this.sandbox.emit('sulu.toolbar.save', 'publish');

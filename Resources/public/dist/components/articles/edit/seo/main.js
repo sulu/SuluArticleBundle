@@ -1,1 +1,1 @@
-define(function(){"use strict";return{type:"seo-tab",parseData:function(a){return a.ext.seo},getUrl:function(){var a=this.options.data();return this.options.excerptUrlPrefix+a.route},save:function(a,b){var c=this.options.data();c.ext.seo=a,this.sandbox.emit("sulu.articles.save",c,b)}}});
+define(function(){"use strict";return{type:"seo-tab",parseData:function(a){return a.ext.seo},getUrl:function(){var a=this.options.data();return this.options.excerptUrlPrefix+a.route},save:function(a,b){var c=this.options.data();c.ext.seo=a,this.sandbox.emit("sulu.article.save",c,b)}}});
