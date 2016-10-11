@@ -34,6 +34,13 @@ define(['jquery', 'services/husky/util'], function ($, Util) {
             );
         },
 
+        delete: function(id) {
+            return Util.save(
+                [baseUrl, '/', id].join(''),
+                'DELETE'
+            );
+        },
+
         unpublish: function(id, locale) {
             return Util.save(
                 [baseUrl, '/', id, '?action=unpublish&locale=' + locale].join(''),

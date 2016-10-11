@@ -11,8 +11,9 @@ define([
     'underscore',
     'jquery',
     'sulusecurity/components/users/models/user',
+    'suluarticle/services/article-manager',
     'text!./form.html'
-], function(_, $, User, form) {
+], function(_, $, User, ArticleManager, form) {
 
     'use strict';
 
@@ -43,6 +44,7 @@ define([
          */
         parseData: function(data) {
             return {
+                id: data.id,
                 authored: data.authored,
                 authors: _.map(data.authors, function(item) {
                     return 'c' + item;
@@ -94,7 +96,11 @@ define([
                 return item.substr(1);
             });
 
-            this.sandbox.emit('sulu.article.save', data, action);
+            ArticleManager.save(data, this.options.locale, action).then(function (response) {
+                this.sandbox.emit('sulu.tab.saved', response.id, response);
+            }.bind(this)).fail(function (xhr) {
+                this.sandbox.emit('sulu.article.error', xhr.status, data);
+            }.bind(this));
         },
 
         /**

@@ -107,9 +107,7 @@ define([
                 editDropdown.delete = {
                     options: {
                         disabled: !this.options.id,
-                        callback: function() {
-                            this.sandbox.emit('sulu.article.delete', this.options.id);
-                        }.bind(this)
+                        callback: this.deleteArticle.bind(this)
                     }
                 };
             }
@@ -160,7 +158,7 @@ define([
             this.sandbox.on('sulu.tab.dirty', this.setHeaderBar.bind(this));
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
-            this.sandbox.on('sulu.article.delete', this.deleteArticle.bind(this));
+            this.sandbox.on('sulu.article.error', this.handleError.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
@@ -168,10 +166,25 @@ define([
             }.bind(this));
         },
 
+        /**
+         * Handles the error based on its error code.
+         *
+         * @param {Number} errorCode
+         * @param {Object} data
+         * @param {string} action
+         */
+        handleError: function(errorCode, data, action) {
+            switch (errorCode) {
+                default:
+                    this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');
+            }
+        },
+
         deleteArticle: function() {
             this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
                 if (wasConfirmed) {
-                    this.sandbox.util.save('/admin/api/articles/' + this.options.id, 'DELETE').then(function() {
+                    ArticleManager.delete(this.options.id).then(function() {
                         this.toList();
                     }.bind(this));
                 }
@@ -421,10 +434,11 @@ define([
         },
 
         saved: function(id, data, action) {
+            this.setData(data);
+
             if (!this.options.id) {
                 this.sandbox.sulu.viewStates.justSaved = true;
             } else {
-                this.setData(data);
                 this.setHeaderBar(true);
                 this.showDraftLabel();
 
