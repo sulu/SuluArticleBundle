@@ -176,10 +176,10 @@ define(['underscore'], function(_) {
                                     column: 'title',
                                     callback: function(item, badge) {
                                         var icons = '',
-                                            tooltip = this.sandbox.translate(this.translations.unpublished);
+                                            tooltip = this.translations.unpublished;
 
                                         if (!!item.published && !item.publishedState) {
-                                            tooltip = this.sandbox.translate(this.translations.publishedWithDraft);
+                                            tooltip = this.translations.publishedWithDraft;
                                             icons += this.templates.publishedIcon({title: tooltip});
                                         }
                                         if (!item.publishedState) {

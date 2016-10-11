@@ -88,7 +88,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::PUBLISH => 'handleIndexLive',
-            Events::UNPUBLISH => 'handleUnpublish',
+            Events::UNPUBLISH => 'handleRemoveLive',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
@@ -197,27 +197,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Removes article-document.
+     * Removes/unpublish article-document.
      *
-     * @param RemoveEvent $event
+     * @param RemoveEvent|UnpublishEvent $event
      */
-    public function handleRemoveLive(RemoveEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        $this->liveIndexer->remove($document);
-        $this->liveIndexer->flush();
-    }
-
-    /**
-     * Unpublish article-document.
-     *
-     * @param UnpublishEvent $event
-     */
-    public function handleUnpublish(UnpublishEvent $event)
+    public function handleRemoveLive($event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {

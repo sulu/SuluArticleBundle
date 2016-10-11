@@ -280,7 +280,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      * @param string $uuid
      * @param Request $request
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function postTriggerAction($uuid, Request $request)
     {

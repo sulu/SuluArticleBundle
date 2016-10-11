@@ -292,7 +292,7 @@ define([
                 this.sandbox.emit(
                     'sulu.header.tabs.label.show',
                     this.sandbox.util.sprintf(
-                        this.sandbox.translate(this.defaults.translations.draftLabel),
+                        this.sandbox.translate(this.translations.draftLabel),
                         {
                             changed: this.sandbox.date.format(this.data.changed, true),
                             user: response.username
@@ -301,7 +301,7 @@ define([
                     [
                         {
                             id: 'delete-draft',
-                            title: this.sandbox.translate(this.defaults.translations.removeDraft),
+                            title: this.sandbox.translate(this.translations.removeDraft),
                             skin: 'critical',
                             onClick: this.deleteDraft.bind(this)
                         }

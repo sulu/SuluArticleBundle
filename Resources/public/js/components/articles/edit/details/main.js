@@ -10,9 +10,8 @@
 define([
     'underscore',
     'jquery',
-    'config',
     'suluarticle/services/article-manager'
-], function(_, $, Config, ArticleManager) {
+], function(_, $, ArticleManager) {
 
     'use strict';
 
