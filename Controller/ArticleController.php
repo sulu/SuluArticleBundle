@@ -88,7 +88,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (!empty($searchPattern = $restHelper->getSearchPattern())) {
             foreach ($restHelper->getSearchFields() as $searchField) {
-                $search->addQuery(new WildcardQuery($searchField, '*' . strtolower($searchPattern) . '*'));
+                $search->addQuery(
+                    new WildcardQuery($this->uncamelize($searchField), '*' . strtolower($searchPattern) . '*')
+                );
             }
         }
 
@@ -103,7 +105,9 @@ class ArticleController extends RestController implements ClassResourceInterface
         $count = $repository->count($search);
 
         if (null !== $restHelper->getSortColumn()) {
-            $search->addSort(new FieldSort($restHelper->getSortColumn(), $restHelper->getSortOrder()));
+            $search->addSort(
+                new FieldSort($this->uncamelize($restHelper->getSortColumn()), $restHelper->getSortOrder())
+            );
         }
 
         $limit = (int) $restHelper->getLimit();
@@ -393,5 +397,23 @@ class ArticleController extends RestController implements ClassResourceInterface
                 $this->getDocumentManager()->publish($document, $locale);
                 break;
         }
+    }
+
+    /**
+     * Converts camel case string into normalized string with underscore.
+     *
+     * @param string $camel
+     *
+     * @return string
+     */
+    private function uncamelize($camel)
+    {
+        $camel = preg_replace(
+            '/(?!^)[[:upper:]][[:lower:]]/',
+            '$0',
+            preg_replace('/(?!^)[[:upper:]]+/', '_$0', $camel)
+        );
+
+        return strtolower($camel);
     }
 }
