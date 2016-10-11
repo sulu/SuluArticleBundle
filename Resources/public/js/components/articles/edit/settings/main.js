@@ -12,7 +12,7 @@ define([
     'jquery',
     'sulusecurity/components/users/models/user',
     'suluarticle/services/article-manager',
-    'text!./form.html'
+    'text!/admin/articles/template/settings.html'
 ], function(_, $, User, ArticleManager, form) {
 
     'use strict';
