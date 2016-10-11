@@ -8,5 +8,7 @@
         <property name="created" type="DateTime" expose="true"/>
         <property name="changed" type="DateTime" expose="true"/>
         <property name="authored" type="DateTime" expose="true"/>
+        <property name="published" type="DateTime" expose="true"/>
+        <property name="publishedState" type="boolean" expose="true"/>
     </class>
 </serializer>

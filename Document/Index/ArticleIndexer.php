@@ -20,6 +20,7 @@ use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -146,6 +147,8 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
+        $article->setPublished($document->getPublished());
+        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
 
         $extensions = $document->getExtensionsData()->toArray();
         $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));

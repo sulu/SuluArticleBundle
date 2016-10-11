@@ -178,6 +178,20 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $teaserMediaId;
 
     /**
+     * @var \DateTime
+     *
+     * @Property(type="date")
+     */
+    protected $published;
+
+    /**
+     * @var boolean
+     *
+     * @Property(type="boolean")
+     */
+    protected $publishedState;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -467,5 +481,41 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setTeaserMediaId($teaserMediaId)
     {
         $this->teaserMediaId = $teaserMediaId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublished()
+    {
+        return $this->published;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublished(\DateTime $published = null)
+    {
+        $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublishedState()
+    {
+        return $this->publishedState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublishedState($publishedState)
+    {
+        $this->publishedState = $publishedState;
+
+        return $this;
     }
 }

@@ -23,6 +23,8 @@ define(['underscore'], function(_) {
                 '<div class="datagrid-container"></div>',
                 '<div class="dialog"></div>'
             ].join(''),
+            draftIcon: '<span class="draft-icon" title="<%= title %>"/>',
+            publishedIcon: '<span class="published-icon" title="<%= title %>"/>',
             route: [
                 'articles',
                 '<% if (!!type) { %>:<%=type%><% } %>',
@@ -31,9 +33,12 @@ define(['underscore'], function(_) {
         },
 
         translations: {
-            headline: 'sulu_article.list.title'
+            headline: 'sulu_article.list.title',
+            unpublished: 'public.unpublished',
+            publishedWithDraft: 'public.published-with-draft'
         }
     };
+
 
     return {
 
@@ -165,7 +170,29 @@ define(['underscore'], function(_) {
                     }.bind(this),
                     viewOptions: {
                         table: {
-                            actionIconColumn: 'title'
+                            actionIconColumn: 'title',
+                            badges: [
+                                {
+                                    column: 'title',
+                                    callback: function(item, badge) {
+                                        var icons = '',
+                                            tooltip = this.sandbox.translate(this.translations.unpublished);
+
+                                        if (!!item.published && !item.publishedState) {
+                                            tooltip = this.sandbox.translate(this.translations.publishedWithDraft);
+                                            icons += this.templates.publishedIcon({title: tooltip});
+                                        }
+                                        if (!item.publishedState) {
+                                            icons += this.templates.draftIcon({title: tooltip});
+                                        }
+
+                                        badge.title = icons;
+                                        badge.cssClass = 'badge-none';
+
+                                        return badge;
+                                    }.bind(this)
+                                }
+                            ]
                         }
                     }
                 }

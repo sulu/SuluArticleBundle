@@ -271,4 +271,36 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setTeaserMediaId($teaserMediaId);
+
+    /**
+     * Get published.
+     *
+     * @return $this
+     */
+    public function getPublished();
+
+    /**
+     * Set published.
+     *
+     * @param \DateTime $published
+     *
+     * @return $this
+     */
+    public function setPublished(\DateTime $published = null);
+
+    /**
+     * Get published state.
+     *
+     * @return $this
+     */
+    public function getPublishedState();
+
+    /**
+     * Set published state.
+     *
+     * @param boolean $publishedState
+     *
+     * @return $this
+     */
+    public function setPublishedState($publishedState);
 }
