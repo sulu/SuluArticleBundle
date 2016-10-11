@@ -124,6 +124,23 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
+    public function setUnpublished($uuid)
+    {
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $uuid);
+
+        if (!$article) {
+            return;
+        }
+
+        $article->setPublished(null);
+        $article->setPublishedState(false);
+
+        $this->manager->persist($article);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function index(ArticleDocument $document)
     {
         $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());

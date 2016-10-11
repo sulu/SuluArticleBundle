@@ -87,8 +87,8 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::PERSIST => [['handleRoute', 0], ['handleRouteUpdate', 0], ['handleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
-            Events::PUBLISH => 'handleIndexLive',
-            Events::UNPUBLISH => 'handleRemoveLive',
+            Events::PUBLISH => [['handleIndexLive', 0],['handleIndex', 0]],
+            Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
@@ -181,6 +181,24 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Removes document from live index and unpublish document in default index.
+     *
+     * @param UnpublishEvent $event
+     */
+    public function handleUnpublish(UnpublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->remove($document);
+        $this->liveIndexer->flush();
+
+        $this->indexer->setUnpublished($document->getUuid());
+    }
+
+    /**
      * Removes article-document.
      *
      * @param RemoveEvent $event
@@ -197,11 +215,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Removes/unpublish article-document.
+     * Removes article-document.
      *
-     * @param RemoveEvent|UnpublishEvent $event
+     * @param RemoveEvent $event
      */
-    public function handleRemoveLive($event)
+    public function handleRemoveLive(RemoveEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
