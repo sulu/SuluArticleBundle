@@ -18,11 +18,11 @@ define(['underscore', 'config'], function(_, Config) {
 
     'use strict';
 
-    var getContentLocales = function () {
+    var getContentLocales = function() {
         var config = Config.get('sulu-content').locales,
             locales = [];
 
-        _.each(config, function (item) {
+        _.each(config, function(item) {
             locales = locales.concat(Object.keys(item));
         });
 

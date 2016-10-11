@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'services/husky/util'], function ($, Util) {
+define(['jquery', 'services/husky/util'], function($, Util) {
     'use strict';
 
     var baseUrl = '/admin/api/articles';

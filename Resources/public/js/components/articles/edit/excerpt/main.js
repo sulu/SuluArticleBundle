@@ -29,9 +29,9 @@ define([
             var content = this.options.data();
             content.ext.excerpt = data;
 
-            ArticleManager.save(content, this.options.locale, action).then(function (response) {
+            ArticleManager.save(content, this.options.locale, action).then(function(response) {
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
-            }.bind(this)).fail(function (xhr) {
+            }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);
             }.bind(this));
         }

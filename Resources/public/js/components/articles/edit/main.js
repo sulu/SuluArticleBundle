@@ -319,9 +319,9 @@ define([
 
                     this.sandbox.emit('husky.label.header.loading');
 
-                    ArticleManager.removeDraft(this.data.id, this.options.locale).always(function () {
+                    ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
-                    }.bind(this)).then(function (response) {
+                    }.bind(this)).then(function(response) {
                         this.sandbox.emit(
                             'sulu.router.navigate',
                             this.sandbox.mvc.history.fragment,
@@ -329,7 +329,7 @@ define([
                             true
                         );
                         this.saved(response.id, response);
-                    }.bind(this)).fail(function () {
+                    }.bind(this)).fail(function() {
                         this.sandbox.emit('husky.label.header.reset');
                         this.sandbox.emit(
                             'sulu.labels.error.show',
@@ -343,7 +343,7 @@ define([
             )
         },
 
-        hasDraft: function (data) {
+        hasDraft: function(data) {
             return !data.id || !!data.publishedState || !data.published;
         },
 
@@ -409,16 +409,16 @@ define([
 
                     this.sandbox.emit('sulu.header.toolbar.item.loading', 'edit');
 
-                    ArticleManager.unpublish(this.data.id, this.options.locale).always(function () {
+                    ArticleManager.unpublish(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
-                    }.bind(this)).then(function (response) {
+                    }.bind(this)).then(function(response) {
                         this.sandbox.emit(
                             'sulu.labels.success.show',
                             'labels.success.content-unpublish-desc',
                             'labels.success'
                         );
                         this.saved(response.id, response);
-                    }.bind(this)).fail(function () {
+                    }.bind(this)).fail(function() {
                         this.sandbox.emit(
                             'sulu.labels.error.show',
                             'labels.error.content-unpublish-desc',

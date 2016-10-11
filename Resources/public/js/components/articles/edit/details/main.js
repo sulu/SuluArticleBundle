@@ -12,13 +12,13 @@ define([
     'jquery',
     'config',
     'suluarticle/services/article-manager'
-], function (_, $, Config, ArticleManager) {
+], function(_, $, Config, ArticleManager) {
 
     'use strict';
 
     return {
 
-        layout: function () {
+        layout: function() {
             return {
                 extendExisting: true,
 
@@ -30,7 +30,7 @@ define([
             };
         },
 
-        initialize: function () {
+        initialize: function() {
             this.saved = true;
 
             this.render();
@@ -39,12 +39,12 @@ define([
             this.listenForChange();
         },
 
-        bindCustomEvents: function () {
-            this.sandbox.on('sulu.tab.template-change', function (item) {
+        bindCustomEvents: function() {
+            this.sandbox.on('sulu.tab.template-change', function(item) {
                 this.checkRenderTemplate(item.template);
             }, this);
 
-            this.sandbox.on('sulu.content.contents.default-template', function (name) {
+            this.sandbox.on('sulu.content.contents.default-template', function(name) {
                 this.template = name;
                 this.sandbox.emit('sulu.header.toolbar.item.change', 'template', name);
             }.bind(this));
@@ -52,13 +52,13 @@ define([
             this.sandbox.on('sulu.tab.save', this.save.bind(this));
         },
 
-        listenForChange: function () {
+        listenForChange: function() {
             this.sandbox.dom.on(this.$el, 'keyup', _.debounce(this.setDirty.bind(this), 10), 'input, textarea');
             this.sandbox.dom.on(this.$el, 'change', _.debounce(this.setDirty.bind(this), 10), 'input[type="checkbox"], select');
             this.sandbox.on('sulu.content.changed', this.setDirty.bind(this));
         },
 
-        setDirty: function () {
+        setDirty: function() {
             this.saved = false;
             this.sandbox.emit('sulu.tab.dirty');
         },
@@ -66,7 +66,7 @@ define([
         /**
          * @param {Object} action
          */
-        save: function (action) {
+        save: function(action) {
             if (!this.sandbox.form.validate(this.formId)) {
                 this.sandbox.emit('sulu.tab.dirty', true);
 
@@ -76,26 +76,26 @@ define([
             var data = this.sandbox.form.getData(this.formId);
             data.template = this.template;
 
-            _.each(data, function (value, key) {
+            _.each(data, function(value, key) {
                 this.data[key] = value;
             }.bind(this));
 
-            ArticleManager.save(this.data, this.options.locale, action).then(function (response) {
+            ArticleManager.save(this.data, this.options.locale, action).then(function(response) {
                 this.data = response;
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
-            }.bind(this)).fail(function (xhr) {
+            }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);
             }.bind(this));
         },
 
-        render: function () {
+        render: function() {
             this.checkRenderTemplate(this.data.template || null);
         },
 
         /**
          * @param {String} template
          */
-        checkRenderTemplate: function (template) {
+        checkRenderTemplate: function(template) {
             if (!!template && this.template === template) {
                 return this.sandbox.emit('sulu.header.toolbar.item.enable', 'template', false);
             }
@@ -112,12 +112,12 @@ define([
         /**
          * @param {String} template
          */
-        showRenderTemplateDialog: function (template) {
+        showRenderTemplateDialog: function(template) {
             // show warning dialog
             this.sandbox.emit('sulu.overlay.show-warning',
                 'sulu.overlay.be-careful',
                 'content.template.dialog.content',
-                function () {
+                function() {
                     // cancel callback
                     this.sandbox.emit('sulu.header.toolbar.item.enable', 'template', false);
 
@@ -125,7 +125,7 @@ define([
                         this.sandbox.emit('sulu.header.toolbar.item.change', 'template', this.template, false);
                     }
                 }.bind(this),
-                function () {
+                function() {
                     // ok callback
                     this.loadFormTemplate(template);
                 }.bind(this)
@@ -135,7 +135,7 @@ define([
         /**
          * @param {String} template
          */
-        loadFormTemplate: function (template) {
+        loadFormTemplate: function(template) {
             if (!template) {
                 template = this.options.config.types[(this.options.type || this.data.type)].default;
             }
@@ -155,7 +155,7 @@ define([
                 this.data = this.sandbox.util.extend({}, data, this.data);
             }
 
-            require([this.getTemplateUrl(template)], function (template) {
+            require([this.getTemplateUrl(template)], function(template) {
                 this.renderFormTemplate(template);
             }.bind(this));
         },
@@ -165,7 +165,7 @@ define([
          *
          * @returns {String}
          */
-        getTemplateUrl: function (template) {
+        getTemplateUrl: function(template) {
             var url = 'text!/admin/content/template/form';
             if (!!template) {
                 url += '/' + template + '.html';
@@ -184,7 +184,7 @@ define([
         /**
          * @param {String} template
          */
-        renderFormTemplate: function (template) {
+        renderFormTemplate: function(template) {
             this.sandbox.dom.html(this.formId, this.sandbox.util.template(template, {
                 translate: this.sandbox.translate,
                 content: this.data,
@@ -196,12 +196,12 @@ define([
                 this.$find('#routePath').parent().remove();
             }
 
-            this.createForm(this.data).then(function () {
+            this.createForm(this.data).then(function() {
                 this.changeTemplateDropdownHandler();
             }.bind(this));
         },
 
-        changeTemplateDropdownHandler: function () {
+        changeTemplateDropdownHandler: function() {
             if (!!this.template) {
                 this.sandbox.emit('sulu.header.toolbar.item.change', 'template', this.template);
             }
@@ -213,13 +213,13 @@ define([
          *
          * @returns {Object}
          */
-        createForm: function (data) {
+        createForm: function(data) {
             var formObject = this.sandbox.form.create(this.formId),
                 deferred = this.sandbox.data.deferred();
 
-            formObject.initialized.then(function () {
-                this.sandbox.form.setData(this.formId, data).then(function () {
-                    this.sandbox.start(this.$el, {reset: true}).then(function () {
+            formObject.initialized.then(function() {
+                this.sandbox.form.setData(this.formId, data).then(function() {
+                    this.sandbox.start(this.$el, {reset: true}).then(function() {
                         this.initSortableBlock();
                         this.bindFormEvents();
                         deferred.resolve();
@@ -237,7 +237,7 @@ define([
             return deferred.promise();
         },
 
-        initSortableBlock: function () {
+        initSortableBlock: function() {
             var $sortable = this.sandbox.dom.find('.sortable', this.$el),
                 sortable;
 
@@ -251,7 +251,7 @@ define([
                 // (un)bind event listener
                 this.sandbox.dom.unbind(sortable, 'sortupdate');
 
-                sortable.bind('sortupdate', function (event) {
+                sortable.bind('sortupdate', function(event) {
                     // update preview
                     this.updatePreviewProperty(event.currentTarget, null);
 
@@ -260,8 +260,8 @@ define([
             }
         },
 
-        bindFormEvents: function () {
-            this.sandbox.dom.on(this.formId, 'form-remove', function (event, propertyName) {
+        bindFormEvents: function() {
+            this.sandbox.dom.on(this.formId, 'form-remove', function(event, propertyName) {
                 this.initSortableBlock();
                 this.setDirty();
 
@@ -269,7 +269,7 @@ define([
                 this.updatePreviewProperty(event.currentTarget, propertyName);
             }.bind(this));
 
-            this.sandbox.dom.on(this.formId, 'form-add', function (event, propertyName, data, index) {
+            this.sandbox.dom.on(this.formId, 'form-add', function(event, propertyName, data, index) {
                 var $elements = this.sandbox.dom.children(this.$find('[data-mapper-property="' + propertyName + '"]')),
                     $element = (index !== undefined && $elements.length > index) ? $elements[index] : this.sandbox.dom.last($elements);
 
@@ -286,13 +286,13 @@ define([
                 this.updatePreviewProperty(event.currentTarget, propertyName);
             }.bind(this));
 
-            this.sandbox.dom.on(this.formId, 'init-sortable', function (e) {
+            this.sandbox.dom.on(this.formId, 'init-sortable', function(e) {
                 // reinit sorting
                 this.initSortableBlock();
             }.bind(this));
         },
 
-        loadComponentData: function () {
+        loadComponentData: function() {
             var promise = $.Deferred();
 
             promise.resolve(this.options.data());
@@ -304,7 +304,7 @@ define([
          * @param {Object} target
          * @param {String} propertyName
          */
-        updatePreviewProperty: function (target, propertyName) {
+        updatePreviewProperty: function(target, propertyName) {
             if (!!this.options.preview) {
                 var data = this.sandbox.form.getData(this.formId);
 

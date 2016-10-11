@@ -96,9 +96,9 @@ define([
                 return item.substr(1);
             });
 
-            ArticleManager.save(data, this.options.locale, action).then(function (response) {
+            ArticleManager.save(data, this.options.locale, action).then(function(response) {
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
-            }.bind(this)).fail(function (xhr) {
+            }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);
             }.bind(this));
         },
