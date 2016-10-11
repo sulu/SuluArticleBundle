@@ -298,7 +298,7 @@ interface ArticleViewDocumentInterface
     /**
      * Set published state.
      *
-     * @param boolean $publishedState
+     * @param bool $publishedState
      *
      * @return $this
      */

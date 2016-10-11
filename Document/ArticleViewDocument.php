@@ -185,7 +185,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $published;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @Property(type="boolean")
      */
