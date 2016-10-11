@@ -356,7 +356,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @return string
      */
-    private function uncamelize($camel) {
+    private function uncamelize($camel)
+    {
         $camel = preg_replace(
             '/(?!^)[[:upper:]][[:lower:]]/',
             '$0',
