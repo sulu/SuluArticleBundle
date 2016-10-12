@@ -49,7 +49,12 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         return [
             'id' => new FieldDescriptor('id', 'public.id', true),
-            'typeTranslation' => new FieldDescriptor('typeTranslation', 'sulu_article.list.type', false, true),
+            'typeTranslation' => new FieldDescriptor(
+                'typeTranslation',
+                'sulu_article.list.type',
+                !$this->getParameter('sulu_article.display_tab_all'),
+                false
+            ),
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
