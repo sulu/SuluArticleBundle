@@ -240,7 +240,7 @@ class ArticleIndexer implements IndexerInterface
             return ucfirst($type);
         }
 
-        $typeTranslationKey =  $this->typeConfiguration[$type]['translation_key'];
+        $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
 
         return $this->translator->trans(
             $typeTranslationKey,
