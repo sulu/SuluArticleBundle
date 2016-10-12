@@ -292,7 +292,7 @@ define([
                 this.sandbox.emit(
                     'sulu.header.tabs.label.show',
                     this.sandbox.util.sprintf(
-                        this.sandbox.translate(this.translations.draftLabel),
+                        this.translations.draftLabel,
                         {
                             changed: this.sandbox.date.format(this.data.changed, true),
                             user: response.username
@@ -301,7 +301,7 @@ define([
                     [
                         {
                             id: 'delete-draft',
-                            title: this.sandbox.translate(this.translations.removeDraft),
+                            title: this.translations.removeDraft,
                             skin: 'critical',
                             onClick: this.deleteDraft.bind(this)
                         }
@@ -338,8 +338,8 @@ define([
                         );
                     }.bind(this));
                 }.bind(this),
-                this.sandbox.translate(this.defaults.translations.deleteDraftConfirmTitle),
-                this.sandbox.translate(this.defaults.translations.deleteDraftConfirmText)
+                this.translations.deleteDraftConfirmTitle,
+                this.translations.deleteDraftConfirmText
             )
         },
 
@@ -427,7 +427,7 @@ define([
                     }.bind(this));
                 }.bind(this),
                 title: this.defaults.translations.unpublishConfirmTitle,
-                description: !!this.hasDraft(this.data)?
+                description: !!this.hasDraft(this.data) ?
                     this.defaults.translations.unpublishConfirmTextNoDraft :
                     this.defaults.translations.unpublishConfirmTextWithDraft
             });
