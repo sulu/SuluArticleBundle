@@ -16,13 +16,11 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
-use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
-use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -92,7 +90,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::PUBLISH => [['handleIndexLive', 0], ['handleIndex', 0]],
             Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
-            Events::REMOVE_DRAFT => 'handleRemoveDraft',
+            Events::REMOVE_DRAFT => ['handleIndex', -1024],
         ];
     }
 
@@ -231,28 +229,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveIndexer->remove($document);
         $this->liveIndexer->flush();
-    }
-
-    /**
-     * Indexes a document after its draft have been removed.
-     *
-     * @param RemoveDraftEvent $event
-     */
-    public function handleRemoveDraft(RemoveDraftEvent $event)
-    {
-        $document = $event->getDocument();
-
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        // Reset the workflowstage to published, because after removing a draft
-        // the document will always be in the published state.
-        $document->setWorkflowStage(WorkflowStage::PUBLISHED);
-
-        // Reindex now.
-        $this->indexer->index($document);
-        $this->indexer->flush();
     }
 
     /**
