@@ -97,6 +97,22 @@ interface ArticleViewDocumentInterface
     public function setType($type);
 
     /**
+     * Returns type translation.
+     *
+     * @return string
+     */
+    public function getTypeTranslation();
+
+    /**
+     * Set type translation.
+     *
+     * @param string $typeTranslation
+     *
+     * @return $this
+     */
+    public function setTypeTranslation($typeTranslation);
+
+    /**
      * Returns structure-type.
      *
      * @return string

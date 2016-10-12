@@ -23,6 +23,7 @@ use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Provides methods to index articles.
@@ -67,6 +68,16 @@ class ArticleIndexer implements IndexerInterface
     private $eventDispatcher;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var array
+     */
+    private $typeConfiguration;
+
+    /**
      * ArticleIndexer constructor.
      *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
@@ -76,6 +87,8 @@ class ArticleIndexer implements IndexerInterface
      * @param SeoFactory $seoFactory
      * @param DocumentFactoryInterface $documentFactory
      * @param EventDispatcherInterface $eventDispatcher
+     * @param TranslatorInterface $translator
+     * @param array $typeConfiguration
      */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
@@ -84,7 +97,9 @@ class ArticleIndexer implements IndexerInterface
         Manager $manager,
         ExcerptFactory $excerptFactory,
         SeoFactory $seoFactory,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        TranslatorInterface $translator,
+        array $typeConfiguration
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
@@ -93,6 +108,8 @@ class ArticleIndexer implements IndexerInterface
         $this->excerptFactory = $excerptFactory;
         $this->seoFactory = $seoFactory;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translator = $translator;
+        $this->typeConfiguration = $typeConfiguration;
     }
 
     /**
@@ -166,6 +183,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
         $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
+        $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
 
         $extensions = $document->getExtensionsData()->toArray();
         $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
@@ -209,5 +227,25 @@ class ArticleIndexer implements IndexerInterface
     public function flush()
     {
         $this->manager->commit();
+    }
+
+    /**
+     * @param $type
+     *
+     * @return string
+     */
+    private function getTypeTranslation($type)
+    {
+        if (!array_key_exists($type, $this->typeConfiguration)) {
+            return ucfirst($type);
+        }
+
+        $typeTranslationKey =  $this->typeConfiguration[$type]['translation_key'];
+
+        return $this->translator->trans(
+            $typeTranslationKey,
+            [],
+            'backend'
+        );
     }
 }

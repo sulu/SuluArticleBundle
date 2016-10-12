@@ -39,6 +39,8 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="translator.default"/>
+            <argument>%sulu_article.types%</argument>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -49,6 +51,8 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="translator.default"/>
+            <argument>%sulu_article.types%</argument>
         </service>
 
         <service id="sulu_article.elastic_search.factory.seo"
@@ -163,15 +167,6 @@
             <argument type="string">%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.teaser.provider" alias="article"/>
-        </service>
-
-        <!-- serialization -->
-        <service id="sulu_article.serializer.event_subscriber"
-                 class="Sulu\Bundle\ArticleBundle\EventListener\ArticleViewDocumentSerializeSubscriber">
-            <argument>%sulu_article.types%</argument>
-
-            <tag name="jms_serializer.event_subscriber" />
-            <tag name="sulu.context" context="admin"/>
         </service>
 
         <!-- sitemap -->
