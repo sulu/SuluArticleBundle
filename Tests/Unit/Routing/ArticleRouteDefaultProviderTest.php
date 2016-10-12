@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
@@ -63,9 +64,18 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
 
     public function publishedDataProvider()
     {
+        $articleDocument = new ArticleDocument();
+        $articleDocument->setWorkflowStage(WorkflowStage::TEST);
+
+        $articleDocumentPublished = new ArticleDocument();
+        $articleDocumentPublished->setWorkflowStage(WorkflowStage::PUBLISHED);
+
+        $unknownDocument = new UnknownDocument();
+
         return [
-            [new UnknownDocument(), false],
-            [new ArticleDocument(), true],
+            [$articleDocument, false],
+            [$articleDocumentPublished, true],
+            [$unknownDocument, false],
         ];
     }
 
