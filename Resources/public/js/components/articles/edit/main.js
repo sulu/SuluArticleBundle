@@ -33,6 +33,7 @@ define([
                 headline: 'sulu_article.edit.title',
                 draftLabel: 'sulu-document-manager.draft-label',
                 removeDraft: 'sulu-content.delete-draft',
+                unpublish: 'sulu-document-manager.unpublish',
                 unpublishConfirmTextNoDraft: 'sulu-content.unpublish-confirm-text-no-draft',
                 unpublishConfirmTextWithDraft: 'sulu-content.unpublish-confirm-text-with-draft',
                 unpublishConfirmTitle: 'sulu-content.unpublish-confirm-title',
@@ -90,7 +91,7 @@ define([
             if (SecurityChecker.hasPermission(this.data, 'live')) {
                 editDropdown.unpublish = {
                     options: {
-                        title: this.sandbox.translate('sulu-document-manager.unpublish'),
+                        title: this.translations.unpublish,
                         disabled: !this.data.published,
                         callback: this.unpublish.bind(this)
                     }
