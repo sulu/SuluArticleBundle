@@ -87,7 +87,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::PERSIST => [['handleRoute', 0], ['handleRouteUpdate', 0], ['handleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
-            Events::PUBLISH => [['handleIndexLive', 0],['handleIndex', 0]],
+            Events::PUBLISH => [['handleIndexLive', 0], ['handleIndex', 0]],
             Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
