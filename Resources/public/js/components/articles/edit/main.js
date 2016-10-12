@@ -427,10 +427,10 @@ define([
                         );
                     }.bind(this));
                 }.bind(this),
-                title: this.defaults.translations.unpublishConfirmTitle,
+                title: this.translations.unpublishConfirmTitle,
                 description: !!this.hasDraft(this.data) ?
-                    this.defaults.translations.unpublishConfirmTextNoDraft :
-                    this.defaults.translations.unpublishConfirmTextWithDraft
+                    this.translations.unpublishConfirmTextNoDraft :
+                    this.translations.unpublishConfirmTextWithDraft
             });
         },
 
