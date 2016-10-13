@@ -36,6 +36,8 @@ define(['underscore', 'config'], function(_, Config) {
         initialize: function(app) {
             app.components.addSource('suluarticle', '/bundles/suluarticle/js/components');
 
+            app.sandbox.urlManager.setUrl('article', 'articles/<%= locale %>/edit:<%= id %>/details');
+
             // set config for this bundle
             var locales = getContentLocales(),
                 config = {
