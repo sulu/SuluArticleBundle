@@ -24,6 +24,16 @@ interface IndexerInterface
     public function clear();
 
     /**
+     * Sets state of document to unpublished.
+     * Clear published and sets published state to false.
+     *
+     * @param string $uuid
+     *
+     * @return ArticleDocument $document
+     */
+    public function setUnpublished($uuid);
+
+    /**
      * Indexes given document.
      *
      * @param ArticleDocument $document

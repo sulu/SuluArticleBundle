@@ -89,6 +89,18 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      *     }
      * )
      */
+    protected $typeTranslation;
+
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "analyzer":"keyword"
+     *     }
+     * )
+     */
     protected $structureType;
 
     /**
@@ -176,6 +188,20 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(type="integer")
      */
     protected $teaserMediaId;
+
+    /**
+     * @var \DateTime
+     *
+     * @Property(type="date")
+     */
+    protected $published;
+
+    /**
+     * @var bool
+     *
+     * @Property(type="boolean")
+     */
+    protected $publishedState;
 
     /**
      * @param string $uuid
@@ -269,6 +295,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeTranslation()
+    {
+        return $this->typeTranslation;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTypeTranslation($typeTranslation)
+    {
+        $this->typeTranslation = $typeTranslation;
 
         return $this;
     }
@@ -467,5 +511,41 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setTeaserMediaId($teaserMediaId)
     {
         $this->teaserMediaId = $teaserMediaId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublished()
+    {
+        return $this->published;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublished(\DateTime $published = null)
+    {
+        $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPublishedState()
+    {
+        return $this->publishedState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPublishedState($publishedState)
+    {
+        $this->publishedState = $publishedState;
+
+        return $this;
     }
 }

@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
@@ -66,6 +67,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
     /**
      * If article is not published the document will be of typ unknown-document.
+     * Also check the workflow stage if it`s a ArticleDocument.
      *
      * {@inheritdoc}
      */
@@ -73,7 +75,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     {
         $object = $this->documentManager->find($id, $locale);
 
-        return $object instanceof ArticleDocument;
+        return $object instanceof ArticleDocument && WorkflowStage::PUBLISHED === $object->getWorkflowStage();
     }
 
     /**

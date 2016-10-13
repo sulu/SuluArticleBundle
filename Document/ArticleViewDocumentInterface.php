@@ -97,6 +97,22 @@ interface ArticleViewDocumentInterface
     public function setType($type);
 
     /**
+     * Returns type translation.
+     *
+     * @return string
+     */
+    public function getTypeTranslation();
+
+    /**
+     * Set type translation.
+     *
+     * @param string $typeTranslation
+     *
+     * @return $this
+     */
+    public function setTypeTranslation($typeTranslation);
+
+    /**
      * Returns structure-type.
      *
      * @return string
@@ -271,4 +287,36 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setTeaserMediaId($teaserMediaId);
+
+    /**
+     * Get published.
+     *
+     * @return $this
+     */
+    public function getPublished();
+
+    /**
+     * Set published.
+     *
+     * @param \DateTime $published
+     *
+     * @return $this
+     */
+    public function setPublished(\DateTime $published = null);
+
+    /**
+     * Get published state.
+     *
+     * @return $this
+     */
+    public function getPublishedState();
+
+    /**
+     * Set published state.
+     *
+     * @param bool $publishedState
+     *
+     * @return $this
+     */
+    public function setPublishedState($publishedState);
 }

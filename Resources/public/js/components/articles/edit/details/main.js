@@ -7,7 +7,11 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore', 'jquery', 'config'], function(_, $, Config) {
+define([
+    'underscore',
+    'jquery',
+    'suluarticle/services/article-manager'
+], function(_, $, ArticleManager) {
 
     'use strict';
 
@@ -75,7 +79,12 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
                 this.data[key] = value;
             }.bind(this));
 
-            this.sandbox.emit('sulu.articles.save', this.data, action);
+            ArticleManager.save(this.data, this.options.locale, action).then(function(response) {
+                this.data = response;
+                this.sandbox.emit('sulu.tab.saved', response.id, response);
+            }.bind(this)).fail(function(xhr) {
+                this.sandbox.emit('sulu.article.error', xhr.status, data);
+            }.bind(this));
         },
 
         render: function() {
@@ -294,8 +303,7 @@ define(['underscore', 'jquery', 'config'], function(_, $, Config) {
          * @param {Object} target
          * @param {String} propertyName
          */
-        updatePreviewProperty: function(target, propertyName)
-        {
+        updatePreviewProperty: function(target, propertyName) {
             if (!!this.options.preview) {
                 var data = this.sandbox.form.getData(this.formId);
 

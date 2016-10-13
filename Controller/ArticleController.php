@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
@@ -22,6 +23,7 @@ use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
+use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
@@ -47,6 +49,12 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         return [
             'id' => new FieldDescriptor('id', 'public.id', true),
+            'typeTranslation' => new FieldDescriptor(
+                'typeTranslation',
+                'sulu_article.list.type',
+                !$this->getParameter('sulu_article.display_tab_all'),
+                false
+            ),
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
@@ -268,6 +276,54 @@ class ArticleController extends RestController implements ClassResourceInterface
         $documentManager->flush();
 
         return $this->handleView($this->view(null));
+    }
+
+    /**
+     * Trigger a action for given article specified over get-action parameter.
+     *
+     * @Post("/articles/{uuid}")
+     *
+     * @param string $uuid
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function postTriggerAction($uuid, Request $request)
+    {
+        // extract parameter
+        $action = $this->getRequestParameter($request, 'action', true);
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
+        // prepare vars
+        $view = null;
+        $data = null;
+
+        try {
+            switch ($action) {
+                case 'unpublish':
+                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                    $this->getDocumentManager()->unpublish($document, $locale);
+                    $this->getDocumentManager()->flush();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    break;
+                case 'remove-draft':
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $this->getDocumentManager()->removeDraft($data, $locale);
+                    $this->getDocumentManager()->flush();
+                    break;
+                default:
+                    throw new RestException('Unrecognized action: ' . $action);
+            }
+
+            // prepare view
+            $view = $this->view($data, $data !== null ? 200 : 204);
+            $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+        } catch (RestException $exc) {
+            $view = $this->view($exc->toArray(), 400);
+        }
+
+        return $this->handleView($view);
     }
 
     /**

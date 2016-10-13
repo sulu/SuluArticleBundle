@@ -22,6 +22,7 @@ use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -86,9 +87,10 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::PERSIST => [['handleRoute', 0], ['handleRouteUpdate', 0], ['handleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
-            Events::PUBLISH => 'handleIndexLive',
-            Events::UNPUBLISH => 'handleRemoveLive',
+            Events::PUBLISH => [['handleIndexLive', 0], ['handleIndex', 0]],
+            Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
+            Events::REMOVE_DRAFT => ['handleIndex', -1024],
         ];
     }
 
@@ -177,6 +179,24 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveIndexer->index($document);
         $this->liveIndexer->flush();
+    }
+
+    /**
+     * Removes document from live index and unpublish document in default index.
+     *
+     * @param UnpublishEvent $event
+     */
+    public function handleUnpublish(UnpublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->remove($document);
+        $this->liveIndexer->flush();
+
+        $this->indexer->setUnpublished($document->getUuid());
     }
 
     /**

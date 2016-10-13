@@ -10,9 +10,11 @@
 define([
     'jquery',
     'underscore',
+    'suluarticle/services/article-manager',
     'sulusecurity/services/user-manager',
-    'services/sulupreview/preview'
-], function($, _, UserManager, Preview) {
+    'services/sulupreview/preview',
+    'sulusecurity/services/security-checker'
+], function($, _, ArticleManager, UserManager, Preview, SecurityChecker) {
 
     'use strict';
 
@@ -29,7 +31,14 @@ define([
 
             translations: {
                 headline: 'sulu_article.edit.title',
-                draftLabel: 'sulu-document-manager.draft-label'
+                draftLabel: 'sulu-document-manager.draft-label',
+                removeDraft: 'sulu-content.delete-draft',
+                unpublish: 'sulu-document-manager.unpublish',
+                unpublishConfirmTextNoDraft: 'sulu-content.unpublish-confirm-text-no-draft',
+                unpublishConfirmTextWithDraft: 'sulu-content.unpublish-confirm-text-with-draft',
+                unpublishConfirmTitle: 'sulu-content.unpublish-confirm-title',
+                deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
+                deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text'
             }
         },
 
@@ -46,11 +55,27 @@ define([
         },
 
         header: function() {
-            var buttons = {
-                save: {
-                    parent: 'saveWithDraft'
-                },
-                template: {
+            var buttons = {}, editDropdown = {}, saveDropdown = {};
+
+            if (SecurityChecker.hasPermission(this.data, 'edit')) {
+                saveDropdown.saveDraft = {};
+
+                if (SecurityChecker.hasPermission(this.data, 'live')) {
+                    saveDropdown.savePublish = {};
+                    saveDropdown.publish = {};
+                }
+
+                buttons.save = {
+                    parent: 'saveWithDraft',
+                    options: {
+                        callback: function() {
+                            this.sandbox.emit('sulu.toolbar.save', 'publish');
+                        }.bind(this),
+                        dropdownItems: saveDropdown
+                    }
+                };
+
+                buttons.template = {
                     options: {
                         dropdownOptions: {
                             url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
@@ -61,11 +86,43 @@ define([
                         }
                     }
                 }
-            };
-
-            if (!!this.options.id) {
-                buttons.delete = {};
             }
+
+            if (SecurityChecker.hasPermission(this.data, 'live')) {
+                editDropdown.unpublish = {
+                    options: {
+                        title: this.translations.unpublish,
+                        disabled: !this.data.published,
+                        callback: this.unpublish.bind(this)
+                    }
+                };
+
+                editDropdown.divider = {
+                    options: {
+                        divider: true
+                    }
+                };
+            }
+
+            if (SecurityChecker.hasPermission(this.data, 'delete')) {
+                editDropdown.delete = {
+                    options: {
+                        disabled: !this.options.id,
+                        callback: this.deleteArticle.bind(this)
+                    }
+                };
+            }
+
+            if (!this.sandbox.util.isEmpty(editDropdown)) {
+                buttons.edit = {
+                    options: {
+                        dropdownItems: editDropdown
+                    }
+                };
+            }
+
+            buttons.statePublished = {};
+            buttons.stateTest = {};
 
             return {
                 tabs: {
@@ -94,16 +151,15 @@ define([
         initialize: function() {
             this.bindCustomEvents();
             this.showDraftLabel();
+            this.setHeaderBar(true);
         },
 
         bindCustomEvents: function() {
             this.sandbox.on('sulu.header.back', this.toList.bind(this));
             this.sandbox.on('sulu.tab.dirty', this.setHeaderBar.bind(this));
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
-            this.sandbox.on('sulu.toolbar.delete', this.deleteItem.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
-            this.sandbox.on('sulu.articles.save', this.saveArticle.bind(this));
-            this.sandbox.on('sulu.tab.saved', this.showDraftLabel.bind(this));
+            this.sandbox.on('sulu.article.error', this.handleError.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
@@ -111,9 +167,28 @@ define([
             }.bind(this));
         },
 
-        deleteItem: function() {
-            this.sandbox.util.save('/admin/api/articles/' + this.options.id, 'DELETE').then(function() {
-                this.toList();
+        /**
+         * Handles the error based on its error code.
+         *
+         * @param {Number} errorCode
+         * @param {Object} data
+         * @param {string} action
+         */
+        handleError: function(errorCode, data, action) {
+            switch (errorCode) {
+                default:
+                    this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');
+            }
+        },
+
+        deleteArticle: function() {
+            this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
+                if (wasConfirmed) {
+                    ArticleManager.delete(this.options.id).then(function() {
+                        this.toList();
+                    }.bind(this));
+                }
             }.bind(this));
         },
 
@@ -141,7 +216,7 @@ define([
             this.loadingSave();
 
             this.saveTab(action).then(function(data) {
-                this.afterSave(action, data);
+                this.saved(data.id, data, action);
             }.bind(this));
         },
 
@@ -152,22 +227,16 @@ define([
         saveTab: function(action) {
             var promise = $.Deferred();
 
-            this.sandbox.once('sulu.tab.saved', function(savedData) {
-                this.setData(savedData);
+            // Display loading animation.
+            this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
 
-                promise.resolve(savedData);
+            this.sandbox.once('sulu.tab.saved', function(id, data) {
+                promise.resolve(data);
             }.bind(this));
 
             this.sandbox.emit('sulu.tab.save', action);
 
             return promise;
-        },
-
-        saveArticle: function(data, action) {
-            return this.sandbox.util.save(this.getUrl(action), !this.data.id ? 'POST' : 'PUT', data).then(function(data) {
-                this.data = data;
-                this.sandbox.emit('sulu.tab.saved', data);
-            }.bind(this));
         },
 
         setHeaderBar: function(saved) {
@@ -178,9 +247,15 @@ define([
             this.setSaveToolbarItems.call(this, 'saveDraft', saveDraft);
             this.setSaveToolbarItems.call(this, 'savePublish', savePublish);
             this.setSaveToolbarItems.call(this, 'publish', publish);
-            this.setSaveToolbarItems.call(this, 'save', (!!saveDraft || !!savePublish || !!publish));
+            this.setSaveToolbarItems.call(this, 'unpublish', !!this.data.published);
 
-            this.saved = saved;
+            if (!!saveDraft || !!savePublish || !!publish) {
+                this.sandbox.emit('sulu.header.toolbar.item.enable', 'save', false);
+            } else {
+                this.sandbox.emit('sulu.header.toolbar.item.disable', 'save', false);
+            }
+
+            this.showState(!!this.data.published);
         },
 
         setSaveToolbarItems: function(item, value) {
@@ -191,40 +266,86 @@ define([
             this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
         },
 
-        afterSave: function(action, data) {
-            this.setHeaderBar(true);
-            this.sandbox.emit('sulu.header.saved', data);
-
+        /**
+         * Routes either to the list, article-add or article-edit, depending on the passed parameter.
+         *
+         * @param action {String} 'new', 'add' or null
+         * @param toEdit {Boolean} if true and no action has been passed the method routes to 'edit'
+         */
+        afterSaveAction: function(action, toEdit) {
             if (action === 'back') {
                 this.toList();
             } else if (action === 'new') {
                 this.toAdd();
-            } else if (!this.options.id) {
-                this.toEdit(this.options.locale, data.id);
+            } else if (toEdit) {
+                this.toEdit(this.options.locale, this.data.id);
             }
         },
 
         showDraftLabel: function() {
             this.sandbox.emit('sulu.header.tabs.label.hide');
 
-            if (!this.data.id || !!this.data.publishedState) {
+            if (this.hasDraft(this.data)) {
                 return;
             }
-
-            this.setHeaderBar(true);
 
             UserManager.find(this.data.changer).then(function(response) {
                 this.sandbox.emit(
                     'sulu.header.tabs.label.show',
                     this.sandbox.util.sprintf(
-                        this.sandbox.translate(this.translations.draftLabel),
+                        this.translations.draftLabel,
                         {
                             changed: this.sandbox.date.format(this.data.changed, true),
                             user: response.username
                         }
-                    )
+                    ),
+                    [
+                        {
+                            id: 'delete-draft',
+                            title: this.translations.removeDraft,
+                            skin: 'critical',
+                            onClick: this.deleteDraft.bind(this)
+                        }
+                    ]
                 );
             }.bind(this));
+        },
+
+        deleteDraft: function() {
+            this.sandbox.sulu.showDeleteDialog(
+                function(wasConfirmed) {
+                    if (!wasConfirmed) {
+                        return;
+                    }
+
+                    this.sandbox.emit('husky.label.header.loading');
+
+                    ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
+                        this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
+                    }.bind(this)).then(function(response) {
+                        this.sandbox.emit(
+                            'sulu.router.navigate',
+                            this.sandbox.mvc.history.fragment,
+                            true,
+                            true
+                        );
+                        this.saved(response.id, response);
+                    }.bind(this)).fail(function() {
+                        this.sandbox.emit('husky.label.header.reset');
+                        this.sandbox.emit(
+                            'sulu.labels.error.show',
+                            'labels.error.remove-draft-desc',
+                            'labels.error'
+                        );
+                    }.bind(this));
+                }.bind(this),
+                this.translations.deleteDraftConfirmTitle,
+                this.translations.deleteDraftConfirmText
+            )
+        },
+
+        hasDraft: function(data) {
+            return !data.id || !!data.publishedState || !data.published;
         },
 
         getUrl: function(action) {
@@ -268,6 +389,65 @@ define([
             if (!!this.preview) {
                 Preview.destroy(this.preview);
             }
+        },
+
+        showState: function(published) {
+            if (!!published) {
+                this.sandbox.emit('sulu.header.toolbar.item.hide', 'stateTest');
+                this.sandbox.emit('sulu.header.toolbar.item.show', 'statePublished');
+            } else {
+                this.sandbox.emit('sulu.header.toolbar.item.hide', 'statePublished');
+                this.sandbox.emit('sulu.header.toolbar.item.show', 'stateTest');
+            }
+        },
+
+        unpublish: function() {
+            this.sandbox.sulu.showConfirmationDialog({
+                callback: function(wasConfirmed) {
+                    if (!wasConfirmed) {
+                        return;
+                    }
+
+                    this.sandbox.emit('sulu.header.toolbar.item.loading', 'edit');
+
+                    ArticleManager.unpublish(this.data.id, this.options.locale).always(function() {
+                        this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
+                    }.bind(this)).then(function(response) {
+                        this.sandbox.emit(
+                            'sulu.labels.success.show',
+                            'labels.success.content-unpublish-desc',
+                            'labels.success'
+                        );
+                        this.saved(response.id, response);
+                    }.bind(this)).fail(function() {
+                        this.sandbox.emit(
+                            'sulu.labels.error.show',
+                            'labels.error.content-unpublish-desc',
+                            'labels.error'
+                        );
+                    }.bind(this));
+                }.bind(this),
+                title: this.translations.unpublishConfirmTitle,
+                description: !!this.hasDraft(this.data) ?
+                    this.translations.unpublishConfirmTextNoDraft :
+                    this.translations.unpublishConfirmTextWithDraft
+            });
+        },
+
+        saved: function(id, data, action) {
+            this.setData(data);
+
+            if (!this.options.id) {
+                this.sandbox.sulu.viewStates.justSaved = true;
+            } else {
+                this.setHeaderBar(true);
+                this.showDraftLabel();
+
+                this.sandbox.emit('sulu.header.saved', data);
+                this.sandbox.emit('sulu.labels.success.show', 'labels.success.content-save-desc', 'labels.success');
+            }
+
+            this.afterSaveAction(action, !this.options.id);
         }
-    };
+    }
 });
