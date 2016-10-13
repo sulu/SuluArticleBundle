@@ -155,7 +155,7 @@ define(['underscore'], function(_) {
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: '/admin/api/articles?locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
+                    url: '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
