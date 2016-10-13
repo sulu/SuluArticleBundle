@@ -230,7 +230,9 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
-     * @param $type
+     * Returns translation for given article type.
+     *
+     * @param string $type
      *
      * @return string
      */
