@@ -89,6 +89,18 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      *     }
      * )
      */
+    protected $typeTranslation;
+
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "analyzer":"keyword"
+     *     }
+     * )
+     */
     protected $structureType;
 
     /**
@@ -283,6 +295,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeTranslation()
+    {
+        return $this->typeTranslation;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTypeTranslation($typeTranslation)
+    {
+        $this->typeTranslation = $typeTranslation;
 
         return $this;
     }
