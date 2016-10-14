@@ -15,7 +15,10 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
+use ONGR\ElasticsearchDSL\Query\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\MatchQuery;
+use ONGR\ElasticsearchDSL\Query\Span\SpanOrQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
@@ -102,6 +105,13 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (null !== ($type = $request->get('type'))) {
             $search->addQuery(new TermQuery('type', $type));
+        }
+
+        if (null !== ($filter = $request->get('filter'))) {
+            $boolQuery = new BoolQuery();
+            $boolQuery->add(new MatchQuery('changer_full_name', $filter), BoolQuery::MUST);
+            $boolQuery->add(new MatchQuery('creator_full_name', $filter), BoolQuery::MUST);
+            $search->addQuery($boolQuery);
         }
 
         if (null === $search->getQueries()) {

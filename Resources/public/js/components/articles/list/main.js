@@ -35,7 +35,10 @@ define(['underscore'], function(_) {
         translations: {
             headline: 'sulu_article.list.title',
             unpublished: 'public.unpublished',
-            publishedWithDraft: 'public.published-with-draft'
+            publishedWithDraft: 'public.published-with-draft',
+            filter: 'sulu_article.list.filter',
+            filterMe: 'sulu_article.list.filter.me',
+            filterAll: 'sulu_article.list.filter.all'
         }
     };
 
@@ -146,17 +149,7 @@ define(['underscore'], function(_) {
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.sandbox.sulu.buttons.get({
-                        settings: {
-                            options: {
-                                dropdownItems: [
-                                    {
-                                        type: 'columnOptions'
-                                    }
-                                ]
-                            }
-                        }
-                    })
+                    template: this.retrieveListToolbarTemplate()
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
@@ -240,6 +233,70 @@ define(['underscore'], function(_) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));
+        },
+
+        retrieveListToolbarTemplate: function() {
+            var listToolbarTemplate = this.sandbox.sulu.buttons.get({
+                settings: {
+                    options: {
+                        dropdownItems: [
+                            {
+                                type: 'columnOptions'
+                            }
+                        ]
+                    }
+                }
+            });
+
+            listToolbarTemplate.push({
+                id: 'filter',
+                icon: 'filter',
+                title: this.translations.filter,
+                group: 2,
+                dropdownOptions: {
+                    url: '/admin/api/users',
+                    resultKey: 'users',
+                    titleAttribute: 'fullName',
+                    idAttribute: 'id',
+                    markSelected: true,
+                    preSelected: !!this.filter ? parseInt(this.filter.id) : null,
+                    callback: function(item) {
+                        this.applyFilterToList.call(this, item);
+                    }.bind(this)
+                },
+                dropdownItems: [
+                    {
+                        divider: true
+                    },
+                    {
+                        id: 'me',
+                        fullName: this.translations.filterMe
+                    },
+                    {
+                        id: 'all',
+                        fullName: this.translations.filterAll
+                    }
+                ]
+            });
+
+            return listToolbarTemplate;
+        },
+
+        /**
+         * Emits the url update event for the list.
+         *
+         * @param item {Object}
+         */
+        applyFilterToList: function(item) {
+            var filter = null;
+            if (!!item.id && item.id === 'me') {
+                filter = this.sandbox.sulu.user.fullName;
+            } else if (!!item.id && item.id === 'all') {
+                filter = null;
+            } else if (!!item.fullName) {
+                filter = item.fullName;
+            }
+            this.sandbox.emit('husky.datagrid.articles.url.update', {filter: filter});
         }
     };
 });

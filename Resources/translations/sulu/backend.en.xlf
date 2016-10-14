@@ -42,6 +42,18 @@
                 <source>search-overlay.index.article.title</source>
                 <target>Article</target>
             </trans-unit>
+            <trans-unit id="11" resname="sulu_article.list.filter">
+                <source>sulu_article.list.filter</source>
+                <target>Filter</target>
+            </trans-unit>
+            <trans-unit id="12" resname="sulu_article.list.filter.me">
+                <source>sulu_article.list.filter.me</source>
+                <target>Me</target>
+            </trans-unit>
+            <trans-unit id="13" resname="sulu_article.list.filter.all">
+                <source>sulu_article.list.filter.all</source>
+                <target>Alle</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
