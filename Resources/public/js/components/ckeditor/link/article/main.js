@@ -24,11 +24,9 @@ define([
     // TODO merge with user settings.
     // TODO column-options
     var fields = JSON.parse(fieldsResponse),
-
         config = Config.get('sulu_article');
 
     return {
-
         defaults: {
             options: {
                 link: {},
@@ -56,6 +54,10 @@ define([
         },
 
         initialize: function() {
+            if (config.typeNames.length > 0) {
+                this.type = config.typeNames[0];
+            }
+
             this.bindCustomEvents();
             this.resolveHref();
             this.render();
@@ -81,10 +83,9 @@ define([
             var $container = $(this.templates.contentDatasource());
             this.$el.append($container);
 
-            var type = '';
-            if (config.typeNames.length > 0) {
-                this.type = config.typeNames[0];
-                type = '&type=' + config.typeNames[0];
+            var typeParameter = '';
+            if (this.type) {
+                typeParameter = '&type=' + this.type;
             }
 
             this.sandbox.start(
@@ -102,7 +103,7 @@ define([
                         options: {
                             el: '#href-select',
                             instanceName: 'article-link',
-                            url: Manager.url({locale: this.options.locale}) + '&sortBy=authored&sortOrder=desc' + type,
+                            url: Manager.url({locale: this.options.locale}) + '&sortBy=authored&sortOrder=desc' + typeParameter,
                             resultKey: 'articles',
                             clickCallback: function(id, item) {
                                 this.options.selectCallback(id, item.title, true);
