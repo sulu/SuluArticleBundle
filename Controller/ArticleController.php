@@ -17,6 +17,7 @@ use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
@@ -96,14 +97,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (!empty($searchPattern = $restHelper->getSearchPattern())
             && 0 < count($searchFields = $restHelper->getSearchFields())
         ) {
-            $boolQuery = new BoolQuery();
-            foreach ($searchFields as $searchField) {
-                $boolQuery->add(
-                    new WildcardQuery($this->uncamelize($searchField), '*' . strtolower($searchPattern) . '*'),
-                    BoolQuery::SHOULD
-                );
-            }
-            $search->addQuery($boolQuery);
+            $search->addQuery(new MultiMatchQuery($searchFields, $searchPattern));
         }
 
         if (null !== ($type = $request->get('type'))) {
