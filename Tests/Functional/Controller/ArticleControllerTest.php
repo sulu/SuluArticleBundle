@@ -20,6 +20,9 @@ use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
+/**
+ * Functional testcases for Article API.
+ */
 class ArticleControllerTest extends SuluTestCase
 {
     private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
@@ -242,6 +245,32 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertContains([$article1['id'], $article1['title']], $items);
         $this->assertContains([$article2['id'], $article2['title']], $items);
+    }
+
+    public function testCGetIds()
+    {
+        $this->purgeIndex();
+
+        $article1 = $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&ids=' . implode(',', [$article2['id'], $article1['id']])
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $this->assertContains($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertContains($article1['id'], $response['_embedded']['articles'][1]['id']);
     }
 
     public function testCGetSearch()

@@ -193,5 +193,15 @@
 
             <tag name="sulu.link.provider" alias="article"/>
         </service>
+
+        <!-- content-type -->
+        <service id="sulu_article.content_types.article_selection"
+                 class="Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType">
+            <argument type="service" id="es.manager.live"/>
+            <argument>%sulu_article.view_document.article.class%</argument>
+            <argument>%sulu_article.content-type.article.template%</argument>
+
+            <tag name="sulu.content.type" alias="article_selection"/>
+        </service>
     </services>
 </container>

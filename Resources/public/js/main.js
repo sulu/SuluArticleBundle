@@ -12,6 +12,8 @@ require.config({
         suluarticle: '../../suluarticle/js',
         suluarticlecss: '../../suluarticle/css',
 
+        'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
+
         'services/suluarticle/article-manager': '../../suluarticle/js/services/manager'
     }
 });

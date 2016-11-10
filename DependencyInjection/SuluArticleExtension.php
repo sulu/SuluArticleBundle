@@ -100,6 +100,11 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.view_document.article.class', $config['documents']['article']['view']);
         $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
 
+        $container->setParameter(
+            'sulu_article.content-type.article.template',
+            $config['content_types']['article']['template']
+        );
+
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
     }

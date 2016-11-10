@@ -46,6 +46,10 @@
                 <source>sulu_article.ckeditor.link</source>
                 <target>Artikel</target>
             </trans-unit>
+            <trans-unit id="12" resname="sulu_article.selection.no-result">
+                <source>sulu_article.selection.no-result</source>
+                <target>Keine Artikel ausgewählt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
