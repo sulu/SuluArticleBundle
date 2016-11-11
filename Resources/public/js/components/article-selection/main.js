@@ -13,14 +13,18 @@
  * Allows selection of multiple articles.
  */
 define([
+    'underscore',
+    'config',
     'text!./overlay.html',
     'text!./contentItem.html',
     'text!/admin/api/articles/fields'
-], function(overlayTemplate, contentItemTemplate, fieldsResponse) {
+], function(_, Config, overlayTemplate, contentItemTemplate, fieldsResponse) {
 
     'use strict';
 
     var fields = JSON.parse(fieldsResponse),
+
+        config = Config.get('sulu_article'),
 
         defaults = {
             options: {
@@ -62,19 +66,12 @@ define([
                 updateList.bind(this)
             );
 
-            this.sandbox.dom.on(this.$el, 'click', function(e) {
-                var id = this.sandbox.dom.data(e.currentTarget, 'id'),
-                    route = 'articles/' + this.options.locale + '/edit:' + id + '/details';
-
-                this.sandbox.emit(this.options.navigateEvent, route);
-
-                return false;
-            }.bind(this), 'a.link');
-
             // adjust position of overlay after column-navigation has initialized
             this.sandbox.on('husky.datagrid.article.view.rendered', function() {
                 this.sandbox.emit('husky.overlay.article-selection.' + this.options.instanceName + '.add.set-position');
             }.bind(this));
+
+            this.sandbox.on('husky.tabs.overlayarticle-selection.articles.add.item.select', typeChange.bind(this));
         },
 
         /**
@@ -94,14 +91,14 @@ define([
                     name: 'datagrid@husky',
                     options: {
                         el: '#article-selection-' + this.options.instanceName + '-list',
-                        instanceName: 'article',
-                        url: this.options.url,
+                        instanceName: this.options.instanceName,
+                        url: this.url,
                         preselected: this.getData() || [],
                         resultKey: this.options.resultKey,
                         sortable: false,
                         columnOptionsInstanceName: '',
                         clickCallback: function(item) {
-                            this.sandbox.emit('husky.datagrid.article.toggle.item', item);
+                            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
                         }.bind(this),
                         selectedCounter: true,
                         searchInstanceName: this.options.instanceName + '-article-search',
@@ -123,7 +120,7 @@ define([
         updateList = function() {
             var data = this.getData() || [];
 
-            this.sandbox.emit('husky.datagrid.article.selected.update', data);
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.selected.update', data);
         },
 
         /**
@@ -148,8 +145,44 @@ define([
          * Starts the overlay component
          */
         startOverlay = function() {
-            var $element = this.sandbox.dom.createElement('<div/>');
+            var $element = this.sandbox.dom.createElement('<div/>'),
+                $data = $(this.templates.overlay({instanceName: this.options.instanceName})),
+                types = config.types,
+                typeNames = config.typeNames,
+                tabs = false;
             this.sandbox.dom.append(this.$el, $element);
+
+            // load all for default
+            this.url = this.options.url;
+
+            if (1 !== typeNames.length) {
+                tabs = [];
+                if (config.displayTabAll === true) {
+                    tabs.push(
+                        {
+                            name: 'public.all',
+                            key: null
+                        }
+                    );
+                } else {
+                    // if not all tab is first load only for the first type
+                    var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
+
+                    this.url = this.options.url + delimiter + 'type=' + typeNames[0];
+                }
+
+                // add tab item for each type
+                _.each(typeNames, function(type) {
+                    tabs.push(
+                        {
+                            title: types[type].title,
+                            data: $data
+                        }
+                    );
+                }.bind(this));
+
+                $data = null;
+            }
 
             this.sandbox.start([
                 {
@@ -164,7 +197,8 @@ define([
                         skin: 'large',
                         okCallback: getAddOverlayData.bind(this),
                         title: this.translations.overlayTitle,
-                        data: this.templates.overlay({instanceName: this.options.instanceName})
+                        tabs: tabs,
+                        data: $data
                     }
                 }
             ]);
@@ -177,7 +211,7 @@ define([
             var data = [],
                 oldData = this.getData();
 
-            this.sandbox.emit('husky.datagrid.article.items.get-selected', function(selected) {
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.items.get-selected', function(selected) {
                 this.sandbox.util.foreach(selected, function(item) {
                     var index = oldData.indexOf(item);
 
@@ -198,6 +232,18 @@ define([
             }
 
             this.setData(result);
+        },
+
+        typeChange = function(item) {
+            for (var type in config.types) {
+                if (config.types.hasOwnProperty(type) && config.types[type].title === item.name) {
+                    this.type = type;
+                    return this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: type});
+                }
+            }
+
+            this.type = null;
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: null});
         };
 
     return {
@@ -228,7 +274,7 @@ define([
         },
 
         getItemContent: function(item) {
-            return this.templates.contentItem(item);
+            return this.templates.contentItem({item: item, locale: this.options.locale});
         },
 
         sortHandler: function(ids) {
