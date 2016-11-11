@@ -15,11 +15,10 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\IdsQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
-use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
@@ -94,6 +93,14 @@ class ArticleController extends RestController implements ClassResourceInterface
         $repository = $manager->getRepository($this->get('sulu_article.view_document.factory')->getClass('article'));
         $search = $repository->createSearch();
 
+        $limit = (int) $restHelper->getLimit();
+        $page = (int) $restHelper->getPage();
+
+        if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
+            $search->addQuery(new IdsQuery($ids));
+            $limit = count($ids);
+        }
+
         if (!empty($searchPattern = $restHelper->getSearchPattern())
             && 0 < count($searchFields = $restHelper->getSearchFields())
         ) {
@@ -116,14 +123,21 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
         }
 
-        $limit = (int) $restHelper->getLimit();
-        $page = (int) $restHelper->getPage();
         $search->setSize($limit);
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
         foreach ($repository->execute($search) as $document) {
-            $result[] = $document;
+            if (false !== ($index = array_search($document->getUuid(), $ids))) {
+                $result[$index] = $document;
+            } else {
+                $result[] = $document;
+            }
+        }
+
+        if (count($ids)) {
+            ksort($result);
+            $result = array_values($result);
         }
 
         return $this->handleView(
