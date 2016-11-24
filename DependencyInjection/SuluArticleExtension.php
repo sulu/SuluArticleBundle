@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Component\Content\Compat\Structure\StructureBridge;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -36,7 +36,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     'content' => [
                         'structure' => [
                             'type_map' => [
-                                'article' => StructureBridge::class,
+                                'article' => ArticleBridge::class,
                             ],
                         ],
                     ],
