@@ -25,4 +25,12 @@ class ArticleBridge extends StructureBridge
     {
         return $this->structure->view;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWebspaceKey()
+    {
+        return;
+    }
 }
