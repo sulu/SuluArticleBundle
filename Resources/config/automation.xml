@@ -10,6 +10,7 @@
         <service id="sulu_article.automation.content_navigation_provider"
                  class="Sulu\Bundle\AutomationBundle\Admin\AutomationContentNavigationProvider">
             <argument type="service" id="sulu_security.security_checker"/>
+            <argument type="service" id="sulu.repository.task"/>
             <argument type="string">%sulu_article.article_document.class%</argument>
 
             <tag name="sulu_admin.content_navigation" alias="article"/>

@@ -126,7 +126,7 @@ define([
 
             return {
                 tabs: {
-                    url: '/admin/content-navigations?alias=article',
+                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale,
                     options: {
                         data: function() {
                             return this.sandbox.util.deepCopy(this.data);
