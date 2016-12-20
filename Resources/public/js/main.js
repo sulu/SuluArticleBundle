@@ -18,6 +18,15 @@ require.config({
     }
 });
 
+if (!require.defined('services/husky/storage')) {
+
+    require.config({
+        paths: {
+            'services/husky/storage':'../../suluarticle/js/polyfill/storage'
+        }
+    });
+}
+
 define(['underscore', 'config'], function(_, Config) {
 
     'use strict';
