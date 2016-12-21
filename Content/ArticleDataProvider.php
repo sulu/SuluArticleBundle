@@ -175,14 +175,14 @@ class ArticleDataProvider implements DataProviderInterface
 
         $queriesCount = 0;
         $operator = $this->getFilter($filters, 'tagOperator', 'or');
-        $this->addBoolQuery('tags', $filters, 'excerpt.tags', $operator, $query, $queriesCount);
+        $this->addBoolQuery('tags', $filters, 'excerpt.tags.id', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteTagsOperator', 'or');
-        $this->addBoolQuery('websiteTags', $filters, 'excerpt.tags', $operator, $query, $queriesCount);
+        $this->addBoolQuery('websiteTags', $filters, 'excerpt.tags.id', $operator, $query, $queriesCount);
 
         $operator = $this->getFilter($filters, 'categoryOperator', 'or');
-        $this->addBoolQuery('categories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
+        $this->addBoolQuery('categories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteCategoriesOperator', 'or');
-        $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
+        $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
 
         if (array_key_exists('type', $filters)) {
             $query->add(new TermQuery('type', $filters['type']));
