@@ -17,6 +17,7 @@ use ONGR\ElasticsearchDSL\Query\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
+use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -108,15 +109,17 @@ class ArticleDataProvider implements DataProviderInterface
             $filters['type'] = $type;
         }
 
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize);
+
         $result = [];
         $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
-        foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
+        foreach ($queryResult as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
         }
 
-        return new DataProviderResult($result, false, $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
     }
 
     /**
@@ -134,10 +137,12 @@ class ArticleDataProvider implements DataProviderInterface
             $filters['type'] = $type;
         }
 
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize);
+
         $result = [];
         $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
-        foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
+        foreach ($queryResult as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleResourceItem(
                 $document,
@@ -145,7 +150,7 @@ class ArticleDataProvider implements DataProviderInterface
             );
         }
 
-        return new DataProviderResult($result, false, $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
     }
 
     /**
@@ -154,6 +159,27 @@ class ArticleDataProvider implements DataProviderInterface
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         return;
+    }
+
+    /**
+     * Returns flag "hasNextPage".
+     * It combines the limit/query-count with the page and page-size.
+     *
+     * @param DocumentIterator $queryResult
+     * @param int $limit
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return bool
+     */
+    private function hasNextPage(DocumentIterator $queryResult, $limit, $page, $pageSize)
+    {
+        $count = $queryResult->count();
+        if ($limit && $limit < $count) {
+            $count = $limit;
+        }
+
+        return $count > ($page * $pageSize);
     }
 
     /**
@@ -200,6 +226,8 @@ class ArticleDataProvider implements DataProviderInterface
         } elseif (null !== $limit) {
             $search->setSize($limit);
         }
+
+        $search->addSort(new FieldSort('title'));
 
         return $repository->execute($search);
     }
