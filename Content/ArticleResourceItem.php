@@ -143,6 +143,26 @@ class ArticleResourceItem implements ResourceItemInterface
     }
 
     /**
+     * Returns route-path.
+     *
+     * @return string
+     */
+    public function getRoutePath()
+    {
+        return $this->article->getRoutePath();
+    }
+
+    /**
+     * Returns view-object.
+     *
+     * @return ArticleViewDocumentInterface
+     */
+    public function getContent()
+    {
+        return $this->article;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getResource()
