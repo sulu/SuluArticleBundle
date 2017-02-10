@@ -22,18 +22,44 @@ define(['jquery', 'services/husky/util'], function($, Util) {
     return {
         url: templates.url,
 
+        /**
+         * Load article.
+         *
+         * @param {String} id
+         * @param {String} locale
+         */
         load: function(id, locale) {
             return Util.load(templates.url({id: id, locale: locale}));
         },
 
+        /**
+         * Save article.
+         *
+         * @param {Array} data
+         * @param {String} id
+         * @param {String} locale
+         * @param {String} action
+         */
         save: function(data, id, locale, action) {
             return Util.save(templates.url({id: id, locale: locale, action: action}), !id ? 'POST' : 'PUT', data);
         },
 
+        /**
+         * Remove article.
+         *
+         * @param {String} id
+         * @param {String} locale
+         */
         remove: function(id, locale) {
             return Util.save(templates.url({id: id, locale: locale}), 'DELETE');
         },
 
+        /**
+         * Unpublish article.
+         *
+         * @param {String} id
+         * @param {String} locale
+         */
         unpublish: function(id, locale) {
             return Util.save(
                 templates.url({id: id, locale: locale, action: 'unpublish'}),
@@ -41,6 +67,12 @@ define(['jquery', 'services/husky/util'], function($, Util) {
             );
         },
 
+        /**
+         * Remove article.
+         *
+         * @param {String} id
+         * @param {String} locale
+         */
         removeDraft: function(id, locale) {
             return Util.save(
                 templates.url({id: id, locale: locale, action: 'remove-draft'}),
