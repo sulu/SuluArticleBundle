@@ -28,12 +28,35 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      *
      * @Id
      */
+    protected $id;
+
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
+     * )
+     */
     protected $uuid;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
+     * )
      */
     protected $locale;
 
@@ -204,11 +227,38 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $publishedState;
 
     /**
+     * @var LocalizationStateViewObject
+     *
+     * @Embedded(class="SuluArticleBundle:LocalizationStateViewObject")
+     */
+    protected $localizationState;
+
+    /**
      * @param string $uuid
      */
-    public function __construct($uuid = null)
+    public function __construct(
+        $uuid = null
+    )
     {
         $this->uuid = $uuid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -436,7 +486,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setSeo($seo)
+    public function setSeo(SeoViewObject $seo)
     {
         $this->seo = $seo;
 
@@ -545,6 +595,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setPublishedState($publishedState)
     {
         $this->publishedState = $publishedState;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLocalizationState()
+    {
+        return $this->localizationState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLocalizationState(LocalizationStateViewObject $localizationState)
+    {
+        $this->localizationState = $localizationState;
 
         return $this;
     }

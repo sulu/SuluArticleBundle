@@ -49,7 +49,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getFieldDescriptors()
     {
         return [
-            'id' => new FieldDescriptor('id', 'public.id', true),
+            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
             'typeTranslation' => new FieldDescriptor(
                 'typeTranslation',
                 'sulu_article.list.type',
@@ -86,6 +86,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function cgetAction(Request $request)
     {
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
         $restHelper = $this->get('sulu_core.list_rest_helper');
 
         /** @var Manager $manager */
@@ -95,6 +97,10 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         $limit = (int) $restHelper->getLimit();
         $page = (int) $restHelper->getPage();
+
+        if (null !== $locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
 
         if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
             $search->addQuery(new IdsQuery($ids));
@@ -170,7 +176,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $uuid,
             $locale,
             [
-                'load_ghost_content' => false,
+                'load_ghost_content' => true,
                 'load_shadow_content' => false,
             ]
         );
@@ -231,7 +237,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $uuid,
             $locale,
             [
-                'load_ghost_content' => false,
+                'load_ghost_content' => true,
                 'load_shadow_content' => false,
             ]
         );

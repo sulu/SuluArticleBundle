@@ -164,6 +164,7 @@ define(['underscore'], function(_) {
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
+                    idKey: 'uuid',
                     instanceName: 'articles',
                     actionCallback: function(id) {
                         this.toEdit(id);
@@ -172,6 +173,21 @@ define(['underscore'], function(_) {
                         table: {
                             actionIconColumn: 'title',
                             badges: [
+                                {
+                                    column: 'title',
+                                    callback: function(item, badge) {
+                                        if (!!item.localizationState &&
+                                            item.localizationState.state === 'ghost' &&
+                                            item.localizationState.locale !== this.options.language
+                                        ) {
+                                            badge.title = item.localizationState.locale;
+
+                                            return badge;
+                                        }
+
+                                        return false;
+                                    }.bind(this)
+                                },
                                 {
                                     column: 'title',
                                     callback: function(item, badge) {

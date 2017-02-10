@@ -14,12 +14,16 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
+use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -113,6 +117,147 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
+     * Returns translation for given article type.
+     *
+     * @param string $type
+     *
+     * @return string
+     */
+    private function getTypeTranslation($type)
+    {
+        if (!array_key_exists($type, $this->typeConfiguration)) {
+            return ucfirst($type);
+        }
+
+        $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
+
+        return $this->translator->trans(
+            $typeTranslationKey,
+            [],
+            'backend'
+        );
+    }
+
+    /**
+     * @param ArticleDocument $document
+     * @param ArticleViewDocument $article
+     */
+    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocument $article)
+    {
+        $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
+    }
+
+    /**
+     * @param string $uuid
+     * @param string $locale
+     *
+     * @return string
+     */
+    protected function getArticleId($uuid, $locale)
+    {
+        return $uuid . '-' . $locale;
+    }
+
+    /**
+     * @param ArticleDocument $document
+     * @param string $locale
+     * @param string $localizationState
+     *
+     * @return ArticleViewDocumentInterface
+     */
+    protected function createOrUpdateArticle(
+        ArticleDocument $document,
+        $locale,
+        $localizationState = LocalizationState::LOCALIZED
+    ) {
+        $articleId = $this->getArticleId($document->getUuid(), $locale);
+        /** @var ArticleViewDocument $article */
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $locale);
+
+        if (!$article) {
+            $article = $this->documentFactory->create('article');
+            $article->setId($articleId);
+            $article->setUuid($document->getUuid());
+            $article->setLocale($locale);
+        } else {
+            // Only index ghosts when the article is a ghost.
+            if (LocalizationState::GHOST === $localizationState
+                && LocalizationState::GHOST !== $article->getLocalizationState()->state
+            ) {
+                return null;
+            }
+        }
+
+        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article',
+            $document->getStructureType()
+        );
+
+        $article->setTitle($document->getTitle());
+        $article->setRoutePath($document->getRoutePath());
+        $article->setChanged($document->getChanged());
+        $article->setCreated($document->getCreated());
+        $article->setAuthored($document->getAuthored());
+        $article->setAuthors($document->getAuthors());
+        $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
+        $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+        $article->setType($this->getType($structureMetadata));
+        $article->setStructureType($document->getStructureType());
+        $article->setPublished($document->getPublished());
+        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
+        $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
+        $article->setLocalizationState(
+            new LocalizationStateViewObject(
+                $localizationState,
+                (LocalizationState::LOCALIZED === $localizationState) ? null : $document->getLocale()
+            )
+        );
+
+        $extensions = $document->getExtensionsData()->toArray();
+        $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
+        $article->setSeo($this->seoFactory->create($extensions['seo']));
+
+        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
+            $descriptionProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.description');
+            $article->setTeaserDescription(
+                $document->getStructure()->getProperty($descriptionProperty->getName())->getValue()
+            );
+        }
+        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.media')) {
+            $mediaProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.media');
+            $mediaData = $document->getStructure()->getProperty($mediaProperty->getName())->getValue();
+            if (null !== $mediaData && array_key_exists('ids', $mediaData)) {
+                $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
+            }
+        }
+
+        $this->manager->persist($article);
+
+        return $article;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($document)
+    {
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
+        if (null === $article) {
+            return;
+        }
+
+        $this->manager->remove($article);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flush()
+    {
+        $this->manager->commit();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function clear()
@@ -160,94 +305,7 @@ class ArticleIndexer implements IndexerInterface
      */
     public function index(ArticleDocument $document)
     {
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
-        if (!$article) {
-            $article = $this->documentFactory->create('article');
-            $article->setUuid($document->getUuid());
-        }
-
-        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
-            'article',
-            $document->getStructureType()
-        );
-
-        $article->setTitle($document->getTitle());
-        $article->setRoutePath($document->getRoutePath());
-        $article->setChanged($document->getChanged());
-        $article->setCreated($document->getCreated());
-        $article->setAuthored($document->getAuthored());
-        $article->setAuthors($document->getAuthors());
-        $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
-        $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
-        $article->setType($this->getType($structureMetadata));
-        $article->setStructureType($document->getStructureType());
-        $article->setPublished($document->getPublished());
-        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
-        $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
-
-        $extensions = $document->getExtensionsData()->toArray();
-        $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
-        $article->setSeo($this->seoFactory->create($extensions['seo']));
-
-        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
-            $descriptionProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.description');
-            $article->setTeaserDescription(
-                $document->getStructure()->getProperty($descriptionProperty->getName())->getValue()
-            );
-        }
-        if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.media')) {
-            $mediaProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.media');
-            $mediaData = $document->getStructure()->getProperty($mediaProperty->getName())->getValue();
-            if (null !== $mediaData && array_key_exists('ids', $mediaData)) {
-                $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
-            }
-        }
-
-        $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
-
-        $this->manager->persist($article);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($document)
-    {
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
-        if (null === $article) {
-            return;
-        }
-
-        $this->manager->remove($article);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function flush()
-    {
-        $this->manager->commit();
-    }
-
-    /**
-     * Returns translation for given article type.
-     *
-     * @param string $type
-     *
-     * @return string
-     */
-    private function getTypeTranslation($type)
-    {
-        if (!array_key_exists($type, $this->typeConfiguration)) {
-            return ucfirst($type);
-        }
-
-        $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
-
-        return $this->translator->trans(
-            $typeTranslationKey,
-            [],
-            'backend'
-        );
+        $article = $this->createOrUpdateArticle($document, $document->getLocale());
+        $this->dispatchIndexEvent($document, $article);
     }
 }

@@ -17,6 +17,22 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 interface ArticleViewDocumentInterface
 {
     /**
+     * Returns id.
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
+     * Set id.
+     *
+     * @param string $id
+     *
+     * @return $this
+     */
+    public function setId($id);
+
+    /**
      * Returns uuid.
      *
      * @return string
@@ -222,7 +238,7 @@ interface ArticleViewDocumentInterface
      *
      * @return $this
      */
-    public function setSeo($seo);
+    public function setSeo(SeoViewObject $seo);
 
     /**
      * Returns authored.
@@ -319,4 +335,20 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setPublishedState($publishedState);
+
+    /**
+     * Get localization state.
+     *
+     * @return LocalizationStateViewObject
+     */
+    public function getLocalizationState();
+
+    /**
+     * Set localization state.
+     *
+     * @param LocalizationStateViewObject $localizationState
+     *
+     * @return $this
+     */
+    public function setLocalizationState(LocalizationStateViewObject $localizationState);
 }

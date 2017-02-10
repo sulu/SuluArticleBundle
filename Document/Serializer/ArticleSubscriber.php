@@ -93,7 +93,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $visitor->addData('type', $context->accept($this->getType($structure->getStructure())));
+        $visitor->addData('articleType', $context->accept($this->getType($structure->getStructure())));
     }
 
     /**

@@ -11,7 +11,7 @@ define([
     'jquery',
     'underscore',
     'config',
-    'suluarticle/services/article-manager',
+    'services/suluarticle/article-manager',
     'sulusecurity/services/user-manager',
     'services/sulupreview/preview',
     'sulusecurity/services/security-checker'
@@ -92,7 +92,7 @@ define([
                 buttons.template = {
                     options: {
                         dropdownOptions: {
-                            url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
+                            url: '/admin/articles/templates?type=' + (this.options.type || this.data.articleType),
                             callback: function(item) {
                                 this.template = item.template;
                                 this.sandbox.emit('sulu.tab.template-change', item);
@@ -157,7 +157,11 @@ define([
                 },
 
                 toolbar: {
-                    buttons: buttons
+                    buttons: buttons,
+                    languageChanger: {
+                        data: this.options.config.languageChanger,
+                        preSelected: this.options.locale
+                    }
                 }
             };
         },
@@ -214,7 +218,7 @@ define([
             if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
             } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.type) + '/' + this.options.locale);
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.articleType) + '/' + this.options.locale);
             }
         },
 
@@ -222,7 +226,7 @@ define([
             if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
             } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.type), true, true);
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.articleType), true, true);
             }
         },
 
