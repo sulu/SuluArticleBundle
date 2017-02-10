@@ -237,16 +237,29 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $id
      */
-    public function remove($document)
+    protected function removeArticle($id)
     {
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $document->getUuid());
+        $article = $this->manager->find(
+            $this->documentFactory->getClass('article'),
+            $id
+        );
         if (null === $article) {
             return;
         }
 
         $this->manager->remove($article);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($document)
+    {
+        $this->removeArticle(
+            $this->getArticleId($document->getUuid(), $document->getOriginalLocale())
+        );
     }
 
     /**

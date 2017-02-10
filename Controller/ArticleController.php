@@ -21,6 +21,7 @@ use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
@@ -40,6 +41,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     const DOCUMENT_TYPE = 'article';
 
     use RequestParametersTrait;
+    use ArticleViewDocumentIdTrait;
 
     /**
      * Create field-descriptor array.
@@ -103,7 +105,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
-            $search->addQuery(new IdsQuery($ids));
+            $search->addQuery(new IdsQuery($this->getViewDocumentIds($ids, $locale)));
             $limit = count($ids);
         }
 

@@ -12,6 +12,7 @@
 namespace Functional\Controller;
 
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
@@ -55,7 +56,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
         $this->assertEquals([$this->getTestUser()->getContact()->getId()], $response['authors']);
@@ -76,7 +77,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
         $this->assertEquals([1, 2, 3], $response['authors']);
@@ -195,7 +196,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('simple', $response['template']);
-        $this->assertEquals(self::$typeMap['simple'], $response['type']);
+        $this->assertEquals(self::$typeMap['simple'], $response['articleType']);
         $this->assertEquals($description, $response['description']);
     }
 
@@ -238,7 +239,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -291,7 +292,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -313,7 +314,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -335,9 +336,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
-        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['id']);
+        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['uuid']);
         $this->assertEquals($article1['title'], $response['_embedded']['articles'][1]['title']);
     }
 
@@ -362,7 +363,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -381,7 +382,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
