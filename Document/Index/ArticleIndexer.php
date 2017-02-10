@@ -172,7 +172,7 @@ class ArticleIndexer implements IndexerInterface
     ) {
         $articleId = $this->getArticleId($document->getUuid(), $locale);
         /** @var ArticleViewDocument $article */
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $locale);
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
 
         if (!$article) {
             $article = $this->documentFactory->create('article');
