@@ -10,11 +10,12 @@
 define([
     'jquery',
     'underscore',
+    'config',
     'suluarticle/services/article-manager',
     'sulusecurity/services/user-manager',
     'services/sulupreview/preview',
     'sulusecurity/services/security-checker'
-], function($, _, ArticleManager, UserManager, Preview, SecurityChecker) {
+], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker) {
 
     'use strict';
 
@@ -63,6 +64,19 @@ define([
                 if (SecurityChecker.hasPermission(this.data, 'live')) {
                     saveDropdown.savePublish = {};
                     saveDropdown.publish = {};
+                }
+
+                if (!!config.has('sulu_automation.enabled')) {
+                    saveDropdown.automationInfo = {
+                        options: {
+                            entityId: this.options.id,
+                            entityClass: 'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
+                            handlerClass: [
+                                'Sulu\\Bundle\\ContentBundle\\Automation\\DocumentPublishHandler',
+                                'Sulu\\Bundle\\ContentBundle\\Automation\\DocumentUnpublishHandler'
+                            ]
+                        }
+                    };
                 }
 
                 buttons.save = {
@@ -126,7 +140,7 @@ define([
 
             return {
                 tabs: {
-                    url: '/admin/content-navigations?alias=article',
+                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale,
                     options: {
                         data: function() {
                             return this.sandbox.util.deepCopy(this.data);

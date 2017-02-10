@@ -64,6 +64,84 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertEquals($item['id'], $result->getItems()[0]->getId());
     }
 
+    public function testResolveDataItemsPagination()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems([], [], [], null, 1, 2);
+        $this->assertCount(2, $result->getItems());
+        $this->assertTrue($result->getHasNextPage());
+        $result = $dataProvider->resolveDataItems([], [], [], null, 2, 2);
+        $this->assertCount(1, $result->getItems());
+        $this->assertFalse($result->getHasNextPage());
+    }
+
+    public function testResolveResourceItemsPaginationWithLimit()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveResourceItems([], [], [], 3, 1, 2);
+        $this->assertCount(2, $result->getItems());
+        $this->assertTrue($result->getHasNextPage());
+        $result = $dataProvider->resolveResourceItems([], [], [], 3, 2, 2);
+        $this->assertCount(1, $result->getItems());
+        $this->assertFalse($result->getHasNextPage());
+    }
+
+    public function testResolveResourceItemsPagination()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveResourceItems([], [], [], null, 1, 2);
+        $this->assertCount(2, $result->getItems());
+        $this->assertTrue($result->getHasNextPage());
+        $result = $dataProvider->resolveResourceItems([], [], [], null, 2, 2);
+        $this->assertCount(1, $result->getItems());
+        $this->assertFalse($result->getHasNextPage());
+    }
+
+    public function testResolveDataItemsPaginationWithLimit()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems([], [], [], 3, 1, 2);
+        $this->assertCount(2, $result->getItems());
+        $this->assertTrue($result->getHasNextPage());
+        $result = $dataProvider->resolveDataItems([], [], [], 3, 2, 2);
+        $this->assertCount(1, $result->getItems());
+        $this->assertFalse($result->getHasNextPage());
+    }
+
     private function createArticle($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();

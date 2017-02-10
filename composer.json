@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^5.5 || ^7.0",
-        "sulu/sulu": "dev-develop",
+        "sulu/sulu": "dev-develop || ^1.4",
         "sulu/document-manager": "@dev",
         "massive/search-bundle": "@dev",
         "ongr/elasticsearch-bundle": "~1.0"
@@ -16,7 +16,10 @@
         "symfony/monolog-bundle": "2.4.*",
         "doctrine/doctrine-bundle": "1.4.*",
         "jackalope/jackalope-doctrine-dbal": "^1.2.5",
-        "phpunit/phpunit": ">=4.8"
+        "phpunit/phpunit": ">=4.8",
+
+        "php-task/task-bundle": "@dev",
+        "php-task/php-task": "@dev"
     },
     "keywords": [
         "articles"
