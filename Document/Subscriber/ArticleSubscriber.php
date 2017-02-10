@@ -86,8 +86,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         RouteRepositoryInterface $routeRepository,
         EntityManagerInterface $entityManager,
         DocumentManagerInterface $documentManager
-    )
-    {
+    ) {
         $this->indexer = $indexer;
         $this->liveIndexer = $liveIndexer;
         $this->routeManager = $routeManager;
