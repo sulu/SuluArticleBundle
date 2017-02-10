@@ -180,7 +180,7 @@ class ArticleIndexer implements IndexerInterface
             $article->setUuid($document->getUuid());
             $article->setLocale($locale);
         } else {
-            // Only index ghosts when the article is a ghost.
+            // Only index ghosts when the article isn't a ghost himself.
             if (LocalizationState::GHOST === $localizationState
                 && LocalizationState::GHOST !== $article->getLocalizationState()->state
             ) {
