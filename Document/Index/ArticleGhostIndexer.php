@@ -107,7 +107,7 @@ class ArticleGhostIndexer extends ArticleIndexer
                         $document->getUuid(),
                         $locale,
                         [
-                            'load_ghost_content' => true
+                            'load_ghost_content' => true,
                         ]
                     ),
                     $localization->getLocale(),

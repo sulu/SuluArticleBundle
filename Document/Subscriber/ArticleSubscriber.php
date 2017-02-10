@@ -110,7 +110,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::UNPUBLISH => 'handleUnpublish',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
             Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
-            Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]]
+            Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
         ];
     }
 
@@ -188,7 +188,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->documents[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
-            'locale' => $document->getLocale()
+            'locale' => $document->getLocale(),
         ];
     }
 
@@ -206,7 +206,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveDocuments[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
-            'locale' => $document->getLocale()
+            'locale' => $document->getLocale(),
         ];
     }
 

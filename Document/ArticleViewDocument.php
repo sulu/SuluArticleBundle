@@ -238,8 +238,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      */
     public function __construct(
         $uuid = null
-    )
-    {
+    ) {
         $this->uuid = $uuid;
     }
 
