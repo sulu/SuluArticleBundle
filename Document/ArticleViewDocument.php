@@ -33,8 +33,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(
-     *     type="string", options={"analyzer": "keyword"})
+     * @Property(type="string", options={"analyzer": "keyword"})
      */
     protected $uuid;
 
