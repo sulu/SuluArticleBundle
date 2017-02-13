@@ -188,6 +188,7 @@ define([
 
         /**
          * Tab changed event, save the new tab id to `this.options.content`.
+         * Can be removed when issue #72 is solved: https://github.com/sulu/SuluArticleBundle/issues/72
          *
          * @param {Object} item
          */

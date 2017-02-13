@@ -241,7 +241,8 @@ define(['underscore'], function(_) {
 
         typeChange: function(item) {
             var url = this.templates.route({type: item.key, locale: this.options.locale});
-            // Save the tab key.
+            // Save the tab key. Can be removed when issue #72 is solved:
+            // https://github.com/sulu/SuluArticleBundle/issues/72
             this.options.type = item.key;
 
             this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
