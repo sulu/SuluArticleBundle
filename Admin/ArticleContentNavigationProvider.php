@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Navigation\ContentNavigationItem;
 use Sulu\Bundle\AdminBundle\Navigation\ContentNavigationProviderInterface;
+use Sulu\Bundle\AdminBundle\Navigation\DisplayCondition;
 
 /**
  * Provides tabs for article-form.
@@ -35,6 +36,11 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $seo->setAction('seo');
         $seo->setComponent('articles/edit/seo@suluarticle');
         $seo->setDisplay(['edit']);
+        $seo->setDisplayConditions(
+            [
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+            ]
+        );
 
         $excerpt = new ContentNavigationItem('content-navigation.contents.excerpt');
         $excerpt->setId('excerpt');
@@ -42,6 +48,11 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $excerpt->setAction('excerpt');
         $excerpt->setComponent('articles/edit/excerpt@suluarticle');
         $excerpt->setDisplay(['edit']);
+        $excerpt->setDisplayConditions(
+            [
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+            ]
+        );
 
         $settings = new ContentNavigationItem('content-navigation.contents.settings');
         $settings->setId('settings');
@@ -49,6 +60,11 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $settings->setAction('settings');
         $settings->setComponent('articles/edit/settings@suluarticle');
         $settings->setDisplay(['edit']);
+        $settings->setDisplayConditions(
+            [
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+            ]
+        );
 
         return [$details, $seo, $excerpt, $settings];
     }

@@ -224,7 +224,11 @@ define(['underscore'], function(_) {
         },
 
         toList: function(locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            if (this.options.config.typeNames.length === 1) {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            } else {
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type) + '/' + (locale || this.options.locale));
+            }
         },
 
         deleteItems: function(ids) {
@@ -237,6 +241,8 @@ define(['underscore'], function(_) {
 
         typeChange: function(item) {
             var url = this.templates.route({type: item.key, locale: this.options.locale});
+            // Save the tab key.
+            this.options.type = item.key;
 
             this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
             this.sandbox.emit('sulu.router.navigate', url, false, false);
