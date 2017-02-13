@@ -11,9 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Metadata;
 
-use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
-use Sulu\Component\Content\Metadata\StructureMetadata;
-
 /**
  * Encapsulates function to get the correct id for an article view document.
  */
