@@ -34,29 +34,14 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
-     *     options={
-     *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
-     *         }
-     *     }
-     * )
+     *     type="string", options={"analyzer": "keyword"})
      */
     protected $uuid;
 
     /**
      * @var string
      *
-     * @Property(
-     *     type="string",
-     *     options={
-     *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
-     *         }
-     *     }
-     * )
+     * @Property(type="string", options={"analyzer": "keyword"})
      */
     protected $locale;
 

@@ -7,9 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define([
-    'services/suluarticle/article-manager'
-], function(ArticleManager) {
+define(['services/suluarticle/article-manager'], function(ArticleManager) {
 
     'use strict';
 

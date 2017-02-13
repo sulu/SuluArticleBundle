@@ -174,7 +174,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Indexes for article-document.
+     * Schedule article document for index.
      *
      * @param AbstractMappingEvent $event
      */
@@ -192,7 +192,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Indexes for article-document.
+     * Schedule article document for live index.
      *
      * @param AbstractMappingEvent $event
      */
@@ -209,6 +209,11 @@ class ArticleSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Index all scheduled article documents with default indexer.
+     *
+     * @param FlushEvent $event
+     */
     public function handleFlush(FlushEvent $event)
     {
         if (count($this->documents) < 1) {
@@ -226,6 +231,11 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->documents = [];
     }
 
+    /**
+     * Index all scheduled article documents with live indexer.
+     *
+     * @param FlushEvent $event
+     */
     public function handleFlushLive(FlushEvent $event)
     {
         if (count($this->liveDocuments) < 1) {
