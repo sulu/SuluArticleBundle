@@ -33,6 +33,7 @@ trait ArticleViewDocumentIdTrait
     /**
      * @param array $uuids
      * @param string $locale
+     *
      * @return array
      */
     protected function getViewDocumentIds($uuids, $locale)
