@@ -11,7 +11,7 @@ define([
     'jquery',
     'underscore',
     'config',
-    'suluarticle/services/article-manager',
+    'services/suluarticle/article-manager',
     'sulusecurity/services/user-manager',
     'services/sulupreview/preview',
     'sulusecurity/services/security-checker'
@@ -92,7 +92,7 @@ define([
                 buttons.template = {
                     options: {
                         dropdownOptions: {
-                            url: '/admin/articles/templates?type=' + (this.options.type || this.data.type),
+                            url: '/admin/articles/templates?type=' + (this.options.type || this.data.articleType),
                             callback: function(item) {
                                 this.template = item.template;
                                 this.sandbox.emit('sulu.tab.template-change', item);
@@ -152,12 +152,16 @@ define([
                         preview: this.preview
                     },
                     componentOptions: {
-                        values: this.data
+                        values: _.defaults(this.data, {type: null})
                     }
                 },
 
                 toolbar: {
-                    buttons: buttons
+                    buttons: buttons,
+                    languageChanger: {
+                        data: this.options.config.languageChanger,
+                        preSelected: this.options.locale
+                    }
                 }
             };
         },
@@ -174,11 +178,22 @@ define([
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
             this.sandbox.on('sulu.article.error', this.handleError.bind(this));
+            this.sandbox.on('husky.tabs.header.item.select', this.tabChanged.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toEdit(item.id);
             }.bind(this));
+        },
+
+        /**
+         * Tab changed event, save the new tab id to `this.options.content`.
+         * Can be removed when issue #72 is solved: https://github.com/sulu/SuluArticleBundle/issues/72
+         *
+         * @param {Object} item
+         */
+        tabChanged: function(item) {
+            this.options.content = item.id;
         },
 
         /**
@@ -207,14 +222,14 @@ define([
         },
 
         toEdit: function(locale, id) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/details', true, true);
+            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/' + (this.options.content  || 'details'), true, true);
         },
 
         toList: function() {
             if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
             } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.type) + '/' + this.options.locale);
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.articleType) + '/' + this.options.locale);
             }
         },
 
@@ -222,7 +237,7 @@ define([
             if (this.options.config.typeNames.length === 1) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
             } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.type), true, true);
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.articleType), true, true);
             }
         },
 
@@ -245,7 +260,7 @@ define([
             this.sandbox.emit('sulu.header.toolbar.item.loading', 'save');
 
             this.sandbox.once('sulu.tab.saved', function(id, data) {
-                promise.resolve(data);
+                promise.resolve(_.defaults(data, {type: null}));
             }.bind(this));
 
             this.sandbox.emit('sulu.tab.save', action);

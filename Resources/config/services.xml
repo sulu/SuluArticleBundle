@@ -31,7 +31,7 @@
             <argument type="string">%sulu_article.documents%</argument>
         </service>
         <service id="sulu_article.elastic_search.article_indexer"
-                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleGhostIndexer">
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
@@ -41,6 +41,8 @@
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="translator.default"/>
             <argument>%sulu_article.types%</argument>
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -100,6 +102,7 @@
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>

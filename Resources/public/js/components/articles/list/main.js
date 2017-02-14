@@ -164,6 +164,7 @@ define(['underscore'], function(_) {
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
+                    idKey: 'uuid',
                     instanceName: 'articles',
                     actionCallback: function(id) {
                         this.toEdit(id);
@@ -172,6 +173,21 @@ define(['underscore'], function(_) {
                         table: {
                             actionIconColumn: 'title',
                             badges: [
+                                {
+                                    column: 'title',
+                                    callback: function(item, badge) {
+                                        if (!!item.localizationState &&
+                                            item.localizationState.state === 'ghost' &&
+                                            item.localizationState.locale !== this.options.language
+                                        ) {
+                                            badge.title = item.localizationState.locale;
+
+                                            return badge;
+                                        }
+
+                                        return false;
+                                    }.bind(this)
+                                },
                                 {
                                     column: 'title',
                                     callback: function(item, badge) {
@@ -208,7 +224,11 @@ define(['underscore'], function(_) {
         },
 
         toList: function(locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            if (this.options.config.typeNames.length === 1 || !this.options.type) {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            } else {
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type) + '/' + (locale || this.options.locale));
+            }
         },
 
         deleteItems: function(ids) {
@@ -221,6 +241,9 @@ define(['underscore'], function(_) {
 
         typeChange: function(item) {
             var url = this.templates.route({type: item.key, locale: this.options.locale});
+            // Save the tab key. Can be removed when issue #72 is solved:
+            // https://github.com/sulu/SuluArticleBundle/issues/72
+            this.options.type = item.key;
 
             this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
             this.sandbox.emit('sulu.router.navigate', url, false, false);

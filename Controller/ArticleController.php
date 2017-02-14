@@ -21,6 +21,7 @@ use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
@@ -40,6 +41,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     const DOCUMENT_TYPE = 'article';
 
     use RequestParametersTrait;
+    use ArticleViewDocumentIdTrait;
 
     /**
      * Create field-descriptor array.
@@ -49,7 +51,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getFieldDescriptors()
     {
         return [
-            'id' => new FieldDescriptor('id', 'public.id', true),
+            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
             'typeTranslation' => new FieldDescriptor(
                 'typeTranslation',
                 'sulu_article.list.type',
@@ -86,6 +88,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function cgetAction(Request $request)
     {
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
         $restHelper = $this->get('sulu_core.list_rest_helper');
 
         /** @var Manager $manager */
@@ -96,8 +100,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $limit = (int) $restHelper->getLimit();
         $page = (int) $restHelper->getPage();
 
+        if (null !== $locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
+
         if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
-            $search->addQuery(new IdsQuery($ids));
+            $search->addQuery(new IdsQuery($this->getViewDocumentIds($ids, $locale)));
             $limit = count($ids);
         }
 
@@ -170,7 +178,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $uuid,
             $locale,
             [
-                'load_ghost_content' => false,
+                'load_ghost_content' => true,
                 'load_shadow_content' => false,
             ]
         );
@@ -199,6 +207,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $document->setAuthored(new \DateTime());
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
+            unset($data['authored']);
         }
         $document->setAuthors($this->getAuthors($data));
 
@@ -240,6 +249,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
+            unset($data['authored']);
         }
         $document->setAuthors($this->getAuthors($data));
 

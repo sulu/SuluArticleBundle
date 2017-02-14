@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
 use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\ContentBundle\Teaser\Teaser;
@@ -22,6 +23,8 @@ use Sulu\Bundle\ContentBundle\Teaser\Teaser;
  */
 class ArticleTeaserProvider implements TeaserProviderInterface
 {
+    use ArticleViewDocumentIdTrait;
+
     /**
      * @var Manager
      */
@@ -78,9 +81,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             return [];
         }
 
+        $articleIds = $this->getViewDocumentIds($ids, $locale);
+
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
-        $search->addQuery(new IdsQuery($ids));
+        $search->addQuery(new IdsQuery($articleIds));
 
         $result = [];
         foreach ($repository->execute($search) as $item) {

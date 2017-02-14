@@ -11,7 +11,7 @@ define([
     'underscore',
     'jquery',
     'sulusecurity/components/users/models/user',
-    'suluarticle/services/article-manager',
+    'services/suluarticle/article-manager',
     'text!/admin/articles/template/settings.html'
 ], function(_, $, User, ArticleManager, form) {
 
@@ -96,7 +96,7 @@ define([
                 return item.substr(1);
             });
 
-            ArticleManager.save(data, this.options.locale, action).then(function(response) {
+            ArticleManager.save(data, data.id, this.options.locale, action).then(function(response) {
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);

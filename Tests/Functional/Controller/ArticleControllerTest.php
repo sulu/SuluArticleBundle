@@ -55,7 +55,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
         $this->assertEquals([$this->getTestUser()->getContact()->getId()], $response['authors']);
@@ -76,7 +76,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['type']);
+        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
         $this->assertEquals([1, 2, 3], $response['authors']);
@@ -99,14 +99,16 @@ class ArticleControllerTest extends SuluTestCase
         }
     }
 
-    public function testPut($title = 'Sulu is awesome')
+    public function testPut($title = 'Sulu is awesome', $locale = 'de', $article = null)
     {
-        $article = $this->testPost();
+        if (!$article) {
+            $article = $this->testPost();
+        }
 
         $client = $this->createAuthenticatedClient();
         $client->request(
             'PUT',
-            '/api/articles/' . $article['id'] . '?locale=de',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
             ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01', 'authors' => [1, 3]]
         );
 
@@ -117,6 +119,83 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
         $this->assertEquals([1, 3], $response['authors']);
+
+        return $article;
+    }
+
+    public function testPutTranslation()
+    {
+        $article = $this->testPut('Sulu ist toll', 'de');
+        $this->testPut('Sulu is nice', 'en', $article);
+    }
+
+    public function testGetGhost()
+    {
+        $title = 'Sulu ist toll';
+        $article = $this->testPut($title, 'de');
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $article['id'] . '?locale=en');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertNotEquals($article['title'], $response['title']);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
+        $this->assertEquals([1, 3], $response['authors']);
+        $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
+    }
+
+    public function testCGetGhost()
+    {
+        $this->purgeIndex();
+
+        $title1 = 'Sulu ist toll - Test 1';
+        $article1 = $this->testPut($title1, 'de');
+
+        $title2 = 'Sulu ist toll - Test 2';
+        $article2 = $this->testPut($title2, 'de');
+        $title2_EN = $title2 . ' (EN)';
+        $this->testPut($title2_EN, 'en', $article2);
+
+        $client = $this->createAuthenticatedClient();
+
+        // Retrieve articles in 'de'.
+        $client->request('GET', '/api/articles?locale=de&type=blog');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function ($item) {
+                return [$item['uuid'], $item['title']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $title1], $items);
+        $this->assertContains([$article2['id'], $title2], $items);
+
+        // Retrieve articles in 'en'.
+        $client->request('GET', '/api/articles?locale=en&type=blog');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function ($item) {
+                return [$item['uuid'], $item['title']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $title1], $items);
+        $this->assertContains([$article2['id'], $title2_EN], $items);
     }
 
     public function testPutExtensions(
@@ -195,7 +274,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('simple', $response['template']);
-        $this->assertEquals(self::$typeMap['simple'], $response['type']);
+        $this->assertEquals(self::$typeMap['simple'], $response['articleType']);
         $this->assertEquals($description, $response['description']);
     }
 
@@ -238,7 +317,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -291,7 +370,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -313,7 +392,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -335,9 +414,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
-        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['id']);
+        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['uuid']);
         $this->assertEquals($article1['title'], $response['_embedded']['articles'][1]['title']);
     }
 
@@ -362,7 +441,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -381,7 +460,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['id'], $item['title']];
+                return [$item['uuid'], $item['title']];
             },
             $response['_embedded']['articles']
         );
