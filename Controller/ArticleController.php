@@ -240,7 +240,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $uuid,
             $locale,
             [
-                'load_ghost_content' => true,
+                'load_ghost_content' => false,
                 'load_shadow_content' => false,
             ]
         );
