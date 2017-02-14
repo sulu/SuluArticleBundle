@@ -38,7 +38,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $seo->setDisplay(['edit']);
         $seo->setDisplayConditions(
             [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
             ]
         );
 
@@ -50,7 +50,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $excerpt->setDisplay(['edit']);
         $excerpt->setDisplayConditions(
             [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
             ]
         );
 
@@ -62,7 +62,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $settings->setDisplay(['edit']);
         $settings->setDisplayConditions(
             [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null)
+                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
             ]
         );
 
