@@ -224,7 +224,7 @@ define(['underscore'], function(_) {
         },
 
         toList: function(locale) {
-            if (this.options.config.typeNames.length === 1) {
+            if (this.options.config.typeNames.length === 1 || !this.options.type) {
                 this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
             } else {
                 this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type) + '/' + (locale || this.options.locale));
