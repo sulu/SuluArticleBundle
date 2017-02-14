@@ -14,8 +14,10 @@ define([
     'services/suluarticle/article-manager',
     'sulusecurity/services/user-manager',
     'services/sulupreview/preview',
-    'sulusecurity/services/security-checker'
-], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker) {
+    'sulusecurity/services/security-checker',
+    'sulucontent/components/copy-locale-overlay/main',
+    'sulucontent/components/open-ghost-overlay/main'
+], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
 
     'use strict';
 
@@ -127,6 +129,18 @@ define([
                 };
             }
 
+            editDropdown.copyLocale = {
+                options: {
+                    title: this.sandbox.translate('toolbar.copy-locale'),
+                        callback: function() {
+                        CopyLocale.startCopyLocalesOverlay.call(this).then(function(newLocales) {
+                            this.data.concreteLanguages = _.uniq(this.data.concreteLanguages.concat(newLocales));
+                            this.sandbox.emit('sulu.labels.success.show', 'labels.success.copy-locale-desc', 'labels.success');
+                        }.bind(this));
+                    }.bind(this)
+                }
+            };
+
             if (!this.sandbox.util.isEmpty(editDropdown)) {
                 buttons.edit = {
                     options: {
@@ -170,6 +184,9 @@ define([
             this.bindCustomEvents();
             this.showDraftLabel();
             this.setHeaderBar(true);
+            this.loadLocalizations();
+
+            this.options.language = this.options.locale;
         },
 
         bindCustomEvents: function() {
@@ -182,7 +199,30 @@ define([
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
-                this.toEdit(item.id);
+
+                if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
+                    OpenGhost.openGhost.call(this, this.data).then(function(copy, src) {
+                        if (!!copy) {
+                            CopyLocale.copyLocale.call(
+                                this,
+                                this.data.id,
+                                src,
+                                [item.id],
+                                function() {
+                                    this.toEdit(item.id);
+                                }.bind(this)
+                            );
+                        } else {
+                            // new article will be created
+                            this.toEdit(item.id);
+                        }
+                    }.bind(this)).fail(function() {
+                        // the open-ghost page got canceled, so reset the language changer
+                        this.sandbox.emit('sulu.header.change-language', this.options.language);
+                    }.bind(this));
+                } else {
+                    this.toEdit(item.id);
+                }
             }.bind(this));
         },
 
@@ -477,6 +517,32 @@ define([
             }
 
             this.afterSaveAction(action, !this.options.id);
+        },
+
+        loadLocalizations: function() {
+            this.sandbox.util.load('/admin/api/localizations').then(function(data) {
+                this.localizations = data._embedded.localizations.map(function(localization) {
+                    return {
+                        id: localization.localization,
+                        title: localization.localization
+                    };
+                });
+            }.bind(this));
+        },
+
+        /**
+         * Returns copy article from a given locale to a array of other locales url.
+         *
+         * @param {string} id
+         * @param {string} src
+         * @param {string[]} dest
+         *
+         * @returns {string}
+         */
+        getCopyLocaleUrl: function(id, src, dest) {
+            return [
+                '/admin/api/articles/', id, '?locale=', src, '&dest=', dest, '&action=copy-locale'
+            ].join('');
         }
     }
 });

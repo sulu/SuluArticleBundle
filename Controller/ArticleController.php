@@ -23,6 +23,7 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
+use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
@@ -321,6 +322,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         // prepare vars
         $view = null;
         $data = null;
+        $userId = $this->getUser()->getId();
 
         try {
             switch ($action) {
@@ -335,6 +337,10 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $data = $this->getDocumentManager()->find($uuid, $locale);
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
+                    break;
+                case 'copy-locale':
+                    $destLocales = $this->getRequestParameter($request, 'dest', true);
+                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
@@ -411,6 +417,14 @@ class ArticleController extends RestController implements ClassResourceInterface
     protected function getDocumentManager()
     {
         return $this->get('sulu_document_manager.document_manager');
+    }
+
+    /**
+     * @return ContentMapperInterface
+     */
+    protected function getMapper()
+    {
+        return $this->get('sulu.content.mapper');
     }
 
     /**
