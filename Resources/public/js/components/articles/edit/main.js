@@ -273,7 +273,7 @@ define([
         deleteArticle: function() {
             this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
                 if (wasConfirmed) {
-                    ArticleManager.delete(this.options.id).then(function() {
+                    ArticleManager.remove(this.options.id, this.options.locale).then(function() {
                         this.toList();
                     }.bind(this));
                 }
