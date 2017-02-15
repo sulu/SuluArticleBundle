@@ -19,7 +19,8 @@ require.config({
 });
 
 if (!require.defined('services/husky/storage')) {
-
+    // this is a polyfill for the storage feature of sulu 1.5
+    // can be removed when changing the dependency of sulu to 1.5
     require.config({
         paths: {
             'services/husky/storage':'../../suluarticle/js/polyfill/storage'
