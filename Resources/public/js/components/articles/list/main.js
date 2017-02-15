@@ -7,7 +7,12 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore'], function(_) {
+define([
+    'underscore',
+    'sulucontent/components/copy-locale-overlay/main',
+    'sulucontent/components/open-ghost-overlay/main',
+    'services/suluarticle/article-manager'
+], function(_, CopyLocale, OpenGhost, ArticleManager) {
 
     'use strict';
 
@@ -166,8 +171,30 @@ define(['underscore'], function(_) {
                     resultKey: 'articles',
                     idKey: 'uuid',
                     instanceName: 'articles',
-                    actionCallback: function(id) {
-                        this.toEdit(id);
+                    actionCallback: function(id, article) {
+                        if ('ghost' === article.localizationState.state) {
+                            ArticleManager.load(id, this.options.locale).then(function(response) {
+                                OpenGhost.openGhost.call(this, response).then(function(copy, src) {
+                                    if (!!copy) {
+                                        CopyLocale.copyLocale.call(
+                                            this,
+                                            id,
+                                            src,
+                                            [this.options.locale],
+                                            function() {
+                                                this.toEdit(id);
+                                            }.bind(this)
+                                        );
+                                    } else {
+                                        this.toEdit(id);
+                                    }
+                                }.bind(this));
+                            }.bind(this)).fail(function(xhr) {
+                                this.sandbox.emit('sulu.article.error', xhr.status, data);
+                            }.bind(this));
+                        } else {
+                            this.toEdit(id);
+                        }
                     }.bind(this),
                     viewOptions: {
                         table: {
@@ -178,7 +205,7 @@ define(['underscore'], function(_) {
                                     callback: function(item, badge) {
                                         if (!!item.localizationState &&
                                             item.localizationState.state === 'ghost' &&
-                                            item.localizationState.locale !== this.options.language
+                                            item.localizationState.locale !== this.options.locale
                                         ) {
                                             badge.title = item.localizationState.locale;
 
@@ -249,6 +276,19 @@ define(['underscore'], function(_) {
             this.sandbox.emit('sulu.router.navigate', url, false, false);
         },
 
+        /**
+         * Returns copy article from a given locale to a array of other locales url.
+         *
+         * @param {string} id
+         * @param {string} src
+         * @param {string[]} dest
+         *
+         * @returns {string}
+         */
+        getCopyLocaleUrl: function(id, src, dest) {
+            return ArticleManager.getCopyLocaleUrl(id, src, dest);
+        },
+
         bindCustomEvents: function() {
             this.sandbox.on('husky.datagrid.articles.number.selections', function(number) {
                 var postfix = number > 0 ? 'enable' : 'disable';
@@ -260,6 +300,10 @@ define(['underscore'], function(_) {
             }.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
+                if (item.id === this.options.locale) {
+                    return;
+                }
+
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));
