@@ -559,7 +559,7 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            return ArticleManager.getCopyLocaleUrl(id,src,dest);
+            return ArticleManager.getCopyLocaleUrl(id, src, dest);
         }
     }
 });
