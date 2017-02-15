@@ -134,6 +134,14 @@ define([
                     title: this.sandbox.translate('toolbar.copy-locale'),
                         callback: function() {
                         CopyLocale.startCopyLocalesOverlay.call(this).then(function(newLocales) {
+                            // reload form when the current locale is in newLocales
+                            if (_.contains(newLocales, this.options.locale)) {
+                                this.toEdit(this.options.locale);
+
+                                return;
+                            }
+
+                            // save new created locales to data and show success label
                             this.data.concreteLanguages = _.uniq(this.data.concreteLanguages.concat(newLocales));
                             this.sandbox.emit('sulu.labels.success.show', 'labels.success.copy-locale-desc', 'labels.success');
                         }.bind(this));
@@ -186,6 +194,7 @@ define([
             this.setHeaderBar(true);
             this.loadLocalizations();
 
+            // the open ghost overlay component needs the current locale in `this.options.language`
             this.options.language = this.options.locale;
         },
 
@@ -196,34 +205,44 @@ define([
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
             this.sandbox.on('sulu.article.error', this.handleError.bind(this));
             this.sandbox.on('husky.tabs.header.item.select', this.tabChanged.bind(this));
+            this.sandbox.on('sulu.header.language-changed', this.languageChanged.bind(this));
+        },
 
-            this.sandbox.on('sulu.header.language-changed', function(item) {
-                this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
+        /**
+         * Language changed event.
+         *
+         * @param {Object} item
+         */
+        languageChanged: function(item) {
+            if (item.id === this.options.locale) {
+                return;
+            }
 
-                if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
-                    OpenGhost.openGhost.call(this, this.data).then(function(copy, src) {
-                        if (!!copy) {
-                            CopyLocale.copyLocale.call(
-                                this,
-                                this.data.id,
-                                src,
-                                [item.id],
-                                function() {
-                                    this.toEdit(item.id);
-                                }.bind(this)
-                            );
-                        } else {
-                            // new article will be created
-                            this.toEdit(item.id);
-                        }
-                    }.bind(this)).fail(function() {
-                        // the open-ghost page got canceled, so reset the language changer
-                        this.sandbox.emit('sulu.header.change-language', this.options.language);
-                    }.bind(this));
-                } else {
-                    this.toEdit(item.id);
-                }
-            }.bind(this));
+            this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
+
+            if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
+                OpenGhost.openGhost.call(this, this.data).then(function(copy, src) {
+                    if (!!copy) {
+                        CopyLocale.copyLocale.call(
+                            this,
+                            this.data.id,
+                            src,
+                            [item.id],
+                            function() {
+                                this.toEdit(item.id);
+                            }.bind(this)
+                        );
+                    } else {
+                        // new article will be created
+                        this.toEdit(item.id);
+                    }
+                }.bind(this)).fail(function() {
+                    // the open-ghost page got canceled, so reset the language changer
+                    this.sandbox.emit('sulu.header.change-language', this.options.language);
+                }.bind(this));
+            } else {
+                this.toEdit(item.id);
+            }
         },
 
         /**
@@ -540,9 +559,7 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            return [
-                '/admin/api/articles/', id, '?locale=', src, '&dest=', dest, '&action=copy-locale'
-            ].join('');
+            return ArticleManager.getCopyLocaleUrl(id,src,dest);
         }
     }
 });

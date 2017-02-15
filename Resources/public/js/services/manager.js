@@ -78,6 +78,21 @@ define(['jquery', 'services/husky/util'], function($, Util) {
                 templates.url({id: id, locale: locale, action: 'remove-draft'}),
                 'POST'
             );
+        },
+
+        /**
+         * Returns copy article from a given locale to a array of other locales url.
+         *
+         * @param {string} id
+         * @param {string} src
+         * @param {string[]} dest
+         *
+         * @returns {string}
+         */
+        getCopyLocaleUrl: function(id, src, dest) {
+            return [
+                templates.url({id: id, locale: src, action: 'copy-locale'}), '&dest=', dest
+            ].join('');
         }
     };
 });

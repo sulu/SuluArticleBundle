@@ -286,9 +286,7 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            return [
-                '/admin/api/articles/', id, '?locale=', src, '&dest=', dest, '&action=copy-locale'
-            ].join('');
+            return ArticleManager.getCopyLocaleUrl(id,src,dest);
         },
 
         bindCustomEvents: function() {
@@ -302,6 +300,10 @@ define([
             }.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
+                if (item.id === this.options.locale) {
+                    return;
+                }
+
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));
