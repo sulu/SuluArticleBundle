@@ -46,26 +46,6 @@
                 <source>sulu_article.ckeditor.link</source>
                 <target>Article</target>
             </trans-unit>
-            <trans-unit id="18" resname="sulu.content.form.settingssulu_article">
-                <source>sulu.content.form.settingssulu_article</source>
-                <target>Changelog</target>
-            </trans-unit>
-            <trans-unit id="19" resname="sulu.content.form.settingssulu_article.changed">
-                <source>sulu.content.form.settingssulu_article.changed</source>
-                <target>Dernier changement par %(changer)s le %(changed)s</target>
-            </trans-unit>
-            <trans-unit id="20" resname="sulu.content.form.settingssulu_article.changed-only">
-                <source>sulu.content.form.settingssulu_article.changed-only</source>
-                <target>Dernier changement le %(changed)s</target>
-            </trans-unit>
-            <trans-unit id="21" resname="sulu.content.form.settingssulu_article.created">
-                <source>sulu.content.form.settingssulu_article.created</source>
-                <target>Créé par %(creator)s le %(created)s</target>
-            </trans-unit>
-            <trans-unit id="22" resname="sulu.content.form.settingssulu_article.created-only">
-                <source>sulu.content.form.settingssulu_article.created-only</source>
-                <target>Créé le %(created)s</target>
-            </trans-unit>
         </body>
     </file>
 </xliff>
