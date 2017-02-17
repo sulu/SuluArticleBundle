@@ -70,6 +70,26 @@
                 <source>sulu_article.settings.copy-locale-overlay.info</source>
                 <target>New article will be created</target>
             </trans-unit>
+            <trans-unit id="18" resname="sulu_article.form.settings.changelog">
+                <source>sulu_article.form.settings.changelog</source>
+                <target>Changelog</target>
+            </trans-unit>
+            <trans-unit id="19" resname="sulu_article.form.settings.changelog.changed">
+                <source>sulu_article.form.settings.changelog.changed</source>
+                <target>Last change from %(changer)s at %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="20" resname="sulu_article.form.settings.changelog.changed-only">
+                <source>sulu_article.form.settings.changelog.changed-only</source>
+                <target>Last change at %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="21" resname="sulu_article.form.settings.changelog.created">
+                <source>sulu_article.form.settings.changelog.created</source>
+                <target>Created by %(creator)s at %(created)s</target>
+            </trans-unit>
+            <trans-unit id="22" resname="sulu_article.form.settings.changelog.created-only">
+                <source>sulu_article.form.settings.changelog.created-only</source>
+                <target>Created by %(created)s</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
