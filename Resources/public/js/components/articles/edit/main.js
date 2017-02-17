@@ -41,7 +41,16 @@ define([
                 unpublishConfirmTextWithDraft: 'sulu-content.unpublish-confirm-text-with-draft',
                 unpublishConfirmTitle: 'sulu-content.unpublish-confirm-title',
                 deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
-                deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text'
+                deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text',
+                openGhostOverlay: {
+                    info: 'sulu_article.settings.open-ghost-overlay.info',
+                    new: 'sulu_article.settings.open-ghost-overlay.new',
+                    copy: 'sulu_article.settings.open-ghost-overlay.copy',
+                    ok: 'sulu_article.settings.open-ghost-overlay.ok'
+                },
+                copyLocaleOverlay: {
+                    info: 'sulu_article.settings.copy-locale-overlay.info'
+                }
             }
         },
 
@@ -133,7 +142,10 @@ define([
                 options: {
                     title: this.sandbox.translate('toolbar.copy-locale'),
                         callback: function() {
-                        CopyLocale.startCopyLocalesOverlay.call(this).then(function(newLocales) {
+                        CopyLocale.startCopyLocalesOverlay.call(
+                            this,
+                            this.translations.copyLocaleOverlay
+                        ).then(function(newLocales) {
                             // reload form when the current locale is in newLocales
                             if (_.contains(newLocales, this.options.locale)) {
                                 this.toEdit(this.options.locale);
@@ -221,7 +233,7 @@ define([
             this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
 
             if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
-                OpenGhost.openGhost.call(this, this.data).then(function(copy, src) {
+                OpenGhost.openGhost.call(this, this.data, this.translations.openGhostOverlay).then(function(copy, src) {
                     if (!!copy) {
                         CopyLocale.copyLocale.call(
                             this,

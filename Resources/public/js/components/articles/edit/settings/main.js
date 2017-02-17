@@ -25,9 +25,9 @@ define([
             authored: 'sulu_article.authored',
             authors: 'sulu_article.authors',
             changelog: 'sulu.content.form.settings.changelog',
-            changed: 'sulu.content.form.settings.changelog.changed',
-            created: 'sulu.content.form.settings.changelog.created',
-            userNotFound: 'sulu.content.form.settings.changelog.user-not-found'
+            changed: 'sulu_article.form.settings.changelog.changed',
+            created: 'sulu_article.form.settings.changelog.created',
+            userNotFound: 'sulu_article.form.settings.changelog.user-not-found'
         }
     };
 
