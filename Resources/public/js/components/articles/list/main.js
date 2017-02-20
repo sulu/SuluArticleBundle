@@ -40,7 +40,13 @@ define([
         translations: {
             headline: 'sulu_article.list.title',
             unpublished: 'public.unpublished',
-            publishedWithDraft: 'public.published-with-draft'
+            publishedWithDraft: 'public.published-with-draft',
+            openGhostOverlay: {
+                info: 'sulu_article.settings.open-ghost-overlay.info',
+                new: 'sulu_article.settings.open-ghost-overlay.new',
+                copy: 'sulu_article.settings.open-ghost-overlay.copy',
+                ok: 'sulu_article.settings.open-ghost-overlay.ok'
+            }
         }
     };
 
@@ -174,21 +180,27 @@ define([
                     actionCallback: function(id, article) {
                         if ('ghost' === article.localizationState.state) {
                             ArticleManager.load(id, this.options.locale).then(function(response) {
-                                OpenGhost.openGhost.call(this, response).then(function(copy, src) {
-                                    if (!!copy) {
-                                        CopyLocale.copyLocale.call(
-                                            this,
-                                            id,
-                                            src,
-                                            [this.options.locale],
-                                            function() {
-                                                this.toEdit(id);
-                                            }.bind(this)
-                                        );
-                                    } else {
-                                        this.toEdit(id);
-                                    }
-                                }.bind(this));
+                                OpenGhost.openGhost.call(
+                                    this,
+                                    response,
+                                    this.translations.openGhostOverlay
+                                ).then(
+                                    function(copy, src) {
+                                        if (!!copy) {
+                                            CopyLocale.copyLocale.call(
+                                                this,
+                                                id,
+                                                src,
+                                                [this.options.locale],
+                                                function() {
+                                                    this.toEdit(id);
+                                                }.bind(this)
+                                            );
+                                        } else {
+                                            this.toEdit(id);
+                                        }
+                                    }.bind(this)
+                                );
                             }.bind(this)).fail(function(xhr) {
                                 this.sandbox.emit('sulu.article.error', xhr.status, data);
                             }.bind(this));

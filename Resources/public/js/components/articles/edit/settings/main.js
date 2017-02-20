@@ -24,10 +24,11 @@ define([
         translations: {
             authored: 'sulu_article.authored',
             authors: 'sulu_article.authors',
-            changelog: 'sulu.content.form.settings.changelog',
-            changed: 'sulu.content.form.settings.changelog.changed',
-            created: 'sulu.content.form.settings.changelog.created',
-            userNotFound: 'sulu.content.form.settings.changelog.user-not-found'
+            changelog: 'sulu_article.form.settings.changelog',
+            changed: 'sulu_article.form.settings.changelog.changed',
+            changedOnly: 'sulu_article.form.settings.changelog.changed-only',
+            created: 'sulu_article.form.settings.changelog.created',
+            createdOnly: 'sulu_article.form.settings.changelog.created-only'
         }
     };
 
@@ -138,51 +139,109 @@ define([
         },
 
         /**
+         * Sets text for created.
+         *
+         * @param {String} fullName
+         * @param {Object} time
+         */
+        setCreationChangelog: function(fullName, time) {
+            var creationText, formattedTime = this.sandbox.date.format(time, true);
+
+            if (!!fullName) {
+                creationText = this.sandbox.util.sprintf(
+                    this.translations.created,
+                    {
+                        creator: fullName,
+                        created: formattedTime
+                    }
+                );
+            } else {
+                creationText = this.sandbox.util.sprintf(
+                    this.translations.createdOnly,
+                    {
+                        created: formattedTime
+                    }
+                )
+            }
+
+            this.sandbox.dom.text('#created', creationText);
+        },
+
+        /**
+         * Sets text for changed.
+         *
+         * @param {String} fullName
+         * @param {Object} time
+         */
+        setChangeChangelog: function(fullName, time) {
+            var changedText, formattedTime = this.sandbox.date.format(time, true);
+
+            if (!!fullName) {
+                changedText = this.sandbox.util.sprintf(
+                    this.translations.changed,
+                    {
+                        changer: fullName,
+                        changed: formattedTime
+                    }
+                );
+            } else {
+                changedText = this.sandbox.util.sprintf(
+                    this.translations.changedOnly,
+                    {
+                        changed: formattedTime
+                    }
+                )
+            }
+
+            this.sandbox.dom.text('#changed', changedText);
+        },
+
+        /**
          * Update changelog.
          *
          * @param data
          */
         updateChangelog: function(data) {
-            var setCreator = function(fullName) {
-                    this.sandbox.dom.text('#created .name', fullName);
-                    creatorDef.resolve();
-                },
-                setChanger = function(fullName) {
-                    this.sandbox.dom.text('#changed .name', fullName);
-                    changerDef.resolve();
-                },
-                creatorDef = $.Deferred(),
-                changerDef = $.Deferred();
+            var creatorDef = $.Deferred();
+            var changerDef = $.Deferred();
 
             if (data.creator === data.changer) {
-                this.loadUser(data.creator).done(function(fullName) {
-                    setChanger.call(this, fullName);
-                    setCreator.call(this, fullName);
+                this.loadUser(data.creator).done(function(model) {
+                    creatorDef.resolve(model.get('fullName'), data.created);
+                    changerDef.resolve(model.get('fullName'), data.changed);
                 }.bind(this)).fail(function() {
-                    setChanger.call(this, this.translations.userNotFound);
-                    setCreator.call(this, this.translations.userNotFound);
+                    creatorDef.resolve(null, data.created);
+                    changerDef.resolve(null, data.changed);
                 }.bind(this));
             } else {
-                this.loadUser(data.creator).done(function(fullName) {
-                    setCreator.call(this, fullName);
+                // load creator
+                this.loadUser(data.creator).done(function(model) {
+                    creatorDef.resolve(model.get('fullName'), data.created);
                 }.bind(this)).fail(function() {
-                    setCreator.call(this, this.translations.userNotFound);
+                    creatorDef.resolve(null, data.created);
                 }.bind(this));
-                this.loadUser(data.changer).done(function(fullName) {
-                    setChanger.call(this, fullName);
+                // load changer
+                this.loadUser(data.changer).done(function(model) {
+                    changerDef.resolve(model.get('fullName'), data.changed);
                 }.bind(this)).fail(function() {
-                    setChanger.call(this, this.translations.userNotFound);
+                    changerDef.resolve(null, data.changed);
                 }.bind(this));
             }
 
-            this.sandbox.dom.text('#created .date', this.sandbox.date.format(data.created, true));
-            this.sandbox.dom.text('#changed .date', this.sandbox.date.format(data.changed, true));
-
-            this.sandbox.data.when([creatorDef, changerDef]).then(function() {
+            this.sandbox.data.when(creatorDef, changerDef).then(function(creation, change) {
+                this.setCreationChangelog(creation[0], creation[1]);
+                this.setChangeChangelog(change[0], change[1]);
                 this.sandbox.dom.show('#changelog-container');
             }.bind(this));
         },
 
+        /**
+         * Loads user.
+         *
+         * @param {String} id
+         *
+         * @return {*}
+         */
         loadUser: function(id) {
             var deferred = $.Deferred(),
                 user = new User({id: id});
@@ -191,7 +250,7 @@ define([
                 global: false,
 
                 success: function(model) {
-                    deferred.resolve(model.get('fullName'))
+                    deferred.resolve(model)
                 }.bind(this),
 
                 error: function() {

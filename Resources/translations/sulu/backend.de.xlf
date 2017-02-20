@@ -50,6 +50,46 @@
                 <source>sulu_article.selection.no-result</source>
                 <target>Keine Artikel ausgewählt</target>
             </trans-unit>
+            <trans-unit id="13" resname="sulu_article.settings.open-ghost-overlay.info">
+                <source>sulu_article.settings.open-ghost-overlay.info</source>
+                <target><![CDATA[Dieser Artikel existiert nicht.<br/>Bitte wählen Sie eine der folgenden Optionen:]]></target>
+            </trans-unit>
+            <trans-unit id="14" resname="sulu_article.settings.open-ghost-overlay.new">
+                <source>sulu_article.settings.open-ghost-overlay.new</source>
+                <target><![CDATA[Erstellen Sie einen neuen <b>leeren Artikel</b> in dieser Sprache]]></target>
+            </trans-unit>
+            <trans-unit id="15" resname="sulu_article.settings.open-ghost-overlay.copy">
+                <source>sulu_article.settings.open-ghost-overlay.copy</source>
+                <target><![CDATA[Erstellen Sie einen neuen Artikel in dieser Sprache und <b>kopieren Sie den Inhalt von</b>:]]></target>
+            </trans-unit>
+            <trans-unit id="16" resname="sulu_article.settings.open-ghost-overlay.ok">
+                <source>sulu_article.settings.open-ghost-overlay.ok</source>
+                <target>Artikel erstellen</target>
+            </trans-unit>
+            <trans-unit id="17" resname="sulu_article.settings.copy-locale-overlay.info">
+                <source>sulu_article.settings.copy-locale-overlay.info</source>
+                <target>Neuer Artikel wird erstellt</target>
+            </trans-unit>
+            <trans-unit id="18" resname="sulu_article.form.settings.changelog">
+                <source>sulu_article.form.settings.changelog</source>
+                <target>Änderungshistorie</target>
+            </trans-unit>
+            <trans-unit id="19" resname="sulu_article.form.settings.changelog.changed">
+                <source>sulu_article.form.settings.changelog.changed</source>
+                <target>Letzte Änderung von %(changer)s am %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="20" resname="sulu_article.form.settings.changelog.changed-only">
+                <source>sulu_article.form.settings.changelog.changed-only</source>
+                <target>Letzte Änderung am %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="21" resname="sulu_article.form.settings.changelog.created">
+                <source>sulu_article.form.settings.changelog.created</source>
+                <target>Erstellt von %(creator)s am %(created)s</target>
+            </trans-unit>
+            <trans-unit id="22" resname="sulu_article.form.settings.changelog.created-only">
+                <source>sulu_article.form.settings.changelog.created-only</source>
+                <target>Erstellt am %(created)s</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
