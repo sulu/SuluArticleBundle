@@ -16,7 +16,7 @@
         "symfony/monolog-bundle": "2.4.*",
         "doctrine/doctrine-bundle": "1.4.*",
         "jackalope/jackalope-doctrine-dbal": "^1.2.5",
-        "phpunit/phpunit": ">=4.8",
+        "phpunit/phpunit": ">=4.8, <6.0",
 
         "php-task/task-bundle": "@dev",
         "php-task/php-task": "@dev"
