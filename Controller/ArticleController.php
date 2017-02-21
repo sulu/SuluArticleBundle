@@ -64,6 +64,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
+            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.list.author', false, false),
             'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
             'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
             'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
@@ -207,13 +208,6 @@ class ArticleController extends RestController implements ClassResourceInterface
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
-        $document->setAuthored(new \DateTime());
-        if (array_key_exists('authored', $data)) {
-            $document->setAuthored(new \DateTime($data['authored']));
-            unset($data['authored']);
-        }
-        $document->setAuthors($this->getAuthors($data));
-
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
@@ -249,12 +243,6 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
 
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
-
-        if (array_key_exists('authored', $data)) {
-            $document->setAuthored(new \DateTime($data['authored']));
-            unset($data['authored']);
-        }
-        $document->setAuthors($this->getAuthors($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -401,22 +389,6 @@ class ArticleController extends RestController implements ClassResourceInterface
                 'route_path' => array_key_exists('routePath', $data) ? $data['routePath'] : null,
             ]
         );
-    }
-
-    /**
-     * Returns authors or current user.
-     *
-     * @param array $data
-     *
-     * @return int[]
-     */
-    private function getAuthors(array $data)
-    {
-        if (!array_key_exists('authors', $data)) {
-            return [$this->getUser()->getContact()->getId()];
-        }
-
-        return $data['authors'];
     }
 
     /**

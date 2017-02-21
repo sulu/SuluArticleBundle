@@ -5,6 +5,7 @@
         <property name="uuid" type="string" expose="true"/>
         <property name="typeTranslation" type="string" expose="true"/>
         <property name="title" type="string" expose="true"/>
+        <property name="authorFullName" type="string" expose="true"/>
         <property name="creatorFullName" type="string" expose="true"/>
         <property name="changerFullName" type="string" expose="true"/>
         <property name="created" type="DateTime" expose="true"/>

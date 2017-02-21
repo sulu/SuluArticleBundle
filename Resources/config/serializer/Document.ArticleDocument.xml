@@ -26,10 +26,8 @@
         <property name="changed" type="DateTime" groups="website,defaultPage,preview"/>
 
         <property name="published" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
+        <property name="author" type="integer" groups="website,defaultPage,preview"/>
         <property name="authored" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
-        <property name="authors" groups="website,defaultPage,smallPage,preview">
-            <type><![CDATA[array<integer>]]></type>
-        </property>
         <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultPage,preview"/>
     </class>
 </serializer>

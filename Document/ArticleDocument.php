@@ -16,6 +16,7 @@ use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
+use Sulu\Component\Content\Document\Behavior\LocalizedAuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
@@ -43,7 +44,8 @@ class ArticleDocument implements
     DateShardingBehavior,
     RoutableInterface,
     ExtensionBehavior,
-    WorkflowStageBehavior
+    WorkflowStageBehavior,
+    LocalizedAuthorBehavior
 {
     /**
      * @var string
@@ -121,6 +123,16 @@ class ArticleDocument implements
     private $changed;
 
     /**
+     * @var int
+     */
+    private $author;
+
+    /**
+     * @var \DateTime
+     */
+    private $authored;
+
+    /**
      * Document's extensions ie seo, ...
      *
      * @var ExtensionContainer
@@ -140,20 +152,6 @@ class ArticleDocument implements
      * @var bool
      */
     protected $published;
-
-    /**
-     * Timestamp of authoring (can be set by user).
-     *
-     * @var \DateTime
-     */
-    protected $authored;
-
-    /**
-     * Array of contact-ids which has authored this article.
-     *
-     * @var int[]
-     */
-    protected $authors = [];
 
     public function __construct()
     {
@@ -415,13 +413,9 @@ class ArticleDocument implements
     }
 
     /**
-     * Set authored date-time.
-     *
-     * @param \DateTime $authored
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setAuthored(\DateTime $authored = null)
+    public function setAuthored($authored)
     {
         $this->authored = $authored;
 
@@ -429,9 +423,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns date-time of authoring this article.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getAuthored()
     {
@@ -439,25 +431,19 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns id of authors.
-     *
-     * @return int[]
+     * {@inheritdoc}
      */
-    public function getAuthors()
+    public function getAuthor()
     {
-        return $this->authors;
+        return $this->author;
     }
 
     /**
-     * Set authors.
-     *
-     * @param int[] $authors
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function setAuthors($authors)
+    public function setAuthor($author)
     {
-        $this->authors = $authors;
+        $this->author = $author;
 
         return $this;
     }

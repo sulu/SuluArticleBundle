@@ -1,44 +1,4 @@
 <form id="settings-form" class="grid">
-    {% block authored %}
-        <div class="grid-row">
-            <div class="grid-col-6 form-group">
-                <label for="authored"><%= translations.authored %></label>
-
-                <div id="authored"
-                     data-mapper-property="authored"
-                     data-aura-component="input@husky"
-                     data-aura-skin="date"
-                     data-aura-instance-name="authored"
-                     data-aura-input-id="authored"
-                     data-type="husky-input"
-                     data-form="true"
-                     data-validation-required="true"
-                     class="trigger-save-button"/>
-            </div>
-        </div>
-    {% endblock %}
-
-    {% block authors %}
-        <div class="grid-row">
-            <div class="grid-col-12 form-group">
-                <label for="authors"><%= translations.authors %></label>
-
-                <div id="authors"
-                     data-mapper-property="authors"
-                     data-form="true"
-                     data-type="contact-selection"
-                     data-type-instance-name="authors"
-                     data-aura-component="contact-selection@sulucontact"
-                     data-aura-matchings='[{"content": "id","name": "id","disabled": false},{"content": "public.avatar","name": "avatar","type": "thumbnails","sortable":false},{"content": "contact.contacts.firstName","name": "firstName"},{"content": "contact.contacts.lastName","name": "lastName"},{"content": "public.email","name": "mainEmail"}]'
-                     data-aura-instance-name="authors"
-                     data-aura-contact="true"
-                     data-aura-account="false"
-                     data-aura-url="/admin/api/customers"
-                     data-aura-contact-url="/admin/api/contacts?flat=true&sortBy=lastName"/>
-            </div>
-        </div>
-    {% endblock %}
-
     {% block changelog %}
         <div class="grid-row section m-top-40" id="changelog-container" style="display: none;">
             <h2 class="divider m-bottom-20" title="Shadow Section">
@@ -46,6 +6,9 @@
             </h2>
 
             <div class="grid">
+                <div class="grid-row">
+                    <span id="author"></span> <a class="fa-pencil btn action only-icon small" id="change-author"></a>
+                </div>
                 <div class="grid-row">
                     <span id="created"></span>
                 </div>

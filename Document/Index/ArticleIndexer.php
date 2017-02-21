@@ -198,9 +198,15 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
-        $article->setAuthors($document->getAuthors());
-        $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
-        $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+        if ($document->getAuthor()) {
+            $article->setAuthorFullName($this->userManager->getFullNameByUserId($document->getAuthor()));
+        }
+        if ($document->getChanger()) {
+            $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
+        }
+        if ($document->getCreator()) {
+            $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+        }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
