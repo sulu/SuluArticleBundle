@@ -403,12 +403,12 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-    * Returns author or current user.
-    *
-    * @param array $data
-    *
-    * @return int
-    */
+     * Returns author or current user.
+     *
+     * @param array $data
+     *
+     * @return int
+     */
     private function getAuthor(array $data)
     {
         if (!array_key_exists('author', $data)) {

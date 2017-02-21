@@ -30,7 +30,23 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory">
             <argument type="string">%sulu_article.documents%</argument>
         </service>
-        <service id="sulu_article.elastic_search.abstract_article_indexer" abstract="true">
+        <service id="sulu_article.elastic_search.article_indexer"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleGhostIndexer">
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_security.user_manager"/>
+            <argument type="service" id="sulu_contact.contact_repository"/>
+            <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="translator.default"/>
+            <argument>%sulu_article.types%</argument>
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+        </service>
+        <service id="sulu_article.elastic_search.article_live_indexer"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
             <argument type="service" id="sulu_contact.contact_repository"/>
@@ -41,16 +57,6 @@
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="translator.default"/>
             <argument>%sulu_article.types%</argument>
-        </service>
-        <service id="sulu_article.elastic_search.article_indexer"
-                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleGhostIndexer"
-                 parent="sulu_article.elastic_search.abstract_article_indexer">
-            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
-            <argument type="service" id="sulu_document_manager.document_manager"/>
-        </service>
-        <service id="sulu_article.elastic_search.article_live_indexer"
-                 class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer"
-                 parent="sulu_article.elastic_search.abstract_article_indexer">
         </service>
 
         <service id="sulu_article.elastic_search.factory.seo"

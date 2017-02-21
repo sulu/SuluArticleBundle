@@ -42,7 +42,7 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], []);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de']);
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
@@ -57,7 +57,11 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], ['type' => new PropertyParameter('type', 'video')]);
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['type' => new PropertyParameter('type', 'video')],
+            ['locale' => 'de']
+        );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
@@ -75,10 +79,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], [], [], null, 1, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], null, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveDataItems([], [], [], null, 2, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], null, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -95,10 +99,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveResourceItems([], [], [], 3, 1, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], 3, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveResourceItems([], [], [], 3, 2, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -114,10 +118,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveResourceItems([], [], [], null, 1, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], null, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveResourceItems([], [], [], null, 2, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], null, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -134,10 +138,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], [], [], 3, 1, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], 3, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveDataItems([], [], [], 3, 2, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }

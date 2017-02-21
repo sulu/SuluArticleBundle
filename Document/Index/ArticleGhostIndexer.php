@@ -101,7 +101,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     public function remove($document)
     {
         foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
-            $articleId = $this->getArticleId($document->getUuid(), $localization->getLocale());
+            $articleId = $this->getViewDocumentId($document->getUuid(), $localization->getLocale());
             $this->removeArticle($articleId);
         }
     }
