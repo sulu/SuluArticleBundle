@@ -44,8 +44,7 @@ class ArticleDocument implements
     DateShardingBehavior,
     RoutableInterface,
     ExtensionBehavior,
-    WorkflowStageBehavior,
-    LocalizedAuthorBehavior
+    WorkflowStageBehavior
 {
     /**
      * @var string

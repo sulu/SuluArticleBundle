@@ -346,6 +346,13 @@ class ArticleSubscriber implements EventSubscriberInterface
                 'property' => 'authored',
             ]
         );
+        $metadata->addFieldMapping(
+            'author',
+            [
+                'encoding' => 'system_localized',
+                'property' => 'author',
+            ]#
+        );
     }
 
     /**

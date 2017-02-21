@@ -208,6 +208,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
+        $document->setAuthored(new \DateTime());
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
+        $document->setAuthor($this->getAuthor($data));
+
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
@@ -243,6 +249,11 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
 
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
+
+        if (array_key_exists('authored', $data)) {
+            $document->setAuthored(new \DateTime($data['authored']));
+        }
+        $document->setAuthor($this->getAuthor($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -389,6 +400,22 @@ class ArticleController extends RestController implements ClassResourceInterface
                 'route_path' => array_key_exists('routePath', $data) ? $data['routePath'] : null,
             ]
         );
+    }
+
+    /**
+    * Returns author or current user.
+    *
+    * @param array $data
+    *
+    * @return int
+    */
+    private function getAuthor(array $data)
+    {
+         if (!array_key_exists('author', $data)) {
+            return $this->getUser()->getContact()->getId();
+        }
+
+        return $data['author'];
     }
 
     /**

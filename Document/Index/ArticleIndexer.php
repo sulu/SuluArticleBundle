@@ -22,6 +22,7 @@ use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
@@ -45,6 +46,11 @@ class ArticleIndexer implements IndexerInterface
      * @var UserManager
      */
     private $userManager;
+
+    /**
+     * @var ContactRepository
+     */
+    private $contactRepository;
 
     /**
      * @var DocumentFactoryInterface
@@ -86,10 +92,11 @@ class ArticleIndexer implements IndexerInterface
      *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
+     * @param ContactRepository $contactRepository
+     * @param DocumentFactoryInterface $documentFactory
      * @param Manager $manager
      * @param ExcerptFactory $excerptFactory
      * @param SeoFactory $seoFactory
-     * @param DocumentFactoryInterface $documentFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param TranslatorInterface $translator
      * @param array $typeConfiguration
@@ -97,6 +104,7 @@ class ArticleIndexer implements IndexerInterface
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
+        ContactRepository $contactRepository,
         DocumentFactoryInterface $documentFactory,
         Manager $manager,
         ExcerptFactory $excerptFactory,
@@ -107,6 +115,7 @@ class ArticleIndexer implements IndexerInterface
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
+        $this->contactRepository = $contactRepository;
         $this->documentFactory = $documentFactory;
         $this->manager = $manager;
         $this->excerptFactory = $excerptFactory;
@@ -199,7 +208,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
         if ($document->getAuthor()) {
-            $article->setAuthorFullName($this->userManager->getFullNameByUserId($document->getAuthor()));
+            $article->setAuthorFullName($this->contactRepository->findById($document->getAuthor())->getFullName());
         }
         if ($document->getChanger()) {
             $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
