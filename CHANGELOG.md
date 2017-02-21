@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.1](https://github.com/sulu/SuluArticleBundle/tree/0.1.1) (2017-02-21)
+[Full Changelog](https://github.com/sulu/SuluArticleBundle/compare/0.1.0...0.1.1)
+
+**Merged pull requests:**
+
+- Added options to allow extra fields [\#77](https://github.com/sulu/SuluArticleBundle/pull/77) ([wachterjohannes](https://github.com/wachterjohannes))
+
 ## [0.1.0](https://github.com/sulu/SuluArticleBundle/tree/0.1.0) (2017-02-10)
 **Fixed bugs:**
 

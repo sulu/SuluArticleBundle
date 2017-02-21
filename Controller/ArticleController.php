@@ -210,7 +210,6 @@ class ArticleController extends RestController implements ClassResourceInterface
         $document->setAuthored(new \DateTime());
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
-            unset($data['authored']);
         }
         $document->setAuthors($this->getAuthors($data));
 
@@ -252,7 +251,6 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
-            unset($data['authored']);
         }
         $document->setAuthors($this->getAuthors($data));
 
