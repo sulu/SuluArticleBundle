@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Form;
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Form-type for article mapping.
@@ -35,5 +36,17 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('resourceSegment', TextType::class, ['mapped' => false]);
         $builder->add('navigationContexts', TextType::class, ['mapped' => false]);
         $builder->add('shadowLocaleEnabled', TextType::class, ['mapped' => false]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'allow_extra_fields' => true,
+            ]
+        );
     }
 }
