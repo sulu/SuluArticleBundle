@@ -351,7 +351,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             [
                 'encoding' => 'system_localized',
                 'property' => 'author',
-            ]#
+            ]
         );
     }
 

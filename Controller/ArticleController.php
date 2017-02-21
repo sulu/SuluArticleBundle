@@ -411,7 +411,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     */
     private function getAuthor(array $data)
     {
-         if (!array_key_exists('author', $data)) {
+        if (!array_key_exists('author', $data)) {
             return $this->getUser()->getContact()->getId();
         }
 

@@ -22,6 +22,7 @@ use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
@@ -36,6 +37,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ArticleIndexer implements IndexerInterface
 {
     use ArticleTypeTrait;
+    use ArticleViewDocumentIdTrait;
 
     /**
      * @var StructureMetadataFactoryInterface
@@ -157,17 +159,6 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return string
-     */
-    protected function getArticleId($uuid, $locale)
-    {
-        return $uuid . '-' . $locale;
-    }
-
-    /**
      * @param ArticleDocument $document
      * @param string $locale
      * @param string $localizationState
@@ -179,7 +170,7 @@ class ArticleIndexer implements IndexerInterface
         $locale,
         $localizationState = LocalizationState::LOCALIZED
     ) {
-        $articleId = $this->getArticleId($document->getUuid(), $locale);
+        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
         /** @var ArticleViewDocument $article */
         $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
 
@@ -273,7 +264,7 @@ class ArticleIndexer implements IndexerInterface
     public function remove($document)
     {
         $this->removeArticle(
-            $this->getArticleId($document->getUuid(), $document->getOriginalLocale())
+            $this->getViewDocumentId($document->getUuid(), $document->getOriginalLocale())
         );
     }
 
