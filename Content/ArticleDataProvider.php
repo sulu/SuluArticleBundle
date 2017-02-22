@@ -103,6 +103,18 @@ class ArticleDataProvider implements DataProviderInterface
         return ['type' => new PropertyParameter('type', null)];
     }
 
+    private function getTypesProperty($propertyParameter)
+    {
+        $filterTypes = [];
+        if (array_key_exists('types', $propertyParameter) && null !== ($types = $propertyParameter['types']->getValue())) {
+            foreach ($types as $type) {
+                $filterTypes[] = $type->getName();
+            }
+        }
+
+        return $filterTypes;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -114,9 +126,7 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -142,9 +152,7 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -225,9 +233,12 @@ class ArticleDataProvider implements DataProviderInterface
             $search->addQuery(new TermQuery('locale', $locale));
         }
 
-        if (array_key_exists('type', $filters)) {
-            $query->add(new TermQuery('type', $filters['type']));
-            ++$queriesCount;
+        if (array_key_exists('types', $filters) && $filters['types']) {
+            $typesQuery = new BoolQuery();
+            foreach ($filters['types'] as $typeFilter) {
+                $typesQuery->add(new TermQuery('type', $typeFilter), BoolQuery::SHOULD);
+            }
+            $search->addQuery($typesQuery);
         }
 
         if (0 === $queriesCount) {

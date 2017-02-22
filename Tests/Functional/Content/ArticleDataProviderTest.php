@@ -59,7 +59,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
         $result = $dataProvider->resolveDataItems(
             [],
-            ['type' => new PropertyParameter('type', 'video')],
+            ['types' => new PropertyParameter('types', [new PropertyParameter('video', null)])],
             ['locale' => 'de']
         );
 
