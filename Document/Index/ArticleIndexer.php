@@ -22,6 +22,8 @@ use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
@@ -35,6 +37,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ArticleIndexer implements IndexerInterface
 {
     use ArticleTypeTrait;
+    use ArticleViewDocumentIdTrait;
 
     /**
      * @var StructureMetadataFactoryInterface
@@ -45,6 +48,11 @@ class ArticleIndexer implements IndexerInterface
      * @var UserManager
      */
     private $userManager;
+
+    /**
+     * @var ContactRepository
+     */
+    private $contactRepository;
 
     /**
      * @var DocumentFactoryInterface
@@ -86,10 +94,11 @@ class ArticleIndexer implements IndexerInterface
      *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
+     * @param ContactRepository $contactRepository
+     * @param DocumentFactoryInterface $documentFactory
      * @param Manager $manager
      * @param ExcerptFactory $excerptFactory
      * @param SeoFactory $seoFactory
-     * @param DocumentFactoryInterface $documentFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param TranslatorInterface $translator
      * @param array $typeConfiguration
@@ -97,6 +106,7 @@ class ArticleIndexer implements IndexerInterface
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
+        ContactRepository $contactRepository,
         DocumentFactoryInterface $documentFactory,
         Manager $manager,
         ExcerptFactory $excerptFactory,
@@ -107,6 +117,7 @@ class ArticleIndexer implements IndexerInterface
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
+        $this->contactRepository = $contactRepository;
         $this->documentFactory = $documentFactory;
         $this->manager = $manager;
         $this->excerptFactory = $excerptFactory;
@@ -148,17 +159,6 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return string
-     */
-    protected function getArticleId($uuid, $locale)
-    {
-        return $uuid . '-' . $locale;
-    }
-
-    /**
      * @param ArticleDocument $document
      * @param string $locale
      * @param string $localizationState
@@ -170,7 +170,7 @@ class ArticleIndexer implements IndexerInterface
         $locale,
         $localizationState = LocalizationState::LOCALIZED
     ) {
-        $articleId = $this->getArticleId($document->getUuid(), $locale);
+        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
         /** @var ArticleViewDocument $article */
         $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
 
@@ -198,9 +198,15 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
-        $article->setAuthors($document->getAuthors());
-        $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
-        $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+        if ($document->getAuthor()) {
+            $article->setAuthorFullName($this->contactRepository->findById($document->getAuthor())->getFullName());
+        }
+        if ($document->getChanger()) {
+            $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
+        }
+        if ($document->getCreator()) {
+            $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+        }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
@@ -258,7 +264,7 @@ class ArticleIndexer implements IndexerInterface
     public function remove($document)
     {
         $this->removeArticle(
-            $this->getArticleId($document->getUuid(), $document->getOriginalLocale())
+            $this->getViewDocumentId($document->getUuid(), $document->getOriginalLocale())
         );
     }
 

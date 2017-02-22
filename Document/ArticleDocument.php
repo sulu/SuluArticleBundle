@@ -121,6 +121,16 @@ class ArticleDocument implements
     private $changed;
 
     /**
+     * @var int
+     */
+    private $author;
+
+    /**
+     * @var \DateTime
+     */
+    private $authored;
+
+    /**
      * Document's extensions ie seo, ...
      *
      * @var ExtensionContainer
@@ -140,20 +150,6 @@ class ArticleDocument implements
      * @var bool
      */
     protected $published;
-
-    /**
-     * Timestamp of authoring (can be set by user).
-     *
-     * @var \DateTime
-     */
-    protected $authored;
-
-    /**
-     * Array of contact-ids which has authored this article.
-     *
-     * @var int[]
-     */
-    protected $authors = [];
 
     public function __construct()
     {
@@ -415,7 +411,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set authored date-time.
+     * Set authored.
      *
      * @param \DateTime $authored
      *
@@ -439,25 +435,25 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns id of authors.
+     * Returns id of author.
      *
-     * @return int[]
+     * @return int
      */
-    public function getAuthors()
+    public function getAuthor()
     {
-        return $this->authors;
+        return $this->author;
     }
 
     /**
-     * Set authors.
+     * Sets id of author.
      *
-     * @param int[] $authors
+     * @param int $author
      *
      * @return $this
      */
-    public function setAuthors($authors)
+    public function setAuthor($author)
     {
-        $this->authors = $authors;
+        $this->author = $author;
 
         return $this;
     }

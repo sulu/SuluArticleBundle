@@ -176,11 +176,19 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $authored;
 
     /**
-     * @var int[]
+     * @var string
      *
-     * @Property(type="integer")
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
+     * )
      */
-    protected $authors;
+    protected $authorFullName;
 
     /**
      * @var string
@@ -497,17 +505,17 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getAuthors()
+    public function getAuthorFullName()
     {
-        return $this->authors;
+        return $this->authorFullName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setAuthors($authors)
+    public function setAuthorFullName($authorFullName)
     {
-        $this->authors = $authors;
+        $this->authorFullName = $authorFullName;
 
         return $this;
     }
