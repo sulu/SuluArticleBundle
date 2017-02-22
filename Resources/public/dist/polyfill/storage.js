@@ -1,0 +1,1 @@
+define(function(){"use strict";function a(){}function b(){}return a.prototype.set=function(a,b){},a.prototype.remove=function(a,b){},a.prototype.has=function(a){return!1},a.prototype.get=function(a){throw'Value for key "'+a+'" does not exist'},a.prototype.getWithDefault=function(a,b){return b},b.prototype.get=function(b,c){return new a},new b});

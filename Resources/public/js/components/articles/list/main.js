@@ -9,16 +9,18 @@
 
 define([
     'underscore',
+    'services/husky/storage',
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main',
     'services/suluarticle/article-manager'
-], function(_, CopyLocale, OpenGhost, ArticleManager) {
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager) {
 
     'use strict';
 
     var defaults = {
         options: {
-            config: {}
+            config: {},
+            storageName: 'articles'
         },
 
         templates: {
@@ -56,6 +58,8 @@ define([
         defaults: defaults,
 
         header: function() {
+            this.storage = storage.get('sulu', this.options.storageName);
+
             var types = this.options.config.types,
                 typeNames = this.options.config.typeNames,
                 button = {
@@ -64,7 +68,8 @@ define([
                 },
                 tabs = false,
                 tabItems,
-                tabPreselect = null;
+                tabPreselect = null,
+                preselectedType = this.options.type || this.storage.getWithDefault('type', null);
 
             if (1 === typeNames.length) {
                 button.callback = function() {
@@ -102,7 +107,7 @@ define([
                         }
                     );
 
-                    if (type === this.options.type) {
+                    if (type === preselectedType) {
                         tabPreselect = types[type].title;
                     }
                 }.bind(this));
@@ -143,6 +148,14 @@ define([
         },
 
         initialize: function() {
+            if (!!this.options.type) {
+                this.storage.set('type', this.options.type);
+            } else if (this.storage.has('type')) {
+                var url = this.templates.route({type: this.storage.get('type'), locale: this.options.locale});
+                this.sandbox.emit('sulu.router.navigate', url, false, false);
+                this.options.type = this.storage.get('type');
+            }
+
             this.render();
 
             this.bindCustomEvents();
@@ -172,6 +185,7 @@ define([
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
                     url: '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
+                    storageName: this.options.storageName,
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
@@ -284,8 +298,10 @@ define([
             // https://github.com/sulu/SuluArticleBundle/issues/72
             this.options.type = item.key;
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
+            this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: item.key});
             this.sandbox.emit('sulu.router.navigate', url, false, false);
+
+            this.storage.set('type', item.key);
         },
 
         /**
