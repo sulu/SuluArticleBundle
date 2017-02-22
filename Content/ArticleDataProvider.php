@@ -83,6 +83,15 @@ class ArticleDataProvider implements DataProviderInterface
             ->enablePagination()
             ->enablePresentAs()
             ->setDeepLink('article/{locale}/edit:{id}/details')
+            ->enableSorting(
+                [
+                    ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],
+                    ['column' => 'authored', 'title' => 'sulu_article.smart-content.authored'],
+                    ['column' => 'created', 'title' => 'sulu_article.smart-content.created'],
+                    ['column' => 'title', 'title' => 'sulu_article.smart-content.title'],
+                    ['column' => 'author_full_name', 'title' => 'sulu_article.smart-content.author-full-name'],
+                ]
+            )
             ->getConfiguration();
     }
 
@@ -195,6 +204,7 @@ class ArticleDataProvider implements DataProviderInterface
     private function getSearchResult(array $filters, $limit, $page, $pageSize)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
+        /** @var Search $search */
         $search = $repository->createSearch();
 
         $query = new BoolQuery();
@@ -227,9 +237,28 @@ class ArticleDataProvider implements DataProviderInterface
             $search->setSize($limit);
         }
 
-        $search->addSort(new FieldSort('title'));
+        if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
+            $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
+            $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
+        }
 
         return $repository->execute($search);
+    }
+
+    /**
+     * Extension point to append order.
+     *
+     * @param array $sortBy
+     * @param string $sortMethod
+     * @param Search $search
+     *
+     * @return array parameters for query
+     */
+    private function appendSortBy($sortBy, $sortMethod, $search)
+    {
+        foreach ($sortBy as $column) {
+            $search->addSort(new FieldSort($column, $sortMethod));
+        }
     }
 
     /**
