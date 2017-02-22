@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
+use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -42,6 +43,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     /**
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
+     * @param ContactRepository $contactRepository
      * @param DocumentFactoryInterface $documentFactory
      * @param Manager $manager
      * @param ExcerptFactory $excerptFactory
@@ -55,6 +57,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
+        ContactRepository $contactRepository,
         DocumentFactoryInterface $documentFactory,
         Manager $manager,
         ExcerptFactory $excerptFactory,
@@ -68,6 +71,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         parent::__construct(
             $structureMetadataFactory,
             $userManager,
+            $contactRepository,
             $documentFactory,
             $manager,
             $excerptFactory,
@@ -97,7 +101,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     public function remove($document)
     {
         foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
-            $articleId = $this->getArticleId($document->getUuid(), $localization->getLocale());
+            $articleId = $this->getViewDocumentId($document->getUuid(), $localization->getLocale());
             $this->removeArticle($articleId);
         }
     }

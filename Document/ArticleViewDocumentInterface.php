@@ -257,20 +257,20 @@ interface ArticleViewDocumentInterface
     public function setAuthored(\DateTime $authored = null);
 
     /**
-     * Returns authors.
+     * Returns author full name.
      *
-     * @return int[]
+     * @return string
      */
-    public function getAuthors();
+    public function getAuthorFullName();
 
     /**
-     * Set authors.
+     * Set author full name.
      *
-     * @param int[] $authors
+     * @param string $authorFullName
      *
      * @return $this
      */
-    public function setAuthors($authors);
+    public function setAuthorFullName($authorFullName);
 
     /**
      * Returns teaser-description.

@@ -30,9 +30,9 @@
                 <source>sulu_article.authored</source>
                 <target>Authored at</target>
             </trans-unit>
-            <trans-unit id="8" resname="sulu_article.authors">
-                <source>sulu_article.authors</source>
-                <target>Authors</target>
+            <trans-unit id="8" resname="sulu_article.author">
+                <source>sulu_article.author</source>
+                <target>Author</target>
             </trans-unit>
             <trans-unit id="9" resname="sulu_article.teaser">
                 <source>sulu_article.teaser</source>
@@ -90,23 +90,31 @@
                 <source>sulu_article.form.settings.changelog.created-only</source>
                 <target>Created by %(created)s</target>
             </trans-unit>
-            <trans-unit id="23" resname="sulu_article.smart-content.published">
+            <trans-unit id="23" resname="sulu_article.form.settings.changelog.authored">
+                <source>sulu_article.form.settings.changelog.authored</source>
+                <target>Authored by %(author)s at %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="24" resname="sulu_article.form.settings.changelog.authored-only">
+                <source>sulu_article.form.settings.changelog.authored-only</source>
+                <target>Authored at %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="25" resname="sulu_article.smart-content.published">
                 <source>sulu_article.smart-content.published</source>
                 <target>Published (date)</target>
             </trans-unit>
-            <trans-unit id="24" resname="sulu_article.smart-content.authored">
+            <trans-unit id="26" resname="sulu_article.smart-content.authored">
                 <source>sulu_article.smart-content.authored</source>
                 <target>Authored (date)</target>
             </trans-unit>
-            <trans-unit id="25" resname="sulu_article.smart-content.created">
+            <trans-unit id="27" resname="sulu_article.smart-content.created">
                 <source>sulu_article.smart-content.created</source>
                 <target>Created (date)</target>
             </trans-unit>
-            <trans-unit id="26" resname="sulu_article.smart-content.title">
+            <trans-unit id="28" resname="sulu_article.smart-content.title">
                 <source>sulu_article.smart-content.title</source>
                 <target>Title (alphabetic)</target>
             </trans-unit>
-            <trans-unit id="27" resname="sulu_article.smart-content.author-full-name">
+            <trans-unit id="29" resname="sulu_article.smart-content.author-full-name">
                 <source>sulu_article.smart-content.author-full-name</source>
                 <target>Author (alphabetic)</target>
             </trans-unit>

@@ -64,6 +64,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
+            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.list.author', false, false),
             'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
             'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
             'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
@@ -211,7 +212,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
         }
-        $document->setAuthors($this->getAuthors($data));
+        $document->setAuthor($this->getAuthor($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -252,7 +253,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
         }
-        $document->setAuthors($this->getAuthors($data));
+        $document->setAuthor($this->getAuthor($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -402,19 +403,19 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Returns authors or current user.
+     * Returns author or current user.
      *
      * @param array $data
      *
-     * @return int[]
+     * @return int
      */
-    private function getAuthors(array $data)
+    private function getAuthor(array $data)
     {
-        if (!array_key_exists('authors', $data)) {
-            return [$this->getUser()->getContact()->getId()];
+        if (!array_key_exists('author', $data)) {
+            return $this->getUser()->getContact()->getId();
         }
 
-        return $data['authors'];
+        return $data['author'];
     }
 
     /**

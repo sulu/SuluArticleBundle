@@ -118,7 +118,7 @@ class ArticleDataProvider implements DataProviderInterface
             $filters['type'] = $type;
         }
 
-        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize);
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
         $uuids = [];
@@ -146,7 +146,7 @@ class ArticleDataProvider implements DataProviderInterface
             $filters['type'] = $type;
         }
 
-        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize);
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
         $uuids = [];
@@ -198,10 +198,11 @@ class ArticleDataProvider implements DataProviderInterface
      * @param int $limit
      * @param int $page
      * @param int $pageSize
+     * @param string $locale
      *
      * @return DocumentIterator
      */
-    private function getSearchResult(array $filters, $limit, $page, $pageSize)
+    private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         /** @var Search $search */
@@ -219,6 +220,10 @@ class ArticleDataProvider implements DataProviderInterface
         $this->addBoolQuery('categories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteCategoriesOperator', 'or');
         $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
+
+        if (null !== $locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
 
         if (array_key_exists('type', $filters)) {
             $query->add(new TermQuery('type', $filters['type']));
