@@ -23,8 +23,9 @@ define([
             form: form
         },
         translations: {
-            authored: 'ssulu.content.form.settings.changelog.authored',
-            authoredOnly: 'sulu.content.form.settings.changelog.authored-only',
+            author: 'sulu_article.author',
+            authored: 'sulu_article.form.settings.changelog.authored',
+            authoredOnly: 'sulu_article.form.settings.changelog.authored-only',
             changelog: 'sulu_article.form.settings.changelog',
             changed: 'sulu_article.form.settings.changelog.changed',
             changedOnly: 'sulu_article.form.settings.changelog.changed-only',
@@ -142,7 +143,7 @@ define([
             if (!!fullName) {
                 this.authorFullname = fullName;
                 authoredText = this.sandbox.util.sprintf(
-                    this.sandbox.translate('sulu.content.form.settings.changelog.authored'),
+                    this.translations.authored,
                     {
                         author: fullName,
                         authored: formattedDate
@@ -150,7 +151,7 @@ define([
                 );
             } else {
                 authoredText = this.sandbox.util.sprintf(
-                    this.sandbox.translate('sulu.content.form.settings.changelog.authored-only'),
+                    this.translations.authoredOnly,
                     {
                         authored: formattedDate
                     }
@@ -344,9 +345,9 @@ define([
                     skin: 'medium',
                     slides: [
                         {
-                            title: this.sandbox.translate('sulu.content.form.settings.author'),
+                            title: this.translations.author,
                             okCallback: function() {
-                                this.sandbox.emit('sulu.content.contents.get-author');
+                                this.sandbox.emit('sulu_article.get-author');
                             }.bind(this),
                             data: $componentContainer
                         }
@@ -357,7 +358,7 @@ define([
             this.sandbox.once('husky.overlay.author-selection.initialized', function() {
                 this.sandbox.start([
                     {
-                        name: 'content/settings/author-selection@sulucontent',
+                        name: 'articles/edit/settings/author-selection@suluarticle',
                         options: {
                             el: $componentContainer,
                             locale: this.options.locale,
@@ -374,7 +375,7 @@ define([
         },
 
         setAuthor: function(data) {
-            this.setDirty.call(this);
+            this.setDirty();
 
             this.data.authored = data.authored;
             if (!data.authorItem) {

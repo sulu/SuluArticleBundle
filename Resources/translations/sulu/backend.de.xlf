@@ -30,9 +30,9 @@
                 <source>sulu_article.authored</source>
                 <target>Verfasst am</target>
             </trans-unit>
-            <trans-unit id="8" resname="sulu_article.authors">
-                <source>sulu_article.authors</source>
-                <target>Autoren</target>
+            <trans-unit id="8" resname="sulu_article.author">
+                <source>sulu_article.author</source>
+                <target>Autor</target>
             </trans-unit>
             <trans-unit id="9" resname="sulu_article.teaser">
                 <source>sulu_article.teaser</source>
@@ -89,6 +89,14 @@
             <trans-unit id="22" resname="sulu_article.form.settings.changelog.created-only">
                 <source>sulu_article.form.settings.changelog.created-only</source>
                 <target>Erstellt am %(created)s</target>
+            </trans-unit>
+            <trans-unit id="23" resname="sulu_article.form.settings.changelog.authored">
+                <source>sulu_article.form.settings.changelog.authored</source>
+                <target>Verfasst von %(author)s am %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="24" resname="sulu_article.form.settings.changelog.authored-only">
+                <source>sulu_article.form.settings.changelog.authored-only</source>
+                <target>Verfasst am %(authored)s</target>
             </trans-unit>
         </body>
     </file>

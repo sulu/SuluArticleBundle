@@ -30,8 +30,8 @@
                 <source>sulu_article.authored</source>
                 <target>Créé à</target>
             </trans-unit>
-            <trans-unit id="8" resname="sulu_article.authors">
-                <source>sulu_article.authors</source>
+            <trans-unit id="8" resname="sulu_article.author">
+                <source>sulu_article.author</source>
                 <target>Auteur</target>
             </trans-unit>
             <trans-unit id="9" resname="sulu_article.teaser">
