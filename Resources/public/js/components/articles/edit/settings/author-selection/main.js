@@ -7,6 +7,10 @@
  * with this source code in the file LICENSE.
  */
 
+/**
+ * Note: This can be removed when the Sulu dependency is set to >= 1.5.*
+ */
+
 define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse) {
 
     'use strict';
