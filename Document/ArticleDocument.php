@@ -411,9 +411,13 @@ class ArticleDocument implements
     }
 
     /**
-     * {@inheritdoc}
+     * Set authored.
+     *
+     * @param \DateTime $authored
+     *
+     * @return $this
      */
-    public function setAuthored($authored)
+    public function setAuthored(\DateTime $authored = null)
     {
         $this->authored = $authored;
 
@@ -421,7 +425,9 @@ class ArticleDocument implements
     }
 
     /**
-     * {@inheritdoc}
+     * Returns date-time of authoring this article.
+     *
+     * @return \DateTime
      */
     public function getAuthored()
     {
@@ -429,7 +435,9 @@ class ArticleDocument implements
     }
 
     /**
-     * {@inheritdoc}
+     * Returns id of author.
+     *
+     * @return int
      */
     public function getAuthor()
     {
@@ -437,7 +445,11 @@ class ArticleDocument implements
     }
 
     /**
-     * {@inheritdoc}
+     * Sets id of author.
+     *
+     * @param int $author
+     *
+     * @return $this
      */
     public function setAuthor($author)
     {

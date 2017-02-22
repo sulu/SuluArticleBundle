@@ -257,14 +257,14 @@ interface ArticleViewDocumentInterface
     public function setAuthored(\DateTime $authored = null);
 
     /**
-     * Returns authors full name.
+     * Returns author full name.
      *
-     * @return int[]
+     * @return string
      */
     public function getAuthorFullName();
 
     /**
-     * Set authors full name.
+     * Set author full name.
      *
      * @param string $authorFullName
      *
