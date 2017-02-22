@@ -233,6 +233,7 @@ class ArticleDataProvider implements DataProviderInterface
             $search->addQuery(new TermQuery('locale', $locale));
         }
 
+
         if (array_key_exists('types', $filters) && $filters['types']) {
             $typesQuery = new BoolQuery();
             foreach ($filters['types'] as $typeFilter) {
