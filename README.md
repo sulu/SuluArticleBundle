@@ -1,7 +1,9 @@
 # SuluArticleBundle
 
-[![Build Status](https://travis-ci.org/sulu/SuluArticleBundle.svg?branch=master)](https://travis-ci.org/sulu/SuluArticleBundle)
-[![StyleCI](https://styleci.io/repos/61883398/shield?branch=develop)](https://styleci.io/repos/61883398)
+[![Build Status](https://travis-ci.org/sulu/SuluArticleBundle.svg)](https://travis-ci.org/sulu/SuluArticleBundle)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/quality-score.png)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/)
+[![Code Coverage](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/coverage.png)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/)
+[![StyleCI](https://styleci.io/repos/61883398/shield)](https://styleci.io/repos/61883398)
 
 The SuluArticleBundle adds support for managing articles in Sulu. Articles can be used in a lot of different ways to
 manage unstructured data with an own URL in an admin-list. Most of the features, which can be used in pages, can also
