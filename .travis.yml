@@ -12,14 +12,22 @@ cache:
 matrix:
   include:
     - php: 5.5
+      env:
+        - SULU_VERSION="~1.4"
+      # - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
     - php: 7.0
+      env:
+      # - COMPOSER_FLAGS="--prefer-dist --no-interaction"
+        - SULU_VERSION="~1.5@RC"
+        - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
+  - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update
 
 install:
-  - travis_retry composer install --no-interaction
+  - travis_retry composer require sulu/sulu:$SULU_VERSION $COMPOSER_FLAGS
   - composer info -i
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
@@ -28,4 +36,8 @@ install:
   - ./Tests/app/console ongr:es:index:create -m live
 
 script:
-  - ./vendor/bin/phpunit
+  - ./vendor/bin/phpunit $CODE_COVERAGE --debug
+
+after_script:
+  - if [[ -n $CODE_COVERAGE ]]; then wget https://scrutinizer-ci.com/ocular.phar ; fi
+  - if [[ -n $CODE_COVERAGE ]]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover ; fi
