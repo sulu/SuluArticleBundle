@@ -103,18 +103,6 @@ class ArticleDataProvider implements DataProviderInterface
         return ['type' => new PropertyParameter('type', null)];
     }
 
-    private function getTypesProperty($propertyParameter)
-    {
-        $filterTypes = [];
-        if (array_key_exists('types', $propertyParameter) && null !== ($types = $propertyParameter['types']->getValue())) {
-            foreach ($types as $type) {
-                $filterTypes[] = $type->getName();
-            }
-        }
-
-        return $filterTypes;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -260,6 +248,25 @@ class ArticleDataProvider implements DataProviderInterface
         }
 
         return $repository->execute($search);
+    }
+
+    /**
+     * Returns array with all types defined in property parameter.
+     *
+     * @param array $propertyParameter
+     *
+     * @return array
+     */
+    private function getTypesProperty($propertyParameter)
+    {
+        $filterTypes = [];
+        if (array_key_exists('types', $propertyParameter) && null !== ($types = $propertyParameter['types']->getValue())) {
+            foreach ($types as $type) {
+                $filterTypes[] = $type->getName();
+            }
+        }
+
+        return $filterTypes;
     }
 
     /**
