@@ -83,6 +83,15 @@ class ArticleDataProvider implements DataProviderInterface
             ->enablePagination()
             ->enablePresentAs()
             ->setDeepLink('article/{locale}/edit:{id}/details')
+            ->enableSorting(
+                [
+                    ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],
+                    ['column' => 'authored', 'title' => 'sulu_article.smart-content.authored'],
+                    ['column' => 'created', 'title' => 'sulu_article.smart-content.created'],
+                    ['column' => 'title', 'title' => 'sulu_article.smart-content.title'],
+                    ['column' => 'author_full_name', 'title' => 'sulu_article.smart-content.author-full-name'],
+                ]
+            )
             ->getConfiguration();
     }
 
@@ -105,9 +114,7 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -133,9 +140,7 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -196,6 +201,7 @@ class ArticleDataProvider implements DataProviderInterface
     private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
+        /** @var Search $search */
         $search = $repository->createSearch();
 
         $query = new BoolQuery();
@@ -215,9 +221,12 @@ class ArticleDataProvider implements DataProviderInterface
             $search->addQuery(new TermQuery('locale', $locale));
         }
 
-        if (array_key_exists('type', $filters)) {
-            $query->add(new TermQuery('type', $filters['type']));
-            ++$queriesCount;
+        if (array_key_exists('types', $filters) && $filters['types']) {
+            $typesQuery = new BoolQuery();
+            foreach ($filters['types'] as $typeFilter) {
+                $typesQuery->add(new TermQuery('type', $typeFilter), BoolQuery::SHOULD);
+            }
+            $search->addQuery($typesQuery);
         }
 
         if (0 === $queriesCount) {
@@ -232,9 +241,50 @@ class ArticleDataProvider implements DataProviderInterface
             $search->setSize($limit);
         }
 
-        $search->addSort(new FieldSort('title'));
+        if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
+            $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
+            $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
+        }
 
         return $repository->execute($search);
+    }
+
+    /**
+     * Returns array with all types defined in property parameter.
+     *
+     * @param array $propertyParameter
+     *
+     * @return array
+     */
+    private function getTypesProperty($propertyParameter)
+    {
+        $filterTypes = [];
+
+        if (array_key_exists('types', $propertyParameter)
+            && null !== ($types = explode(',', $propertyParameter['types']->getValue()))
+        ) {
+            foreach ($types as $type) {
+                $filterTypes[] = $type;
+            }
+        }
+
+        return $filterTypes;
+    }
+
+    /**
+     * Extension point to append order.
+     *
+     * @param array $sortBy
+     * @param string $sortMethod
+     * @param Search $search
+     *
+     * @return array parameters for query
+     */
+    private function appendSortBy($sortBy, $sortMethod, $search)
+    {
+        foreach ($sortBy as $column) {
+            $search->addSort(new FieldSort($column, $sortMethod));
+        }
     }
 
     /**
