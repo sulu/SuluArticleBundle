@@ -77,7 +77,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(0, $result->getItems());
 
-        // get all articles with types video and blog
+        // get all articles with type video or blog
         $result = $dataProvider->resolveDataItems(
             [],
             ['types' => new PropertyParameter('types', 'video,blog')],
