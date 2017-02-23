@@ -98,6 +98,26 @@
                 <source>sulu_article.form.settings.changelog.authored-only</source>
                 <target>Authored at %(authored)s</target>
             </trans-unit>
+            <trans-unit id="25" resname="sulu_article.smart-content.published">
+                <source>sulu_article.smart-content.published</source>
+                <target>Published (date)</target>
+            </trans-unit>
+            <trans-unit id="26" resname="sulu_article.smart-content.authored">
+                <source>sulu_article.smart-content.authored</source>
+                <target>Authored (date)</target>
+            </trans-unit>
+            <trans-unit id="27" resname="sulu_article.smart-content.created">
+                <source>sulu_article.smart-content.created</source>
+                <target>Created (date)</target>
+            </trans-unit>
+            <trans-unit id="28" resname="sulu_article.smart-content.title">
+                <source>sulu_article.smart-content.title</source>
+                <target>Title (alphabetic)</target>
+            </trans-unit>
+            <trans-unit id="29" resname="sulu_article.smart-content.author-full-name">
+                <source>sulu_article.smart-content.author-full-name</source>
+                <target>Author (alphabetic)</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

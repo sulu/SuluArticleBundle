@@ -51,21 +51,67 @@ class ArticleDataProviderTest extends SuluTestCase
 
     public function testResolveDataItemsTypeParam()
     {
-        $this->createArticle();
-        $item = $this->createArticle('Test', 'simple');
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
 
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
+        // get all articles with type video
         $result = $dataProvider->resolveDataItems(
             [],
-            ['type' => new PropertyParameter('type', 'video')],
+            ['types' => new PropertyParameter('types', 'video')],
             ['locale' => 'de']
         );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
-        $this->assertEquals($item['id'], $result->getItems()[0]->getId());
+        $this->assertEquals($item2['id'], $result->getItems()[0]->getId());
+    }
+
+    public function testResolveDataItemsTypeParamMultiple()
+    {
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with type video or blog
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['types' => new PropertyParameter('types', 'video,blog')],
+            ['locale' => 'de']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(2, $result->getItems());
+        $this->assertContains(
+            $item1['id'],
+            [$result->getItems()[0]->getId(), $result->getItems()[1]->getId()]
+        );
+        $this->assertContains(
+            $item2['id'],
+            [$result->getItems()[0]->getId(), $result->getItems()[1]->getId()]
+        );
+    }
+
+    public function testResolveDataItemsTypeParamWrong()
+    {
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with type other
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['types' => new PropertyParameter('types', 'other')],
+            ['locale' => 'de']
+        );
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(0, $result->getItems());
     }
 
     public function testResolveDataItemsPagination()
