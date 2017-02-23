@@ -16,6 +16,14 @@ define(['jquery', 'services/husky/util'], function($, Util) {
             '<% if (typeof id !== "undefined") { %>/<%= id %><% } %>' +
             '?locale=<%= locale %>' +
             '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
+        ),
+        urlVersion: _.template(
+            '/admin/api/articles' +
+            '/<%= id %>' +
+            '/versions' +
+            '<% if (typeof version !== "undefined") { %>/<%= version %><% } %>' +
+            '?locale=<%= locale %>' +
+            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
         )
     };
 
@@ -81,18 +89,44 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
+         * Restore article to given version.
+         *
+         * @param {String} id
+         * @param {String} version
+         * @param {String} locale
+         */
+        restoreVersion: function(id, version, locale) {
+            return Util.save(
+                templates.urlVersion({id: id, locale: locale, version: version, action: 'restore'}),
+                'POST'
+            );
+        },
+
+        /**
          * Returns copy article from a given locale to a array of other locales url.
          *
-         * @param {string} id
-         * @param {string} src
-         * @param {string[]} dest
+         * @param {String} id
+         * @param {String} src
+         * @param {String[]} dest
          *
-         * @returns {string}
+         * @returns {String}
          */
         getCopyLocaleUrl: function(id, src, dest) {
             return [
                 templates.url({id: id, locale: src, action: 'copy-locale'}), '&dest=', dest
             ].join('');
+        },
+
+        /**
+         * Returns get versions url for given id and locale.
+         *
+         * @param {String} id
+         * @param {String} locale
+         *
+         * @return {String}
+         */
+        getVersionsUrl: function(id, locale) {
+            return templates.urlVersion({id: id, locale: locale});
         }
     };
 });
