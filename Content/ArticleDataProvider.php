@@ -259,9 +259,12 @@ class ArticleDataProvider implements DataProviderInterface
     private function getTypesProperty($propertyParameter)
     {
         $filterTypes = [];
-        if (array_key_exists('types', $propertyParameter) && null !== ($types = $propertyParameter['types']->getValue())) {
+
+        if (array_key_exists('types', $propertyParameter)
+            && null !== ($types = explode(',', $propertyParameter['types']->getValue()))
+        ) {
             foreach ($types as $type) {
-                $filterTypes[] = $type->getName();
+                $filterTypes[] = $type;
             }
         }
 
