@@ -76,7 +76,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
-        
+
         // get all articles with type video or blog
         $result = $dataProvider->resolveDataItems(
             [],
