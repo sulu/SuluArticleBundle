@@ -101,6 +101,12 @@ Create assets:
 php bin/console assets:install
 ```
 
+Create translations:
+
+```bash
+php bin/console sulu:translation:export
+```
+
 Create required phpcr nodes:
 
 ```bash
