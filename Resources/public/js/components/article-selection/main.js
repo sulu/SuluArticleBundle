@@ -71,7 +71,7 @@ define([
                 this.sandbox.emit('husky.overlay.article-selection.' + this.options.instanceName + '.add.set-position');
             }.bind(this));
 
-            this.sandbox.on('husky.tabs.overlayarticle-selection.articles.add.item.select', typeChange.bind(this));
+            this.sandbox.on('husky.tabs.overlayarticle-selection.' + this.options.instanceName + '.add.item.select', typeChange.bind(this));
         },
 
         /**
