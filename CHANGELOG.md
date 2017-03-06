@@ -1,11 +1,42 @@
 # Change Log
 
+## [0.1.2](https://github.com/sulu/SuluArticleBundle/tree/0.1.2) (2017-03-06)
+[Full Changelog](https://github.com/sulu/SuluArticleBundle/compare/0.1.1...0.1.2)
+
+**Closed issues:**
+
+- Single Article Author [\#76](https://github.com/sulu/SuluArticleBundle/issues/76)
+- ArticleDataProvider additional Sorting [\#63](https://github.com/sulu/SuluArticleBundle/issues/63)
+- ArticleDataProvider Sorting [\#62](https://github.com/sulu/SuluArticleBundle/issues/62)
+- Exception thrown in content type will only call in twig and cant be catched [\#50](https://github.com/sulu/SuluArticleBundle/issues/50)
+
+**Merged pull requests:**
+
+- Fixed article-selection event name [\#90](https://github.com/sulu/SuluArticleBundle/pull/90) ([wachterjohannes](https://github.com/wachterjohannes))
+- Update installation.md [\#86](https://github.com/sulu/SuluArticleBundle/pull/86) ([alexander-schranz](https://github.com/alexander-schranz))
+- Smart content provider: Added sorting [\#81](https://github.com/sulu/SuluArticleBundle/pull/81) ([trickreich](https://github.com/trickreich))
+- Prepared files for release 0.2.0 [\#79](https://github.com/sulu/SuluArticleBundle/pull/79) ([wachterjohannes](https://github.com/wachterjohannes))
+- Implemented single author [\#78](https://github.com/sulu/SuluArticleBundle/pull/78) ([trickreich](https://github.com/trickreich))
+- Added storage to save latest type [\#56](https://github.com/sulu/SuluArticleBundle/pull/56) ([wachterjohannes](https://github.com/wachterjohannes))
+
 ## [0.1.1](https://github.com/sulu/SuluArticleBundle/tree/0.1.1) (2017-02-21)
 [Full Changelog](https://github.com/sulu/SuluArticleBundle/compare/0.1.0...0.1.1)
+
+**Closed issues:**
+
+- Current sulu develop breaks settings-tab because of missing translation key [\#71](https://github.com/sulu/SuluArticleBundle/issues/71)
+- Implement SecurityChecker [\#69](https://github.com/sulu/SuluArticleBundle/issues/69)
+- Language copy locale overlay [\#66](https://github.com/sulu/SuluArticleBundle/issues/66)
+- Implement multilingual articles [\#65](https://github.com/sulu/SuluArticleBundle/issues/65)
+- Unpublish article [\#8](https://github.com/sulu/SuluArticleBundle/issues/8)
 
 **Merged pull requests:**
 
 - Added options to allow extra fields [\#77](https://github.com/sulu/SuluArticleBundle/pull/77) ([wachterjohannes](https://github.com/wachterjohannes))
+- Implemented security context [\#75](https://github.com/sulu/SuluArticleBundle/pull/75) ([trickreich](https://github.com/trickreich))
+- Added translations in ghost and copy locale overlays and settings tab [\#74](https://github.com/sulu/SuluArticleBundle/pull/74) ([trickreich](https://github.com/trickreich))
+- Implemented copy locale feature [\#73](https://github.com/sulu/SuluArticleBundle/pull/73) ([trickreich](https://github.com/trickreich))
+- Implemented multilingual articles [\#68](https://github.com/sulu/SuluArticleBundle/pull/68) ([trickreich](https://github.com/trickreich))
 
 ## [0.1.0](https://github.com/sulu/SuluArticleBundle/tree/0.1.0) (2017-02-10)
 **Fixed bugs:**
