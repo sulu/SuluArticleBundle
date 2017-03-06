@@ -83,7 +83,7 @@ class VersionController extends FOSRestController implements
         $versionCollection = new ListRepresentation(
             $versionData,
             'versions',
-            'get_node_versions',
+            $request->attributes->get('_route'),
             [
                 'uuid' => $uuid,
                 'locale' => $locale,
