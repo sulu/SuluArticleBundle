@@ -229,7 +229,7 @@ define([
             var changerDef = $.Deferred();
             var authorDef = $.Deferred();
 
-            if (data.creator === data.changer) {
+            if (data.creator && data.changer && data.creator === data.changer) {
                 this.loadUser(data.creator).done(function(model) {
                     creatorDef.resolve(model.get('fullName'), data.created);
                     changerDef.resolve(model.get('fullName'), data.changed);
@@ -279,20 +279,25 @@ define([
          * @return {*}
          */
         loadUser: function(id) {
-            var deferred = $.Deferred(),
-                user = new User({id: id});
+            var deferred = $.Deferred();
 
-            user.fetch({
-                global: false,
+            if (id) {
+                var user = new User({id: id});
 
-                success: function(model) {
-                    deferred.resolve(model)
-                }.bind(this),
+                user.fetch({
+                    global: false,
 
-                error: function() {
-                    deferred.reject();
-                }.bind(this)
-            });
+                    success: function(model) {
+                        deferred.resolve(model)
+                    }.bind(this),
+
+                    error: function() {
+                        deferred.reject();
+                    }.bind(this)
+                });
+            } else {
+                deferred.reject();
+            }
 
             return deferred;
         },
