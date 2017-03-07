@@ -23,7 +23,12 @@ matrix:
     - php: 7.0
       env:
       # - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        - SULU_VERSION="~1.5@RC"
+        - SULU_VERSION="~1.5"
+        - CODE_COVERAGE="--coverage-clover=coverage.clover"
+    - php: 7.0
+      env:
+        - SULU_VERSION="~1.5"
+        - SYMFONY__PHPCR__TRANSPORT=jackrabbit
         - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
