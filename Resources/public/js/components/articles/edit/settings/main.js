@@ -300,6 +300,8 @@ define([
                     deferred.reject();
                 }.bind(this)
             });
+
+            return deferred;
         },
 
         /**
