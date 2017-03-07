@@ -281,25 +281,25 @@ define([
         loadUser: function(id) {
             var deferred = $.Deferred();
 
-            if (id) {
-                var user = new User({id: id});
-
-                user.fetch({
-                    global: false,
-
-                    success: function(model) {
-                        deferred.resolve(model)
-                    }.bind(this),
-
-                    error: function() {
-                        deferred.reject();
-                    }.bind(this)
-                });
-            } else {
+            // when no id set return here
+            if (!id) {
                 deferred.reject();
+
+                return deferred;
             }
 
-            return deferred;
+            var user = new User({id: id});
+            user.fetch({
+                global: false,
+
+                success: function(model) {
+                    deferred.resolve(model)
+                }.bind(this),
+
+                error: function() {
+                    deferred.reject();
+                }.bind(this)
+            });
         },
 
         /**
