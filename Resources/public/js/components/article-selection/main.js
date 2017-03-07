@@ -153,7 +153,8 @@ define([
             this.sandbox.dom.append(this.$el, $element);
 
             // load all for default
-            this.url = this.options.url + '?locale=' + this.options.locale;
+            var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
+            this.url = this.options.url + delimiter + 'locale=' + this.options.locale;
 
             if (1 !== typeNames.length) {
                 tabs = [];
@@ -167,8 +168,6 @@ define([
                     );
                 } else {
                     // if not all tab is first load only for the first type
-                    var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
-
                     this.url = this.options.url + delimiter + 'locale=' + this.options.locale + '&type=' + typeNames[0];
                 }
 
