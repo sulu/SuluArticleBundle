@@ -5,6 +5,11 @@ language: php
 services:
   - elasticsearch
 
+env:
+  global:
+    - JACKRABBIT_VERSION=2.12.0
+    - SYMFONY__PHPCR__TRANSPORT=doctrinedbal
+
 cache:
   directories:
     - "$HOME/.composer/cache"
@@ -22,6 +27,16 @@ matrix:
         - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
+  - if [ ! -d downloads ]; then mkdir downloads; fi
+  - |
+    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
+        if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
+            cd downloads
+            wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar
+            cd -
+        fi
+        java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar > /dev/null &
+    fi
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update

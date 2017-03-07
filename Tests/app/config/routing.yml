@@ -1,8 +1,8 @@
-sulu_content_api:
+sulu_article_api:
     type: rest
-    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
+    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
     prefix: /api
 
-sulu_content:
+sulu_article:
     resource: "@SuluArticleBundle/Resources/config/routing.xml"
     prefix: /articles
