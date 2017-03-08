@@ -32,7 +32,8 @@ matrix:
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
-  - if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
+  - |
+    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
             cd downloads
             wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar

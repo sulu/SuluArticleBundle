@@ -69,7 +69,7 @@ class VersionController extends FOSRestController implements
         $userIds = array_unique(
             array_map(
                 function($version) {
-                /** @var Version $version */
+                    /** @var Version $version */
                     return $version->getAuthor();
                 },
                 $versions
