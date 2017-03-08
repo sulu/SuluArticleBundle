@@ -24,7 +24,7 @@ matrix:
     - php: 7.0
       env:
       # - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        - SULU_VERSION="1.5.*"
+        - SULU_VERSION="dev-develop"
         - CODE_COVERAGE="--coverage-clover=coverage.clover"
     - php: 7.0
       env:
