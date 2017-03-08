@@ -71,7 +71,7 @@ define([
                 this.sandbox.emit('husky.overlay.article-selection.' + this.options.instanceName + '.add.set-position');
             }.bind(this));
 
-            this.sandbox.on('husky.tabs.overlayarticle-selection.articles.add.item.select', typeChange.bind(this));
+            this.sandbox.on('husky.tabs.overlayarticle-selection.' + this.options.instanceName + '.add.item.select', typeChange.bind(this));
         },
 
         /**
@@ -153,22 +153,22 @@ define([
             this.sandbox.dom.append(this.$el, $element);
 
             // load all for default
-            this.url = this.options.url;
+            var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
+            this.url = this.options.url + delimiter + 'locale=' + this.options.locale;
 
             if (1 !== typeNames.length) {
                 tabs = [];
                 if (config.displayTabAll === true) {
                     tabs.push(
                         {
-                            name: 'public.all',
-                            key: null
+                            title: 'public.all',
+                            key: null,
+                            data: $data
                         }
                     );
                 } else {
                     // if not all tab is first load only for the first type
-                    var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
-
-                    this.url = this.options.url + delimiter + 'type=' + typeNames[0];
+                    this.url = this.options.url + delimiter + 'locale=' + this.options.locale + '&type=' + typeNames[0];
                 }
 
                 // add tab item for each type
@@ -235,15 +235,19 @@ define([
         },
 
         typeChange = function(item) {
-            for (var type in config.types) {
-                if (config.types.hasOwnProperty(type) && config.types[type].title === item.name) {
-                    this.type = type;
-                    return this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: type});
+            this.type = null;
+
+            if (item.name) {
+                for (var type in config.types) {
+                    if (config.types.hasOwnProperty(type) && config.types[type].title === item.name) {
+                        this.type = type;
+
+                        break;
+                    }
                 }
             }
 
-            this.type = null;
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: null});
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: this.type});
         };
 
     return {
@@ -269,7 +273,10 @@ define([
             var delimiter = (this.options.url.indexOf('?') === -1) ? '?' : '&';
 
             return [
-                this.options.url, delimiter, this.options.idsParameter, '=', (data || []).join(',')
+                this.options.url,
+                delimiter,
+                'locale=' + this.options.locale,
+                '&', this.options.idsParameter, '=', (data || []).join(',')
             ].join('');
         },
 

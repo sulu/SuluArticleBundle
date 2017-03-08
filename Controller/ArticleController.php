@@ -64,7 +64,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
-            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.list.author', false, false),
+            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.author', false, false),
             'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
             'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
             'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),

@@ -1,33 +1,29 @@
 # Installation
 
-Install ElasticSearch
+## Install ElasticSearch
 
-Install bundle over composer:
+The sulu article bundle requires a running elasticsearch `^2.2`.
+
+## Install bundle over composer:
 
 ```bash
 composer require sulu/article-bundle
 ```
 
-Possible bundle configurations:
+**Add bundle to AbstractKernel:**
 
-```yml
-sulu_article:
-    documents:
-        article:
-            view: Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
-    types:
+```php
+/* app/AbstractKernel.php */
 
-        # Prototype
-        name:
-            translation_key:      ~
-
-    # Display tab 'all' in list view
-    display_tab_all:      true
+new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
+new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
 ```
 
-Configure the bundles:
+## Configure the bundles:
 
 ```yml
+# app/config/config.yml
+
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
@@ -62,6 +58,23 @@ ongr_elasticsearch:
                 - SuluArticleBundle
 ```
 
+## Configure the routing
+
+```yml
+# app/config/admin/routing.yml
+
+sulu_arictle_api:
+    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
+    type: rest
+    prefix: /admin/api
+
+sulu_article:
+    resource: "@SuluArticleBundle/Resources/config/routing.xml"
+    prefix: /admin/articles
+```
+
+## Create Template
+
 Add xml template for structure in configured folder:
 
 ```
@@ -80,34 +93,47 @@ Add template for article type in configured folder: ``
 Example is located in Bundle
 [article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
 
-Configure the routing
+## Initialize bundle
 
-```yml
-sulu_arictle_api:
-    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
-    type: rest
-    prefix: /admin/api
+Create assets:
 
-sulu_article:
-    resource: "@SuluArticleBundle/Resources/config/routing.xml"
-    prefix: /admin/articles
+```bash
+php bin/console assets:install
 ```
 
-Add bundle to AbstractKernel:
+Create translations:
 
-```php
-new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
-new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+```bash
+php bin/console sulu:translate:export
 ```
 
 Create required phpcr nodes:
 
 ```bash
-bin/console sulu:document:init
+php bin/console sulu:document:init
 ```
 
 Create elasticsearch index:
 
 ```bash
-bin/console ongr:es:index:create
+php bin/console ongr:es:index:create
+```
+
+## Possible bundle configurations:
+
+```yml
+# app/config/config.yml
+
+sulu_article:
+    documents:
+        article:
+            view: Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
+    types:
+
+        # Prototype
+        name:
+            translation_key:      ~
+
+    # Display tab 'all' in list view
+    display_tab_all:      true
 ```
