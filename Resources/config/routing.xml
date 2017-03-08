@@ -8,7 +8,6 @@
     </route>
 
     <route id="sulu_article.template.settings" path="/template/settings.html">
-        <default key="_controller">FrameworkBundle:Template:template</default>
-        <default key="template">SuluArticleBundle::settings.html.twig</default>
+        <default key="_controller">SuluArticleBundle:Template:settings</default>
     </route>
 </routes>

@@ -27,6 +27,8 @@ use Sulu\Component\DocumentManager\Behavior\Mapping\NodeNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 use Sulu\Component\DocumentManager\Behavior\Path\AutoNameBehavior;
+use Sulu\Component\DocumentManager\Behavior\VersionBehavior;
+use Sulu\Component\DocumentManager\Version;
 
 /**
  * Represents an article in phpcr.
@@ -43,7 +45,8 @@ class ArticleDocument implements
     DateShardingBehavior,
     RoutableInterface,
     ExtensionBehavior,
-    WorkflowStageBehavior
+    WorkflowStageBehavior,
+    VersionBehavior
 {
     /**
      * @var string
@@ -150,6 +153,13 @@ class ArticleDocument implements
      * @var bool
      */
     protected $published;
+
+    /**
+     * List of versions.
+     *
+     * @var Version[]
+     */
+    protected $versions = [];
 
     public function __construct()
     {
@@ -456,5 +466,21 @@ class ArticleDocument implements
         $this->author = $author;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersions()
+    {
+        return $this->versions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setVersions($versions)
+    {
+        $this->versions = $versions;
     }
 }

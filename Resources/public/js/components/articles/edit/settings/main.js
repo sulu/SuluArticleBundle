@@ -10,11 +10,12 @@
 define([
     'underscore',
     'jquery',
+    'config',
     'sulusecurity/components/users/models/user',
     'sulucontact/models/contact',
     'services/suluarticle/article-manager',
     'text!/admin/articles/template/settings.html'
-], function(_, $, User, Contact, ArticleManager, form) {
+], function(_, $, Config, User, Contact, ArticleManager, form) {
 
     'use strict';
 
@@ -57,6 +58,50 @@ define([
                 created: data.created,
                 changed: data.changed
             };
+        },
+
+        render: function(data) {
+            this.data = data;
+            this.$el.html(this.getTemplate());
+
+            this.createForm(data);
+
+            if (Config.get('sulu-content')['versioning']['enabled']) {
+                this.sandbox.start([
+                    {
+                        name: 'datagrid@husky',
+                        options: {
+                            el: '#versions',
+                            instanceName: 'versions',
+                            url: ArticleManager.getVersionsUrl(data.id, this.options.locale),
+                            resultKey: 'versions',
+                            actionCallback: this.restoreVersion.bind(this),
+                            viewOptions: {
+                                table: {
+                                    actionIcon: 'history',
+                                    actionColumn: 'authored',
+                                    selectItem: false
+                                }
+                            },
+                            matchings: [
+                                {
+                                    name: 'authored',
+                                    attribute: 'authored',
+                                    content: this.sandbox.translate('sulu-document-manager.version.authored'),
+                                    type: 'datetime'
+                                },
+                                {
+                                    name: 'author',
+                                    attribute: 'author',
+                                    content: this.sandbox.translate('sulu-document-manager.version.author')
+                                }
+                            ]
+                        }
+                    }
+                ]);
+            }
+
+            this.rendered();
         },
 
         rendered: function() {
@@ -393,6 +438,42 @@ define([
 
             this.setAuthorChangelog(data.authorItem.firstName + ' ' + data.authorItem.lastName, new Date(data.authored));
             this.data.author = data.author;
+        },
+
+        restoreVersion: function(versionId, version) {
+            this.sandbox.sulu.showConfirmationDialog({
+                callback: function(wasConfirmed) {
+                    if (!wasConfirmed) {
+                        return;
+                    }
+
+                    this.sandbox.emit('husky.overlay.alert.show-loader');
+                    ArticleManager.restoreVersion(this.options.id, versionId, version.locale)
+                        .always(function() {
+                            this.sandbox.emit('husky.overlay.alert.hide-loader');
+                        }.bind(this))
+                        .then(function() {
+                            this.sandbox.emit('husky.overlay.alert.close');
+                            this.sandbox.emit(
+                                'sulu.router.navigate',
+                                'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
+                                true,
+                                true
+                            );
+                        }.bind(this))
+                        .fail(function() {
+                            this.sandbox.emit(
+                                'sulu.labels.error.show',
+                                'sulu.content.restore-error-description',
+                                'sulu.content.restore-error-title'
+                            );
+                        }.bind(this));
+
+                    return false;
+                }.bind(this),
+                title: this.sandbox.translate('sulu-document-manager.restore-confirmation-title'),
+                description: this.sandbox.translate('sulu-document-manager.restore-confirmation-description')
+            });
         }
     };
 });

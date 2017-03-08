@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Manages template for articles.
@@ -52,6 +53,23 @@ class TemplateController extends Controller
             [
                 '_embedded' => $templates,
                 'total' => count($templates),
+            ]
+        );
+    }
+
+    /**
+     * Renders template for settings tab in edit form.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
+     * @return Response
+     */
+    public function settingsAction(Request $request)
+    {
+        return $this->render(
+            'SuluArticleBundle::settings.html.twig',
+            [
+                'versioning' => $this->getParameter('sulu_document_manager.versioning.enabled'),
             ]
         );
     }
