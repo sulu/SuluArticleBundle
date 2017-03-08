@@ -15,10 +15,13 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
+use PHPCR\Version\VersionException;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Component\Content\Document\Behavior\SecurityBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Exception\DocumentNotFoundException;
 use Sulu\Component\DocumentManager\Version;
+use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Security\SecuredControllerInterface;
@@ -47,10 +50,15 @@ class VersionController extends FOSRestController implements
         $locale = $this->getRequestParameter($request, 'locale', true);
 
         $document = $this->get('sulu_document_manager.document_manager')->find($uuid, $request->query->get('locale'));
-        $versions = array_reverse(array_filter($document->getVersions(), function($version) use ($locale) {
-            /** @var Version $version */
-            return $version->getLocale() === $locale;
-        }));
+        $versions = array_reverse(
+            array_filter(
+                $document->getVersions(),
+                function($version) use ($locale) {
+                    /** @var Version $version */
+                    return $version->getLocale() === $locale;
+                }
+            )
+        );
         $total = count($versions);
 
         $listRestHelper = $this->get('sulu_core.list_rest_helper');
@@ -58,10 +66,15 @@ class VersionController extends FOSRestController implements
 
         $versions = array_slice($versions, $listRestHelper->getOffset(), $limit);
 
-        $userIds = array_unique(array_map(function($version) {
-            /** @var Version $version */
-            return $version->getAuthor();
-        }, $versions));
+        $userIds = array_unique(
+            array_map(
+                function($version) {
+                /** @var Version $version */
+                    return $version->getAuthor();
+                },
+                $versions
+            )
+        );
 
         $users = $this->get('sulu_security.user_repository')->findUsersById($userIds);
         $fullNamesByIds = [];
@@ -104,6 +117,8 @@ class VersionController extends FOSRestController implements
      * @Post("/articles/{uuid}/versions/{version}")
      *
      * @return Response
+     *
+     * @throws RestException
      */
     public function postTriggerAction(Request $request, $uuid, $version)
     {
@@ -112,20 +127,29 @@ class VersionController extends FOSRestController implements
 
         switch ($action) {
             case 'restore':
-                $document = $this->getDocumentManager()->find($uuid, $locale);
-                $this->getDocumentManager()->restore(
-                    $document,
-                    $locale,
-                    str_replace('_', '.', $version)
-                );
-                $this->getDocumentManager()->flush();
+                try {
+                    $document = $this->getDocumentManager()->find($uuid, $locale);
 
-                $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $this->getDocumentManager()->restore(
+                        $document,
+                        $locale,
+                        str_replace('_', '.', $version)
+                    );
+                    $this->getDocumentManager()->flush();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+                    $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+                } catch (VersionException $exception) {
+                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
+                } catch (DocumentNotFoundException $exception) {
+                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
+                }
+
                 break;
+            default:
+                throw new RestException(sprintf('Unrecognized action: "%s"', $action));
         }
-
-        $view = $this->view($data, $data !== null ? 200 : 204);
-        $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
 
         return $this->handleView($view);
     }

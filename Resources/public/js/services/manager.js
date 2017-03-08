@@ -14,13 +14,7 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         url: _.template(
             '/admin/api/articles' +
             '<% if (typeof id !== "undefined") { %>/<%= id %><% } %>' +
-            '?locale=<%= locale %>' +
-            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
-        ),
-        urlVersion: _.template(
-            '/admin/api/articles' +
-            '/<%= id %>' +
-            '/versions' +
+            '<% if (typeof postfix !== "undefined") { %>/<%= postfix %><% } %>' +
             '<% if (typeof version !== "undefined") { %>/<%= version %><% } %>' +
             '?locale=<%= locale %>' +
             '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
@@ -97,7 +91,7 @@ define(['jquery', 'services/husky/util'], function($, Util) {
          */
         restoreVersion: function(id, version, locale) {
             return Util.save(
-                templates.urlVersion({id: id, locale: locale, version: version, action: 'restore'}),
+                templates.url({id: id, postfix: 'versions', locale: locale, version: version, action: 'restore'}),
                 'POST'
             );
         },
@@ -126,7 +120,7 @@ define(['jquery', 'services/husky/util'], function($, Util) {
          * @return {String}
          */
         getVersionsUrl: function(id, locale) {
-            return templates.urlVersion({id: id, locale: locale});
+            return templates.url({id: id, postfix: 'versions', locale: locale});
         }
     };
 });

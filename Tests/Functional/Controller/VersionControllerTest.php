@@ -69,6 +69,27 @@ class VersionControllerTest extends SuluTestCase
         $this->assertEquals('first title', $response['title']);
     }
 
+    public function testPostRestoreInvalidVersion()
+    {
+        /** @var ArticleDocument $article */
+        $article = $this->documentManager->create('article');
+        $article->setTitle('first title');
+        $article->setStructureType('default');
+
+        $this->documentManager->persist($article, $this->locale);
+        $this->documentManager->publish($article, $this->locale);
+        $this->documentManager->flush();
+
+        $client = $this->createAuthenticatedClient();
+
+        $client->request(
+            'POST',
+            '/api/articles/' . $article->getUuid() . '/versions/2_0?action=restore&locale=' . $this->locale
+        );
+
+        $this->assertHttpStatusCode(404, $client->getResponse());
+    }
+
     public function testCGet()
     {
         /** @var ArticleDocument $article */

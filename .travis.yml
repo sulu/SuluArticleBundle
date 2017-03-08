@@ -12,6 +12,7 @@ env:
 
 cache:
   directories:
+    - "downloads"
     - "$HOME/.composer/cache"
 
 matrix:
@@ -29,12 +30,9 @@ matrix:
       env:
         - SULU_VERSION="~1.5"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
-        - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
-  - if [ ! -d downloads ]; then mkdir downloads; fi
-  - |
-    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
+  - if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
             cd downloads
             wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar
