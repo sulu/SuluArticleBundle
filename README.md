@@ -24,7 +24,7 @@ and code are not stable yet (pre 1.0).
 
 * Composer
 * PHP `^5.5 || ^7.0`
-* Sulu `^1.4`
+* Sulu `^1.5`
 * Elasticsearch `^2.2`
 
 For detailed requirements see [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/composer.json).
