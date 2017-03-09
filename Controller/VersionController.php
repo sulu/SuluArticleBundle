@@ -127,24 +127,18 @@ class VersionController extends FOSRestController implements
 
         switch ($action) {
             case 'restore':
-                try {
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                $document = $this->getDocumentManager()->find($uuid, $locale);
 
-                    $this->getDocumentManager()->restore(
-                        $document,
-                        $locale,
-                        str_replace('_', '.', $version)
-                    );
-                    $this->getDocumentManager()->flush();
+                $this->getDocumentManager()->restore(
+                    $document,
+                    $locale,
+                    str_replace('_', '.', $version)
+                );
+                $this->getDocumentManager()->flush();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
-                    $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
-                    $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
-                } catch (VersionException $exception) {
-                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
-                } catch (DocumentNotFoundException $exception) {
-                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
-                }
+                $data = $this->getDocumentManager()->find($uuid, $locale);
+                $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+                $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
 
                 break;
             default:
