@@ -7,13 +7,20 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore'], function(_) {
+define([
+    'underscore',
+    'services/husky/storage',
+    'sulucontent/components/copy-locale-overlay/main',
+    'sulucontent/components/open-ghost-overlay/main',
+    'services/suluarticle/article-manager'
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager) {
 
     'use strict';
 
     var defaults = {
         options: {
-            config: {}
+            config: {},
+            storageName: 'articles'
         },
 
         templates: {
@@ -38,7 +45,13 @@ define(['underscore'], function(_) {
             publishedWithDraft: 'public.published-with-draft',
             filter: 'sulu_article.list.filter',
             filterMe: 'sulu_article.list.filter.me',
-            filterAll: 'sulu_article.list.filter.all'
+            filterAll: 'sulu_article.list.filter.all',
+            openGhostOverlay: {
+                info: 'sulu_article.settings.open-ghost-overlay.info',
+                new: 'sulu_article.settings.open-ghost-overlay.new',
+                copy: 'sulu_article.settings.open-ghost-overlay.copy',
+                ok: 'sulu_article.settings.open-ghost-overlay.ok'
+            }
         }
     };
 
@@ -48,6 +61,8 @@ define(['underscore'], function(_) {
         defaults: defaults,
 
         header: function() {
+            this.storage = storage.get('sulu', this.options.storageName);
+
             var types = this.options.config.types,
                 typeNames = this.options.config.typeNames,
                 button = {
@@ -56,7 +71,8 @@ define(['underscore'], function(_) {
                 },
                 tabs = false,
                 tabItems,
-                tabPreselect = null;
+                tabPreselect = null,
+                preselectedType = this.options.type || this.storage.getWithDefault('type', null);
 
             if (1 === typeNames.length) {
                 button.callback = function() {
@@ -94,7 +110,7 @@ define(['underscore'], function(_) {
                         }
                     );
 
-                    if (type === this.options.type) {
+                    if (type === preselectedType) {
                         tabPreselect = types[type].title;
                     }
                 }.bind(this));
@@ -135,6 +151,14 @@ define(['underscore'], function(_) {
         },
 
         initialize: function() {
+            if (!!this.options.type) {
+                this.storage.set('type', this.options.type);
+            } else if (this.storage.has('type')) {
+                var url = this.templates.route({type: this.storage.get('type'), locale: this.options.locale});
+                this.sandbox.emit('sulu.router.navigate', url, false, false);
+                this.options.type = this.storage.get('type');
+            }
+
             this.render();
 
             this.bindCustomEvents();
@@ -154,17 +178,62 @@ define(['underscore'], function(_) {
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
                     url: '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
+                    storageName: this.options.storageName,
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
+                    idKey: 'uuid',
                     instanceName: 'articles',
-                    actionCallback: function(id) {
-                        this.toEdit(id);
+                    actionCallback: function(id, article) {
+                        if ('ghost' === article.localizationState.state) {
+                            ArticleManager.load(id, this.options.locale).then(function(response) {
+                                OpenGhost.openGhost.call(
+                                    this,
+                                    response,
+                                    this.translations.openGhostOverlay
+                                ).then(
+                                    function(copy, src) {
+                                        if (!!copy) {
+                                            CopyLocale.copyLocale.call(
+                                                this,
+                                                id,
+                                                src,
+                                                [this.options.locale],
+                                                function() {
+                                                    this.toEdit(id);
+                                                }.bind(this)
+                                            );
+                                        } else {
+                                            this.toEdit(id);
+                                        }
+                                    }.bind(this)
+                                );
+                            }.bind(this)).fail(function(xhr) {
+                                this.sandbox.emit('sulu.article.error', xhr.status, data);
+                            }.bind(this));
+                        } else {
+                            this.toEdit(id);
+                        }
                     }.bind(this),
                     viewOptions: {
                         table: {
                             actionIconColumn: 'title',
                             badges: [
+                                {
+                                    column: 'title',
+                                    callback: function(item, badge) {
+                                        if (!!item.localizationState &&
+                                            item.localizationState.state === 'ghost' &&
+                                            item.localizationState.locale !== this.options.locale
+                                        ) {
+                                            badge.title = item.localizationState.locale;
+
+                                            return badge;
+                                        }
+
+                                        return false;
+                                    }.bind(this)
+                                },
                                 {
                                     column: 'title',
                                     callback: function(item, badge) {
@@ -201,7 +270,11 @@ define(['underscore'], function(_) {
         },
 
         toList: function(locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            if (this.options.config.typeNames.length === 1 || !this.options.type) {
+                this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
+            } else {
+                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type) + '/' + (locale || this.options.locale));
+            }
         },
 
         deleteItems: function(ids) {
@@ -214,9 +287,27 @@ define(['underscore'], function(_) {
 
         typeChange: function(item) {
             var url = this.templates.route({type: item.key, locale: this.options.locale});
+            // Save the tab key. Can be removed when issue #72 is solved:
+            // https://github.com/sulu/SuluArticleBundle/issues/72
+            this.options.type = item.key;
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {type: item.key});
+            this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: item.key});
             this.sandbox.emit('sulu.router.navigate', url, false, false);
+
+            this.storage.set('type', item.key);
+        },
+
+        /**
+         * Returns copy article from a given locale to a array of other locales url.
+         *
+         * @param {string} id
+         * @param {string} src
+         * @param {string[]} dest
+         *
+         * @returns {string}
+         */
+        getCopyLocaleUrl: function(id, src, dest) {
+            return ArticleManager.getCopyLocaleUrl(id, src, dest);
         },
 
         bindCustomEvents: function() {
@@ -230,6 +321,10 @@ define(['underscore'], function(_) {
             }.bind(this));
 
             this.sandbox.on('sulu.header.language-changed', function(item) {
+                if (item.id === this.options.locale) {
+                    return;
+                }
+
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));

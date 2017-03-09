@@ -16,14 +16,16 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\MatchQuery;
-use ONGR\ElasticsearchDSL\Query\Span\SpanOrQuery;
+use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
-use ONGR\ElasticsearchDSL\Query\WildcardQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
+use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
@@ -31,17 +33,19 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
+use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides API for articles.
  */
-class ArticleController extends RestController implements ClassResourceInterface
+class ArticleController extends RestController implements ClassResourceInterface, SecuredControllerInterface
 {
     const DOCUMENT_TYPE = 'article';
 
     use RequestParametersTrait;
+    use ArticleViewDocumentIdTrait;
 
     /**
      * Create field-descriptor array.
@@ -51,7 +55,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getFieldDescriptors()
     {
         return [
-            'id' => new FieldDescriptor('id', 'public.id', true),
+            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
             'typeTranslation' => new FieldDescriptor(
                 'typeTranslation',
                 'sulu_article.list.type',
@@ -61,6 +65,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'title' => new FieldDescriptor('title', 'public.title', false, true),
             'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
             'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
+            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.author', false, false),
             'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
             'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
             'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
@@ -88,6 +93,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function cgetAction(Request $request)
     {
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
         $restHelper = $this->get('sulu_core.list_rest_helper');
 
         /** @var Manager $manager */
@@ -95,12 +102,22 @@ class ArticleController extends RestController implements ClassResourceInterface
         $repository = $manager->getRepository($this->get('sulu_article.view_document.factory')->getClass('article'));
         $search = $repository->createSearch();
 
-        if (!empty($searchPattern = $restHelper->getSearchPattern())) {
-            foreach ($restHelper->getSearchFields() as $searchField) {
-                $search->addQuery(
-                    new WildcardQuery($this->uncamelize($searchField), '*' . strtolower($searchPattern) . '*')
-                );
-            }
+        $limit = (int) $restHelper->getLimit();
+        $page = (int) $restHelper->getPage();
+
+        if (null !== $locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
+
+        if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
+            $search->addQuery(new IdsQuery($this->getViewDocumentIds($ids, $locale)));
+            $limit = count($ids);
+        }
+
+        if (!empty($searchPattern = $restHelper->getSearchPattern())
+            && 0 < count($searchFields = $restHelper->getSearchFields())
+        ) {
+            $search->addQuery(new MultiMatchQuery($searchFields, $searchPattern));
         }
 
         if (null !== ($type = $request->get('type'))) {
@@ -126,14 +143,21 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
         }
 
-        $limit = (int) $restHelper->getLimit();
-        $page = (int) $restHelper->getPage();
         $search->setSize($limit);
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
         foreach ($repository->execute($search) as $document) {
-            $result[] = $document;
+            if (false !== ($index = array_search($document->getUuid(), $ids))) {
+                $result[$index] = $document;
+            } else {
+                $result[] = $document;
+            }
+        }
+
+        if (count($ids)) {
+            ksort($result);
+            $result = array_values($result);
         }
 
         return $this->handleView(
@@ -166,7 +190,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $uuid,
             $locale,
             [
-                'load_ghost_content' => false,
+                'load_ghost_content' => true,
                 'load_shadow_content' => false,
             ]
         );
@@ -196,7 +220,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
         }
-        $document->setAuthors($this->getAuthors($data));
+        $document->setAuthor($this->getAuthor($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -237,7 +261,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (array_key_exists('authored', $data)) {
             $document->setAuthored(new \DateTime($data['authored']));
         }
-        $document->setAuthors($this->getAuthors($data));
+        $document->setAuthor($this->getAuthor($data));
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
@@ -307,6 +331,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         // prepare vars
         $view = null;
         $data = null;
+        $userId = $this->getUser()->getId();
 
         try {
             switch ($action) {
@@ -322,6 +347,10 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
                     break;
+                case 'copy-locale':
+                    $destLocales = $this->getRequestParameter($request, 'dest', true);
+                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
             }
@@ -334,6 +363,14 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSecurityContext()
+    {
+        return ArticleAdmin::SECURITY_CONTEXT;
     }
 
     /**
@@ -374,19 +411,19 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Returns authors or current user.
+     * Returns author or current user.
      *
      * @param array $data
      *
-     * @return int[]
+     * @return int
      */
-    private function getAuthors(array $data)
+    private function getAuthor(array $data)
     {
-        if (!array_key_exists('authors', $data)) {
-            return [$this->getUser()->getContact()->getId()];
+        if (!array_key_exists('author', $data)) {
+            return $this->getUser()->getContact()->getId();
         }
 
-        return $data['authors'];
+        return $data['author'];
     }
 
     /**
@@ -397,6 +434,14 @@ class ArticleController extends RestController implements ClassResourceInterface
     protected function getDocumentManager()
     {
         return $this->get('sulu_document_manager.document_manager');
+    }
+
+    /**
+     * @return ContentMapperInterface
+     */
+    protected function getMapper()
+    {
+        return $this->get('sulu.content.mapper');
     }
 
     /**

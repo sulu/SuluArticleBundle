@@ -10,7 +10,7 @@
 define([
     'underscore',
     'jquery',
-    'suluarticle/services/article-manager'
+    'services/suluarticle/article-manager'
 ], function(_, $, ArticleManager) {
 
     'use strict';
@@ -79,8 +79,20 @@ define([
                 this.data[key] = value;
             }.bind(this));
 
-            ArticleManager.save(this.data, this.options.locale, action).then(function(response) {
+            ArticleManager.save(this.data, this.data.id, this.options.locale, action).then(function(response) {
                 this.data = response;
+
+                if (this.ghost && !this.data.type) {
+                    this.sandbox.emit(
+                        'sulu.router.navigate',
+                        'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
+                        true,
+                        true
+                    );
+
+                    return;
+                }
+
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);
@@ -136,7 +148,7 @@ define([
          */
         loadFormTemplate: function(template) {
             if (!template) {
-                template = this.options.config.types[(this.options.type || this.data.type)].default;
+                template = this.options.config.types[(this.options.type || this.data.articleType)].default;
             }
 
             this.template = template;
@@ -190,9 +202,22 @@ define([
                 options: this.options
             }));
 
-            if (!this.data.id) {
+            if (!this.data.id || (this.data.type && this.data.type.name === 'ghost')) {
                 // route-path will be generator on post-request
                 this.$find('#routePath').parent().remove();
+                this.data.routePath = null;
+            }
+
+            if (this.data.type && this.data.type.name === 'ghost') {
+                this.ghost = {
+                    locale: this.data.type.value,
+                    title: this.data.title
+                };
+
+                this.data = {
+                    id: this.data.id,
+                    articleType: this.data.articleType
+                };
             }
 
             this.createForm(this.data).then(function() {
@@ -218,6 +243,10 @@ define([
 
             formObject.initialized.then(function() {
                 this.sandbox.form.setData(this.formId, data).then(function() {
+                    if (!!this.ghost) {
+                        this.sandbox.dom.attr('#title', 'placeholder', this.ghost.locale + ': ' + this.ghost.title);
+                    }
+
                     this.sandbox.start(this.$el, {reset: true}).then(function() {
                         this.initSortableBlock();
                         this.bindFormEvents();

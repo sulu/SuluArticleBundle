@@ -10,9 +10,23 @@
 require.config({
     paths: {
         suluarticle: '../../suluarticle/js',
-        suluarticlecss: '../../suluarticle/css'
+        suluarticlecss: '../../suluarticle/css',
+
+        'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
+
+        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager'
     }
 });
+
+if (!require.defined('services/husky/storage')) {
+    // this is a polyfill for the storage feature of sulu 1.5
+    // can be removed when changing the dependency of sulu to 1.5
+    require.config({
+        paths: {
+            'services/husky/storage':'../../suluarticle/js/polyfill/storage'
+        }
+    });
+}
 
 define(['underscore', 'config'], function(_, Config) {
 
@@ -127,8 +141,8 @@ define(['underscore', 'config'], function(_, Config) {
 
             app.sandbox.mvc.routes.push({
                 route: 'articles/:locale/edit::id/:content',
-                callback: function(locale, id) {
-                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                callback: function(locale, id, content) {
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-config=\'' + JSON.stringify(config) +  '\'/>';
                 }
             });
         }

@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 
@@ -50,6 +51,11 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
 
     /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
      * @var ArticleSubscriber
      */
     private $articleSubscriber;
@@ -66,6 +72,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
 
         $this->document = $this->prophesize(ArticleDocument::class);
 
@@ -74,7 +81,8 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->liveIndexer->reveal(),
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
-            $this->entityManager->reveal()
+            $this->entityManager->reveal(),
+            $this->documentManager->reveal()
         );
     }
 
@@ -97,6 +105,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $route = $this->prophesize(RouteInterface::class);
         $this->document->getRoutePath()->willReturn('/test');
         $this->document->setRoute($route->reveal())->shouldBeCalled();
+        $this->document->getOriginalLocale()->willReturn('de');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
 
         $this->articleSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));

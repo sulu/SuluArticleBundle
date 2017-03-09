@@ -17,6 +17,7 @@ use ONGR\ElasticsearchDSL\Query\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
+use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -82,6 +83,15 @@ class ArticleDataProvider implements DataProviderInterface
             ->enablePagination()
             ->enablePresentAs()
             ->setDeepLink('article/{locale}/edit:{id}/details')
+            ->enableSorting(
+                [
+                    ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],
+                    ['column' => 'authored', 'title' => 'sulu_article.smart-content.authored'],
+                    ['column' => 'created', 'title' => 'sulu_article.smart-content.created'],
+                    ['column' => 'title', 'title' => 'sulu_article.smart-content.title'],
+                    ['column' => 'author_full_name', 'title' => 'sulu_article.smart-content.author-full-name'],
+                ]
+            )
             ->getConfiguration();
     }
 
@@ -104,19 +114,19 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
+
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
         $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
-        foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
+        foreach ($queryResult as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
         }
 
-        return new DataProviderResult($result, false, $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
     }
 
     /**
@@ -130,14 +140,14 @@ class ArticleDataProvider implements DataProviderInterface
         $page = 1,
         $pageSize = null
     ) {
-        if (array_key_exists('type', $propertyParameter) && null !== ($type = $propertyParameter['type']->getValue())) {
-            $filters['type'] = $type;
-        }
+        $filters['types'] = $this->getTypesProperty($propertyParameter);
+
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
         $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
-        foreach ($this->getSearchResult($filters, $limit, $page, $pageSize) as $document) {
+        foreach ($queryResult as $document) {
             $uuids[] = $document->getUuid();
             $result[] = new ArticleResourceItem(
                 $document,
@@ -145,7 +155,7 @@ class ArticleDataProvider implements DataProviderInterface
             );
         }
 
-        return new DataProviderResult($result, false, $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
     }
 
     /**
@@ -157,36 +167,66 @@ class ArticleDataProvider implements DataProviderInterface
     }
 
     /**
+     * Returns flag "hasNextPage".
+     * It combines the limit/query-count with the page and page-size.
+     *
+     * @param DocumentIterator $queryResult
+     * @param int $limit
+     * @param int $page
+     * @param int $pageSize
+     *
+     * @return bool
+     */
+    private function hasNextPage(DocumentIterator $queryResult, $limit, $page, $pageSize)
+    {
+        $count = $queryResult->count();
+        if ($limit && $limit < $count) {
+            $count = $limit;
+        }
+
+        return $count > ($page * $pageSize);
+    }
+
+    /**
      * Creates search for filters and returns search-result.
      *
      * @param array $filters
      * @param int $limit
      * @param int $page
      * @param int $pageSize
+     * @param string $locale
      *
      * @return DocumentIterator
      */
-    private function getSearchResult(array $filters, $limit, $page, $pageSize)
+    private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
+        /** @var Search $search */
         $search = $repository->createSearch();
 
         $query = new BoolQuery();
 
         $queriesCount = 0;
         $operator = $this->getFilter($filters, 'tagOperator', 'or');
-        $this->addBoolQuery('tags', $filters, 'excerpt.tags', $operator, $query, $queriesCount);
+        $this->addBoolQuery('tags', $filters, 'excerpt.tags.id', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteTagsOperator', 'or');
-        $this->addBoolQuery('websiteTags', $filters, 'excerpt.tags', $operator, $query, $queriesCount);
+        $this->addBoolQuery('websiteTags', $filters, 'excerpt.tags.id', $operator, $query, $queriesCount);
 
         $operator = $this->getFilter($filters, 'categoryOperator', 'or');
-        $this->addBoolQuery('categories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
+        $this->addBoolQuery('categories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
         $operator = $this->getFilter($filters, 'websiteCategoriesOperator', 'or');
-        $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories', $operator, $query, $queriesCount);
+        $this->addBoolQuery('websiteCategories', $filters, 'excerpt.categories.id', $operator, $query, $queriesCount);
 
-        if (array_key_exists('type', $filters)) {
-            $query->add(new TermQuery('type', $filters['type']));
-            ++$queriesCount;
+        if (null !== $locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
+
+        if (array_key_exists('types', $filters) && $filters['types']) {
+            $typesQuery = new BoolQuery();
+            foreach ($filters['types'] as $typeFilter) {
+                $typesQuery->add(new TermQuery('type', $typeFilter), BoolQuery::SHOULD);
+            }
+            $search->addQuery($typesQuery);
         }
 
         if (0 === $queriesCount) {
@@ -201,7 +241,50 @@ class ArticleDataProvider implements DataProviderInterface
             $search->setSize($limit);
         }
 
+        if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
+            $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
+            $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
+        }
+
         return $repository->execute($search);
+    }
+
+    /**
+     * Returns array with all types defined in property parameter.
+     *
+     * @param array $propertyParameter
+     *
+     * @return array
+     */
+    private function getTypesProperty($propertyParameter)
+    {
+        $filterTypes = [];
+
+        if (array_key_exists('types', $propertyParameter)
+            && null !== ($types = explode(',', $propertyParameter['types']->getValue()))
+        ) {
+            foreach ($types as $type) {
+                $filterTypes[] = $type;
+            }
+        }
+
+        return $filterTypes;
+    }
+
+    /**
+     * Extension point to append order.
+     *
+     * @param array $sortBy
+     * @param string $sortMethod
+     * @param Search $search
+     *
+     * @return array parameters for query
+     */
+    private function appendSortBy($sortBy, $sortMethod, $search)
+    {
+        foreach ($sortBy as $column) {
+            $search->addSort(new FieldSort($column, $sortMethod));
+        }
     }
 
     /**

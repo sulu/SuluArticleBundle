@@ -7,7 +7,9 @@
  * with this source code in the file LICENSE.
  */
 
-define(['suluarticle/services/article-manager'], function(ArticleManager) {
+define([
+    'services/suluarticle/article-manager'
+], function(ArticleManager) {
 
     'use strict';
 
@@ -27,7 +29,7 @@ define(['suluarticle/services/article-manager'], function(ArticleManager) {
             var content = this.options.data();
             content.ext.excerpt = data;
 
-            ArticleManager.save(content, this.options.locale, action).then(function(response) {
+            ArticleManager.save(content, content.id, this.options.locale, action).then(function(response) {
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
                 this.sandbox.emit('sulu.article.error', xhr.status, data);

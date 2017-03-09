@@ -27,6 +27,8 @@ use Sulu\Component\DocumentManager\Behavior\Mapping\NodeNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 use Sulu\Component\DocumentManager\Behavior\Path\AutoNameBehavior;
+use Sulu\Component\DocumentManager\Behavior\VersionBehavior;
+use Sulu\Component\DocumentManager\Version;
 
 /**
  * Represents an article in phpcr.
@@ -43,7 +45,8 @@ class ArticleDocument implements
     DateShardingBehavior,
     RoutableInterface,
     ExtensionBehavior,
-    WorkflowStageBehavior
+    WorkflowStageBehavior,
+    VersionBehavior
 {
     /**
      * @var string
@@ -121,6 +124,16 @@ class ArticleDocument implements
     private $changed;
 
     /**
+     * @var int
+     */
+    private $author;
+
+    /**
+     * @var \DateTime
+     */
+    private $authored;
+
+    /**
      * Document's extensions ie seo, ...
      *
      * @var ExtensionContainer
@@ -142,18 +155,11 @@ class ArticleDocument implements
     protected $published;
 
     /**
-     * Timestamp of authoring (can be set by user).
+     * List of versions.
      *
-     * @var \DateTime
+     * @var Version[]
      */
-    protected $authored;
-
-    /**
-     * Array of contact-ids which has authored this article.
-     *
-     * @var int[]
-     */
-    protected $authors = [];
+    protected $versions = [];
 
     public function __construct()
     {
@@ -415,7 +421,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set authored date-time.
+     * Set authored.
      *
      * @param \DateTime $authored
      *
@@ -439,26 +445,42 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns id of authors.
+     * Returns id of author.
      *
-     * @return int[]
+     * @return int
      */
-    public function getAuthors()
+    public function getAuthor()
     {
-        return $this->authors;
+        return $this->author;
     }
 
     /**
-     * Set authors.
+     * Sets id of author.
      *
-     * @param int[] $authors
+     * @param int $author
      *
      * @return $this
      */
-    public function setAuthors($authors)
+    public function setAuthor($author)
     {
-        $this->authors = $authors;
+        $this->author = $author;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersions()
+    {
+        return $this->versions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setVersions($versions)
+    {
+        $this->versions = $versions;
     }
 }
