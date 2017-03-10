@@ -348,25 +348,32 @@ define([
                 icon: 'filter',
                 title: this.translations.filter,
                 group: 2,
+                dropdownOptions: {
+                    idAttribute: 'id',
+                    markSelected: true,
+                    callback: function(item) {
+                        this.applyFilterToList.call(this, item);
+                    }.bind(this)
+                },
                 dropdownItems: [
                     {
                         id: 'current',
-                        fullName: 'XYZ'
+                        title: 'XYZ'
                     },
                     {
                         divider: true
                     },
                     {
                         id: 'me',
-                        fullName: this.translations.filterMe
+                        title: this.translations.filterMe
                     },
                     {
                         id: 'all',
-                        fullName: this.translations.filterAll
+                        title: this.translations.filterAll
                     },
                     {
-                        id: 'filter',
-                        fullName: this.translations.filterBy
+                        id: 'filterBy',
+                        title: this.translations.filterBy
                     }
                 ]
             });
@@ -381,13 +388,27 @@ define([
          */
         applyFilterToList: function(item) {
             var filter = null;
-            if (!!item.id && item.id === 'me') {
-                filter = this.sandbox.sulu.user.fullName;
-            } else if (!!item.id && item.id === 'all') {
-                filter = null;
-            } else if (!!item.fullName) {
-                filter = item.fullName;
+
+            if (!!item.id) {
+                switch(item.id) {
+                    case 'me':
+                        filter = this.sandbox.sulu.user.id;
+
+                        break;
+                    case 'all':
+                        filter = null;
+
+                        break;
+                    case 'filterBy':
+                        console.log('Open overlay here');
+                        break;
+                    default:
+                        console.log('Id not known');
+
+                        break;
+                }
             }
+
             this.sandbox.emit('husky.datagrid.articles.url.update', {filter: filter});
         }
     };

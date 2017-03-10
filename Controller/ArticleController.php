@@ -126,8 +126,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (null !== ($filter = $request->get('filter'))) {
             $boolQuery = new BoolQuery();
-            $boolQuery->add(new MatchQuery('changer_full_name', $filter), BoolQuery::MUST);
-            $boolQuery->add(new MatchQuery('creator_full_name', $filter), BoolQuery::MUST);
+            $boolQuery->add(new MatchQuery('changer_contact_id', $filter), BoolQuery::SHOULD);
+            $boolQuery->add(new MatchQuery('creator_contact_id', $filter), BoolQuery::SHOULD);
+            $boolQuery->add(new MatchQuery('author_id', $filter), BoolQuery::SHOULD);
             $search->addQuery($boolQuery);
         }
 
