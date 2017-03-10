@@ -561,7 +561,7 @@ class ArticleControllerTest extends SuluTestCase
             false,
             true
         );
-        
+
         /** @var ArticleDocument $article */
         $article = $documentManager->create('article');
         $article->setTitle('first title');
