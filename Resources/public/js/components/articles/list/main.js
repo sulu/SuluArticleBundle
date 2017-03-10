@@ -344,25 +344,21 @@ define([
             });
 
             listToolbarTemplate.push({
-                id: 'filter',
+                id: 'contactIdFilter',
                 icon: 'filter',
-                title: this.translations.filter,
                 group: 2,
+                title: this.translations.filterAll,
+                showTitle: true,
                 dropdownOptions: {
+                    preSelected: 'all',
                     idAttribute: 'id',
                     markSelected: true,
+                    changeButton: true,
                     callback: function(item) {
                         this.applyFilterToList.call(this, item);
                     }.bind(this)
                 },
                 dropdownItems: [
-                    {
-                        id: 'current',
-                        title: 'XYZ'
-                    },
-                    {
-                        divider: true
-                    },
                     {
                         id: 'me',
                         title: this.translations.filterMe
@@ -370,10 +366,6 @@ define([
                     {
                         id: 'all',
                         title: this.translations.filterAll
-                    },
-                    {
-                        id: 'filterBy',
-                        title: this.translations.filterBy
                     }
                 ]
             });
@@ -387,29 +379,22 @@ define([
          * @param item {Object}
          */
         applyFilterToList: function(item) {
-            var filter = null;
+            var contactId = null;
 
             if (!!item.id) {
                 switch(item.id) {
                     case 'me':
-                        filter = this.sandbox.sulu.user.id;
+                        contactId = this.sandbox.sulu.user.id;
 
-                        break;
-                    case 'all':
-                        filter = null;
-
-                        break;
-                    case 'filterBy':
-                        console.log('Open overlay here');
                         break;
                     default:
-                        console.log('Id not known');
+                        contactId = null;
 
                         break;
                 }
             }
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {filter: filter});
+            this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contactId});
         }
     };
 });
