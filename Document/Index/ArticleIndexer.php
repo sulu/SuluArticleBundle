@@ -27,7 +27,6 @@ use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
-use Sulu\Component\Contact\Model\ContactInterface;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
