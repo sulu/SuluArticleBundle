@@ -226,6 +226,27 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $localizationState;
 
     /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
+    protected $authorId;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
+    protected $creatorContactId;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
+    protected $changerContactId;
+
+    /**
      * @param string $uuid
      */
     public function __construct(
@@ -606,5 +627,59 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         $this->localizationState = $localizationState;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAuthorId($authorId)
+    {
+        $this->authorId = $authorId;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthorId()
+    {
+        return $this->authorId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setCreatorContactId($creatorContactId)
+    {
+        $this->creatorContactId = $creatorContactId;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatorContactId()
+    {
+        return $this->creatorContactId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setChangerContactId($changerContactId)
+    {
+        $this->changerContactId = $changerContactId;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChangerContactId()
+    {
+        return $this->changerContactId;
     }
 }

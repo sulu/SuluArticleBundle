@@ -307,7 +307,7 @@ interface ArticleViewDocumentInterface
     /**
      * Get published.
      *
-     * @return $this
+     * @return \DateTime
      */
     public function getPublished();
 
@@ -323,7 +323,7 @@ interface ArticleViewDocumentInterface
     /**
      * Get published state.
      *
-     * @return $this
+     * @return bool
      */
     public function getPublishedState();
 
@@ -351,4 +351,40 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setLocalizationState(LocalizationStateViewObject $localizationState);
+
+    /**
+     * @param string $authorId
+     *
+     * @return $this
+     */
+    public function setAuthorId($authorId);
+
+    /**
+     * @return string
+     */
+    public function getAuthorId();
+
+    /**
+     * @param string $creatorContactId
+     *
+     * @return $this
+     */
+    public function setCreatorContactId($creatorContactId);
+
+    /**
+     * @return string
+     */
+    public function getCreatorContactId();
+
+    /**
+     * @param string $changerContactId
+     *
+     * @return $this
+     */
+    public function setChangerContactId($changerContactId);
+
+    /**
+     * @return string
+     */
+    public function getChangerContactId();
 }

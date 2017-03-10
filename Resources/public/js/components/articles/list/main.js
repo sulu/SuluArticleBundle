@@ -43,7 +43,7 @@ define([
             headline: 'sulu_article.list.title',
             unpublished: 'public.unpublished',
             publishedWithDraft: 'public.published-with-draft',
-            filter: 'sulu_article.list.filter',
+            filterBy: 'sulu_article.list.filter.by',
             filterMe: 'sulu_article.list.filter.me',
             filterAll: 'sulu_article.list.filter.all',
             openGhostOverlay: {
@@ -348,18 +348,11 @@ define([
                 icon: 'filter',
                 title: this.translations.filter,
                 group: 2,
-                dropdownOptions: {
-                    url: '/admin/api/users',
-                    resultKey: 'users',
-                    titleAttribute: 'fullName',
-                    idAttribute: 'id',
-                    markSelected: true,
-                    preSelected: !!this.filter ? parseInt(this.filter.id) : null,
-                    callback: function(item) {
-                        this.applyFilterToList.call(this, item);
-                    }.bind(this)
-                },
                 dropdownItems: [
+                    {
+                        id: 'current',
+                        fullName: 'XYZ'
+                    },
                     {
                         divider: true
                     },
@@ -370,6 +363,10 @@ define([
                     {
                         id: 'all',
                         fullName: this.translations.filterAll
+                    },
+                    {
+                        id: 'filter',
+                        fullName: this.translations.filterBy
                     }
                 ]
             });

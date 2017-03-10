@@ -23,8 +23,11 @@ use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Component\Contact\Model\ContactInterface;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -199,13 +202,22 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
         if ($document->getAuthor()) {
-            $article->setAuthorFullName($this->contactRepository->findById($document->getAuthor())->getFullName());
+            /** @var Contact $author */
+            $author = $this->contactRepository->findById($document->getAuthor());
+            $article->setAuthorFullName($author->getFullName());
+            $article->setAuthorId($author->getId());
         }
         if ($document->getChanger()) {
-            $article->setChangerFullName($this->userManager->getFullNameByUserId($document->getChanger()));
+            /** @var User $changer */
+            $changer = $this->userManager->getUserById($document->getChanger());
+            $article->setChangerFullName($changer->getFullName());
+            $article->setChangerContactId($changer->getContact()->getId());
         }
         if ($document->getCreator()) {
+            /** @var User $creator */
+            $creator = $this->userManager->getUserById($document->getCreator());
             $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
+            $article->setCreatorContactId($creator->getContact()->getId());
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());

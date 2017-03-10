@@ -118,6 +118,18 @@
                 <source>sulu_article.smart-content.author-full-name</source>
                 <target>Autor (Alphabet)</target>
             </trans-unit>
+            <trans-unit id="list-filter-01" resname="sulu_article.list.filter.by">
+                <source>sulu_article.list.filter.by</source>
+                <target>Nur von...</target>
+            </trans-unit>
+            <trans-unit id="list-filter-02" resname="sulu_article.list.filter.me">
+                <source>sulu_article.list.filter.me</source>
+                <target>Nur meine</target>
+            </trans-unit>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.all">
+                <source>sulu_article.list.filter.all</source>
+                <target>Alle</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
