@@ -15,11 +15,9 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
-use PHPCR\Version\VersionException;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Component\Content\Document\Behavior\SecurityBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Exception\DocumentNotFoundException;
 use Sulu\Component\DocumentManager\Version;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
@@ -127,24 +125,18 @@ class VersionController extends FOSRestController implements
 
         switch ($action) {
             case 'restore':
-                try {
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                $document = $this->getDocumentManager()->find($uuid, $locale);
 
-                    $this->getDocumentManager()->restore(
-                        $document,
-                        $locale,
-                        str_replace('_', '.', $version)
-                    );
-                    $this->getDocumentManager()->flush();
+                $this->getDocumentManager()->restore(
+                    $document,
+                    $locale,
+                    str_replace('_', '.', $version)
+                );
+                $this->getDocumentManager()->flush();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
-                    $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
-                    $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
-                } catch (VersionException $exception) {
-                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
-                } catch (DocumentNotFoundException $exception) {
-                    $view = $this->view($exception->getMessage(), Response::HTTP_NOT_FOUND);
-                }
+                $data = $this->getDocumentManager()->find($uuid, $locale);
+                $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
+                $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
 
                 break;
             default:
