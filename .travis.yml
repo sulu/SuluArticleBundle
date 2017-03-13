@@ -28,7 +28,7 @@ matrix:
         - CODE_COVERAGE="--coverage-clover=coverage.clover"
     - php: 7.0
       env:
-        - SULU_VERSION="1.5.*"
+        - SULU_VERSION="dev-master"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
