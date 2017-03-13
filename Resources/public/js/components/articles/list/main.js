@@ -43,6 +43,8 @@ define([
             headline: 'sulu_article.list.title',
             unpublished: 'public.unpublished',
             publishedWithDraft: 'public.published-with-draft',
+            filterMe: 'sulu_article.list.filter.me',
+            filterAll: 'sulu_article.list.filter.all',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -170,17 +172,7 @@ define([
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.sandbox.sulu.buttons.get({
-                        settings: {
-                            options: {
-                                dropdownItems: [
-                                    {
-                                        type: 'columnOptions'
-                                    }
-                                ]
-                            }
-                        }
-                    })
+                    template: this.retrieveListToolbarTemplate()
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
@@ -335,6 +327,63 @@ define([
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));
+        },
+
+        /**
+         * Generates list toolbar buttons.
+         */
+        retrieveListToolbarTemplate: function() {
+            return this.sandbox.sulu.buttons.get({
+                contactIdFilter: {
+                    options: {
+                        icon: 'filter',
+                        group: 2,
+                        title: this.translations.filterAll,
+                        showTitle: true,
+                        dropdownOptions: {
+                            preSelected: 'all',
+                            idAttribute: 'id',
+                            markSelected: true,
+                            changeButton: true,
+                            callback: function(item) {
+                                this.applyFilterToList.call(this, item);
+                            }.bind(this)
+                        },
+                        dropdownItems: [
+                            {
+                                id: 'me',
+                                title: this.translations.filterMe
+                            },
+                            {
+                                id: 'all',
+                                title: this.translations.filterAll
+                            }
+                        ]
+                    }
+                }
+            });
+        },
+
+        /**
+         * Emits the url update event for the list.
+         *
+         * @param item {Object}
+         */
+        applyFilterToList: function(item) {
+            var contactId = null;
+
+            if (!!item.id) {
+                switch(item.id) {
+                    case 'me':
+                        contactId = this.sandbox.sulu.user.id;
+                        break;
+                    default:
+                        contactId = null;
+                        break;
+                }
+            }
+
+            this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contactId});
         }
     };
 });

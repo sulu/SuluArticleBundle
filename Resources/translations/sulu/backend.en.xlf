@@ -118,6 +118,14 @@
                 <source>sulu_article.smart-content.author-full-name</source>
                 <target>Author (alphabetic)</target>
             </trans-unit>
+            <trans-unit id="list-filter-01" resname="sulu_article.list.filter.me">
+                <source>sulu_article.list.filter.me</source>
+                <target>Only mine</target>
+            </trans-unit>
+            <trans-unit id="list-filter-02" resname="sulu_article.list.filter.all">
+                <source>sulu_article.list.filter.all</source>
+                <target>All</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

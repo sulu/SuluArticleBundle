@@ -11,6 +11,7 @@
 
 namespace Functional\Controller;
 
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
@@ -18,7 +19,9 @@ use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Component\DocumentManager\DocumentManager;
 
 /**
  * Functional testcases for Article API.
@@ -69,7 +72,12 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'POST',
             '/api/articles?locale=de',
-            ['title' => $title, 'template' => $template, 'authored' => '2016-01-01', 'author' => 1]
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -79,7 +87,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $response;
     }
@@ -109,7 +117,12 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=' . $locale,
-            ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01', 'author' => 1]
+            [
+                'title' => $title,
+                'template' => 'default',
+                'authored' => '2016-01-01',
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -118,7 +131,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $article;
     }
@@ -143,7 +156,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
     }
 
@@ -466,6 +479,180 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertContains([$article2['id'], $article2['title']], $items);
+    }
+
+    public function testCGetFilterByContactId()
+    {
+        $this->purgeDatabase();
+
+        /** @var UserManager $userManager */
+        $userManager = $this->getContainer()->get('sulu_security.user_manager');
+        $contactManager = $this->getContainer()->get('sulu_contact.contact_manager');
+        /** @var DocumentManager $documentManager */
+        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
+
+        // create contact1
+        $contact1 = $contactManager->save(
+            [
+                'firstName' => 'Testi 1',
+                'lastName' => 'Testo 1',
+            ],
+            null,
+            false,
+            true
+        );
+
+        // create contact2
+        $contact2 = $contactManager->save(
+            [
+                'firstName' => 'Testi 2',
+                'lastName' => 'Testo 2',
+            ],
+            null,
+            false,
+            true
+        );
+
+        // create contact3
+        $contact3 = $contactManager->save(
+            [
+                'firstName' => 'Testi 3',
+                'lastName' => 'Testo 3',
+            ],
+            null,
+            false,
+            true
+        );
+
+        // create user1
+        $user1 = $userManager->save(
+            [
+                'username' => 'testi.testo1',
+                'email' => 'testi.testo1@LOL.xyz',
+                'password' => 'ThisIsSave!#123',
+                'contact' => [
+                    'id' => $contact1->getId(),
+                ],
+            ],
+            'de',
+            null,
+            false,
+            true
+        );
+
+        // create user2
+        $user2 = $userManager->save(
+            [
+                'username' => 'testi.testo2',
+                'email' => 'testi.testo2@LOL.xyz',
+                'password' => 'ThisIsSave!#123',
+                'contact' => [
+                    'id' => $contact2->getId(),
+                ],
+            ],
+            'de',
+            null,
+            false,
+            true
+        );
+
+        // create user3
+        $user3 = $userManager->save(
+            [
+                'username' => 'testi.testo3',
+                'email' => 'testi.testo3@LOL.xyz',
+                'password' => 'ThisIsSave!#123',
+                'contact' => [
+                    'id' => $contact3->getId(),
+                ],
+            ],
+            'de',
+            null,
+            false,
+            true
+        );
+
+        /** @var ArticleDocument $article */
+        $article = $documentManager->create('article');
+        $article->setTitle('first title');
+        $article->setStructureType('default');
+        $article->setAuthor($contact3->getId());
+
+        $documentManager->persist($article, 'de', ['user' => $user1->getId()]);
+        $documentManager->publish($article, 'de');
+        $documentManager->flush();
+
+        $documentManager->persist($article, 'de', ['user' => $user2->getId()]);
+        $documentManager->publish($article, 'de');
+        $documentManager->flush();
+
+        // create client
+        $client = $this->createAuthenticatedClient();
+
+        // retrieve all articles for user1
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=title&type=blog&contactId=' . $user1->getContact()->getId()
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        // retrieve all articles for user2
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=title&type=blog&contactId=' . $user2->getContact()->getId()
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        // add article
+        /** @var ArticleDocument $article */
+        $article2 = $documentManager->create('article');
+        $article2->setTitle('first title');
+        $article2->setStructureType('default');
+
+        $documentManager->persist($article2, 'de', ['user' => $user1->getId()]);
+        $documentManager->publish($article2, 'de');
+        $documentManager->flush();
+
+        // retrieve all articles for user1
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=title&type=blog&contactId=' . $user1->getContact()->getId()
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        // retrieve all articles for user2
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=title&type=blog&contactId=' . $user2->getContact()->getId()
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        // retrieve all articles for user3
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=title&type=blog&contactId=' . $user3->getContact()->getId()
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
     }
 
     public function testDelete()
