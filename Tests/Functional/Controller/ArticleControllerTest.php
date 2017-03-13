@@ -72,7 +72,12 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'POST',
             '/api/articles?locale=de',
-            ['title' => $title, 'template' => $template, 'authored' => '2016-01-01', 'author' => 1]
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -82,7 +87,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $response;
     }
@@ -112,7 +117,12 @@ class ArticleControllerTest extends SuluTestCase
         $client->request(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=' . $locale,
-            ['title' => $title, 'template' => 'default', 'authored' => '2016-01-01', 'author' => 1]
+            [
+                'title' => $title,
+                'template' => 'default',
+                'authored' => '2016-01-01',
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -121,7 +131,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $article;
     }
@@ -146,7 +156,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(new \DateTime('2016-01-01'), new \DateTime($response['authored']));
-        $this->assertEquals(1, $response['author']);
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
     }
 

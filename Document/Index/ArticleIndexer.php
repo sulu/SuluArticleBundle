@@ -203,20 +203,26 @@ class ArticleIndexer implements IndexerInterface
         if ($document->getAuthor()) {
             /** @var Contact $author */
             $author = $this->contactRepository->findById($document->getAuthor());
-            $article->setAuthorFullName($author->getFullName());
-            $article->setAuthorId($author->getId());
+            if ($author) {
+                $article->setAuthorFullName($author->getFullName());
+                $article->setAuthorId($author->getId());
+            }
         }
         if ($document->getChanger()) {
             /** @var User $changer */
             $changer = $this->userManager->getUserById($document->getChanger());
-            $article->setChangerFullName($changer->getFullName());
-            $article->setChangerContactId($changer->getContact()->getId());
+            if ($changer) {
+                $article->setChangerFullName($changer->getFullName());
+                $article->setChangerContactId($changer->getContact()->getId());
+            }
         }
         if ($document->getCreator()) {
             /** @var User $creator */
             $creator = $this->userManager->getUserById($document->getCreator());
-            $article->setCreatorFullName($this->userManager->getFullNameByUserId($document->getCreator()));
-            $article->setCreatorContactId($creator->getContact()->getId());
+            if ($creator) {
+                $article->setCreatorFullName($creator->getFullName());
+                $article->setCreatorContactId($creator->getContact()->getId());
+            }
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
