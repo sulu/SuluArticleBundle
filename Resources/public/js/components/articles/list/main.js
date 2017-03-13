@@ -43,7 +43,6 @@ define([
             headline: 'sulu_article.list.title',
             unpublished: 'public.unpublished',
             publishedWithDraft: 'public.published-with-draft',
-            filterBy: 'sulu_article.list.filter.by',
             filterMe: 'sulu_article.list.filter.me',
             filterAll: 'sulu_article.list.filter.all',
             openGhostOverlay: {
@@ -330,47 +329,39 @@ define([
             }.bind(this));
         },
 
+        /**
+         * Generates list toolbar buttons.
+         */
         retrieveListToolbarTemplate: function() {
-            var listToolbarTemplate = this.sandbox.sulu.buttons.get({
-                settings: {
+            return this.sandbox.sulu.buttons.get({
+                contactIdFilter: {
                     options: {
+                        icon: 'filter',
+                        group: 2,
+                        title: this.translations.filterAll,
+                        showTitle: true,
+                        dropdownOptions: {
+                            preSelected: 'all',
+                            idAttribute: 'id',
+                            markSelected: true,
+                            changeButton: true,
+                            callback: function(item) {
+                                this.applyFilterToList.call(this, item);
+                            }.bind(this)
+                        },
                         dropdownItems: [
                             {
-                                type: 'columnOptions'
+                                id: 'me',
+                                title: this.translations.filterMe
+                            },
+                            {
+                                id: 'all',
+                                title: this.translations.filterAll
                             }
                         ]
                     }
                 }
             });
-
-            listToolbarTemplate.push({
-                id: 'contactIdFilter',
-                icon: 'filter',
-                group: 2,
-                title: this.translations.filterAll,
-                showTitle: true,
-                dropdownOptions: {
-                    preSelected: 'all',
-                    idAttribute: 'id',
-                    markSelected: true,
-                    changeButton: true,
-                    callback: function(item) {
-                        this.applyFilterToList.call(this, item);
-                    }.bind(this)
-                },
-                dropdownItems: [
-                    {
-                        id: 'me',
-                        title: this.translations.filterMe
-                    },
-                    {
-                        id: 'all',
-                        title: this.translations.filterAll
-                    }
-                ]
-            });
-
-            return listToolbarTemplate;
         },
 
         /**
@@ -385,11 +376,9 @@ define([
                 switch(item.id) {
                     case 'me':
                         contactId = this.sandbox.sulu.user.id;
-
                         break;
                     default:
                         contactId = null;
-
                         break;
                 }
             }

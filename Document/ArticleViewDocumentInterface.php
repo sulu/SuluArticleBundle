@@ -353,6 +353,8 @@ interface ArticleViewDocumentInterface
     public function setLocalizationState(LocalizationStateViewObject $localizationState);
 
     /**
+     * Set author id.
+     *
      * @param string $authorId
      *
      * @return $this
@@ -360,11 +362,15 @@ interface ArticleViewDocumentInterface
     public function setAuthorId($authorId);
 
     /**
+     * Get author id.
+     *
      * @return string
      */
     public function getAuthorId();
 
     /**
+     * Set creator contact id.
+     *
      * @param string $creatorContactId
      *
      * @return $this
@@ -372,11 +378,15 @@ interface ArticleViewDocumentInterface
     public function setCreatorContactId($creatorContactId);
 
     /**
+     * Get creator contact id.
+     *
      * @return string
      */
     public function getCreatorContactId();
 
     /**
+     * Set creator contact id.
+     *
      * @param string $changerContactId
      *
      * @return $this
@@ -384,6 +394,8 @@ interface ArticleViewDocumentInterface
     public function setChangerContactId($changerContactId);
 
     /**
+     * Get changer contact id.
+     *
      * @return string
      */
     public function getChangerContactId();
