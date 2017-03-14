@@ -399,7 +399,7 @@ define([
                         {
                             title: this.translations.author,
                             okCallback: function() {
-                                this.sandbox.emit('sulu_article.get-author');
+                                this.sandbox.emit('sulu.content.contents.get-author');
                             }.bind(this),
                             data: $componentContainer
                         }
@@ -410,7 +410,7 @@ define([
             this.sandbox.once('husky.overlay.author-selection.initialized', function() {
                 this.sandbox.start([
                     {
-                        name: 'articles/edit/settings/author-selection@suluarticle',
+                        name: 'content/settings/author-selection@sulucontent',
                         options: {
                             el: $componentContainer,
                             locale: this.options.locale,

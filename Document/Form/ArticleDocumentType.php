@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -36,6 +37,12 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('resourceSegment', TextType::class, ['mapped' => false]);
         $builder->add('navigationContexts', TextType::class, ['mapped' => false]);
         $builder->add('shadowLocaleEnabled', TextType::class, ['mapped' => false]);
+        $builder->add(
+            'authored',
+            DateType::class,
+            ['widget' => 'single_text', 'model_timezone' => 'UTC', 'view_timezone' => 'UTC']
+        );
+        $builder->add('author', TextType::class);
     }
 
     /**

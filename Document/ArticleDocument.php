@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\Behavior\AuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
@@ -46,7 +47,8 @@ class ArticleDocument implements
     RoutableInterface,
     ExtensionBehavior,
     WorkflowStageBehavior,
-    VersionBehavior
+    VersionBehavior,
+    AuthorBehavior
 {
     /**
      * @var string
@@ -421,23 +423,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set authored.
-     *
-     * @param \DateTime $authored
-     *
-     * @return $this
-     */
-    public function setAuthored(\DateTime $authored = null)
-    {
-        $this->authored = $authored;
-
-        return $this;
-    }
-
-    /**
-     * Returns date-time of authoring this article.
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     public function getAuthored()
     {
@@ -445,9 +431,15 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns id of author.
-     *
-     * @return int
+     * {@inheritdoc}
+     */
+    public function setAuthored($authored)
+    {
+        $this->authored = $authored;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getAuthor()
     {
@@ -455,17 +447,11 @@ class ArticleDocument implements
     }
 
     /**
-     * Sets id of author.
-     *
-     * @param int $author
-     *
-     * @return $this
+     * {@inheritdoc}
      */
     public function setAuthor($author)
     {
         $this->author = $author;
-
-        return $this;
     }
 
     /**
