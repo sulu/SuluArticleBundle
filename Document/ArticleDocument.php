@@ -423,9 +423,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns author-date.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getAuthored()
     {
@@ -433,9 +431,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set author-date.
-     *
-     * @param string $authored
+     * {@inheritdoc}
      */
     public function setAuthored($authored)
     {
@@ -443,9 +439,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns id of author contact.
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function getAuthor()
     {
@@ -453,9 +447,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set id of author contact.
-     *
-     * @param int $author
+     * {@inheritdoc}
      */
     public function setAuthor($author)
     {
