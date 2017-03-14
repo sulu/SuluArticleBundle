@@ -277,7 +277,7 @@ define([
         },
 
         deleteItems: function(ids) {
-            this.sandbox.util.save('/admin/api/articles?ids=' + ids.join(','), 'DELETE').then(function() {
+            ArticleManager.remove(ids, this.options.locale).then(function() {
                 _.each(ids, function(id) {
                     this.sandbox.emit('husky.datagrid.articles.record.remove', id);
                 }.bind(this));

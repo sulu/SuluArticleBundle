@@ -23,9 +23,7 @@ use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
-use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
@@ -200,29 +198,17 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
-        if ($document->getAuthor()) {
-            /** @var Contact $author */
-            $author = $this->contactRepository->findById($document->getAuthor());
-            if ($author) {
-                $article->setAuthorFullName($author->getFullName());
-                $article->setAuthorId($author->getId());
-            }
+        if ($document->getAuthor() && $author = $this->contactRepository->findById($document->getAuthor())) {
+            $article->setAuthorFullName($author->getFullName());
+            $article->setAuthorId($author->getId());
         }
-        if ($document->getChanger()) {
-            /** @var User $changer */
-            $changer = $this->userManager->getUserById($document->getChanger());
-            if ($changer) {
-                $article->setChangerFullName($changer->getFullName());
-                $article->setChangerContactId($changer->getContact()->getId());
-            }
+        if ($document->getChanger() && $changer = $this->userManager->getUserById($document->getChanger())) {
+            $article->setChangerFullName($changer->getFullName());
+            $article->setChangerContactId($changer->getContact()->getId());
         }
-        if ($document->getCreator()) {
-            /** @var User $creator */
-            $creator = $this->userManager->getUserById($document->getCreator());
-            if ($creator) {
-                $article->setCreatorFullName($creator->getFullName());
-                $article->setCreatorContactId($creator->getContact()->getId());
-            }
+        if ($document->getCreator() && $creator = $this->userManager->getUserById($document->getCreator())) {
+            $article->setCreatorFullName($creator->getFullName());
+            $article->setCreatorContactId($creator->getContact()->getId());
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
@@ -237,9 +223,12 @@ class ArticleIndexer implements IndexerInterface
         );
 
         $extensions = $document->getExtensionsData()->toArray();
-        $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
-        $article->setSeo($this->seoFactory->create($extensions['seo']));
-
+        if (array_key_exists('excerpt', $extensions)) {
+            $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
+        }
+        if (array_key_exists('seo', $extensions)) {
+            $article->setSeo($this->seoFactory->create($extensions['seo']));
+        }
         if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
             $descriptionProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.description');
             $article->setTeaserDescription(
