@@ -102,7 +102,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         return [
             Events::HYDRATE => [['handleHydrate', -500]],
-            Events::PERSIST => [['handleRoute', 0], ['handleRouteUpdate', 0], ['handleScheduleIndex', -500]],
+            Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0], ['handleScheduleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::PUBLISH => [['handleScheduleIndexLive', 0], ['handleScheduleIndex', 0]],
@@ -147,7 +147,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $document->setUuid($event->getNode()->getIdentifier());
 
-        $route = $this->routeManager->create($document);
+        $route = $this->routeManager->create($document, $event->getOption('route_path'));
         $this->entityManager->persist($route);
         $this->entityManager->flush();
     }

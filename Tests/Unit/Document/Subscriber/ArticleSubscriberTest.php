@@ -116,12 +116,27 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $route = $this->prophesize(RouteInterface::class);
         $this->document->getRoutePath()->willReturn(null);
         $this->document->setUuid('123-123-123')->shouldBeCalled();
-        $this->routeManager->create($this->document->reveal())->shouldBeCalled()->willReturn($route->reveal());
+        $this->routeManager->create($this->document->reveal(), null)->shouldBeCalled()->willReturn($route->reveal());
 
         $this->entityManager->persist($route->reveal())->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
         $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class));
+    }
+
+    public function testHandleRouteWithRoute()
+    {
+        $route = $this->prophesize(RouteInterface::class);
+        $this->document->getRoutePath()->willReturn(null);
+        $this->document->setUuid('123-123-123')->shouldBeCalled();
+        $this->routeManager->create($this->document->reveal(), '/test-1')
+            ->shouldBeCalled()
+            ->willReturn($route->reveal());
+
+        $this->entityManager->persist($route->reveal())->shouldBeCalled();
+        $this->entityManager->flush()->shouldBeCalled();
+
+        $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class, '/test-1'));
     }
 
     public function testHandleRouteUpdate()

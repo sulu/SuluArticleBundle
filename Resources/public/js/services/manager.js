@@ -17,7 +17,8 @@ define(['jquery', 'services/husky/util'], function($, Util) {
             '<% if (typeof postfix !== "undefined") { %>/<%= postfix %><% } %>' +
             '<% if (typeof version !== "undefined") { %>/<%= version %><% } %>' +
             '?locale=<%= locale %>' +
-            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
+            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>' +
+            '<% if (typeof ids !== "undefined") { %>&ids=<%= ids.join(",") %><% } %>'
         )
     };
 
@@ -49,11 +50,15 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         /**
          * Remove article.
          *
-         * @param {String} id
+         * @param {String|Array} id
          * @param {String} locale
          */
         remove: function(id, locale) {
-            return Util.save(templates.url({id: id, locale: locale}), 'DELETE');
+            if (typeof someVar === 'string') {
+                return Util.save(templates.url({id: id, locale: locale}), 'DELETE');
+            }
+
+            return Util.save(templates.url({ids: id, locale: locale}), 'DELETE');
         },
 
         /**
