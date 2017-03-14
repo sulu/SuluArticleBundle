@@ -45,6 +45,7 @@ define([
             publishedWithDraft: 'public.published-with-draft',
             filterMe: 'sulu_article.list.filter.me',
             filterAll: 'sulu_article.list.filter.all',
+            filterBy: 'sulu_article.list.filter.by',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -58,6 +59,10 @@ define([
     return {
 
         defaults: defaults,
+
+        data: {
+            contactId: null
+        },
 
         header: function() {
             this.storage = storage.get('sulu', this.options.storageName);
@@ -166,17 +171,30 @@ define([
         render: function() {
             this.$el.html(this.templates.list());
 
+            var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
+            var contactFilter = this.getContactFilterFromStorage();
+            var filterTitle = this.translations.filterAll;
+
+            if (!!contactFilter.contact) {
+                urlArticleApi += '&contactId=' + contactFilter.contact.id;
+                filterTitle = this.translations.filterBy + ' ' + contactFilter.contact.firstName + ' ' + contactFilter.contact.lastName;
+
+                if (this.sandbox.sulu.user.contact.id === contactFilter.contact.id) {
+                    filterTitle = this.translations.filterMe;
+                }
+            }
+
             this.sandbox.sulu.initListToolbarAndList.call(this,
                 'article',
                 '/admin/api/articles/fields',
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.retrieveListToolbarTemplate()
+                    template: this.retrieveListToolbarTemplate(filterTitle)
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : ''),
+                    url: urlArticleApi,
                     storageName: this.options.storageName,
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
@@ -327,36 +345,59 @@ define([
                 this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
                 this.toList(item.id);
             }.bind(this));
+
+            this.sandbox.on('husky.toolbar.articles.initialized', function() {
+                this.sandbox.emit('husky.toolbar.articles.item.mark', this.getContactFilterFromStorage().filterKey);
+            }.bind(this));
         },
 
         /**
          * Generates list toolbar buttons.
+         *
+         * @param {String} title
          */
-        retrieveListToolbarTemplate: function() {
+        retrieveListToolbarTemplate: function(title) {
             return this.sandbox.sulu.buttons.get({
                 contactIdFilter: {
                     options: {
                         icon: 'filter',
                         group: 2,
-                        title: this.translations.filterAll,
+                        title: title,
                         showTitle: true,
                         dropdownOptions: {
-                            preSelected: 'all',
                             idAttribute: 'id',
                             markSelected: true,
-                            changeButton: true,
-                            callback: function(item) {
-                                this.applyFilterToList.call(this, item);
-                            }.bind(this)
+                            changeButton: false
                         },
                         dropdownItems: [
                             {
-                                id: 'me',
-                                title: this.translations.filterMe
+                                id: 'all',
+                                title: this.translations.filterAll,
+                                callback: function() {
+                                    this.applyFilterToList.call(
+                                        this,
+                                        'all',
+                                        null,
+                                        this.translations.filterAll
+                                    );
+                                }.bind(this)
                             },
                             {
-                                id: 'all',
-                                title: this.translations.filterAll
+                                id: 'me',
+                                title: this.translations.filterMe,
+                                callback: function() {
+                                    this.applyFilterToList.call(
+                                        this,
+                                        'me',
+                                        this.sandbox.sulu.user.contact,
+                                        this.translations.filterMe
+                                    );
+                                }.bind(this)
+                            },
+                            {
+                                id: 'filterBy',
+                                title: this.translations.filterBy + '...',
+                                callback: this.openContactSelectionOverlay.bind(this)
                             }
                         ]
                     }
@@ -365,25 +406,55 @@ define([
         },
 
         /**
-         * Emits the url update event for the list.
-         *
-         * @param item {Object}
+         * Opens contact selection overlay.
          */
-        applyFilterToList: function(item) {
-            var contactId = null;
+        openContactSelectionOverlay: function() {
+            var $container = $('<div/>');
 
-            if (!!item.id) {
-                switch(item.id) {
-                    case 'me':
-                        contactId = this.sandbox.sulu.user.id;
-                        break;
-                    default:
-                        contactId = null;
-                        break;
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'articles/list/contact-selection@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: {
+                        contact: this.getContactFilterFromStorage.call(this).contact
+                    },
+                    selectCallback: function(data) {
+                        this.applyFilterToList.call(
+                            this,
+                            'filterBy',
+                            data.contactItem,
+                            this.translations.filterBy + ' ' + data.contactItem.firstName + ' ' + data.contactItem.lastName
+                        );
+                        this.sandbox.emit('husky.overlay.contact-selection.close');
+                    }.bind(this)
                 }
-            }
+            }]);
+        },
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contactId});
+        /**
+         * Emits the url update event for the list, changes the title of the filter button
+         * and saves the selected contact id in the storage.
+         *
+         * @param {string} filterKey
+         * @param {Object} contact
+         * @param {String} title
+         */
+        applyFilterToList: function(filterKey, contact, title) {
+            this.storage.set('contactFilter', {
+                contact: contact,
+                filterKey: filterKey
+            });
+            this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contact ? contact.id : null});
+            this.sandbox.emit('husky.toolbar.articles.button.set', 'contactIdFilter', {
+                title: title
+            });
+        },
+
+        getContactFilterFromStorage: function() {
+            return this.storage.getWithDefault('contactFilter', {filterKey: 'all', contact: null});
         }
     };
 });
