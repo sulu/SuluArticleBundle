@@ -126,6 +126,14 @@
                 <source>sulu_article.list.filter.all</source>
                 <target>All</target>
             </trans-unit>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by">
+                <source>sulu_article.list.filter.all</source>
+                <target>Only from</target>
+            </trans-unit>
+            <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
+                <source>sulu_article.contact-selection-overlay.title</source>
+                <target>Filter article by contact</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
