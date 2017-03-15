@@ -173,15 +173,10 @@ define([
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
             var contactFilter = this.getContactFilterFromStorage();
-            var filterTitle = this.translations.filterAll;
+            var filterTitle = this.getContactFilterTitle(contactFilter.filterKey, contactFilter.contact);
 
             if (!!contactFilter.contact) {
                 urlArticleApi += '&contactId=' + contactFilter.contact.id;
-                filterTitle = this.translations.filterBy + ' ' + contactFilter.contact.firstName + ' ' + contactFilter.contact.lastName;
-
-                if (this.sandbox.sulu.user.contact.id === contactFilter.contact.id) {
-                    filterTitle = this.translations.filterMe;
-                }
             }
 
             this.sandbox.sulu.initListToolbarAndList.call(this,
@@ -377,8 +372,7 @@ define([
                                     this.applyFilterToList.call(
                                         this,
                                         'all',
-                                        null,
-                                        this.translations.filterAll
+                                        null
                                     );
                                 }.bind(this)
                             },
@@ -389,8 +383,7 @@ define([
                                     this.applyFilterToList.call(
                                         this,
                                         'me',
-                                        this.sandbox.sulu.user.contact,
-                                        this.translations.filterMe
+                                        this.sandbox.sulu.user.contact
                                     );
                                 }.bind(this)
                             },
@@ -425,8 +418,7 @@ define([
                         this.applyFilterToList.call(
                             this,
                             'filterBy',
-                            data.contactItem,
-                            this.translations.filterBy + ' ' + data.contactItem.firstName + ' ' + data.contactItem.lastName
+                            data.contactItem
                         );
                         this.sandbox.emit('husky.overlay.contact-selection.close');
                     }.bind(this)
@@ -440,21 +432,50 @@ define([
          *
          * @param {string} filterKey
          * @param {Object} contact
-         * @param {String} title
          */
-        applyFilterToList: function(filterKey, contact, title) {
+        applyFilterToList: function(filterKey, contact) {
             this.storage.set('contactFilter', {
                 contact: contact,
                 filterKey: filterKey
             });
             this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contact ? contact.id : null});
             this.sandbox.emit('husky.toolbar.articles.button.set', 'contactIdFilter', {
-                title: title
+                title: this.getContactFilterTitle(filterKey, contact)
             });
         },
 
+        /**
+         * Retrieves the contact filter from the storage.
+         *
+         * @returns {Object}
+         */
         getContactFilterFromStorage: function() {
             return this.storage.getWithDefault('contactFilter', {filterKey: 'all', contact: null});
+        },
+
+        /**
+         * Returns the title for the contact filter button.
+         *
+         * @param {String} filterKey
+         * @param {Object} contact
+         * @return {String}
+         */
+        getContactFilterTitle: function(filterKey, contact) {
+            var title = '';
+
+            switch(filterKey) {
+                case 'all':
+                    title = this.translations.filterAll;
+                    break;
+                case 'filterBy':
+                    title = this.translations.filterBy + ' ' + contact.firstName + ' ' + contact.lastName
+                    break;
+                case 'me':
+                    title = this.translations.filterMe;
+                    break;
+            }
+
+            return title;
         }
     };
 });

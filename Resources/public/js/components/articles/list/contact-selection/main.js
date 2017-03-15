@@ -75,7 +75,7 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
                     {
                         name: 'search@husky',
                         options: {
-                            el: '.contact-selection-search',
+                            el: $overlayContainer.find('.contact-selection-search'),
                             appearance: 'white small',
                             instanceName: 'contact-selection-search'
                         }
@@ -83,7 +83,7 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
                     {
                         name: 'datagrid@husky',
                         options: {
-                            el: '.contact-selection-list',
+                            el: $overlayContainer.find('.contact-selection-list'),
                             instanceName: 'contact-selection',
                             url: '/admin/api/contacts?flat=true',
                             resultKey: 'contacts',
