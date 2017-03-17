@@ -19,16 +19,17 @@ matrix:
   include:
     - php: 5.5
       env:
-        - SULU_VERSION="1.5.*"
-      # - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
+        - SULU_VERSION="~1.5.1"
+        - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
     - php: 7.0
       env:
-      # - COMPOSER_FLAGS="--prefer-dist --no-interaction"
+        - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SULU_VERSION="dev-develop"
         - CODE_COVERAGE="--coverage-clover=coverage.clover"
     - php: 7.0
       env:
-        - SULU_VERSION="dev-master"
+        - COMPOSER_FLAGS="--prefer-dist --no-interaction"
+        - SULU_VERSION="~1.5.1"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
@@ -55,7 +56,7 @@ install:
   - ./Tests/app/console ongr:es:index:create -m live
 
 script:
-  - ./vendor/bin/phpunit $CODE_COVERAGE --debug
+  - ./vendor/bin/phpunit $CODE_COVERAGE
 
 after_script:
   - if [[ -n $CODE_COVERAGE ]]; then wget https://scrutinizer-ci.com/ocular.phar ; fi

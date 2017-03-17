@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^5.5 || ^7.0",
-        "sulu/sulu": "^1.5 || dev-develop || dev-master",
+        "sulu/sulu": "^1.5.1 || dev-develop",
         "sulu/document-manager": "@dev",
         "massive/search-bundle": "@dev",
         "ongr/elasticsearch-bundle": "~1.0"
