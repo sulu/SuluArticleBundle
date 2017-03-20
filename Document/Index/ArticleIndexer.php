@@ -198,7 +198,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
-        if ($document->getAuthor() && $author = $this->contactRepository->findById($document->getAuthor())) {
+        if ($document->getAuthor() && $author = $this->contactRepository->find($document->getAuthor())) {
             $article->setAuthorFullName($author->getFullName());
             $article->setAuthorId($author->getId());
         }
