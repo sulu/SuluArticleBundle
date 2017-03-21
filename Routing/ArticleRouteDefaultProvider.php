@@ -15,7 +15,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
 
 /**
  * Provides route-defaults for articles.
@@ -33,15 +35,22 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     private $structureMetadataFactory;
 
     /**
+     * @var CacheLifetimeResolverInterface
+     */
+    private $cacheLifetimeResolver;
+
+    /**
      * @param DocumentManagerInterface $documentManager
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
-        StructureMetadataFactoryInterface $structureMetadataFactory
+        StructureMetadataFactoryInterface $structureMetadataFactory,
+        CacheLifetimeResolverInterface $cacheLifetimeResolver
     ) {
         $this->documentManager = $documentManager;
         $this->structureMetadataFactory = $structureMetadataFactory;
+        $this->cacheLifetimeResolver = $cacheLifetimeResolver;
     }
 
     /**
@@ -60,7 +69,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         return [
             'object' => $object,
             'view' => $metadata->view,
-            '_cacheLifetime' => $metadata->cacheLifetime,
+            '_cacheLifetime' => $this->getCacheLifetime($metadata),
             '_controller' => $metadata->controller,
         ];
     }
@@ -84,5 +93,33 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     public function supports($entityClass)
     {
         return $entityClass === ArticleDocument::class;
+    }
+
+    /**
+     * Get cache life time.
+     *
+     * @param StructureMetadata $metadata
+     *
+     * @return int|null
+     */
+    private function getCacheLifetime($metadata)
+    {
+        $cacheLifetime = $metadata->cacheLifetime;
+
+        if (!$cacheLifetime) {
+            return null;
+        }
+
+        if (!is_array($cacheLifetime)
+            || !isset($cacheLifetime['type'])
+            || !isset($cacheLifetime['value'])
+            || $this->cacheLifetimeResolver->supports($cacheLifetime['type'], $cacheLifetime['value'])
+        ) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid cachelifetime in article route default provider: %s', var_export($cacheLifetime, true))
+            );
+        }
+
+        return $this->cacheLifetimeResolver->resolve($cacheLifetime['type'], $cacheLifetime['value']);
     }
 }
