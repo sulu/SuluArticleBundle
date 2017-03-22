@@ -13,28 +13,16 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPCR\NodeInterface;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
-use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
-use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 
-class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
+class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var ArticleIndexer
-     */
-    private $draftIndexer;
-
-    /**
-     * @var ArticleIndexer
-     */
-    private $liveIndexer;
-
     /**
      * @var RouteManagerInterface
      */
@@ -51,38 +39,27 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
 
     /**
-     * @var DocumentManagerInterface
-     */
-    private $documentManager;
-
-    /**
-     * @var ArticleSubscriber
+     * @var RoutableSubscriber
      */
     private $articleSubscriber;
 
     /**
-     * @var ArticleDocument
+     * @var RoutableBehavior
      */
     private $document;
 
     protected function setUp()
     {
-        $this->draftIndexer = $this->prophesize(ArticleIndexer::class);
-        $this->liveIndexer = $this->prophesize(ArticleIndexer::class);
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
-        $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
 
-        $this->document = $this->prophesize(ArticleDocument::class);
+        $this->document = $this->prophesize(RoutableBehavior::class);
 
-        $this->articleSubscriber = new ArticleSubscriber(
-            $this->draftIndexer->reveal(),
-            $this->liveIndexer->reveal(),
+        $this->articleSubscriber = new RoutableSubscriber(
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
-            $this->entityManager->reveal(),
-            $this->documentManager->reveal()
+            $this->entityManager->reveal()
         );
     }
 

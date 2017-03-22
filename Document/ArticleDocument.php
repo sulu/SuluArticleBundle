@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
-use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\AuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
@@ -44,7 +44,7 @@ class ArticleDocument implements
     LocalizedStructureBehavior,
     LocalizedAuditableBehavior,
     DateShardingBehavior,
-    RoutableInterface,
+    RoutableBehavior,
     ExtensionBehavior,
     WorkflowStageBehavior,
     VersionBehavior,
@@ -178,9 +178,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set uuid.
-     *
-     * @param string $uuid
+     * {@inheritdoc}
      */
     public function setUuid($uuid)
     {
@@ -257,9 +255,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Returns route-path.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getRoutePath()
     {
@@ -267,9 +263,7 @@ class ArticleDocument implements
     }
 
     /**
-     * Set route-path.
-     *
-     * @param string $routePath
+     * {@inheritdoc}
      */
     public function setRoutePath($routePath)
     {
