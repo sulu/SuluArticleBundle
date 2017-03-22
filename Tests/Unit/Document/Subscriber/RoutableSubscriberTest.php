@@ -20,6 +20,7 @@ use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\RemoveEvent;
 
 class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +42,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @var RoutableSubscriber
      */
-    private $articleSubscriber;
+    private $routableSubscriber;
 
     /**
      * @var RoutableBehavior
@@ -56,7 +57,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->document = $this->prophesize(RoutableBehavior::class);
 
-        $this->articleSubscriber = new RoutableSubscriber(
+        $this->routableSubscriber = new RoutableSubscriber(
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
             $this->entityManager->reveal()
@@ -85,7 +86,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getOriginalLocale()->willReturn('de');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
 
-        $this->articleSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
+        $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
     }
 
     public function testHandleRoute()
@@ -98,7 +99,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->persist($route->reveal())->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
-        $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class));
+        $this->routableSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class));
     }
 
     public function testHandleRouteWithRoute()
@@ -113,7 +114,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->persist($route->reveal())->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
-        $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class, '/test-1'));
+        $this->routableSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class, '/test-1'));
     }
 
     public function testHandleRouteUpdate()
@@ -129,6 +130,22 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->persist($newRoute)->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
-        $this->articleSubscriber->handleRouteUpdate($this->prophesizeEvent(PersistEvent::class, '/test-2'));
+        $this->routableSubscriber->handleRouteUpdate($this->prophesizeEvent(PersistEvent::class, '/test-2'));
+    }
+
+    public function testHandleRemove()
+    {
+        $event = $this->prophesize(RemoveEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+
+        $route = $this->prophesize(RouteInterface::class);
+        $this->document->getRoutePath()->willReturn('/test');
+        $this->document->getOriginalLocale()->willReturn('de');
+        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $this->entityManager->remove($route->reveal())->shouldBeCalled();
+        $this->entityManager->flush()->shouldBeCalled();
+
+        $this->routableSubscriber->handleRemove($event->reveal());
     }
 }
