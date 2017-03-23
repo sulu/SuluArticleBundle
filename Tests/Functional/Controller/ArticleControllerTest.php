@@ -60,7 +60,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals('2016-01-01', (new \DateTime($response['authored']))->format('Y-m-d'));
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $response;
@@ -86,7 +86,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals('2016-01-01', (new \DateTime($response['authored']))->format('Y-m-d'));
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $response;
@@ -130,7 +130,7 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', (new \DateTime($response['authored']))->format('Y-m-d'));
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         return $article;
@@ -155,7 +155,7 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', (new \DateTime($response['authored']))->format('Y-m-d'));
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
     }
