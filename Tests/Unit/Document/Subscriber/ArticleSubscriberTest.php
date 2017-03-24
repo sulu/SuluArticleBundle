@@ -11,44 +11,26 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
-use Doctrine\ORM\EntityManagerInterface;
-use PHPCR\NodeInterface;
+use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
+use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
-use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
-use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Event\HydrateEvent;
-use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
+use Sulu\Component\DocumentManager\Event\FlushEvent;
+use Sulu\Component\DocumentManager\Event\RemoveEvent;
 
 class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ArticleIndexer
+     * @var IndexerInterface
      */
-    private $draftIndexer;
+    private $indexer;
 
     /**
-     * @var ArticleIndexer
+     * @var IndexerInterface
      */
     private $liveIndexer;
-
-    /**
-     * @var RouteManagerInterface
-     */
-    private $routeManager;
-
-    /**
-     * @var RouteRepositoryInterface
-     */
-    private $routeRepository;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
 
     /**
      * @var DocumentManagerInterface
@@ -65,93 +47,114 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     private $document;
 
+    /**
+     * @var string
+     */
+    private $uuid = '123-123-123';
+
+    /**
+     * @var string
+     */
+    private $locale = 'de';
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
-        $this->draftIndexer = $this->prophesize(ArticleIndexer::class);
-        $this->liveIndexer = $this->prophesize(ArticleIndexer::class);
-        $this->routeManager = $this->prophesize(RouteManagerInterface::class);
-        $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
-        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->indexer = $this->prophesize(IndexerInterface::class);
+        $this->liveIndexer = $this->prophesize(IndexerInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
 
         $this->document = $this->prophesize(ArticleDocument::class);
+        $this->document->getUuid()->willReturn($this->uuid);
+        $this->document->getLocale()->willReturn($this->locale);
+        $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
 
         $this->articleSubscriber = new ArticleSubscriber(
-            $this->draftIndexer->reveal(),
+            $this->indexer->reveal(),
             $this->liveIndexer->reveal(),
-            $this->routeManager->reveal(),
-            $this->routeRepository->reveal(),
-            $this->entityManager->reveal(),
             $this->documentManager->reveal()
         );
     }
 
-    protected function prophesizeEvent($className, $routePath = null)
+    protected function prophesizeEvent($className)
     {
-        $node = $this->prophesize(NodeInterface::class);
-        $node->getIdentifier()->willReturn('123-123-123');
-
         $event = $this->prophesize($className);
         $event->getDocument()->willReturn($this->document->reveal());
-        $event->getLocale()->willReturn('de');
-        $event->getNode()->willReturn($node->reveal());
-        $event->getOption('route_path')->willReturn($routePath);
 
         return $event->reveal();
     }
 
-    public function testHandleHydrate()
+    public function testHandleScheduleIndex()
     {
-        $route = $this->prophesize(RouteInterface::class);
-        $this->document->getRoutePath()->willReturn('/test');
-        $this->document->setRoute($route->reveal())->shouldBeCalled();
-        $this->document->getOriginalLocale()->willReturn('de');
-        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+        $event = $this->prophesizeEvent(AbstractMappingEvent::class);
+        $this->articleSubscriber->handleScheduleIndex($event);
 
-        $this->articleSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
+        $this->indexer->index(Argument::any())->shouldNotBeCalled();
+        $this->indexer->flush()->shouldNotBeCalled();
+        $this->liveIndexer->index(Argument::any())->shouldNotBeCalled();
+        $this->liveIndexer->flush()->shouldNotBeCalled();
     }
 
-    public function testHandleRoute()
+    public function testHandleScheduleIndexLive()
     {
-        $route = $this->prophesize(RouteInterface::class);
-        $this->document->getRoutePath()->willReturn(null);
-        $this->document->setUuid('123-123-123')->shouldBeCalled();
-        $this->routeManager->create($this->document->reveal(), null)->shouldBeCalled()->willReturn($route->reveal());
+        $event = $this->prophesizeEvent(AbstractMappingEvent::class);
+        $this->articleSubscriber->handleScheduleIndexLive($event);
 
-        $this->entityManager->persist($route->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
-
-        $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class));
+        $this->indexer->index(Argument::any())->shouldNotBeCalled();
+        $this->indexer->flush()->shouldNotBeCalled();
+        $this->liveIndexer->index(Argument::any())->shouldNotBeCalled();
+        $this->liveIndexer->flush()->shouldNotBeCalled();
     }
 
-    public function testHandleRouteWithRoute()
+    public function testHandleFlush()
     {
-        $route = $this->prophesize(RouteInterface::class);
-        $this->document->getRoutePath()->willReturn(null);
-        $this->document->setUuid('123-123-123')->shouldBeCalled();
-        $this->routeManager->create($this->document->reveal(), '/test-1')
-            ->shouldBeCalled()
-            ->willReturn($route->reveal());
+        $event = $this->prophesizeEvent(AbstractMappingEvent::class);
+        $this->articleSubscriber->handleScheduleIndex($event);
 
-        $this->entityManager->persist($route->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
+        $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
 
-        $this->articleSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class, '/test-1'));
+        $this->articleSubscriber->handleFlush($this->prophesize(FlushEvent::class)->reveal());
+
+        $this->indexer->index($this->document->reveal())->shouldBeCalled();
+        $this->indexer->flush()->shouldBeCalled();
+        $this->liveIndexer->index(Argument::any())->shouldNotBeCalled();
+        $this->liveIndexer->flush()->shouldNotBeCalled();
     }
 
-    public function testHandleRouteUpdate()
+    public function testHandleFlushLive()
     {
-        $route = $this->prophesize(RouteInterface::class);
-        $newRoute = $this->prophesize(RouteInterface::class);
-        $this->document->getRoute()->willReturn($route->reveal());
+        $event = $this->prophesizeEvent(AbstractMappingEvent::class);
+        $this->articleSubscriber->handleScheduleIndexLive($event);
 
-        $newRoute->getPath()->willReturn('/test-2');
+        $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
 
-        $this->routeManager->update($this->document->reveal(), '/test-2')->willReturn($newRoute->reveal());
-        $this->document->setRoutePath('/test-2')->shouldBeCalled();
-        $this->entityManager->persist($newRoute)->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
+        $this->articleSubscriber->handleFlushLive($this->prophesize(FlushEvent::class)->reveal());
 
-        $this->articleSubscriber->handleRouteUpdate($this->prophesizeEvent(PersistEvent::class, '/test-2'));
+        $this->indexer->index(Argument::any())->shouldNotBeCalled();
+        $this->indexer->flush()->shouldNotBeCalled();
+        $this->liveIndexer->index($this->document->reveal())->shouldBeCalled();
+        $this->liveIndexer->flush()->shouldBeCalled();
+    }
+
+    public function testHandleRemove()
+    {
+        $this->articleSubscriber->handleRemove($this->prophesizeEvent(RemoveEvent::class));
+
+        $this->indexer->remove($this->document->reveal())->shouldBeCalled();
+        $this->indexer->flush()->shouldBeCalled();
+        $this->liveIndexer->index(Argument::any())->shouldNotBeCalled();
+        $this->liveIndexer->flush()->shouldNotBeCalled();
+    }
+
+    public function testHandleRemoveLive()
+    {
+        $this->articleSubscriber->handleRemoveLive($this->prophesizeEvent(RemoveEvent::class));
+
+        $this->indexer->remove(Argument::any())->shouldNotBeCalled();
+        $this->indexer->flush()->shouldNotBeCalled();
+        $this->liveIndexer->remove($this->document->reveal())->shouldBeCalled();
+        $this->liveIndexer->flush()->shouldBeCalled();
     }
 }

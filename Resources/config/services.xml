@@ -101,10 +101,15 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber">
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.subscriber.routable"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
-            <argument type="service" id="sulu_document_manager.document_manager"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
