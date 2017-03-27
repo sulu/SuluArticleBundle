@@ -18,6 +18,7 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
 
 class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +31,11 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
      * @var StructureMetadataFactoryInterface
      */
     private $structureMetadataFactory;
+
+    /**
+     * @var CacheLifetimeResolverInterface
+     */
+    private $cacheLifetimeResolver;
 
     /**
      * @var ArticleRouteDefaultProvider
@@ -55,10 +61,12 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
+        $this->cacheLifetimeResolver = $this->prophesize(CacheLifetimeResolverInterface::class);
 
         $this->provider = new ArticleRouteDefaultProvider(
             $this->documentManager->reveal(),
-            $this->structureMetadataFactory->reveal()
+            $this->structureMetadataFactory->reveal(),
+            $this->cacheLifetimeResolver->reveal()
         );
     }
 
@@ -96,11 +104,13 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
 
         $structureMetadata = new StructureMetadata('default');
         $structureMetadata->view = 'default.html.twig';
-        $structureMetadata->cacheLifetime = 3600;
+        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
         $structureMetadata->controller = 'SuluArticleBundle:Default:index';
 
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($article->reveal());
         $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);
+        $this->cacheLifetimeResolver->supports('seconds', 3600)->willReturn(true);
+        $this->cacheLifetimeResolver->resolve('seconds', 3600)->willReturn(3600);
 
         $result = $this->provider->getByEntity($this->entityClass, $this->entityId, $this->locale);
 
