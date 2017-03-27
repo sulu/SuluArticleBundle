@@ -13,16 +13,20 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Indexes article and generate route on persist and removes it from index and routing on delete.
+ * Handle specialized article events.
  */
 class ArticlePageSubscriber implements EventSubscriberInterface
 {
+    const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
+    const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
+
     /**
      * @var StructureMetadataFactoryInterface
      */
@@ -42,8 +46,8 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PERSIST => [['setTitleOnPersist', 2048], ['setPageOnPersist', 0]],
-            Events::HYDRATE => [['setPageOnHydrate', 0]],
+            Events::PERSIST => [['setTitleOnPersist', 2048], ['setPageNumberOnPersist', 0]],
+            Events::HYDRATE => [['setPageNumberOnHydrate', 0]],
         ];
     }
 
@@ -59,17 +63,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $metadata = $this->structureMetadataFactory->getStructureMetadata(
-            'article_page',
-            $document->getStructureType()
-        );
+        $pageTitle = uniqid('page-', true);
+        $pageTitleProperty = $this->getPageTitleProperty($document);
 
-        $pageTitleProperty = $metadata->getPropertyByTagName('sulu_article.page_title');
-        if (!$pageTitleProperty) {
-            $pageTitleProperty = $metadata->getProperty('pageTitle');
-        }
-
-        $pageTitle = 'page-' . uniqid('page-1', true);
         if ($pageTitleProperty) {
             $pageTitle = $document->getStructure()->getStagedData()[$pageTitleProperty->getName()];
         }
@@ -77,23 +73,58 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         $document->setTitle($pageTitle);
     }
 
-    public function setPageOnPersist(PersistEvent $event)
+    /**
+     * Find page-title property.
+     *
+     * @param ArticlePageDocument $document
+     *
+     * @return PropertyMetadata
+     */
+    private function getPageTitleProperty(ArticlePageDocument $document)
     {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticlePageDocument) {
-            return;
+        $metadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article_page',
+            $document->getStructureType()
+        );
+
+        if ($metadata->hasPropertyWithTagName(self::PAGE_TITLE_TAG_NAME)) {
+            return $metadata->getPropertyByTagName(self::PAGE_TITLE_TAG_NAME);
         }
 
-        $event->getAccessor()->set('page', $event->getNode()->getIndex() + 1);
+        if ($metadata->hasProperty(self::PAGE_TITLE_PROPERTY_NAME)) {
+            return $metadata->getProperty(self::PAGE_TITLE_PROPERTY_NAME);
+        }
+
+        return null;
     }
 
-    public function setPageOnHydrate(HydrateEvent $event)
+    /**
+     * Set page-number to document on persist.
+     *
+     * @param PersistEvent $event
+     */
+    public function setPageNumberOnPersist(PersistEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument) {
             return;
         }
 
-        $event->getAccessor()->set('page', $event->getNode()->getIndex() + 1);
+        $event->getAccessor()->set('pageNumber', $event->getNode()->getIndex() + 1);
+    }
+
+    /**
+     * Set page-number to document on persist.
+     *
+     * @param HydrateEvent $event
+     */
+    public function setPageNumberOnHydrate(HydrateEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $event->getAccessor()->set('pageNumber', $event->getNode()->getIndex() + 1);
     }
 }

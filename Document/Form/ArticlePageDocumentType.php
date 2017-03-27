@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -20,14 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticlePageDocumentType extends AbstractStructureBehaviorType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        parent::buildForm($builder, $options);
-    }
-
     /**
      * {@inheritdoc}
      */

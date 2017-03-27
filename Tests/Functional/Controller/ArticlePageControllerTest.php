@@ -11,18 +11,27 @@
 
 namespace Functional\Controller;
 
+use ONGR\ElasticsearchBundle\Service\Manager;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
 class ArticlePageControllerTest extends SuluTestCase
 {
+    use ArticleViewDocumentIdTrait;
+
     /**
      * {@inheritdoc}
      */
     public function setUp()
     {
         parent::setUp();
+
+        $this->purgeIndex();
 
         $this->initPhpcr();
 
@@ -82,11 +91,17 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals(2, $response['page']);
+        $this->assertEquals(2, $response['pageNumber']);
 
         $article = $this->getArticle($article['id']);
         $this->assertCount(1, $article['pages']);
         $this->assertEquals($response['id'], reset($article['pages'])['id']);
+
+        $articleViewDocument = $this->findViewDocument($article['id'], 'de');
+        $this->assertCount(1, $articleViewDocument->getPages());
+        $this->assertEquals(2, $articleViewDocument->getPages()[0]->pageNumber);
+        $this->assertEquals($pageTitle, $articleViewDocument->getPages()[0]->title);
+        $this->assertEquals($response['id'], $articleViewDocument->getPages()[0]->uuid);
     }
 
     public function testGet($title = 'Test-Article', $pageTitle = 'Test-Page', $template = 'default_pages')
@@ -103,7 +118,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals(2, $response['page']);
+        $this->assertEquals(2, $response['pageNumber']);
     }
 
     public function testPut($title = 'Test-Article', $pageTitle = 'New-Page-Title', $template = 'default_pages')
@@ -129,7 +144,13 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals('Sulu is awesome', $response['article']);
-        $this->assertEquals(2, $response['page']);
+        $this->assertEquals(2, $response['pageNumber']);
+
+        $articleViewDocument = $this->findViewDocument($article['id'], 'de');
+        $this->assertCount(1, $articleViewDocument->getPages());
+        $this->assertEquals(2, $articleViewDocument->getPages()[0]->pageNumber);
+        $this->assertEquals($pageTitle, $articleViewDocument->getPages()[0]->title);
+        $this->assertEquals($response['id'], $articleViewDocument->getPages()[0]->uuid);
     }
 
     public function testDelete()
@@ -144,5 +165,29 @@ class ArticlePageControllerTest extends SuluTestCase
 
         $article = $this->getArticle($article['id']);
         $this->assertCount(0, $article['pages']);
+
+        $articleViewDocument = $this->findViewDocument($article['id'], 'de');
+        $this->assertCount(0, $articleViewDocument->getPages());
+    }
+
+    private function purgeIndex()
+    {
+        /** @var IndexerInterface $indexer */
+        $indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
+        $indexer->clear();
+    }
+
+    /**
+     * @param $uuid
+     * @param $locale
+     *
+     * @return ArticleViewDocumentInterface
+     */
+    private function findViewDocument($uuid, $locale)
+    {
+        /** @var Manager $manager */
+        $manager = $this->getContainer()->get('es.manager.default');
+
+        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
     }
 }

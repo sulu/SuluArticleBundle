@@ -74,7 +74,7 @@ class ArticlePageDocument implements
     /**
      * @var int
      */
-    private $page;
+    private $pageNumber;
 
     public function __construct()
     {
@@ -210,8 +210,8 @@ class ArticlePageDocument implements
      *
      * @return int
      */
-    public function getPage()
+    public function getPageNumber()
     {
-        return $this->page;
+        return $this->pageNumber;
     }
 }

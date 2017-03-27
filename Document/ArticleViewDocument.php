@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
+use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Indexable document for articles.
@@ -247,11 +248,17 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $changerContactId;
 
     /**
+     * @var ArticlePageViewObject[]
+     *
+     * @Embedded(class="SuluArticleBundle:ArticlePageViewObject", multiple=true)
+     */
+    protected $pages = [];
+
+    /**
      * @param string $uuid
      */
-    public function __construct(
-        $uuid = null
-    ) {
+    public function __construct($uuid = null)
+    {
         $this->uuid = $uuid;
     }
 
@@ -681,5 +688,23 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function getChangerContactId()
     {
         return $this->changerContactId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPages(Collection $pages)
+    {
+        $this->pages = $pages;
+
+        return $this;
     }
 }
