@@ -54,7 +54,7 @@ define(['jquery', 'services/husky/util'], function($, Util) {
          * @param {String} locale
          */
         remove: function(id, locale) {
-            if (typeof someVar === 'string') {
+            if (typeof id === 'string') {
                 return Util.save(templates.url({id: id, locale: locale}), 'DELETE');
             }
 
