@@ -113,7 +113,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         if (!is_array($cacheLifetime)
             || !isset($cacheLifetime['type'])
             || !isset($cacheLifetime['value'])
-            || $this->cacheLifetimeResolver->supports($cacheLifetime['type'], $cacheLifetime['value'])
+            || !$this->cacheLifetimeResolver->supports($cacheLifetime['type'], $cacheLifetime['value'])
         ) {
             throw new \InvalidArgumentException(
                 sprintf('Invalid cachelifetime in article route default provider: %s', var_export($cacheLifetime, true))
