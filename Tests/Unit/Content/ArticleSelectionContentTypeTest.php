@@ -19,6 +19,7 @@ use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Component\Content\Compat\PropertyInterface;
+use Sulu\Component\Content\Compat\StructureInterface;
 
 /**
  * Unit testcases for ArticleSelection ContentType.
@@ -37,8 +38,12 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $manager = $this->prophesize(Manager::class);
         $property = $this->prophesize(PropertyInterface::class);
+        $structure = $this->prophesize(StructureInterface::class);
         $repository = $this->prophesize(Repository::class);
         $search = $this->prophesize(Search::class);
+
+        $structure->getLanguageCode()->willReturn('de');
+        $property->getStructure()->willReturn($structure->reveal());
 
         $property->getValue()->willReturn($ids);
         $manager->getRepository(ArticleViewDocument::class)->willReturn($repository->reveal());
@@ -46,7 +51,16 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
         $search->addQuery(
             Argument::that(
                 function (IdsQuery $query) use ($ids) {
-                    return $query->toArray() === ['ids' => ['values' => $ids]];
+                    return $query->toArray() === [
+                            'ids' => [
+                                'values' => array_map(
+                                    function ($id) {
+                                        return $id . '-de';
+                                    },
+                                    $ids
+                                ),
+                            ],
+                        ];
                 }
             )
         )->shouldBeCalled();

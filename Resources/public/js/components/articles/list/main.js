@@ -194,7 +194,6 @@ define([
                     searchInstanceName: 'articles',
                     searchFields: ['title'],
                     resultKey: 'articles',
-                    idKey: 'uuid',
                     instanceName: 'articles',
                     actionCallback: function(id, article) {
                         if ('ghost' === article.localizationState.state) {
