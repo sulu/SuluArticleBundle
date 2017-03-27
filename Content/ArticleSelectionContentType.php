@@ -14,14 +14,17 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\IdsQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
 /**
- * TODO add description here.
+ * This class provides article selection.
  */
 class ArticleSelectionContentType extends SimpleContentType
 {
+    use ArticleViewDocumentIdTrait;
+
     /**
      * @var Manager
      */
@@ -61,9 +64,11 @@ class ArticleSelectionContentType extends SimpleContentType
             return [];
         }
 
+        $locale = $property->getStructure()->getLanguageCode();
+
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
-        $search->addQuery(new IdsQuery($value));
+        $search->addQuery(new IdsQuery($this->getViewDocumentIds($value, $locale)));
 
         $result = [];
         /** @var ArticleViewDocumentInterface $articleDocument */

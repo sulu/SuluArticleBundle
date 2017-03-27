@@ -184,7 +184,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -202,7 +202,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -330,7 +330,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -383,7 +383,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -405,7 +405,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
@@ -427,9 +427,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
-        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['uuid']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
-        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['uuid']);
+        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['id']);
         $this->assertEquals($article1['title'], $response['_embedded']['articles'][1]['title']);
     }
 
@@ -454,7 +454,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -473,7 +473,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -720,7 +720,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title']];
+                return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
         );
@@ -737,7 +737,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title'], $item['localizationState']];
+                return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
         );
@@ -758,7 +758,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $items = array_map(
             function ($item) {
-                return [$item['uuid'], $item['title'], $item['localizationState']];
+                return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
         );
