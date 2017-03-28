@@ -353,6 +353,15 @@ define([
          */
         retrieveListToolbarTemplate: function(title) {
             return this.sandbox.sulu.buttons.get({
+                settings: {
+                    options: {
+                        dropdownItems: [
+                            {
+                                type: 'columnOptions'
+                            }
+                        ]
+                    }
+                },
                 contactIdFilter: {
                     options: {
                         icon: 'filter',
