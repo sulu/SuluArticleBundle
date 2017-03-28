@@ -12,12 +12,13 @@ define([
     'underscore',
     'config',
     'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
     'sulusecurity/services/user-manager',
     'services/sulupreview/preview',
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main'
-], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
+], function($, _, config, ArticleManager, ArticleRouter, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
 
     'use strict';
 
@@ -293,23 +294,15 @@ define([
         },
 
         toEdit: function(locale, id) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/' + (this.options.content  || 'details'), true, true);
+            ArticleRouter.toEdit(id, locale, this.options.content);
         },
 
         toList: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.articleType) + '/' + this.options.locale);
-            }
+            ArticleRouter.toList(locale, (this.options.type || this.data.articleType));
         },
 
         toAdd: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.articleType), true, true);
-            }
+            ArticleRouter.toAdd(locale, (this.options.type || this.data.articleType));
         },
 
         save: function(action) {
@@ -423,6 +416,7 @@ define([
                     ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
                     }.bind(this)).then(function(response) {
+                        // reload page
                         this.sandbox.emit(
                             'sulu.router.navigate',
                             this.sandbox.mvc.history.fragment,

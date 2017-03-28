@@ -10,8 +10,9 @@
 define([
     'underscore',
     'jquery',
-    'services/suluarticle/article-manager'
-], function(_, $, ArticleManager) {
+    'services/suluarticle/article-manager',
+    'services/suluarticle/article-router'
+], function(_, $, ArticleManager, ArticleRouter) {
 
     'use strict';
 
@@ -83,14 +84,7 @@ define([
                 this.data = response;
 
                 if (this.ghost && !this.data.type) {
-                    this.sandbox.emit(
-                        'sulu.router.navigate',
-                        'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
-                        true,
-                        true
-                    );
-
-                    return;
+                    return ArticleRouter.toEditForce(this.data.id, this.options.locale);
                 }
 
                 this.sandbox.emit('sulu.tab.saved', response.id, response);

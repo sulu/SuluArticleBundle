@@ -1,1 +1,5 @@
 /*----------------------------------------*/
+/* line 1, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide {
+  width: 200px;
+}
