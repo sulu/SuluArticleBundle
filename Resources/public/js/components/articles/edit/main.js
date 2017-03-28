@@ -22,15 +22,26 @@ define([
 
     'use strict';
 
+    var constants = {
+        headerRightSelector: '.right-container'
+    };
+
     return {
 
         defaults: {
             options: {
+                page: 1,
                 config: {}
             },
 
             templates: {
-                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>'
+                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
+                pageSwitcher: [
+                    '<div class="language-changer">',
+                    '   <span class="title">Page <%= page %> of <%= max %></span>',
+                    '   <span class="dropdown-toggle"></span>',
+                    '</div>'
+                ].join('')
             },
 
             translations: {
@@ -184,7 +195,9 @@ define([
                             return this.templates.url({id: this.options.id, locale: this.options.locale});
                         }.bind(this),
                         config: this.options.config,
-                        preview: this.preview
+                        preview: this.preview,
+                        page: this.options.page,
+                        id: this.options.id
                     },
                     componentOptions: {
                         values: _.defaults(this.data, {type: null})
@@ -202,6 +215,8 @@ define([
         },
 
         initialize: function() {
+            this.startPageSwitcher();
+
             this.bindCustomEvents();
             this.showDraftLabel();
             this.setHeaderBar(true);
@@ -456,14 +471,11 @@ define([
         },
 
         loadComponentData: function() {
-            var promise = $.Deferred();
-
             if (!this.options.id) {
-                promise.resolve({});
-
-                return promise;
+                return {_embedded: {pages: []}};
             }
 
+            var promise = $.Deferred();
             this.sandbox.util.load(this.getUrl()).done(function(data) {
                 this.preview = Preview.initialize({});
                 this.preview.start(
@@ -482,6 +494,10 @@ define([
         destroy: function() {
             if (!!this.preview) {
                 Preview.destroy(this.preview);
+            }
+
+            if (!!this.$dropdownElement) {
+                this.sandbox.stop(this.$dropdownElement);
             }
         },
 
@@ -566,6 +582,45 @@ define([
          */
         getCopyLocaleUrl: function(id, src, dest) {
             return ArticleManager.getCopyLocaleUrl(id, src, dest);
+        },
+
+        startPageSwitcher: function() {
+            var page = this.options.page,
+                max = (this.data._embedded.pages || []).length + 1,
+                data = [];
+
+            for (var i = 1; i <= max; i++) {
+                data.push({id: i, title: 'Page ' + i + ' of ' + max});
+            }
+
+            data = data.concat([
+                {divider: true},
+                {id: 'add', title: 'Create new page'}
+            ]);
+
+            this.$dropdownElement = $(this.templates.pageSwitcher({page: page, max: max}));
+
+            var $rightContainer = $(constants.headerRightSelector);
+            $rightContainer.prepend(this.$dropdownElement);
+            $rightContainer.addClass('wide');
+
+            this.sandbox.start([{
+                name: 'dropdown@husky',
+                options: {
+                    el: this.$dropdownElement,
+                    instanceName: 'header-pages',
+                    alignment: 'right',
+                    valueName: 'title',
+                    data: data,
+                    clickCallback: function(item) {
+                        if (item.id === 'add') {
+                            return ArticleRouter.toPageAdd(this.options.id, this.options.locale);
+                        }
+
+                        return ArticleRouter.toPageEdit(this.options.id, item.id, this.options.locale);
+                    }.bind(this)
+                }
+            }]);
         }
     }
 });

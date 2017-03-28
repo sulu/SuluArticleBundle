@@ -11,10 +11,16 @@ define(['underscore', 'services/husky/mediator'], function(_, Mediator) {
 
     'use strict';
 
-    var routes = {
+    var constants = {
+            defaultTab: 'details'
+        },
+
+        routes = {
             list: _.template('articles/<%= locale %>'),
             add: _.template('articles/<%= locale %>/add'),
-            edit: _.template('articles/<%= locale %>/edit:<%= id %>/<%= tab %>')
+            edit: _.template('articles/<%= locale %>/edit:<%= id %>/<%= tab %>'),
+            editPage: _.template('articles/<%= locale %>/edit:<%= id %>/page:<%= page %>/<%= tab %>'),
+            addPage: _.template('articles/<%= locale %>/edit:<%= id %>/add-page/<%= tab %>')
         },
 
         goto = function(route, trigger, force) {
@@ -33,13 +39,19 @@ define(['underscore', 'services/husky/mediator'], function(_, Mediator) {
             goto(routes.add({locale: locale}));
         },
         toEdit: function(id, locale, tab) {
-            goto(routes.edit({id: id, locale: locale, tab: (tab || 'details')}));
+            goto(routes.edit({id: id, locale: locale, tab: (tab || constants.defaultTab)}));
         },
         toEditForce: function(id, locale, tab) {
-            goto(routes.edit({id: id, locale: locale, tab: (tab || 'details')}), true, true);
+            goto(routes.edit({id: id, locale: locale, tab: (tab || constants.defaultTab)}), true, true);
         },
         toEditUpdate: function(id, locale, tab) {
-            goto(routes.edit({id: id, locale: locale, tab: (tab || 'details')}), true, true);
+            goto(routes.edit({id: id, locale: locale, tab: (tab || constants.defaultTab)}), true, true);
+        },
+        toPageEdit: function(id, page, locale) {
+            goto(routes.editPage({id: id, page: page, locale: locale, tab: constants.defaultTab}));
+        },
+        toPageAdd: function(id, locale) {
+            goto(routes.addPage({id: id, locale: locale, tab: constants.defaultTab}));
         }
     };
 });

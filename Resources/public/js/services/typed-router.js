@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['services/husky/mediator', 'articlebundle/services/base-router'], function(Mediator, BaseRouter) {
+define(['services/husky/mediator', 'suluarticle/services/base-router'], function(Mediator, BaseRouter) {
 
     'use strict';
 
@@ -35,6 +35,12 @@ define(['services/husky/mediator', 'articlebundle/services/base-router'], functi
         },
         toEditUpdate: function(id, locale, tab) {
             BaseRouter.toEditUpdate(id, locale, tab);
+        },
+        toPageEdit: function(id, page, locale) {
+            BaseRouter.toPageEdit(id, page, locale);
+        },
+        toPageAdd: function(id, locale) {
+            BaseRouter.toPageEdit(id, locale);
         }
     };
 });
