@@ -11,16 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
-use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
-use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
-use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -42,21 +37,6 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $liveIndexer;
 
     /**
-     * @var RouteManagerInterface
-     */
-    private $routeManager;
-
-    /**
-     * @var RouteRepositoryInterface
-     */
-    private $routeRepository;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
      * @var DocumentManagerInterface
      */
     private $documentManager;
@@ -74,24 +54,15 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * @param IndexerInterface $indexer
      * @param IndexerInterface $liveIndexer
-     * @param RouteManagerInterface $routeManager
-     * @param RouteRepositoryInterface $routeRepository
-     * @param EntityManagerInterface $entityManager
      * @param DocumentManagerInterface $documentManager
      */
     public function __construct(
         IndexerInterface $indexer,
         IndexerInterface $liveIndexer,
-        RouteManagerInterface $routeManager,
-        RouteRepositoryInterface $routeRepository,
-        EntityManagerInterface $entityManager,
         DocumentManagerInterface $documentManager
     ) {
         $this->indexer = $indexer;
         $this->liveIndexer = $liveIndexer;
-        $this->routeManager = $routeManager;
-        $this->routeRepository = $routeRepository;
-        $this->entityManager = $entityManager;
         $this->documentManager = $documentManager;
     }
 
@@ -101,76 +72,13 @@ class ArticleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::HYDRATE => [['handleHydrate', -500]],
-            Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0], ['handleScheduleIndex', -500]],
+            Events::PERSIST => [['handleScheduleIndex', -500]],
             Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
-            Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::PUBLISH => [['handleScheduleIndexLive', 0], ['handleScheduleIndex', 0]],
             Events::UNPUBLISH => 'handleUnpublish',
-            Events::CONFIGURE_OPTIONS => 'configureOptions',
             Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
         ];
-    }
-
-    /**
-     * Load route for article-document.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleHydrate(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument || null === $document->getRoutePath()) {
-            return;
-        }
-
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
-        if (!$route) {
-            return;
-        }
-
-        $document->setRoute($route);
-    }
-
-    /**
-     * Generate route for article-document.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleRoute(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument || null !== $document->getRoutePath()) {
-            return;
-        }
-
-        $document->setUuid($event->getNode()->getIdentifier());
-
-        $route = $this->routeManager->create($document, $event->getOption('route_path'));
-        $this->entityManager->persist($route);
-        $this->entityManager->flush();
-    }
-
-    /**
-     * Update route for article-document if route-path was changed.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleRouteUpdate(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument
-            || null === $document->getRoute()
-            || null === ($routePath = $event->getOption('route_path'))
-        ) {
-            return;
-        }
-
-        $route = $this->routeManager->update($document, $routePath);
-        $document->setRoutePath($route->getPath());
-        $this->entityManager->persist($route);
-        $this->entityManager->flush();
     }
 
     /**
@@ -222,7 +130,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         foreach ($this->documents as $document) {
             $this->indexer->index(
-                    $this->documentManager->find($document['uuid'],
+                $this->documentManager->find(
+                    $document['uuid'],
                     $document['locale']
                 )
             );
@@ -318,37 +227,5 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveIndexer->remove($document);
         $this->liveIndexer->flush();
-    }
-
-    /**
-     * Add route to metadata.
-     *
-     * @param MetadataLoadEvent $event
-     */
-    public function handleMetadataLoad(MetadataLoadEvent $event)
-    {
-        if ($event->getMetadata()->getClass() !== ArticleDocument::class) {
-            return;
-        }
-
-        $metadata = $event->getMetadata();
-        $metadata->addFieldMapping(
-            'routePath',
-            [
-                'encoding' => 'system_localized',
-                'property' => 'routePath',
-            ]
-        );
-    }
-
-    /**
-     * Add route-path to options.
-     *
-     * @param ConfigureOptionsEvent $event
-     */
-    public function configureOptions(ConfigureOptionsEvent $event)
-    {
-        $options = $event->getOptions();
-        $options->setDefaults(['route_path' => null]);
     }
 }
