@@ -1,17 +1,21 @@
 # Doctrine Configuration
 doctrine:
     dbal:
-        dbname:   "su_articles_test"
+        dbname: "su_articles_test"
 
 sulu_core:
     content:
         structure:
             default_type:
                 article: "default"
+                article_page: "default"
             paths:
                 article:
                     path: "%kernel.root_dir%/Resources/articles"
                     type: "article"
+                article_page:
+                    path: "%kernel.root_dir%/Resources/articles"
+                    type: "article_page"
 
 ongr_elasticsearch:
     managers:

@@ -23,12 +23,14 @@ use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\LocalizedTitleBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\NodeNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 use Sulu\Component\DocumentManager\Behavior\Path\AutoNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\VersionBehavior;
+use Sulu\Component\DocumentManager\Collection\ChildrenCollection;
 use Sulu\Component\DocumentManager\Version;
 
 /**
@@ -48,7 +50,8 @@ class ArticleDocument implements
     ExtensionBehavior,
     WorkflowStageBehavior,
     VersionBehavior,
-    AuthorBehavior
+    AuthorBehavior,
+    ChildrenBehavior
 {
     /**
      * @var string
@@ -163,10 +166,16 @@ class ArticleDocument implements
      */
     protected $versions = [];
 
+    /**
+     * @var ChildrenCollection
+     */
+    protected $children;
+
     public function __construct()
     {
         $this->structure = new Structure();
         $this->extensions = new ExtensionContainer();
+        $this->children = new \ArrayIterator();
     }
 
     /**
@@ -469,5 +478,13 @@ class ArticleDocument implements
     public function setVersions($versions)
     {
         $this->versions = $versions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 }

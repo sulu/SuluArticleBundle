@@ -32,17 +32,12 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         // extensions
         $builder->add('extensions', TextType::class, ['property_path' => 'extensionsData']);
 
-        // TODO: Fix the admin interface to not send this junk (not required for articles)
-        $builder->add('redirectType', TextType::class, ['mapped' => false]);
-        $builder->add('resourceSegment', TextType::class, ['mapped' => false]);
-        $builder->add('navigationContexts', TextType::class, ['mapped' => false]);
-        $builder->add('shadowLocaleEnabled', TextType::class, ['mapped' => false]);
+        $builder->add('author', TextType::class);
         $builder->add(
             'authored',
             DateType::class,
             ['widget' => 'single_text', 'model_timezone' => 'UTC', 'view_timezone' => 'UTC']
         );
-        $builder->add('author', TextType::class);
     }
 
     /**

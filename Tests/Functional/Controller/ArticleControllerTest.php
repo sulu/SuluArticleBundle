@@ -11,10 +11,13 @@
 
 namespace Functional\Controller;
 
+use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
@@ -30,6 +33,8 @@ use Sulu\Component\DocumentManager\DocumentManager;
  */
 class ArticleControllerTest extends SuluTestCase
 {
+    use ArticleViewDocumentIdTrait;
+
     private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
 
     /**
@@ -91,6 +96,8 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
         return $response;
     }
 
@@ -134,6 +141,8 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
+
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
         return $article;
     }
@@ -675,6 +684,8 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
+
+        $this->assertNull($this->findViewDocument($article['id'], 'de'));
     }
 
     public function testCDelete()
@@ -697,6 +708,9 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
+
+        $this->assertNull($this->findViewDocument($article1['id'], 'de'));
+        $this->assertNull($this->findViewDocument($article2['id'], 'de'));
     }
 
     public function testCopyLocale()
@@ -843,5 +857,13 @@ class ArticleControllerTest extends SuluTestCase
         /** @var IndexerInterface $indexer */
         $indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
         $indexer->flush();
+    }
+
+    private function findViewDocument($uuid, $locale)
+    {
+        /** @var Manager $manager */
+        $manager = $this->getContainer()->get('es.manager.default');
+
+        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
     }
 }
