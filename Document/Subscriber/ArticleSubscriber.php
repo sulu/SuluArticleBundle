@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
@@ -74,7 +75,12 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         return [
             Events::PERSIST => [['handleScheduleIndex', -500]],
-            Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
+            Events::REMOVE => [
+                ['handleRemove', -500],
+                ['handleRemoveLive', -500],
+                ['handleRemovePage', -500],
+                ['handleRemovePageLive', -500],
+            ],
             Events::PUBLISH => [['handleScheduleIndexLive', 0], ['handleScheduleIndex', 0]],
             Events::UNPUBLISH => 'handleUnpublish',
             Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
@@ -92,7 +98,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
-            return;
+            if (!$document instanceof ArticlePageDocument) {
+                return;
+            }
+
+            $document = $document->getParent();
         }
 
         $this->documents[$document->getUuid()] = [
@@ -110,7 +120,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
-            return;
+            if (!$document instanceof ArticlePageDocument) {
+                return;
+            }
+
+            $document = $document->getParent();
         }
 
         $this->liveDocuments[$document->getUuid()] = [
@@ -130,13 +144,11 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($this->documents as $document) {
-            $this->indexer->index(
-                $this->documentManager->find(
-                    $document['uuid'],
-                    $document['locale']
-                )
-            );
+        foreach ($this->documents as $documentData) {
+            $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
+            $this->documentManager->refresh($document, $documentData['locale']);
+
+            $this->indexer->index($document);
         }
         $this->indexer->flush();
         $this->documents = [];
@@ -153,32 +165,14 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($this->liveDocuments as $document) {
-            $this->liveIndexer->index(
-                $this->documentManager->find(
-                    $document['uuid'],
-                    $document['locale']
-                )
-            );
+        foreach ($this->liveDocuments as $documentData) {
+            $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
+            $this->documentManager->refresh($document, $documentData['locale']);
+
+            $this->liveIndexer->index($document);
         }
         $this->liveIndexer->flush();
         $this->liveDocuments = [];
-    }
-
-    /**
-     * Indexes for article-document in live index.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleIndexLive(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        $this->liveIndexer->index($document);
-        $this->liveIndexer->flush();
     }
 
     /**
@@ -197,6 +191,44 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->liveIndexer->flush();
 
         $this->indexer->setUnpublished($document->getUuid());
+    }
+
+    /**
+     * Reindex article if a page was removed.
+     *
+     * @param RemoveEvent $event
+     */
+    public function handleRemovePage(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document = $document->getParent();
+        $this->documents[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
+    }
+
+    /**
+     * Reindex article live if a page was removed.
+     *
+     * @param RemoveEvent $event
+     */
+    public function handleRemovePageLive(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document = $document->getParent();
+        $this->liveDocuments[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
     }
 
     /**
