@@ -54,6 +54,7 @@ class ArticleInitializer implements InitializerInterface
     {
         $nodeTypeManager = $this->sessionManager->getSession()->getWorkspace()->getNodeTypeManager();
         $nodeTypeManager->registerNodeType(new ArticleNodeType(), true);
+        $nodeTypeManager->registerNodeType(new ArticlePageNodeType(), true);
 
         $articlesPath = $this->pathBuilder->build(['%base%', '%articles%']);
         if (true === $this->nodeManager->has($articlesPath)) {

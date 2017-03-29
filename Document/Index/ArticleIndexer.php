@@ -11,10 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
+use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -151,9 +152,9 @@ class ArticleIndexer implements IndexerInterface
 
     /**
      * @param ArticleDocument $document
-     * @param ArticleViewDocument $article
+     * @param ArticleViewDocumentInterface $article
      */
-    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocument $article)
+    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
         $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
     }
@@ -170,22 +171,9 @@ class ArticleIndexer implements IndexerInterface
         $locale,
         $localizationState = LocalizationState::LOCALIZED
     ) {
-        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
-        /** @var ArticleViewDocument $article */
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
-
+        $article = $this->findOrCreateViewDocument($document, $locale, $localizationState);
         if (!$article) {
-            $article = $this->documentFactory->create('article');
-            $article->setId($articleId);
-            $article->setUuid($document->getUuid());
-            $article->setLocale($locale);
-        } else {
-            // Only index ghosts when the article isn't a ghost himself.
-            if (LocalizationState::GHOST === $localizationState
-                && LocalizationState::GHOST !== $article->getLocalizationState()->state
-            ) {
-                return null;
-            }
+            return;
         }
 
         $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
@@ -243,9 +231,64 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
+        $this->mapPages($document, $article);
+
         $this->manager->persist($article);
 
         return $article;
+    }
+
+    /**
+     * Returns view-document from index or create a new one.
+     *
+     * @param ArticleDocument $document
+     * @param string $locale
+     * @param string $localizationState
+     *
+     * @return ArticleViewDocumentInterface
+     */
+    protected function findOrCreateViewDocument(ArticleDocument $document, $locale, $localizationState)
+    {
+        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
+        /** @var ArticleViewDocumentInterface $article */
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
+
+        if ($article) {
+            // Only index ghosts when the article isn't a ghost himself.
+            if (LocalizationState::GHOST === $localizationState
+                && LocalizationState::GHOST !== $article->getLocalizationState()->state
+            ) {
+                return null;
+            }
+
+            return $article;
+        }
+
+        $article = $this->documentFactory->create('article');
+        $article->setId($articleId);
+        $article->setUuid($document->getUuid());
+        $article->setLocale($locale);
+
+        return $article;
+    }
+
+    /**
+     * Maps pages from document to view-document.
+     *
+     * @param ArticleDocument $document
+     * @param ArticleViewDocumentInterface $article
+     */
+    private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
+    {
+        $pages = [];
+        foreach ($document->getChildren() as $child) {
+            $pages[] = $page = new ArticlePageViewObject();
+            $page->uuid = $child->getUuid();
+            $page->pageNumber = $child->getPageNumber();
+            $page->title = $child->getTitle();
+        }
+
+        $article->setPages(new Collection($pages));
     }
 
     /**
