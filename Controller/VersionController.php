@@ -136,7 +136,11 @@ class VersionController extends FOSRestController implements
 
                 $data = $this->getDocumentManager()->find($uuid, $locale);
                 $view = $this->view($data, $data !== null ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
-                $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+                $view->setSerializationContext(
+                    SerializationContext::create()
+                        ->setSerializeNull(true)
+                        ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
+                );
 
                 break;
             default:
