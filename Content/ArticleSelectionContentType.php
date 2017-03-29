@@ -18,7 +18,7 @@ use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
 /**
- * TODO add description here.
+ * Provides article_selection content-type.
  */
 class ArticleSelectionContentType extends SimpleContentType
 {

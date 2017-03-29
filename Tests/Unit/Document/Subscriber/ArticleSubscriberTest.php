@@ -114,6 +114,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->handleScheduleIndex($event);
 
         $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
+        $this->documentManager->refresh($this->document->reveal(), $this->locale)->willReturn($this->document->reveal());
 
         $this->articleSubscriber->handleFlush($this->prophesize(FlushEvent::class)->reveal());
 
@@ -129,6 +130,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->handleScheduleIndexLive($event);
 
         $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
+        $this->documentManager->refresh($this->document->reveal(), $this->locale)->willReturn($this->document->reveal());
 
         $this->articleSubscriber->handleFlushLive($this->prophesize(FlushEvent::class)->reveal());
 
