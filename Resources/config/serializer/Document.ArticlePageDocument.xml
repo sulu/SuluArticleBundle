@@ -7,10 +7,17 @@
                 <h:parameter name="articleUuid" value="expr(object.getParent().getUuid())"/>
                 <h:parameter name="locale" value="expr(object.getLocale())"/>
             </h:href>
-            <h:exclusion groups="defaultPage"/>
+            <h:exclusion groups="defaultArticlePage,smallArticlePage"/>
         </h:relation>
 
-        <property name="uuid" serialized-name="id" type="string" groups="defaultPage,smallPage,preview"/>
+        <h:relation rel="article">
+            <h:embedded>
+                <h:content>expr(object.getParent())</h:content>
+            </h:embedded>
+            <h:exclusion groups="defaultArticlePage"/>
+        </h:relation>
+
+        <property name="uuid" serialized-name="id" type="string" groups="defaultArticlePage,smallArticlePage,preview"/>
         <property name="nodeName" type="string"/>
         <property name="path" type="string"/>
 
@@ -20,12 +27,11 @@
         <property name="structureType" type="string" groups="preview"/>
 
         <property name="title" serialized-name="articleTitle" type="string" groups="preview"/>
-        <property name="pageNumber" type="integer" groups="website,defaultPage,preview"/>
-        <property name="creator" type="integer" groups="website,defaultPage,preview"/>
-        <property name="changer" type="integer" groups="website,defaultPage,preview"/>
-        <property name="created" type="DateTime" groups="website,defaultPage,preview"/>
-        <property name="changed" type="DateTime" groups="website,defaultPage,preview"/>
-
-        <property name="published" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
+        <property name="pageNumber" type="integer" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+        <property name="creator" type="integer" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+        <property name="changer" type="integer" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+        <property name="created" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+        <property name="changed" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+        <property name="published" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
     </class>
 </serializer>

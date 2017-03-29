@@ -93,9 +93,11 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(2, $response['pageNumber']);
 
+        $this->assertEquals($article['id'], $response['_embedded']['article']['id']);
+
         $article = $this->getArticle($article['id']);
-        $this->assertCount(1, $article['pages']);
-        $this->assertEquals($response['id'], reset($article['pages'])['id']);
+        $this->assertCount(1, $article['_embedded']['pages']);
+        $this->assertEquals($response['id'], reset($article['_embedded']['pages'])['id']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(1, $articleViewDocument->getPages());
@@ -164,7 +166,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(204, $client->getResponse());
 
         $article = $this->getArticle($article['id']);
-        $this->assertCount(0, $article['pages']);
+        $this->assertCount(0, $article['_embedded']['pages']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(0, $articleViewDocument->getPages());
