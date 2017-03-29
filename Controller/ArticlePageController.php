@@ -16,6 +16,7 @@ use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
+use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
@@ -44,6 +45,8 @@ class ArticlePageController extends RestController implements ClassResourceInter
      * @param Request $request
      *
      * @return Response
+     *
+     * @throws ArticlePageNotFoundException
      */
     public function getAction($articleUuid, $uuid, Request $request)
     {
@@ -57,9 +60,18 @@ class ArticlePageController extends RestController implements ClassResourceInter
             ]
         );
 
+        if ($articleUuid !== $document->getParent()->getUuid()) {
+            // it is required that the parent will be called to resolve the proxy.
+            // this wont be done in the serialization process.
+
+            throw new ArticlePageNotFoundException($uuid, $articleUuid);
+        }
+
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
             )
         );
     }
@@ -80,12 +92,14 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $data = $request->request->all();
 
         $this->persistDocument($data, $document, $locale, $articleUuid);
-        $this->handleActionParameter($action, $document, $locale);
+        $this->handleActionParameter($action, $document->getParent(), $locale);
         $this->getDocumentManager()->flush();
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
             )
         );
     }
@@ -117,12 +131,14 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
 
         $this->persistDocument($data, $document, $locale, $articleUuid);
-        $this->handleActionParameter($action, $document, $locale);
+        $this->handleActionParameter($action, $document->getParent(), $locale);
         $this->getDocumentManager()->flush();
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
             )
         );
     }

@@ -199,7 +199,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -224,7 +226,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -260,7 +264,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -348,7 +354,11 @@ class ArticleController extends RestController implements ClassResourceInterface
 
             // prepare view
             $view = $this->view($data, $data !== null ? 200 : 204);
-            $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+            $view->setSerializationContext(
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
+            );
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
         }
