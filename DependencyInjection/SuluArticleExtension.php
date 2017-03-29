@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
+use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -100,6 +101,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     'exception' => [
                         'codes' => [
                             ParameterNotAllowedException::class => 400,
+                            ArticlePageNotFoundException::class => 404,
                         ],
                     ],
                 ]
