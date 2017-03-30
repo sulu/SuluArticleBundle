@@ -17,9 +17,9 @@ define([
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main',
-    './adapter/page-1',
-    './adapter/page-x'
-], function($, _, config, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Page1, PageX) {
+    './adapter/article',
+    './adapter/article-page'
+], function($, _, config, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Article, ArticlePage) {
 
     'use strict';
 
@@ -499,7 +499,7 @@ define([
                 return this.adapter;
             }
 
-            return this.adapter = (this.options.page === 1 ? Page1 : PageX);
+            return this.adapter = (this.options.page === 1 ? Article : ArticlePage);
         },
 
         destroy: function() {
