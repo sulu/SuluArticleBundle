@@ -15,7 +15,8 @@ require.config({
         'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
 
         'services/suluarticle/article-manager': '../../suluarticle/js/services/manager',
-        'services/suluarticle/article-router': '../../suluarticle/js/services/router'
+        'services/suluarticle/article-router': '../../suluarticle/js/services/router',
+        'services/suluarticle/property-configuration': '../../suluarticle/js/services/property-configuration'
     }
 });
 

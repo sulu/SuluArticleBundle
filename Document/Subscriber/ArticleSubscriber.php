@@ -14,9 +14,14 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
+use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\PublishEvent;
+use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -43,6 +48,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $documentManager;
 
     /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
+
+    /**
      * @var array
      */
     private $documents = [];
@@ -56,15 +66,18 @@ class ArticleSubscriber implements EventSubscriberInterface
      * @param IndexerInterface $indexer
      * @param IndexerInterface $liveIndexer
      * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $documentInspector
      */
     public function __construct(
         IndexerInterface $indexer,
         IndexerInterface $liveIndexer,
-        DocumentManagerInterface $documentManager
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $documentInspector
     ) {
         $this->indexer = $indexer;
         $this->liveIndexer = $liveIndexer;
         $this->documentManager = $documentManager;
+        $this->documentInspector = $documentInspector;
     }
 
     /**
@@ -73,16 +86,20 @@ class ArticleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PERSIST => [['handleScheduleIndex', -500]],
+            Events::PERSIST => [['handleScheduleIndex', -500], ['setChildrenStructureType', 0]],
             Events::REMOVE => [
                 ['handleRemove', -500],
                 ['handleRemoveLive', -500],
                 ['handleRemovePage', -500],
                 ['handleRemovePageLive', -500],
             ],
-            Events::PUBLISH => [['handleScheduleIndexLive', 0], ['handleScheduleIndex', 0]],
+            Events::PUBLISH => [
+                ['handleScheduleIndexLive', 0],
+                ['handleScheduleIndex', 0],
+                ['publishChildren', 0],
+            ],
             Events::UNPUBLISH => 'handleUnpublish',
-            Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
+            Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
         ];
     }
@@ -129,6 +146,44 @@ class ArticleSubscriber implements EventSubscriberInterface
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
+    }
+
+    /**
+     * Publish pages when article will be published.
+     *
+     * @param PublishEvent $event
+     */
+    public function publishChildren(PublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST) {
+                $this->documentManager->publish($child, $event->getLocale());
+            }
+        }
+    }
+
+    /**
+     * Remove draft from children.
+     *
+     * @param RemoveDraftEvent $event
+     */
+    public function removeDraftChildren(RemoveDraftEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST) {
+                $this->documentManager->removeDraft($child, $event->getLocale());
+            }
+        }
     }
 
     /**
@@ -259,5 +314,27 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveIndexer->remove($document);
         $this->liveIndexer->flush();
+    }
+
+    /**
+     * Set structure-type to pages.
+     *
+     * @param PersistEvent $event
+     */
+    public function setChildrenStructureType(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST
+                && $document->getStructureType() !== $child->getStructureType()
+            ) {
+                $child->setStructureType($document->getStructureType());
+                $this->documentManager->persist($child, $event->getLocale(), $event->getOptions());
+            }
+        }
     }
 }

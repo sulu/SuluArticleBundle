@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,11 +23,11 @@ class WebsiteArticleController extends Controller
 {
     /**
      * @param string $view
-     * @param ArticleDocument $object
+     * @param ArticleInterface $object
      *
      * @return Response
      */
-    public function indexAction($view, ArticleDocument $object)
+    public function indexAction($view, ArticleInterface $object)
     {
         $content = $this->get('jms_serializer')->serialize(
             $object,

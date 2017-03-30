@@ -274,7 +274,7 @@ define([
         },
 
         toEdit: function(id, locale) {
-            ArticleRouter.toEdit(id, locale);
+            ArticleRouter.toEdit(id, (locale || this.options.locale));
         },
 
         toAdd: function(type, locale) {

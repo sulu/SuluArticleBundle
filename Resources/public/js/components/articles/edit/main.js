@@ -14,11 +14,12 @@ define([
     'services/suluarticle/article-manager',
     'services/suluarticle/article-router',
     'sulusecurity/services/user-manager',
-    'services/sulupreview/preview',
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
-    'sulucontent/components/open-ghost-overlay/main'
-], function($, _, config, ArticleManager, ArticleRouter, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
+    'sulucontent/components/open-ghost-overlay/main',
+    './adapter/page-1',
+    './adapter/page-x'
+], function($, _, config, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Page1, PageX) {
 
     'use strict';
 
@@ -37,7 +38,7 @@ define([
             templates: {
                 url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
                 pageSwitcher: [
-                    '<div class="language-changer">',
+                    '<div class="page-changer">',
                     '   <span class="title">Page <%= page %> of <%= max %></span>',
                     '   <span class="dropdown-toggle"></span>',
                     '</div>'
@@ -119,6 +120,7 @@ define([
                             callback: function(item) {
                                 this.template = item.template;
                                 this.sandbox.emit('sulu.tab.template-change', item);
+                                this.setHeaderBar();
                             }.bind(this)
                         }
                     }
@@ -196,6 +198,7 @@ define([
                         }.bind(this),
                         config: this.options.config,
                         preview: this.preview,
+                        adapter: this.getAdapter(),
                         page: this.options.page,
                         id: this.options.id
                     },
@@ -248,12 +251,13 @@ define([
 
             this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
 
-            if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
-                OpenGhost.openGhost.call(this, this.data, this.translations.openGhostOverlay).then(function(copy, src) {
+            var data = this.getAdapter().prepareData(this.data, this);
+            if (-1 === _(data.concreteLanguages).indexOf(item.id)) {
+                OpenGhost.openGhost.call(this, data, this.translations.openGhostOverlay).then(function(copy, src) {
                     if (!!copy) {
                         CopyLocale.copyLocale.call(
                             this,
-                            this.data.id,
+                            data.id,
                             src,
                             [item.id],
                             function() {
@@ -309,15 +313,19 @@ define([
         },
 
         toEdit: function(locale, id) {
-            ArticleRouter.toEdit(id, locale, this.options.content);
+            if (!!this.options.page) {
+                return ArticleRouter.toPageEdit((id || this.options.id), this.options.page, (locale || this.options.locale))
+            }
+
+            ArticleRouter.toEdit((id || this.options.id), (locale || this.options.locale), this.options.content);
         },
 
-        toList: function() {
-            ArticleRouter.toList(locale, (this.options.type || this.data.articleType));
+        toList: function(locale) {
+            ArticleRouter.toList((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
-        toAdd: function() {
-            ArticleRouter.toAdd(locale, (this.options.type || this.data.articleType));
+        toAdd: function(locale) {
+            ArticleRouter.toAdd((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
         save: function(action) {
@@ -378,15 +386,16 @@ define([
          * Routes either to the list, article-add or article-edit, depending on the passed parameter.
          *
          * @param action {String} 'new', 'add' or null
-         * @param toEdit {Boolean} if true and no action has been passed the method routes to 'edit'
          */
-        afterSaveAction: function(action, toEdit) {
+        afterSaveAction: function(action) {
             if (action === 'back') {
                 this.toList();
             } else if (action === 'new') {
                 this.toAdd();
-            } else if (toEdit) {
+            } else if (!this.options.id) {
                 this.toEdit(this.options.locale, this.data.id);
+            } else if (!this.options.page) {
+                ArticleRouter.toPageEdit(this.data.id, this.data._embedded.pages.length + 1, this.options.locale);
             }
         },
 
@@ -477,13 +486,7 @@ define([
 
             var promise = $.Deferred();
             this.sandbox.util.load(this.getUrl()).done(function(data) {
-                this.preview = Preview.initialize({});
-                this.preview.start(
-                    'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
-                    this.options.id,
-                    this.options.locale,
-                    data
-                );
+                this.preview = this.getAdapter().startPreview(this, data);
 
                 promise.resolve(data);
             }.bind(this));
@@ -491,9 +494,17 @@ define([
             return promise;
         },
 
+        getAdapter: function() {
+            if (this.adapter) {
+                return this.adapter;
+            }
+
+            return this.adapter = (this.options.page === 1 ? Page1 : PageX);
+        },
+
         destroy: function() {
             if (!!this.preview) {
-                Preview.destroy(this.preview);
+                this.getAdapter().destroyPreview(this.preview);
             }
 
             if (!!this.$dropdownElement) {
@@ -557,7 +568,7 @@ define([
                 this.sandbox.emit('sulu.labels.success.show', 'labels.success.content-save-desc', 'labels.success');
             }
 
-            this.afterSaveAction(action, !this.options.id);
+            this.afterSaveAction(action);
         },
 
         loadLocalizations: function() {
@@ -581,13 +592,19 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            return ArticleManager.getCopyLocaleUrl(id, src, dest);
+            var data = this.getAdapter().prepareData(this.data, this);
+
+            return this.getAdapter().getCopyLocaleUrl(id, data.id, src, dest);
         },
 
         startPageSwitcher: function() {
             var page = this.options.page,
                 max = (this.data._embedded.pages || []).length + 1,
                 data = [];
+
+            if (!page) {
+                page = ++max;
+            }
 
             for (var i = 1; i <= max; i++) {
                 data.push({id: i, title: 'Page ' + i + ' of ' + max});
@@ -615,6 +632,8 @@ define([
                     clickCallback: function(item) {
                         if (item.id === 'add') {
                             return ArticleRouter.toPageAdd(this.options.id, this.options.locale);
+                        } else if (item.id === 1) {
+                            return ArticleRouter.toEdit(this.options.id, this.options.locale);
                         }
 
                         return ArticleRouter.toPageEdit(this.options.id, item.id, this.options.locale);

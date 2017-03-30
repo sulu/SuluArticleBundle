@@ -40,7 +40,7 @@ define(['services/husky/mediator', 'suluarticle/services/base-router'], function
             BaseRouter.toPageEdit(id, page, locale);
         },
         toPageAdd: function(id, locale) {
-            BaseRouter.toPageEdit(id, locale);
+            BaseRouter.toPageAdd(id, locale);
         }
     };
 });

@@ -16,10 +16,9 @@ define([
     'use strict';
 
     var typeNames = Object.keys(Config.get('sulu_article').types);
-
     if (typeNames.length > 1) {
-        return BaseRouter;
+        return TypedRouter;
     }
 
-    return TypedRouter;
+    return BaseRouter;
 });

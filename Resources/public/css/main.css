@@ -1,5 +1,39 @@
 /*----------------------------------------*/
-/* line 1, ../../scss/modules/edit.scss */
+/* line 3, ../../scss/modules/edit.scss */
 .sulu-header .toolbar-row .right-container.wide {
   width: 200px;
+}
+/* line 6, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide .page-changer {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 10px;
+  line-height: 25px;
+  padding-left: 8px;
+  border-radius: 3px;
+  border: 2px solid #fff;
+  font-size: 12px;
+  color: #fff;
+  position: relative;
+  cursor: pointer;
+}
+/* line 19, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-toggle {
+  display: inline-block;
+  vertical-align: top;
+  padding: 0 8px 0 10px;
+}
+/* line 24, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-toggle:after {
+  border-top: 6px solid #fff;
+}
+/* line 29, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-menu {
+  right: 0;
+  left: auto;
+  margin-top: 0;
+  display: inline-block;
+  min-width: 160px;
+  width: auto;
+  color: #000;
 }
