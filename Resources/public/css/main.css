@@ -39,16 +39,16 @@
 }
 
 /* line 42, ../../scss/modules/edit.scss */
-#content-form .highlight-section .grid-row:last-child {
+.article-form #content-form .highlight-section .grid-row:last-child {
   margin-bottom: 0;
 }
 /* line 46, ../../scss/modules/edit.scss */
-#content-form .highlight-section .article-title {
+.article-form #content-form .highlight-section .article-title {
   width: 870px;
   padding-left: 0;
 }
 /* line 50, ../../scss/modules/edit.scss */
-#content-form .highlight-section .article-title .content-title.underlined {
+.article-form #content-form .highlight-section .article-title .content-title.underlined {
   margin-top: 10px;
   border-bottom: 2px solid #999;
 }
