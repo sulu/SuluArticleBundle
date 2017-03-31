@@ -26,7 +26,13 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
     public function getNavigationItems(array $options = [])
     {
         $details = new ContentNavigationItem('sulu_article.edit.details');
-        $details->setAction('details');
+
+        $action = 'details';
+        if (array_key_exists('page', $options) && (int) $options['page'] !== 1) {
+            $action = 'page:' . $options['page'] . '/' . $action;
+        }
+
+        $details->setAction($action);
         $details->setPosition(10);
         $details->setComponent('articles/edit/details@suluarticle');
 
