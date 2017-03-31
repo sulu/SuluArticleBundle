@@ -12,8 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Component\HttpCache\HttpCache;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,12 +27,12 @@ class WebsiteArticleController extends Controller
      * Article index action.
      *
      * @param Request $request
-     * @param ArticleDocument $object
+     * @param ArticleInterface $object
      * @param string $view
      *
      * @return Response
      */
-    public function indexAction(Request $request, ArticleDocument $object, $view)
+    public function indexAction(Request $request, ArticleInterface $object, $view)
     {
         $content = $this->get('jms_serializer')->serialize(
             $object,

@@ -13,11 +13,17 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
+use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\PublishEvent;
+use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 
 class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -36,6 +42,11 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
      * @var DocumentManagerInterface
      */
     private $documentManager;
+
+    /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
 
     /**
      * @var ArticleSubscriber
@@ -65,6 +76,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->indexer = $this->prophesize(IndexerInterface::class);
         $this->liveIndexer = $this->prophesize(IndexerInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
+        $this->documentInspector = $this->prophesize(DocumentInspector::class);
 
         $this->document = $this->prophesize(ArticleDocument::class);
         $this->document->getUuid()->willReturn($this->uuid);
@@ -74,14 +86,23 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber = new ArticleSubscriber(
             $this->indexer->reveal(),
             $this->liveIndexer->reveal(),
-            $this->documentManager->reveal()
+            $this->documentManager->reveal(),
+            $this->documentInspector->reveal()
         );
     }
 
-    protected function prophesizeEvent($className)
+    protected function prophesizeEvent($className, $locale = null, $options = null)
     {
         $event = $this->prophesize($className);
         $event->getDocument()->willReturn($this->document->reveal());
+
+        if (null !== $options) {
+            $event->getOptions()->willReturn($options);
+        }
+
+        if (null !== $locale) {
+            $event->getLocale()->willReturn($locale);
+        }
 
         return $event->reveal();
     }
@@ -158,5 +179,71 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->indexer->flush()->shouldNotBeCalled();
         $this->liveIndexer->remove($this->document->reveal())->shouldBeCalled();
         $this->liveIndexer->flush()->shouldBeCalled();
+    }
+
+    public function testPublishChildren()
+    {
+        $children = [
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+        ];
+
+        $this->document->getChildren()->willReturn($children);
+
+        foreach ($children as $child) {
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+            $this->documentManager->publish($child, $this->locale)->shouldBeCalled();
+        }
+
+        $this->articleSubscriber->publishChildren($this->prophesizeEvent(PublishEvent::class, $this->locale));
+    }
+
+    public function testRemoveDraftChildren()
+    {
+        $children = [
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+            $this->prophesize(ArticlePageDocument::class)->reveal(),
+        ];
+
+        $this->document->getChildren()->willReturn($children);
+
+        foreach ($children as $child) {
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+            $this->documentManager->removeDraft($child, $this->locale)->shouldBeCalled();
+        }
+
+        $this->articleSubscriber->removeDraftChildren($this->prophesizeEvent(RemoveDraftEvent::class, $this->locale));
+    }
+
+    public function testSetChildrenStructureType()
+    {
+        $children = [
+            $this->prophesize(ArticlePageDocument::class),
+            $this->prophesize(ArticlePageDocument::class),
+            $this->prophesize(ArticlePageDocument::class),
+        ];
+
+        $this->document->getStructureType()->willReturn('test');
+        $this->document->getChildren()->willReturn(
+            array_map(
+                function ($child) {
+                    return $child->reveal();
+                },
+                $children
+            )
+        );
+
+        foreach ($children as $child) {
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+            $this->documentManager->persist($child, $this->locale, Argument::any())->shouldBeCalled();
+            $child->getStructureType()->willReturn('my-test');
+            $child->setStructureType('test')->shouldBeCalled();
+        }
+
+        $this->articleSubscriber->setChildrenStructureType(
+            $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
+        );
     }
 }

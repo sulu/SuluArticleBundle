@@ -14,8 +14,9 @@ define([
     'sulusecurity/components/users/models/user',
     'sulucontact/models/contact',
     'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
     'text!/admin/articles/template/settings.html'
-], function(_, $, Config, User, Contact, ArticleManager, form) {
+], function(_, $, Config, User, Contact, ArticleManager, ArticleRouter, form) {
 
     'use strict';
 
@@ -454,12 +455,7 @@ define([
                         }.bind(this))
                         .then(function() {
                             this.sandbox.emit('husky.overlay.alert.close');
-                            this.sandbox.emit(
-                                'sulu.router.navigate',
-                                'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
-                                true,
-                                true
-                            );
+                            ArticleRouter.toEditForce(this.data.id, this.options.locale);
                         }.bind(this))
                         .fail(function() {
                             this.sandbox.emit(
