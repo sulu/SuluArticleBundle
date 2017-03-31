@@ -12,8 +12,9 @@ define([
     'services/husky/storage',
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main',
-    'services/suluarticle/article-manager'
-], function(_, storage, CopyLocale, OpenGhost, ArticleManager) {
+    'services/suluarticle/article-manager',
+    'services/suluarticle/article-router'
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter) {
 
     'use strict';
 
@@ -158,8 +159,7 @@ define([
             if (!!this.options.type) {
                 this.storage.set('type', this.options.type);
             } else if (this.storage.has('type')) {
-                var url = this.templates.route({type: this.storage.get('type'), locale: this.options.locale});
-                this.sandbox.emit('sulu.router.navigate', url, false, false);
+                ArticleRouter.toList(this.options.locale, this.storage.get('type'));
                 this.options.type = this.storage.get('type');
             }
 
@@ -273,19 +273,15 @@ define([
         },
 
         toEdit: function(id, locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + id + '/details');
+            ArticleRouter.toEdit(id, (locale || this.options.locale));
         },
 
         toAdd: function(type, locale) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/add' + (this.options.config.typeNames.length > 1 ? (':' + type) : ''));
+            ArticleRouter.toAdd((locale || this.options.locale), type);
         },
 
         toList: function(locale) {
-            if (this.options.config.typeNames.length === 1 || !this.options.type) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale));
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type) + '/' + (locale || this.options.locale));
-            }
+            ArticleRouter.toList((locale || this.options.locale), this.options.type);
         },
 
         deleteItems: function(ids) {
@@ -297,15 +293,13 @@ define([
         },
 
         typeChange: function(item) {
-            var url = this.templates.route({type: item.key, locale: this.options.locale});
             // Save the tab key. Can be removed when issue #72 is solved:
             // https://github.com/sulu/SuluArticleBundle/issues/72
             this.options.type = item.key;
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: item.key});
-            this.sandbox.emit('sulu.router.navigate', url, false, false);
-
-            this.storage.set('type', item.key);
+            this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: this.options.type});
+            ArticleRouter.toEditUpdate(this.options.locale, this.options.type);
+            this.storage.set('type', this.options.type);
         },
 
         /**

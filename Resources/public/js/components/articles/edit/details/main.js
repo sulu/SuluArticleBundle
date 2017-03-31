@@ -10,8 +10,10 @@
 define([
     'underscore',
     'jquery',
-    'services/suluarticle/article-manager'
-], function(_, $, ArticleManager) {
+    'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
+    'services/suluarticle/property-configuration'
+], function(_, $, ArticleManager, ArticleRouter, PropertyConfiguration) {
 
     'use strict';
 
@@ -73,24 +75,17 @@ define([
             }
 
             var data = this.sandbox.form.getData(this.formId);
-            data.template = this.template;
-
-            _.each(data, function(value, key) {
-                this.data[key] = value;
-            }.bind(this));
-
-            ArticleManager.save(this.data, this.data.id, this.options.locale, action).then(function(response) {
+            this.options.adapter.save(this, data, action).done(function(response) {
                 this.data = response;
 
                 if (this.ghost && !this.data.type) {
-                    this.sandbox.emit(
+                    // reload page
+                    return this.sandbox.emit(
                         'sulu.router.navigate',
-                        'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
+                        this.sandbox.mvc.history.fragment,
                         true,
                         true
                     );
-
-                    return;
                 }
 
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
@@ -166,9 +161,7 @@ define([
                 this.data = this.sandbox.util.extend({}, data, this.data);
             }
 
-            require([this.getTemplateUrl(template)], function(template) {
-                this.renderFormTemplate(template);
-            }.bind(this));
+            require([this.getTemplateUrl(template)], this.renderFormTemplate.bind(this));
         },
 
         /**
@@ -202,27 +195,33 @@ define([
                 options: this.options
             }));
 
-            if (!this.data.id || (this.data.type && this.data.type.name === 'ghost')) {
+            var data = this.options.adapter.prepareData(this.data, this);
+
+            if (!data.id || (data.type && data.type.name === 'ghost')) {
                 // route-path will be generator on post-request
                 this.$find('#routePath').parent().remove();
                 this.data.routePath = null;
             }
 
-            if (this.data.type && this.data.type.name === 'ghost') {
+            if (data.type && data.type.name === 'ghost') {
+                var titleProperty = this.getTitleProperty(),
+                    pageTitleProperty = this.getPageTitleProperty();
+
                 this.ghost = {
-                    locale: this.data.type.value,
-                    title: this.data.title
+                    locale: data.type.value,
+                    title: titleProperty ? data[titleProperty.name] : '',
+                    pageTitle: pageTitleProperty ? data[pageTitleProperty.name] : ''
                 };
 
-                this.data = {
+                data = {
                     id: this.data.id,
                     articleType: this.data.articleType
                 };
             }
 
-            this.createForm(this.data).then(function() {
-                this.changeTemplateDropdownHandler();
-            }.bind(this));
+            this.options.adapter.beforeFormCreate(this);
+
+            this.createForm(data).then(this.changeTemplateDropdownHandler.bind(this));
         },
 
         changeTemplateDropdownHandler: function() {
@@ -244,7 +243,16 @@ define([
             formObject.initialized.then(function() {
                 this.sandbox.form.setData(this.formId, data).then(function() {
                     if (!!this.ghost) {
-                        this.sandbox.dom.attr('#title', 'placeholder', this.ghost.locale + ': ' + this.ghost.title);
+                        var titleProperty = this.getTitleProperty(),
+                            pageTitleProperty = this.getPageTitleProperty();
+
+                        if (titleProperty) {
+                            this.sandbox.dom.attr(titleProperty.$el, 'placeholder', this.ghost.locale + ': ' + this.ghost.title);
+                        }
+
+                        if (pageTitleProperty) {
+                            this.sandbox.dom.attr(pageTitleProperty.$el, 'placeholder', this.ghost.locale + ': ' + this.ghost.pageTitle);
+                        }
                     }
 
                     this.sandbox.start(this.$el, {reset: true}).then(function() {
@@ -254,9 +262,16 @@ define([
 
                         if (!!this.options.preview) {
                             this.options.preview.bindDomEvents(this.$el);
-                            var data = this.data;
+                            var data = this.options.adapter.prepareData(this.data, this);
                             data.template = this.template;
-                            this.options.preview.updateContext({template: this.template}, data);
+                            if (!!data.type && data.type.name === 'ghost') {
+                                data = {id: data.id};
+                            }
+
+                            this.options.preview.updateContext(
+                                {template: this.template},
+                                this.options.adapter.prepareData(data, this)
+                            );
                         }
                     }.bind(this));
                 }.bind(this));
@@ -321,11 +336,7 @@ define([
         },
 
         loadComponentData: function() {
-            var promise = $.Deferred();
-
-            promise.resolve(this.options.data());
-
-            return promise;
+            return this.options.data();
         },
 
         /**
@@ -341,6 +352,42 @@ define([
                 }
 
                 this.options.preview.updateProperty(propertyName, data[propertyName]);
+            }
+        },
+
+        getTitleProperty: function() {
+            if (!this.propertyConfiguration) {
+                this.propertyConfiguration = PropertyConfiguration.generate(this.$el);
+            }
+
+            if (!!this.propertyConfiguration.tags['sulu_article.article_title']) {
+                return this.propertyConfiguration.tags['sulu_article.article_title'].highestProperty;
+            }
+
+            return this.propertyConfiguration.title;
+        },
+
+        getPageTitleProperty: function() {
+            if (!this.propertyConfiguration) {
+                this.propertyConfiguration = PropertyConfiguration.generate(this.$el);
+            }
+
+            if (!!this.propertyConfiguration.tags['sulu_article.page_title']) {
+                return this.propertyConfiguration.tags['sulu_article.page_title'].highestProperty;
+            } else if (!!this.propertyConfiguration.pageTitle) {
+                return this.propertyConfiguration.pageTitle;
+            }
+        },
+
+        getRoutePathProperty: function() {
+            if (!this.propertyConfiguration) {
+                this.propertyConfiguration = PropertyConfiguration.generate(this.$el);
+            }
+
+            if (!!this.propertyConfiguration.tags['sulu_article.article_route']) {
+                return this.propertyConfiguration.tags['sulu_article.article_route'].highestProperty;
+            } else if (!!this.propertyConfiguration.routePath) {
+                return this.propertyConfiguration.routePath;
             }
         }
     };

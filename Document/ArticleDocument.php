@@ -51,7 +51,8 @@ class ArticleDocument implements
     WorkflowStageBehavior,
     VersionBehavior,
     AuthorBehavior,
-    ChildrenBehavior
+    ChildrenBehavior,
+    ArticleInterface
 {
     /**
      * @var string
@@ -479,5 +480,21 @@ class ArticleDocument implements
     public function getChildren()
     {
         return $this->children;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getArticleUuid()
+    {
+        return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageUuid()
+    {
+        return $this->getUuid();
     }
 }

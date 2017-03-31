@@ -41,12 +41,12 @@ class ArticlePageControllerTest extends SuluTestCase
         $mediaTypes->load($this->getEntityManager());
     }
 
-    private function createArticle($title = 'Test-Article', $template = 'default_pages')
+    private function createArticle($title = 'Test-Article', $template = 'default_pages', $locale = 'de')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',
-            '/api/articles?locale=de',
+            '/api/articles?locale=' . $locale,
             [
                 'title' => $title,
                 'pageTitle' => $title,
@@ -59,23 +59,41 @@ class ArticlePageControllerTest extends SuluTestCase
         return json_decode($client->getResponse()->getContent(), true);
     }
 
-    private function getArticle($uuid)
+    private function createArticleLocale($article, $title = 'Test-Article', $template = 'default_pages', $locale = 'en')
     {
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles/' . $uuid . '?locale=de');
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
+            [
+                'title' => $title,
+                'pageTitle' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
+        );
 
         return json_decode($client->getResponse()->getContent(), true);
     }
 
-    private function post($article, $pageTitle = 'Test-Page')
+    private function getArticle($uuid, $locale = 'de')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $uuid . '?locale=' . $locale);
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    private function post($article, $pageTitle = 'Test-Page', $template = 'default_pages', $locale = 'de')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',
-            '/api/articles/' . $article['id'] . '/pages?locale=de',
+            '/api/articles/' . $article['id'] . '/pages?locale=' . $locale,
             [
                 'pageTitle' => $pageTitle,
-                'author' => $this->getTestUser()->getContact()->getId(),
+                'template' => $template,
             ]
         );
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -170,6 +188,81 @@ class ArticlePageControllerTest extends SuluTestCase
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(0, $articleViewDocument->getPages());
+    }
+
+    public function testHandleGhostArticlePageAndArticle($pageTitle = 'Sulu is awesome')
+    {
+        $article = $this->createArticle();
+        $page = $this->post($article);
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
+            [
+                'pageTitle' => $pageTitle,
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertArrayNotHasKey('type', $response);
+        $this->assertEquals($pageTitle, $response['pageTitle']);
+
+        // article should stay ghost
+        $article = $this->getArticle($article['id'], 'en');
+        $this->assertEquals('ghost', $article['type']['name']);
+    }
+
+    public function testHandleGhostArticlePage($pageTitle = 'Sulu is awesome')
+    {
+        $article = $this->createArticle();
+        $page = $this->post($article);
+
+        $article = $this->createArticleLocale($article);
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
+            [
+                'pageTitle' => $pageTitle,
+                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertArrayNotHasKey('type', $response);
+        $this->assertEquals($pageTitle, $response['pageTitle']);
+    }
+
+    public function testCopyLocale()
+    {
+        $article = $this->createArticle();
+        $page = $this->post($article);
+
+        $article = $this->createArticleLocale($article);
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?action=copy-locale&locale=de&dest=en'
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $client->request('GET', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en');
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertArrayNotHasKey('type', $response);
+        $this->assertEquals($page['id'], $response['id']);
+        $this->assertEquals($page['pageTitle'], $response['pageTitle']);
     }
 
     private function purgeIndex()

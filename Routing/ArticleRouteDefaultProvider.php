@@ -12,6 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
@@ -100,7 +102,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     {
         $object = $this->documentManager->find($id, $locale);
 
-        return $object instanceof ArticleDocument && WorkflowStage::PUBLISHED === $object->getWorkflowStage();
+        return $object instanceof ArticleInterface && WorkflowStage::PUBLISHED === $object->getWorkflowStage();
     }
 
     /**
@@ -108,7 +110,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     public function supports($entityClass)
     {
-        return $entityClass === ArticleDocument::class;
+        return $entityClass === ArticleDocument::class || $entityClass === ArticlePageDocument::class;
     }
 
     /**
