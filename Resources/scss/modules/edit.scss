@@ -1,0 +1,39 @@
+$toolbarRowPageChangerColor: $white !default;
+
+.sulu-header .toolbar-row .right-container.wide {
+    width: 200px;
+
+    .page-changer {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 10px;
+        line-height: 25px;
+        padding-left: 8px;
+        border-radius: $borderRadius;
+        border: 2px solid $toolbarRowPageChangerColor;
+        font-size: $smallFontSize;
+        color: $toolbarRowPageChangerColor;
+        position: relative;
+        cursor: pointer;
+
+        .dropdown-toggle {
+            display: inline-block;
+            vertical-align: top;
+            padding: 0 8px 0 10px;
+
+            &:after {
+                border-top: 6px solid $toolbarRowPageChangerColor;
+            }
+        }
+
+        .dropdown-menu {
+            right: 0;
+            left: auto;
+            margin-top: 0;
+            display: inline-block;
+            min-width: 160px;
+            width: auto;
+            color: #000;
+        }
+    }
+}

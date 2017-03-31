@@ -102,6 +102,7 @@
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
@@ -116,6 +117,8 @@
         <service id="sulu_article.subscriber.article_page"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticlePageSubscriber">
             <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
@@ -204,6 +207,7 @@
             <argument type="service" id="serializer"/>
 
             <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticleDocument"/>
+            <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument"/>
         </service>
 
         <!-- link -->

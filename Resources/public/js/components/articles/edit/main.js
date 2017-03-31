@@ -12,24 +12,37 @@ define([
     'underscore',
     'config',
     'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
     'sulusecurity/services/user-manager',
-    'services/sulupreview/preview',
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
-    'sulucontent/components/open-ghost-overlay/main'
-], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
+    'sulucontent/components/open-ghost-overlay/main',
+    './adapter/article',
+    './adapter/article-page'
+], function($, _, config, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Article, ArticlePage) {
 
     'use strict';
+
+    var constants = {
+        headerRightSelector: '.right-container'
+    };
 
     return {
 
         defaults: {
             options: {
+                page: 1,
                 config: {}
             },
 
             templates: {
-                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>'
+                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
+                pageSwitcher: [
+                    '<div class="page-changer">',
+                    '   <span class="title">Page <%= page %> of <%= max %></span>',
+                    '   <span class="dropdown-toggle"></span>',
+                    '</div>'
+                ].join('')
             },
 
             translations: {
@@ -107,6 +120,7 @@ define([
                             callback: function(item) {
                                 this.template = item.template;
                                 this.sandbox.emit('sulu.tab.template-change', item);
+                                this.setHeaderBar();
                             }.bind(this)
                         }
                     }
@@ -183,7 +197,10 @@ define([
                             return this.templates.url({id: this.options.id, locale: this.options.locale});
                         }.bind(this),
                         config: this.options.config,
-                        preview: this.preview
+                        preview: this.preview,
+                        adapter: this.getAdapter(),
+                        page: this.options.page,
+                        id: this.options.id
                     },
                     componentOptions: {
                         values: _.defaults(this.data, {type: null})
@@ -201,6 +218,8 @@ define([
         },
 
         initialize: function() {
+            this.startPageSwitcher();
+
             this.bindCustomEvents();
             this.showDraftLabel();
             this.setHeaderBar(true);
@@ -232,12 +251,13 @@ define([
 
             this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
 
-            if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
-                OpenGhost.openGhost.call(this, this.data, this.translations.openGhostOverlay).then(function(copy, src) {
+            var data = this.getAdapter().prepareData(this.data, this);
+            if (-1 === _(data.concreteLanguages).indexOf(item.id)) {
+                OpenGhost.openGhost.call(this, data, this.translations.openGhostOverlay).then(function(copy, src) {
                     if (!!copy) {
                         CopyLocale.copyLocale.call(
                             this,
-                            this.data.id,
+                            data.id,
                             src,
                             [item.id],
                             function() {
@@ -293,23 +313,19 @@ define([
         },
 
         toEdit: function(locale, id) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/' + (this.options.content  || 'details'), true, true);
+            if (!!this.options.page) {
+                return ArticleRouter.toPageEdit((id || this.options.id), this.options.page, (locale || this.options.locale))
+            }
+
+            ArticleRouter.toEdit((id || this.options.id), (locale || this.options.locale), this.options.content);
         },
 
-        toList: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.articleType) + '/' + this.options.locale);
-            }
+        toList: function(locale) {
+            ArticleRouter.toList((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
-        toAdd: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.articleType), true, true);
-            }
+        toAdd: function(locale) {
+            ArticleRouter.toAdd((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
         save: function(action) {
@@ -370,15 +386,16 @@ define([
          * Routes either to the list, article-add or article-edit, depending on the passed parameter.
          *
          * @param action {String} 'new', 'add' or null
-         * @param toEdit {Boolean} if true and no action has been passed the method routes to 'edit'
          */
-        afterSaveAction: function(action, toEdit) {
+        afterSaveAction: function(action) {
             if (action === 'back') {
                 this.toList();
             } else if (action === 'new') {
                 this.toAdd();
-            } else if (toEdit) {
+            } else if (!this.options.id) {
                 this.toEdit(this.options.locale, this.data.id);
+            } else if (!this.options.page) {
+                ArticleRouter.toPageEdit(this.data.id, this.data._embedded.pages.length + 1, this.options.locale);
             }
         },
 
@@ -423,6 +440,7 @@ define([
                     ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
                     }.bind(this)).then(function(response) {
+                        // reload page
                         this.sandbox.emit(
                             'sulu.router.navigate',
                             this.sandbox.mvc.history.fragment,
@@ -462,22 +480,13 @@ define([
         },
 
         loadComponentData: function() {
-            var promise = $.Deferred();
-
             if (!this.options.id) {
-                promise.resolve({});
-
-                return promise;
+                return {_embedded: {pages: []}};
             }
 
+            var promise = $.Deferred();
             this.sandbox.util.load(this.getUrl()).done(function(data) {
-                this.preview = Preview.initialize({});
-                this.preview.start(
-                    'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
-                    this.options.id,
-                    this.options.locale,
-                    data
-                );
+                this.preview = this.getAdapter().startPreview(this, data);
 
                 promise.resolve(data);
             }.bind(this));
@@ -485,9 +494,21 @@ define([
             return promise;
         },
 
+        getAdapter: function() {
+            if (this.adapter) {
+                return this.adapter;
+            }
+
+            return this.adapter = (this.options.page === 1 ? Article : ArticlePage);
+        },
+
         destroy: function() {
             if (!!this.preview) {
-                Preview.destroy(this.preview);
+                this.getAdapter().destroyPreview(this.preview);
+            }
+
+            if (!!this.$dropdownElement) {
+                this.sandbox.stop(this.$dropdownElement);
             }
         },
 
@@ -547,7 +568,7 @@ define([
                 this.sandbox.emit('sulu.labels.success.show', 'labels.success.content-save-desc', 'labels.success');
             }
 
-            this.afterSaveAction(action, !this.options.id);
+            this.afterSaveAction(action);
         },
 
         loadLocalizations: function() {
@@ -571,7 +592,54 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            return ArticleManager.getCopyLocaleUrl(id, src, dest);
+            var data = this.getAdapter().prepareData(this.data, this);
+
+            return this.getAdapter().getCopyLocaleUrl(id, data.id, src, dest);
+        },
+
+        startPageSwitcher: function() {
+            var page = this.options.page,
+                max = (this.data._embedded.pages || []).length + 1,
+                data = [];
+
+            if (!page) {
+                page = ++max;
+            }
+
+            for (var i = 1; i <= max; i++) {
+                data.push({id: i, title: 'Page ' + i + ' of ' + max});
+            }
+
+            data = data.concat([
+                {divider: true},
+                {id: 'add', title: 'Create new page'}
+            ]);
+
+            this.$dropdownElement = $(this.templates.pageSwitcher({page: page, max: max}));
+
+            var $rightContainer = $(constants.headerRightSelector);
+            $rightContainer.prepend(this.$dropdownElement);
+            $rightContainer.addClass('wide');
+
+            this.sandbox.start([{
+                name: 'dropdown@husky',
+                options: {
+                    el: this.$dropdownElement,
+                    instanceName: 'header-pages',
+                    alignment: 'right',
+                    valueName: 'title',
+                    data: data,
+                    clickCallback: function(item) {
+                        if (item.id === 'add') {
+                            return ArticleRouter.toPageAdd(this.options.id, this.options.locale);
+                        } else if (item.id === 1) {
+                            return ArticleRouter.toEdit(this.options.id, this.options.locale);
+                        }
+
+                        return ArticleRouter.toPageEdit(this.options.id, item.id, this.options.locale);
+                    }.bind(this)
+                }
+            }]);
         }
     }
 });
