@@ -239,6 +239,9 @@ class ArticleDataProvider implements DataProviderInterface
             $this->addPagination($search, $pageSize, $page, $limit);
         } elseif (null !== $limit) {
             $search->setSize($limit);
+        } else {
+            // FIXME find better way to achieve this
+            $search->setSize(1000);
         }
 
         if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
