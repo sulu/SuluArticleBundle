@@ -49,7 +49,7 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetObject($id = '123-123-123', $locale = 'de')
     {
-        $this->documentManager->find($id, $locale)
+        $this->documentManager->find($id, $locale, Argument::any())
             ->willReturn($this->prophesize(ArticleDocument::class)->reveal())->shouldBeCalledTimes(1);
 
         $this->assertInstanceOf(ArticleDocument::class, $this->provider->getObject($id, $locale));

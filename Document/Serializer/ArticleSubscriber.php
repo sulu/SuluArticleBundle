@@ -17,6 +17,7 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
@@ -107,11 +108,13 @@ class ArticleSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticleInterface || !$context->attributes->containsKey('website')) {
             return;
         }
 
-        $visitor->addData('uuid', $context->accept($article->getUuid()));
+        $visitor->addData('uuid', $context->accept($article->getArticleUuid()));
+        $visitor->addData('pageUuid', $context->accept($article->getPageUuid()));
+
         $visitor->addData('extension', $context->accept($article->getExtensionsData()->toArray()));
 
         $content = $this->resolve($article);
@@ -123,11 +126,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Returns content and view of article.
      *
-     * @param ArticleDocument $article
+     * @param ArticleInterface $article
      *
      * @return array
      */
-    private function resolve(ArticleDocument $article)
+    private function resolve(ArticleInterface $article)
     {
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $structure->setDocument($article);

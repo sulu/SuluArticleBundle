@@ -15,6 +15,7 @@ use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\PreviewBundle\Preview\Object\PreviewObjectProviderInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -49,7 +50,14 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function getObject($id, $locale)
     {
-        return $this->documentManager->find($id, $locale);
+        return $this->documentManager->find(
+            $id,
+            $locale,
+            [
+                'load_ghost_content' => false,
+                'load_shadow_content' => true,
+            ]
+        );
     }
 
     /**
@@ -104,6 +112,11 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function serialize($object)
     {
+        if ($object instanceof ArticlePageDocument) {
+            // resolve proxy to ensure that this will also be serialized
+            $object->getParent()->getTitle();
+        }
+
         return $this->serializer->serialize(
             $object,
             'json',

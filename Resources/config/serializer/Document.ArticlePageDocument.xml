@@ -18,7 +18,7 @@
         </h:relation>
 
         <property name="uuid" serialized-name="id" type="string" groups="defaultArticlePage,smallArticlePage,preview"/>
-        <property name="nodeName" type="string"/>
+        <property name="nodeName" type="string" groups="preview"/>
         <property name="path" type="string"/>
 
         <property name="locale" type="string" groups="preview"/>
@@ -33,5 +33,7 @@
         <property name="created" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
         <property name="changed" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
         <property name="published" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
+
+        <property name="parent" type="Sulu\Bundle\ArticleBundle\Document\ArticleDocument" groups="preview"/>
     </class>
 </serializer>
