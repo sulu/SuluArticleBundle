@@ -199,7 +199,7 @@ define([
 
             return {
                 tabs: {
-                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale,
+                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale + (this.options.page ? '&page=' + this.options.page : ''),
                     options: {
                         data: function() {
                             return this.sandbox.util.deepCopy(this.data);
