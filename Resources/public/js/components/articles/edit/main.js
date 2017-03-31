@@ -11,6 +11,7 @@ define([
     'jquery',
     'underscore',
     'config',
+    'services/husky/util',
     'services/suluarticle/article-manager',
     'services/suluarticle/article-router',
     'sulusecurity/services/user-manager',
@@ -19,7 +20,7 @@ define([
     'sulucontent/components/open-ghost-overlay/main',
     './adapter/article',
     './adapter/article-page'
-], function($, _, config, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Article, ArticlePage) {
+], function($, _, config, Util, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Article, ArticlePage) {
 
     'use strict';
 
@@ -39,7 +40,7 @@ define([
                 url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
                 pageSwitcher: [
                     '<div class="page-changer">',
-                    '   <span class="title">Page <%= page %> of <%= max %></span>',
+                    '   <span class="title"><%= label %></span>',
                     '   <span class="dropdown-toggle"></span>',
                     '</div>'
                 ].join('')
@@ -56,6 +57,8 @@ define([
                 deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
                 deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text',
                 deletePage: 'sulu_article.edit.delete_page',
+                pageOf: 'sulu_article.edit.page-of',
+                newPage: 'sulu_article.edit.new-page',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -633,18 +636,18 @@ define([
             }
 
             for (var i = 1; i <= max; i++) {
-                data.push({id: i, title: 'Page ' + i + ' of ' + max});
+                data.push({id: i, title: Util.sprintf(this.translations.pageOf, i, max)});
             }
 
             // new page is only available for existing articles
             if (this.options.id) {
                 data = data.concat([
                     {divider: true},
-                    {id: 'add', title: 'Create new page'}
+                    {id: 'add', title: this.translations.newPage}
                 ]);
             }
 
-            this.$dropdownElement = $(this.templates.pageSwitcher({page: page, max: max}));
+            this.$dropdownElement = $(this.templates.pageSwitcher({label: Util.sprintf(this.translations.pageOf, page, max)}));
 
             var $rightContainer = $(constants.headerRightSelector);
             $rightContainer.prepend(this.$dropdownElement);
