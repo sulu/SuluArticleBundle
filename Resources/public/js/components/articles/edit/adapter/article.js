@@ -21,12 +21,17 @@ define([
         },
 
         startPreview: function(component, data) {
+            var pageData = data;
+            if (!!pageData.type && pageData.type.name === 'ghost') {
+                pageData = {id: pageData.id};
+            }
+
             var preview = Preview.initialize({});
             preview.start(
                 'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
-                component.options.id,
+                pageData.id,
                 component.options.locale,
-                data
+                pageData
             );
 
             return preview;
@@ -50,6 +55,10 @@ define([
             _.each(data, function(value, key) {
                 component.data[key] = value;
             });
+
+            if (!!component.data.type && component.data.type.name === 'ghost') {
+                component.data['_hash'] = null;
+            }
 
             return ArticleManager.save(component.data, component.data.id, component.options.locale, action);
         }

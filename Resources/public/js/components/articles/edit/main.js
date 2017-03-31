@@ -315,7 +315,7 @@ define([
         },
 
         toEdit: function(locale, id) {
-            if (!!this.options.page) {
+            if (!!this.options.page && this.options.page !== 1) {
                 return ArticleRouter.toPageEdit((id || this.options.id), this.options.page, (locale || this.options.locale))
             }
 
@@ -515,7 +515,7 @@ define([
         },
 
         showState: function(published) {
-            if (!!published) {
+            if (!!published && !this.data.type) {
                 this.sandbox.emit('sulu.header.toolbar.item.hide', 'stateTest');
                 this.sandbox.emit('sulu.header.toolbar.item.show', 'statePublished');
             } else {
