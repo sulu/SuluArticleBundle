@@ -54,15 +54,22 @@ define([
                 routePathProperty = component.getRoutePathProperty();
 
             if (titleProperty) {
-                titleProperty.$el.parent().remove();
+                titleProperty.$el.closest('.grid-row').remove();
             }
             if (routePathProperty) {
-                routePathProperty.$el.parent().remove();
+                routePathProperty.$el.closest('.grid-row').remove();
             }
 
-            if (0 === component.$el.find('.section-highlight *[data-mapper-property]').length) {
+            var $titleComponent = component.$el.find('.section-highlight');
+            if (0 === component.$el.find('.highlight-section *[data-mapper-property]').length) {
                 component.$el.find('.highlight-section').remove();
+
+                $titleComponent = component.$el.find('#content-form');
             }
+
+            $titleComponent.prepend(
+                '<div class="sulu-title article-title"><div class="content-title underlined"><h2>' + component.data.title + '</h2></div></div>'
+            );
         },
 
         prepareData: function(data, component) {

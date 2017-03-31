@@ -37,3 +37,19 @@ $toolbarRowPageChangerColor: $white !default;
         }
     }
 }
+
+.article-form #content-form .highlight-section {
+    .grid-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .article-title {
+        width: 870px;
+        padding-left: 0;
+
+        .content-title.underlined {
+            margin-top: 10px;
+            border-bottom: 2px solid $grayLight;
+        }
+    }
+}
