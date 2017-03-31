@@ -54,10 +54,10 @@ define([
                 routePathProperty = component.getRoutePathProperty();
 
             if (titleProperty) {
-                titleProperty.$el.parent().parent().remove();
+                titleProperty.$el.closest('.grid-row').remove();
             }
             if (routePathProperty) {
-                routePathProperty.$el.parent().parent().remove();
+                routePathProperty.$el.closest('.grid-row').remove();
             }
 
             var $titleComponent = component.$el.find('.section-highlight');
