@@ -326,7 +326,7 @@ define([
         },
 
         toEdit: function(locale, id) {
-            if (!!this.options.page) {
+            if (!!this.options.page && this.options.page !== 1) {
                 return ArticleRouter.toPageEdit((id || this.options.id), this.options.page, (locale || this.options.locale))
             }
 
@@ -526,7 +526,7 @@ define([
         },
 
         showState: function(published) {
-            if (!!published) {
+            if (!!published && !this.data.type) {
                 this.sandbox.emit('sulu.header.toolbar.item.hide', 'stateTest');
                 this.sandbox.emit('sulu.header.toolbar.item.show', 'statePublished');
             } else {
@@ -629,10 +629,13 @@ define([
                 data.push({id: i, title: 'Page ' + i + ' of ' + max});
             }
 
-            data = data.concat([
-                {divider: true},
-                {id: 'add', title: 'Create new page'}
-            ]);
+            // new page is only available for existing articles
+            if (this.options.id) {
+                data = data.concat([
+                    {divider: true},
+                    {id: 'add', title: 'Create new page'}
+                ]);
+            }
 
             this.$dropdownElement = $(this.templates.pageSwitcher({page: page, max: max}));
 
