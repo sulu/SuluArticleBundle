@@ -12,8 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
-use Sulu\Component\HttpCache\HttpCache;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Component\HttpCache\HttpCache;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
