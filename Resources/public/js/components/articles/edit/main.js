@@ -229,6 +229,8 @@ define([
         },
 
         initialize: function() {
+            this.$el.addClass('article-form');
+
             this.startPageSwitcher();
 
             this.bindCustomEvents();
