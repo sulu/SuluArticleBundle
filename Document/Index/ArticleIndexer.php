@@ -293,16 +293,14 @@ class ArticleIndexer implements IndexerInterface
             ->addQuery(new MatchAllQuery())
             ->setSize($pageSize);
 
-        $count = $repository->count($repository->createSearch()->addQuery(new MatchAllQuery()));
-        $maxPage = ceil($count / $pageSize);
-        for ($page = 1; $page <= $maxPage; ++$page) {
-            $search->setFrom(($page - 1) * $pageSize);
-            foreach ($repository->execute($search) as $document) {
+        do {
+            $result = $repository->execute($search);
+            foreach ($result as $document) {
                 $this->manager->remove($document);
             }
 
             $this->manager->commit();
-        }
+        } while ($result->count() !== 0);
 
         $this->manager->clearCache();
         $this->manager->flush();
