@@ -612,10 +612,13 @@ define([
                 data.push({id: i, title: 'Page ' + i + ' of ' + max});
             }
 
-            data = data.concat([
-                {divider: true},
-                {id: 'add', title: 'Create new page'}
-            ]);
+            // new page is only available for existing articles
+            if (this.options.id) {
+                data = data.concat([
+                    {divider: true},
+                    {id: 'add', title: 'Create new page'}
+                ]);
+            }
 
             this.$dropdownElement = $(this.templates.pageSwitcher({page: page, max: max}));
 
