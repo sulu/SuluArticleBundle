@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
@@ -22,6 +23,7 @@ use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Rest\Exception\MissingParameterException;
+use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
 use Sulu\Component\Security\SecuredControllerInterface;
@@ -102,6 +104,51 @@ class ArticlePageController extends RestController implements ClassResourceInter
                     ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
             )
         );
+    }
+
+    /**
+     * Trigger a action for given article-page specified over get-action parameter.
+     *
+     * @Post("/articles/{articleUuid}/pages/{uuid}")
+     *
+     * @param string $uuid
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function postTriggerAction($articleUuid, $uuid, Request $request)
+    {
+        // extract parameter
+        $action = $this->getRequestParameter($request, 'action', true);
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
+        // prepare vars
+        $view = null;
+        $data = null;
+        $userId = $this->getUser()->getId();
+
+        try {
+            switch ($action) {
+                case 'copy-locale':
+                    $destLocales = $this->getRequestParameter($request, 'dest', true);
+                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    break;
+                default:
+                    throw new RestException('Unrecognized action: ' . $action);
+            }
+
+            // prepare view
+            $view = $this->view($data);
+            $view->setSerializationContext(
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
+            );
+        } catch (RestException $exc) {
+            $view = $this->view($exc->toArray(), 400);
+        }
+
+        return $this->handleView($view);
     }
 
     /**
@@ -186,12 +233,11 @@ class ArticlePageController extends RestController implements ClassResourceInter
         if (array_key_exists('title', $data)) {
             throw new ParameterNotAllowedException('title', ArticlePageDocument::class);
         }
-        if (array_key_exists('template', $data)) {
-            throw new ParameterNotAllowedException('template', ArticlePageDocument::class);
-        }
 
         $article = $this->getDocumentManager()->find($articleUuid, $locale);
-        $data['template'] = $article->getStructureType();
+        if (!array_key_exists('template', $data)) {
+            $data['template'] = $article->getStructureType();
+        }
 
         $form = $this->createForm(
             ArticlePageDocumentType::class,

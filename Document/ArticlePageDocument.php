@@ -29,7 +29,8 @@ class ArticlePageDocument implements
     ParentBehavior,
     AutoNameBehavior,
     PathBehavior,
-    StructureBehavior
+    StructureBehavior,
+    ArticleInterface
 {
     /**
      * @var string
@@ -213,5 +214,37 @@ class ArticlePageDocument implements
     public function getPageNumber()
     {
         return $this->pageNumber;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getArticleUuid()
+    {
+        return $this->getParent()->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageUuid()
+    {
+        return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWorkflowStage()
+    {
+        return $this->getParent()->getWorkflowStage();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionsData()
+    {
+        return $this->getParent()->getExtensionsData();
     }
 }

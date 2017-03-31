@@ -353,7 +353,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             }
 
             // prepare view
-            $view = $this->view($data, $data !== null ? 200 : 204);
+            $view = $this->view($data);
             $view->setSerializationContext(
                 SerializationContext::create()
                     ->setSerializeNull(true)
