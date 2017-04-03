@@ -99,6 +99,17 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
+         * Remove article-page.
+         *
+         * @param {String} articleId
+         * @param {String} pageId
+         * @param {String} locale
+         */
+        removePage: function(articleId, pageId, locale) {
+            return Util.save(templates.pageUrl({articleId: articleId, pageId: pageId, locale: locale}), 'DELETE');
+        },
+
+        /**
          * Unpublish article.
          *
          * @param {String} id

@@ -138,6 +138,10 @@
                 <source>sulu_article.edit.copy</source>
                 <target>Artikel kopieren</target>
             </trans-unit>
+            <trans-unit id="edit-delete-page">
+                <source>sulu_article.edit.delete_page</source>
+                <target>Seite löschen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

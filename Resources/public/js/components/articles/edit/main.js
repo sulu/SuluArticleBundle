@@ -56,6 +56,7 @@ define([
                 deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
                 deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text',
                 copy: 'sulu_article.edit.copy',
+                deletePage: 'sulu_article.edit.delete_page',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -149,6 +150,14 @@ define([
                     options: {
                         disabled: !this.options.id,
                         callback: this.deleteArticle.bind(this)
+                    }
+                };
+
+                editDropdown.deletePage = {
+                    options: {
+                        title: this.translations.deletePage,
+                        disabled: (!this.options.page || this.options.page === 1),
+                        callback: this.deleteArticlePage.bind(this)
                     }
                 };
             }
@@ -317,11 +326,26 @@ define([
 
         deleteArticle: function() {
             this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
-                if (wasConfirmed) {
-                    ArticleManager.remove(this.options.id, this.options.locale).then(function() {
-                        this.toList();
-                    }.bind(this));
+                if (!wasConfirmed) {
+                    return;
                 }
+
+                ArticleManager.remove(this.options.id, this.options.locale).then(function() {
+                    this.toList();
+                }.bind(this));
+            }.bind(this));
+        },
+
+        deleteArticlePage: function() {
+            this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
+                if (!wasConfirmed) {
+                    return;
+                }
+
+                var pageData = this.getAdapter().prepareData(this.data, this);
+                ArticleManager.removePage(this.options.id, pageData.id, this.options.locale).then(function() {
+                    ArticleRouter.toEditForce(this.options.id, this.options.locale);
+                }.bind(this));
             }.bind(this));
         },
 
