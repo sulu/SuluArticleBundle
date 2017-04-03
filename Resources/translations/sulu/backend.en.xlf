@@ -134,6 +134,10 @@
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filter article by contact</target>
             </trans-unit>
+            <trans-unit id="edit-delete-page">
+                <source>sulu_article.edit.delete_page</source>
+                <target>Delete page</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
