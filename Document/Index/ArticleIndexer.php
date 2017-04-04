@@ -42,56 +42,54 @@ class ArticleIndexer implements IndexerInterface
     /**
      * @var StructureMetadataFactoryInterface
      */
-    private $structureMetadataFactory;
+    protected $structureMetadataFactory;
 
     /**
      * @var UserManager
      */
-    private $userManager;
+    protected $userManager;
 
     /**
      * @var ContactRepository
      */
-    private $contactRepository;
+    protected $contactRepository;
 
     /**
      * @var DocumentFactoryInterface
      */
-    private $documentFactory;
+    protected $documentFactory;
 
     /**
      * @var Manager
      */
-    private $manager;
+    protected $manager;
 
     /**
      * @var ExcerptFactory
      */
-    private $excerptFactory;
+    protected $excerptFactory;
 
     /**
      * @var SeoFactory
      */
-    private $seoFactory;
+    protected $seoFactory;
 
     /**
      * @var EventDispatcherInterface
      */
-    private $eventDispatcher;
+    protected $eventDispatcher;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    protected $translator;
 
     /**
      * @var array
      */
-    private $typeConfiguration;
+    protected $typeConfiguration;
 
     /**
-     * ArticleIndexer constructor.
-     *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
      * @param ContactRepository $contactRepository
@@ -243,8 +241,6 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
-        $this->manager->persist($article);
-
         return $article;
     }
 
@@ -332,5 +328,6 @@ class ArticleIndexer implements IndexerInterface
     {
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
         $this->dispatchIndexEvent($document, $article);
+        $this->manager->persist($article);
     }
 }
