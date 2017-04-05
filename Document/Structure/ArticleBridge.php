@@ -28,6 +28,46 @@ class ArticleBridge extends StructureBridge
 
     /**
      * {@inheritdoc}
+     *
+     * Will be called by SuluCollector to collect profiler data.
+     */
+    public function getNavContexts()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Will be called by SuluCollector to collect profiler data.
+     */
+    public function getShadowLocales()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Will be called by SuluCollector to collect profiler data.
+     */
+    public function getEnabledShadowLanguages()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Will be called by SuluCollector to collect profiler data.
+     */
+    public function getOriginTemplate()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getWebspaceKey()
     {
