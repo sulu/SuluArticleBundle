@@ -114,6 +114,13 @@
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+        <service id="sulu_article.subscriber.page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber">
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
         <service id="sulu_article.subscriber.article_page"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticlePageSubscriber">
             <argument type="service" id="sulu_content.structure.factory"/>
@@ -122,6 +129,7 @@
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+
         <service id="sulu_article.initializer"
                  class="Sulu\Bundle\ArticleBundle\Document\Initializer\ArticleInitializer">
             <argument type="service" id="sulu_document_manager.node_manager"/>
@@ -165,6 +173,13 @@
             <argument type="service" id="sulu_route.generator.route_generator"/>
 
             <tag name="sulu.route_generator" alias="template"/>
+        </service>
+        <service id="sulu_article.route_generator.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticlePageRouteGenerator">
+            <argument type="service" id="sulu_route.generator.route_generator"/>
+            <argument type="service" id="sulu_route.generator.expression_token_provider"/>
+
+            <tag name="sulu.route_generator" alias="article_page"/>
         </service>
 
         <!-- content -->
