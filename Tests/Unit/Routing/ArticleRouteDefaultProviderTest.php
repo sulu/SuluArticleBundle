@@ -12,7 +12,9 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
+use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -36,6 +38,11 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
      * @var CacheLifetimeResolverInterface
      */
     private $cacheLifetimeResolver;
+
+    /**
+     * @var StructureManagerInterface
+     */
+    private $structureManager;
 
     /**
      * @var ArticleRouteDefaultProvider
@@ -62,11 +69,13 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->cacheLifetimeResolver = $this->prophesize(CacheLifetimeResolverInterface::class);
+        $this->structureManager = $this->prophesize(StructureManagerInterface::class);
 
         $this->provider = new ArticleRouteDefaultProvider(
             $this->documentManager->reveal(),
             $this->structureMetadataFactory->reveal(),
-            $this->cacheLifetimeResolver->reveal()
+            $this->cacheLifetimeResolver->reveal(),
+            $this->structureManager->reveal()
         );
     }
 
@@ -112,11 +121,16 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $this->cacheLifetimeResolver->supports('seconds', 3600)->willReturn(true);
         $this->cacheLifetimeResolver->resolve('seconds', 3600)->willReturn(3600);
 
+        $structure = $this->prophesize(ArticleBridge::class);
+        $structure->setDocument($article->reveal())->shouldBeCalled();
+        $this->structureManager->wrapStructure('article', $structureMetadata)->willReturn($structure->reveal());
+
         $result = $this->provider->getByEntity($this->entityClass, $this->entityId, $this->locale);
 
         $this->assertEquals(
             [
                 'object' => $article->reveal(),
+                'structure' => $structure->reveal(),
                 'view' => 'default.html.twig',
                 '_controller' => 'SuluArticleBundle:Default:index',
                 '_cacheLifetime' => 3600,

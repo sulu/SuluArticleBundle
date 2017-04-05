@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
+use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -40,17 +41,26 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     private $cacheLifetimeResolver;
 
     /**
+     * @var StructureManagerInterface
+     */
+    private $structureManager;
+
+    /**
      * @param DocumentManagerInterface $documentManager
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
+     * @param CacheLifetimeResolverInterface $cacheLifetimeResolver
+     * @param StructureManagerInterface $structureManager
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
         StructureMetadataFactoryInterface $structureMetadataFactory,
-        CacheLifetimeResolverInterface $cacheLifetimeResolver
+        CacheLifetimeResolverInterface $cacheLifetimeResolver,
+        StructureManagerInterface $structureManager
     ) {
         $this->documentManager = $documentManager;
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->cacheLifetimeResolver = $cacheLifetimeResolver;
+        $this->structureManager = $structureManager;
     }
 
     /**
@@ -66,9 +76,15 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         $metadata = $this->structureMetadataFactory->getStructureMetadata('article', $object->getStructureType());
 
+        // this parameter should not be used
+        // but the sulu-collector for the profiler needs it to determine data from request
+        $structure = $this->structureManager->wrapStructure('article', $metadata);
+        $structure->setDocument($object);
+
         return [
             'object' => $object,
             'view' => $metadata->view,
+            'structure' => $structure,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
             '_controller' => $metadata->controller,
         ];
