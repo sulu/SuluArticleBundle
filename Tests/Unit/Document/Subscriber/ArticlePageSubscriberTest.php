@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
-use PHPCR\NodeInterface;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -24,9 +23,7 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\Content\Metadata\StructureMetadata;
-use Sulu\Component\DocumentManager\DocumentAccessor;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 
 class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -204,32 +201,6 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->setTitle(Argument::type('string'))->shouldBeCalled();
 
         $this->subscriber->setTitleOnPersist($event);
-    }
-
-    public function testSetPageNumberOnPersist()
-    {
-        $node = $this->prophesize(NodeInterface::class);
-        $node->getIndex()->willReturn(1);
-
-        $accessor = $this->prophesize(DocumentAccessor::class);
-        $accessor->set('pageNumber', 2)->shouldBeCalled();
-
-        $event = $this->createEvent(PersistEvent::class, $node->reveal(), $accessor->reveal());
-
-        $this->subscriber->setPageNumberOnPersist($event);
-    }
-
-    public function testSetPageNumberOnHydrate()
-    {
-        $node = $this->prophesize(NodeInterface::class);
-        $node->getIndex()->willReturn(1);
-
-        $accessor = $this->prophesize(DocumentAccessor::class);
-        $accessor->set('pageNumber', 2)->shouldBeCalled();
-
-        $event = $this->createEvent(HydrateEvent::class, $node->reveal(), $accessor->reveal());
-
-        $this->subscriber->setPageNumberOnHydrate($event);
     }
 
     public function testSetWorkflowStageOnArticle()

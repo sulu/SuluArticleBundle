@@ -11,6 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
@@ -30,6 +33,8 @@ class ArticlePageDocument implements
     AutoNameBehavior,
     PathBehavior,
     StructureBehavior,
+    RoutableBehavior,
+    PageBehavior,
     ArticleInterface
 {
     /**
@@ -71,6 +76,16 @@ class ArticlePageDocument implements
      * @var StructureInterface
      */
     private $structure;
+
+    /**
+     * @var RouteInterface
+     */
+    private $route;
+
+    /**
+     * @var string
+     */
+    private $routePath;
 
     /**
      * @var int
@@ -207,13 +222,64 @@ class ArticlePageDocument implements
     }
 
     /**
-     * Returns page.
-     *
-     * @return int
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->uuid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRoute(RouteInterface $route)
+    {
+        $this->route = $route;
+        $this->routePath = $route->getPath();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoutePath()
+    {
+        return $this->routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRoutePath($routePath)
+    {
+        $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPageNumber()
     {
         return $this->pageNumber;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPageNumber($pageNumber)
+    {
+        $this->pageNumber = $pageNumber;
+
+        return $this;
     }
 
     /**
