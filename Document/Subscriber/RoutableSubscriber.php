@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
@@ -47,8 +48,11 @@ class RoutableSubscriber implements EventSubscriberInterface
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(RouteManagerInterface $routeManager, RouteRepositoryInterface $routeRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        RouteManagerInterface $routeManager,
+        RouteRepositoryInterface $routeRepository,
+        EntityManagerInterface $entityManager
+    ) {
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
@@ -62,7 +66,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         return [
             Events::HYDRATE => [['handleHydrate', -500]],
             Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0]],
-            Events::REMOVE => [['handleRemove', -500]],
+            Events::REMOVE => [
+                // high priority to ensure nodes are not deleted until we iterate over children
+                ['handleRemove', 1024],
+            ],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
@@ -146,7 +153,43 @@ class RoutableSubscriber implements EventSubscriberInterface
         }
 
         $this->entityManager->remove($route);
+
+        if ($document instanceof ChildrenBehavior) {
+            $this->removeChildRoutes($document);
+        }
+
         $this->entityManager->flush();
+    }
+
+    /**
+     * Iterate over children and remove routes.
+     *
+     * @param ChildrenBehavior $document
+     */
+    private function removeChildRoutes(ChildrenBehavior $document)
+    {
+        foreach ($document->getChildren() as $child) {
+            if ($child instanceof RoutableBehavior) {
+                $this->removeChildRoute($child);
+            }
+
+            if ($child instanceof ChildrenBehavior) {
+                $this->removeChildRoutes($child);
+            }
+        }
+    }
+
+    /**
+     * Removes route if exists.
+     *
+     * @param RoutableBehavior $document
+     */
+    private function removeChildRoute(RoutableBehavior $document)
+    {
+        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
+        if ($route) {
+            $this->entityManager->remove($route);
+        }
     }
 
     /**

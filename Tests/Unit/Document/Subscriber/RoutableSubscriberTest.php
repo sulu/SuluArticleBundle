@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
@@ -144,6 +145,35 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
 
         $this->entityManager->remove($route->reveal())->shouldBeCalled();
+        $this->entityManager->flush()->shouldBeCalled();
+
+        $this->routableSubscriber->handleRemove($event->reveal());
+    }
+
+    public function testHandleRemoveWithChildren()
+    {
+        $this->document->willImplement(ChildrenBehavior::class);
+
+        $event = $this->prophesize(RemoveEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+
+        $this->document->getRoutePath()->willReturn('/test');
+        $this->document->getOriginalLocale()->willReturn('de');
+        $route1 = $this->prophesize(RouteInterface::class);
+        $this->routeRepository->findByPath('/test', 'de')->willReturn($route1->reveal());
+
+        $child = $this->prophesize(RoutableBehavior::class);
+        $child->willImplement(ChildrenBehavior::class);
+        $child->getChildren()->willReturn([]);
+        $this->document->getChildren()->willReturn([$child->reveal()]);
+
+        $child->getRoutePath()->willReturn('/test/test-2');
+        $child->getOriginalLocale()->willReturn('de');
+        $route2 = $this->prophesize(RouteInterface::class);
+        $this->routeRepository->findByPath('/test/test-2', 'de')->willReturn($route2->reveal());
+
+        $this->entityManager->remove($route1->reveal())->shouldBeCalled();
+        $this->entityManager->remove($route2->reveal())->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
         $this->routableSubscriber->handleRemove($event->reveal());
