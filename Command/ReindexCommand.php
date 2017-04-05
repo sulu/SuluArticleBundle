@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Command;
 
+use Sulu\Component\Content\Document\WorkflowStage;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,16 +40,22 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $sql2 = 'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article"';
+
         $id = 'sulu_article.elastic_search.article_indexer';
         if ($input->getOption('live')) {
             $id = 'sulu_article.elastic_search.article_live_indexer';
+            $sql2 = sprintf(
+                '%s AND [i18n:%s-state] = %s',
+                $sql2,
+                $input->getArgument('locale'),
+                WorkflowStage::PUBLISHED
+            );
         }
 
         $indexer = $this->getContainer()->get($id);
         $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $query = $documentManager->createQuery(
-            'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article"'
-        );
+        $query = $documentManager->createQuery($sql2);
 
         if ($input->getOption('clear')) {
             $indexer->clear();
