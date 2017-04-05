@@ -18,7 +18,6 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -69,11 +68,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         return [
             Events::PERSIST => [
                 ['setTitleOnPersist', 2048],
-                ['setPageNumberOnPersist', 0],
                 ['setStructureTypeToParent', -2048],
                 ['setWorkflowStageOnArticle', -2048],
             ],
-            Events::HYDRATE => [['setPageNumberOnHydrate', 0]],
         ];
     }
 
@@ -151,21 +148,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Set page-number to document on persist.
-     *
-     * @param PersistEvent $event
-     */
-    public function setPageNumberOnPersist(PersistEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticlePageDocument) {
-            return;
-        }
-
-        $event->getAccessor()->set('pageNumber', $event->getNode()->getIndex() + 1);
-    }
-
-    /**
      * Set structure-type to parent document.
      *
      * @param PersistEvent $event
@@ -182,20 +164,5 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
         $document->getParent()->setStructureType($document->getStructureType());
         $this->documentManager->persist($document->getParent(), $event->getLocale());
-    }
-
-    /**
-     * Set page-number to document on persist.
-     *
-     * @param HydrateEvent $event
-     */
-    public function setPageNumberOnHydrate(HydrateEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticlePageDocument) {
-            return;
-        }
-
-        $event->getAccessor()->set('pageNumber', $event->getNode()->getIndex() + 1);
     }
 }
