@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
-use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
+use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -53,32 +53,28 @@ class PageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            Events::HYDRATE => ['handleHydrate'],
             Events::PERSIST => [['handlePersist', -1024]],
             Events::REMOVE => [['handleRemove', 5]],
-            Events::METADATA_LOAD => 'handleMetadataLoad',
         ];
     }
 
     /**
-     * Add page-number to metadata.
+     * Set the page-number to existing pages.
      *
-     * @param MetadataLoadEvent $event
+     * @param HydrateEvent $event
      */
-    public function handleMetadataLoad(MetadataLoadEvent $event)
+    public function handleHydrate(HydrateEvent $event)
     {
-        $metadata = $event->getMetadata();
-
-        if (false === $metadata->getReflectionClass()->isSubclassOf(PageBehavior::class)) {
+        $document = $event->getDocument();
+        $node = $event->getNode();
+        $propertyName = $this->propertyEncoder->systemName(static::FIELD);
+        if (!$document instanceof PageBehavior || !$node->hasProperty($propertyName)) {
             return;
         }
 
-        $metadata->addFieldMapping(
-            'pageNumber',
-            [
-                'encoding' => 'system',
-                'property' => self::FIELD,
-            ]
-        );
+        $node = $event->getNode();
+        $document->setPageNumber($node->getPropertyValue($this->propertyEncoder->systemName(static::FIELD)));
     }
 
     /**
@@ -89,7 +85,9 @@ class PageSubscriber implements EventSubscriberInterface
     public function handlePersist(PersistEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof PageBehavior || $document->getPageNumber()) {
+        $node = $event->getNode();
+        $propertyName = $this->propertyEncoder->systemName(static::FIELD);
+        if (!$document instanceof PageBehavior || $node->hasProperty($propertyName)) {
             return;
         }
 
@@ -105,7 +103,8 @@ class PageSubscriber implements EventSubscriberInterface
         }
 
         $childNode = $this->documentInspector->getNode($document);
-        $childNode->setProperty($this->propertyEncoder->systemName(static::FIELD), $page);
+        $childNode->setProperty($propertyName, $page);
+        $document->setPageNumber($page);
     }
 
     /**

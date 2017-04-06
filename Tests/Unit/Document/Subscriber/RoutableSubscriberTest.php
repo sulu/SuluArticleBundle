@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPCR\NodeInterface;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
@@ -41,6 +42,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
 
     /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
      * @var RoutableSubscriber
      */
     private $routableSubscriber;
@@ -50,30 +56,37 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     private $document;
 
+    /**
+     * @var NodeInterface
+     */
+    private $node;
+
     protected function setUp()
     {
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
 
         $this->document = $this->prophesize(RoutableBehavior::class);
+
+        $this->node = $this->prophesize(NodeInterface::class);
+        $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->routableSubscriber = new RoutableSubscriber(
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
-            $this->entityManager->reveal()
+            $this->entityManager->reveal(),
+            $this->propertyEncoder->reveal()
         );
     }
 
     protected function prophesizeEvent($className, $routePath = null)
     {
-        $node = $this->prophesize(NodeInterface::class);
-        $node->getIdentifier()->willReturn('123-123-123');
-
         $event = $this->prophesize($className);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getLocale()->willReturn('de');
-        $event->getNode()->willReturn($node->reveal());
+        $event->getNode()->willReturn($this->node->reveal());
         $event->getOption('route_path')->willReturn($routePath);
 
         return $event->reveal();
@@ -82,10 +95,15 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testHandleHydrate()
     {
         $route = $this->prophesize(RouteInterface::class);
-        $this->document->getRoutePath()->willReturn('/test');
         $this->document->setRoute($route->reveal())->shouldBeCalled();
         $this->document->getOriginalLocale()->willReturn('de');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::FIELD, 'de')
+            ->willReturn('i18n:de-' . RoutableSubscriber::FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::FIELD, null)->willReturn('/test');
+
+        $this->document->setRoutePath('/test')->shouldBeCalled();
 
         $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
     }

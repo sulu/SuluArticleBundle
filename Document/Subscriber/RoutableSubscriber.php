@@ -19,8 +19,10 @@ use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
+use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
+use Sulu\Component\DocumentManager\PropertyEncoder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -28,6 +30,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RoutableSubscriber implements EventSubscriberInterface
 {
+    const FIELD = 'routePath';
+
     /**
      * @var RouteManagerInterface
      */
@@ -44,18 +48,26 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $entityManager;
 
     /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
+     * @param PropertyEncoder $propertyEncoder
      */
     public function __construct(
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        PropertyEncoder $propertyEncoder
     ) {
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
+        $this->propertyEncoder = $propertyEncoder;
     }
 
     /**
@@ -64,8 +76,9 @@ class RoutableSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::HYDRATE => [['handleHydrate', -500]],
-            Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0]],
+            Events::HYDRATE => ['handleHydrate'],
+            // low priority because all other subscriber should be finished
+            Events::PERSIST => [['handleRouteUpdate', -2000], ['handleRoute', -2010], ['persistRoute', -2020]],
             Events::REMOVE => [
                 // high priority to ensure nodes are not deleted until we iterate over children
                 ['handleRemove', 1024],
@@ -83,15 +96,21 @@ class RoutableSubscriber implements EventSubscriberInterface
     public function handleHydrate(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof RoutableBehavior || null === $document->getRoutePath()) {
+        if (!$document instanceof RoutableBehavior) {
             return;
         }
 
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
+        $routePath = $event->getNode()->getPropertyValueWithDefault($this->getPropertyName($event->getLocale()), null);
+        if (!$routePath) {
+            return;
+        }
+
+        $route = $this->routeRepository->findByPath($routePath, $event->getLocale());
         if (!$route) {
             return;
         }
 
+        $document->setRoutePath($routePath);
         $document->setRoute($route);
     }
 
@@ -133,6 +152,22 @@ class RoutableSubscriber implements EventSubscriberInterface
         $document->setRoutePath($route->getPath());
         $this->entityManager->persist($route);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Save route-path to node.
+     *
+     * @param PersistEvent $event
+     */
+    public function persistRoute(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutableBehavior || null === $document->getRoute()) {
+            return;
+        }
+
+        $node = $event->getNode();
+        $node->setProperty($this->getPropertyName($event->getLocale()), $document->getRoutePath());
     }
 
     /**
@@ -222,5 +257,17 @@ class RoutableSubscriber implements EventSubscriberInterface
     {
         $options = $event->getOptions();
         $options->setDefaults(['route_path' => null]);
+    }
+
+    /**
+     * Returns encoded property-name.
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getPropertyName($locale)
+    {
+        return $this->propertyEncoder->localizedSystemName(self::FIELD, $locale);
     }
 }

@@ -111,6 +111,7 @@
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
