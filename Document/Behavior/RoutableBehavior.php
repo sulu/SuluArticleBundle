@@ -12,13 +12,14 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
 use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
+use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\LocaleBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 
 /**
  * This behavior has to be attached to documents which should have a sulu-route.
  */
-interface RoutableBehavior extends RoutableInterface, UuidBehavior, LocaleBehavior
+interface RoutableBehavior extends RoutableInterface, UuidBehavior, LocaleBehavior, StructureBehavior
 {
     /**
      * Returns route-path.

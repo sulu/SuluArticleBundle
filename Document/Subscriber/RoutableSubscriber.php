@@ -19,11 +19,13 @@ use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
+use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -34,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RoutableSubscriber implements EventSubscriberInterface
 {
     const ROUTE_FIELD = 'routePath';
+    const TAG_NAME = 'sulu_article.article_route';
 
     /**
      * @var RouteManagerInterface
@@ -66,12 +69,18 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $propertyEncoder;
 
     /**
+     * @var StructureMetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
      * @param DocumentManagerInterface $documentManager
      * @param DocumentInspector $documentInspector
      * @param PropertyEncoder $propertyEncoder
+     * @param StructureMetadataFactoryInterface $metadataFactory
      */
     public function __construct(
         RouteManagerInterface $routeManager,
@@ -79,7 +88,8 @@ class RoutableSubscriber implements EventSubscriberInterface
         EntityManagerInterface $entityManager,
         DocumentManagerInterface $documentManager,
         DocumentInspector $documentInspector,
-        PropertyEncoder $propertyEncoder
+        PropertyEncoder $propertyEncoder,
+        StructureMetadataFactoryInterface $metadataFactory
     ) {
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
@@ -87,6 +97,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         $this->documentManager = $documentManager;
         $this->documentInspector = $documentInspector;
         $this->propertyEncoder = $propertyEncoder;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
@@ -95,8 +106,9 @@ class RoutableSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::HYDRATE => [['handleHydrate', -500]],
-            Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0]],
+            Events::HYDRATE => ['handleHydrate'],
+            // low priority because all other subscriber should be finished
+            Events::PERSIST => [['handleRouteUpdate', -2000], ['handleRoute', -2010], ['persistRoute', -2020]],
             Events::REMOVE => [
                 // high priority to ensure nodes are not deleted until we iterate over children
                 ['handleRemove', 1024],
@@ -115,15 +127,22 @@ class RoutableSubscriber implements EventSubscriberInterface
     public function handleHydrate(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof RoutableBehavior || null === $document->getRoutePath()) {
+        if (!$document instanceof RoutableBehavior) {
             return;
         }
 
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
+        $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
+        if (!$routePath) {
+            return;
+        }
+
+        $route = $this->routeRepository->findByPath($routePath, $event->getLocale());
         if (!$route) {
             return;
         }
 
+        $document->setRoutePath($routePath);
         $document->setRoute($route);
     }
 
@@ -165,6 +184,23 @@ class RoutableSubscriber implements EventSubscriberInterface
         $document->setRoutePath($route->getPath());
         $this->entityManager->persist($route);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Save route-path to node.
+     *
+     * @param PersistEvent $event
+     */
+    public function persistRoute(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutableBehavior || null === $document->getRoute()) {
+            return;
+        }
+
+        $node = $event->getNode();
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
+        $node->setProperty($propertyName, $document->getRoutePath());
     }
 
     /**
@@ -284,5 +320,37 @@ class RoutableSubscriber implements EventSubscriberInterface
     {
         $options = $event->getOptions();
         $options->setDefaults(['route_path' => null]);
+    }
+
+    /**
+     * Returns encoded "routePath" property-name.
+     *
+     * @param string $structureType
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getRoutePathPropertyName($structureType, $locale)
+    {
+        $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
+
+        if ($metadata->hasTag(self::TAG_NAME)) {
+            return $this->getPropertyName($locale, $metadata->getPropertyByTagName(self::TAG_NAME)->getName());
+        }
+
+        return $this->getPropertyName($locale, self::ROUTE_FIELD);
+    }
+
+    /**
+     * Returns encoded property-name.
+     *
+     * @param string $locale
+     * @param string $name
+     *
+     * @return string
+     */
+    private function getPropertyName($locale, $name)
+    {
+        return $this->propertyEncoder->localizedSystemName($name, $locale);
     }
 }
