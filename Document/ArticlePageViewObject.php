@@ -44,6 +44,21 @@ class ArticlePageViewObject
     public $title;
 
     /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *         "fields":{
+     *            "raw":{"type":"string", "index":"not_analyzed"},
+     *            "value":{"type":"string"}
+     *         }
+     *     }
+     * )
+     */
+    public $routePath;
+
+    /**
      * @var int
      *
      * @Property(type="integer", options={"index"="not_analyzed"})

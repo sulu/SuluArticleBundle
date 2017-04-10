@@ -76,6 +76,9 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->prophesize(PersistEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($this->node->reveal());
+
+        $this->node->hasProperty('sulu:pageNumber')->willReturn(false);
 
         $parentDocument = $this->prophesize(ChildrenBehavior::class);
         $parentDocument->getChildren()->willReturn(
@@ -88,6 +91,7 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getParent()->willReturn($parentDocument->reveal());
         $this->document->getUuid()->willReturn('1-2-3');
         $this->document->getPageNumber()->willReturn(null);
+        $this->document->setPageNumber(3)->shouldBeCalled();
 
         $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
 
@@ -100,6 +104,11 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $event = $this->prophesize(PersistEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($this->node->reveal());
+
+        $this->node->hasProperty('sulu:pageNumber')->willReturn(true);
+
+        $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
 
         $this->document->getPageNumber()->willReturn(2);
         $this->document->setPageNumber(Argument::any())->shouldNotBeCalled();
