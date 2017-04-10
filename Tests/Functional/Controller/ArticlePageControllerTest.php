@@ -11,6 +11,7 @@
 
 namespace Functional\Controller;
 
+use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
@@ -33,6 +34,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
         $this->purgeIndex();
 
+        $this->purgeDatabase();
         $this->initPhpcr();
 
         $collectionTypes = new LoadCollectionTypes();
@@ -52,7 +54,6 @@ class ArticlePageControllerTest extends SuluTestCase
                 'pageTitle' => $title,
                 'template' => $template,
                 'authored' => '2016-01-01',
-                'author' => $this->getTestUser()->getContact()->getId(),
             ]
         );
 
@@ -70,7 +71,6 @@ class ArticlePageControllerTest extends SuluTestCase
                 'pageTitle' => $title,
                 'template' => $template,
                 'authored' => '2016-01-01',
-                'author' => $this->getTestUser()->getContact()->getId(),
             ]
         );
 
@@ -109,6 +109,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
+        $this->assertEquals($this->getRoute($title, 2), $response['route']);
         $this->assertEquals(2, $response['pageNumber']);
 
         $this->assertEquals($article['id'], $response['_embedded']['article']['id']);
@@ -124,6 +125,41 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($response['id'], $articleViewDocument->getPages()[0]->uuid);
     }
 
+    public function testPostMultiplePages($title = 'Test-Article')
+    {
+        $article = $this->createArticle($title);
+
+        $response1 = $this->post($article, 'Test-1');
+        $this->assertEquals($title, $response1['title']);
+        $this->assertEquals('Test-1', $response1['pageTitle']);
+        $this->assertEquals($this->getRoute($title, 2), $response1['route']);
+        $this->assertEquals(2, $response1['pageNumber']);
+
+        $response2 = $this->post($article, 'Test-2');
+        $this->assertEquals($title, $response2['title']);
+        $this->assertEquals('Test-2', $response2['pageTitle']);
+        $this->assertEquals($this->getRoute($title, 3), $response2['route']);
+        $this->assertEquals(3, $response2['pageNumber']);
+
+        $article = $this->getArticle($article['id']);
+        $this->assertCount(2, $article['_embedded']['pages']);
+        $this->assertEquals($response1['id'], $article['_embedded']['pages'][0]['id']);
+        $this->assertEquals($response2['id'], $article['_embedded']['pages'][1]['id']);
+
+        $articleViewDocument = $this->findViewDocument($article['id'], 'de');
+        $this->assertCount(2, $articleViewDocument->getPages());
+
+        $this->assertEquals(2, $articleViewDocument->getPages()[0]->pageNumber);
+        $this->assertEquals('Test-1', $articleViewDocument->getPages()[0]->title);
+        $this->assertEquals($response1['id'], $articleViewDocument->getPages()[0]->uuid);
+        $this->assertEquals($response1['route'], $articleViewDocument->getPages()[0]->routePath);
+
+        $this->assertEquals(3, $articleViewDocument->getPages()[1]->pageNumber);
+        $this->assertEquals('Test-2', $articleViewDocument->getPages()[1]->title);
+        $this->assertEquals($response2['id'], $articleViewDocument->getPages()[1]->uuid);
+        $this->assertEquals($response2['route'], $articleViewDocument->getPages()[1]->routePath);
+    }
+
     public function testGet($title = 'Test-Article', $pageTitle = 'Test-Page', $template = 'default_pages')
     {
         $article = $this->createArticle($title, $template);
@@ -136,6 +172,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertEquals($title, $response['title']);
+        $this->assertEquals($this->getRoute($title, 2), $response['route']);
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals(2, $response['pageNumber']);
@@ -153,7 +190,6 @@ class ArticlePageControllerTest extends SuluTestCase
             [
                 'pageTitle' => $pageTitle,
                 'article' => 'Sulu is awesome',
-                'author' => $this->getTestUser()->getContact()->getId(),
             ]
         );
 
@@ -161,6 +197,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertEquals($title, $response['title']);
+        $this->assertEquals($this->getRoute($title, 2), $response['route']);
         $this->assertEquals($pageTitle, $response['pageTitle']);
         $this->assertEquals($template, $response['template']);
         $this->assertEquals('Sulu is awesome', $response['article']);
@@ -201,7 +238,6 @@ class ArticlePageControllerTest extends SuluTestCase
             '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
             [
                 'pageTitle' => $pageTitle,
-                'author' => $this->getTestUser()->getContact()->getId(),
             ]
         );
 
@@ -229,7 +265,6 @@ class ArticlePageControllerTest extends SuluTestCase
             '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
             [
                 'pageTitle' => $pageTitle,
-                'author' => $this->getTestUser()->getContact()->getId(),
             ]
         );
 
@@ -284,5 +319,10 @@ class ArticlePageControllerTest extends SuluTestCase
         $manager = $this->getContainer()->get('es.manager.default');
 
         return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+    }
+
+    private function getRoute($title, $page)
+    {
+        return '/articles/' . Urlizer::urlize($title) . '/page-' . $page;
     }
 }
