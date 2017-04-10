@@ -108,11 +108,13 @@
         </service>
         <service id="sulu_article.subscriber.routable"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
+            <argument type="service" id="sulu_route.generator_pool"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
             <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>

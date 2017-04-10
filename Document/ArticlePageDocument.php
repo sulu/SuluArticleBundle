@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
-use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Structure\Structure;
@@ -33,7 +33,7 @@ class ArticlePageDocument implements
     AutoNameBehavior,
     PathBehavior,
     StructureBehavior,
-    RoutableBehavior,
+    RoutablePageBehavior,
     PageBehavior,
     ArticleInterface
 {
@@ -243,7 +243,6 @@ class ArticlePageDocument implements
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
-        $this->routePath = $route->getPath();
 
         return $this;
     }
@@ -262,6 +261,14 @@ class ArticlePageDocument implements
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClass()
+    {
+        return self::class;
     }
 
     /**
