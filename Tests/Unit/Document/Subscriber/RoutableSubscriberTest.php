@@ -19,6 +19,9 @@ use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
@@ -47,6 +50,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     private $propertyEncoder;
 
     /**
+     * @var StructureMetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * @var RoutableSubscriber
      */
     private $routableSubscriber;
@@ -67,6 +75,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
+        $this->metadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
 
         $this->document = $this->prophesize(RoutableBehavior::class);
 
@@ -77,7 +86,8 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
             $this->entityManager->reveal(),
-            $this->propertyEncoder->reveal()
+            $this->propertyEncoder->reveal(),
+            $this->metadataFactory->reveal()
         );
     }
 
@@ -97,11 +107,40 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $route = $this->prophesize(RouteInterface::class);
         $this->document->setRoute($route->reveal())->shouldBeCalled();
         $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getStructureType()->willReturn('default');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::FIELD, 'de')
             ->willReturn('i18n:de-' . RoutableSubscriber::FIELD);
         $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::FIELD, null)->willReturn('/test');
+
+        $this->document->setRoutePath('/test')->shouldBeCalled();
+
+        $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
+    }
+
+    public function testHandleHydrateTaggedProperty()
+    {
+        $route = $this->prophesize(RouteInterface::class);
+        $this->document->setRoute($route->reveal())->shouldBeCalled();
+        $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getStructureType()->willReturn('default');
+        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $propertyMetadata = $this->prophesize(PropertyMetadata::class);
+        $propertyMetadata->getName()->willReturn('test');
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(true);
+        $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME)->willReturn($propertyMetadata->reveal());
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->propertyEncoder->localizedSystemName('test', 'de')->willReturn('i18n:de-test');
+        $this->node->getPropertyValueWithDefault('i18n:de-test', null)->willReturn('/test');
 
         $this->document->setRoutePath('/test')->shouldBeCalled();
 

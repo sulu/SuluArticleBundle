@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
@@ -31,6 +32,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RoutableSubscriber implements EventSubscriberInterface
 {
     const FIELD = 'routePath';
+    const TAG_NAME = 'sulu_article.article_route';
 
     /**
      * @var RouteManagerInterface
@@ -53,21 +55,29 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $propertyEncoder;
 
     /**
+     * @var StructureMetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
      * @param PropertyEncoder $propertyEncoder
+     * @param StructureMetadataFactoryInterface $metadataFactory
      */
     public function __construct(
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
         EntityManagerInterface $entityManager,
-        PropertyEncoder $propertyEncoder
+        PropertyEncoder $propertyEncoder,
+        StructureMetadataFactoryInterface $metadataFactory
     ) {
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
         $this->propertyEncoder = $propertyEncoder;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
@@ -100,7 +110,8 @@ class RoutableSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $routePath = $event->getNode()->getPropertyValueWithDefault($this->getPropertyName($event->getLocale()), null);
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
+        $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
         if (!$routePath) {
             return;
         }
@@ -167,7 +178,8 @@ class RoutableSubscriber implements EventSubscriberInterface
         }
 
         $node = $event->getNode();
-        $node->setProperty($this->getPropertyName($event->getLocale()), $document->getRoutePath());
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
+        $node->setProperty($propertyName, $document->getRoutePath());
     }
 
     /**
@@ -260,14 +272,34 @@ class RoutableSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Returns encoded property-name.
+     * Returns encoded "routePath" property-name.
      *
+     * @param string $structureType
      * @param string $locale
      *
      * @return string
      */
-    private function getPropertyName($locale)
+    private function getRoutePathPropertyName($structureType, $locale)
     {
-        return $this->propertyEncoder->localizedSystemName(self::FIELD, $locale);
+        $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
+
+        if ($metadata->hasTag(self::TAG_NAME)) {
+            return $this->getPropertyName($locale, $metadata->getPropertyByTagName(self::TAG_NAME)->getName());
+        }
+
+        return $this->getPropertyName($locale, self::FIELD);
+    }
+
+    /**
+     * Returns encoded property-name.
+     *
+     * @param string $locale
+     * @param string $name
+     *
+     * @return string
+     */
+    private function getPropertyName($locale, $name)
+    {
+        return $this->propertyEncoder->localizedSystemName($name, $locale);
     }
 }
