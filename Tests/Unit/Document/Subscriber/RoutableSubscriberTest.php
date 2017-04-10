@@ -22,6 +22,9 @@ use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
@@ -60,6 +63,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     private $propertyEncoder;
 
     /**
+     * @var StructureMetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
      * @var RoutableSubscriber
      */
     private $routableSubscriber;
@@ -69,6 +77,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     private $document;
 
+    /**
+     * @var NodeInterface
+     */
+    private $node;
+
     protected function setUp()
     {
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
@@ -77,8 +90,12 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
+        $this->metadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
 
         $this->document = $this->prophesize(RoutableBehavior::class);
+
+        $this->node = $this->prophesize(NodeInterface::class);
+        $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->routableSubscriber = new RoutableSubscriber(
             $this->routeManager->reveal(),
@@ -86,19 +103,17 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->entityManager->reveal(),
             $this->documentManager->reveal(),
             $this->documentInspector->reveal(),
-            $this->propertyEncoder->reveal()
+            $this->propertyEncoder->reveal(),
+            $this->metadataFactory->reveal()
         );
     }
 
     protected function prophesizeEvent($className, $routePath = null)
     {
-        $node = $this->prophesize(NodeInterface::class);
-        $node->getIdentifier()->willReturn('123-123-123');
-
         $event = $this->prophesize($className);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getLocale()->willReturn('de');
-        $event->getNode()->willReturn($node->reveal());
+        $event->getNode()->willReturn($this->node->reveal());
         $event->getOption('route_path')->willReturn($routePath);
 
         return $event->reveal();
@@ -107,10 +122,44 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testHandleHydrate()
     {
         $route = $this->prophesize(RouteInterface::class);
-        $this->document->getRoutePath()->willReturn('/test');
         $this->document->setRoute($route->reveal())->shouldBeCalled();
         $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getStructureType()->willReturn('default');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-' . RoutableSubscriber::ROUTE_FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::ROUTE_FIELD, null)->willReturn('/test');
+
+        $this->document->setRoutePath('/test')->shouldBeCalled();
+
+        $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
+    }
+
+    public function testHandleHydrateTaggedProperty()
+    {
+        $route = $this->prophesize(RouteInterface::class);
+        $this->document->setRoute($route->reveal())->shouldBeCalled();
+        $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getStructureType()->willReturn('default');
+        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $propertyMetadata = $this->prophesize(PropertyMetadata::class);
+        $propertyMetadata->getName()->willReturn('test');
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(true);
+        $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME)->willReturn($propertyMetadata->reveal());
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->propertyEncoder->localizedSystemName('test', 'de')->willReturn('i18n:de-test');
+        $this->node->getPropertyValueWithDefault('i18n:de-test', null)->willReturn('/test');
+
+        $this->document->setRoutePath('/test')->shouldBeCalled();
 
         $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
     }
