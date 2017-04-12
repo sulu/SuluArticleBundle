@@ -285,7 +285,7 @@ class ArticleIndexer implements IndexerInterface
             $pages[] = $page = new ArticlePageViewObject();
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();
-            $page->title = $child->getTitle();
+            $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
         }
 
