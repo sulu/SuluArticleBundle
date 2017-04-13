@@ -103,6 +103,7 @@
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>

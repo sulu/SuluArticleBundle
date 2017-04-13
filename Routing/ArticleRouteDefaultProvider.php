@@ -44,6 +44,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     /**
      * @param DocumentManagerInterface $documentManager
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
+     * @param CacheLifetimeResolverInterface $cacheLifetimeResolver
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
@@ -66,12 +67,17 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             $object = $this->documentManager->find($id, $locale);
         }
 
+        $pageNumber = $object->getPageNumber();
+        if ($object instanceof ArticlePageDocument) {
+            $object = $object->getParent();
+        }
+
         $metadata = $this->structureMetadataFactory->getStructureMetadata('article', $object->getStructureType());
 
         return [
             'object' => $object,
             'view' => $metadata->view,
-            'pageNumber' => $object->getPageNumber(),
+            'pageNumber' => $pageNumber,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
             '_controller' => $metadata->controller,
         ];

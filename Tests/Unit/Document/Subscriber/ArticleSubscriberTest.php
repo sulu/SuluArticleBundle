@@ -11,16 +11,19 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
+use PHPCR\NodeInterface;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
+use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
@@ -54,6 +57,11 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
     private $articleSubscriber;
 
     /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
      * @var ArticleDocument
      */
     private $document;
@@ -77,6 +85,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->liveIndexer = $this->prophesize(IndexerInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
+        $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
 
         $this->document = $this->prophesize(ArticleDocument::class);
         $this->document->getUuid()->willReturn($this->uuid);
@@ -87,7 +96,8 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->indexer->reveal(),
             $this->liveIndexer->reveal(),
             $this->documentManager->reveal(),
-            $this->documentInspector->reveal()
+            $this->documentInspector->reveal(),
+            $this->propertyEncoder->reveal()
         );
     }
 
@@ -189,7 +199,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->prophesize(ArticlePageDocument::class)->reveal(),
         ];
 
-        $this->document->getChildren()->willReturn($children);
+        $this->document->getChildren()->willReturn(new \ArrayIterator($children));
 
         foreach ($children as $child) {
             $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
@@ -245,5 +255,74 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->setChildrenStructureType(
             $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
         );
+    }
+
+    public function testHydratePagData()
+    {
+        $node = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(HydrateEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($node->reveal());
+        $event->getLocale()->willReturn($this->locale);
+
+        $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
+        $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
+            ->willReturn($propertyName);
+
+        $node->getPropertyValueWithDefault($propertyName, json_encode([]))
+            ->willReturn(json_encode([['title' => 'Test title']]));
+
+        $this->document->setPages([['title' => 'Test title']])->shouldBeCalled();
+
+        $this->articleSubscriber->hydratePageData($event->reveal());
+    }
+
+    public function testPersistPageData()
+    {
+        $node = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(PersistEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($node->reveal());
+        $event->getLocale()->willReturn($this->locale);
+
+        $pages = [
+            [
+                'uuid' => '123-123-123',
+                'title' => 'Test article: page 1',
+                'routePath' => '/test-article',
+                'pageNumber' => 1,
+            ],
+            [
+                'uuid' => '321-321-321',
+                'title' => 'Test article: page 2',
+                'routePath' => '/test-article/page-2',
+                'pageNumber' => 2,
+            ],
+        ];
+
+        $this->document->getUuid()->willReturn($pages[0]['uuid']);
+        $this->document->getPageTitle()->willReturn($pages[0]['title']);
+        $this->document->getRoutePath()->willReturn($pages[0]['routePath']);
+        $this->document->getPageNumber()->willReturn($pages[0]['pageNumber']);
+
+        $child = $this->prophesize(ArticlePageDocument::class);
+        $child->getUuid()->willReturn($pages[1]['uuid']);
+        $child->getPageTitle()->willReturn($pages[1]['title']);
+        $child->getRoutePath()->willReturn($pages[1]['routePath']);
+        $child->getPageNumber()->willReturn($pages[1]['pageNumber']);
+        $this->document->getChildren()->willReturn(new \ArrayIterator([$child->reveal()]));
+
+        $this->documentInspector->getLocalizationState($child->reveal())->willReturn(LocalizationState::LOCALIZED);
+
+        $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
+        $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
+            ->willReturn($propertyName);
+
+        $this->document->setPages($pages)->shouldBeCalled();
+        $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
+
+        $this->articleSubscriber->persistPageData($event->reveal());
     }
 }

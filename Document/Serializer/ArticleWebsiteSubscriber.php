@@ -106,6 +106,11 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor->addData('extension', $context->accept($article->getExtensionsData()->toArray()));
     }
 
+    /**
+     * Append page data.
+     *
+     * @param ObjectEvent $event
+     */
     public function appendPageData(ObjectEvent $event)
     {
         $article = $event->getObject();
@@ -116,27 +121,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $pages = [
-            [
-                'pageNumber' => $article->getPageNumber(),
-                'title' => $article->getPageTitle(),
-                'route' => $article->getRoutePath(),
-            ],
-        ];
-
-        foreach ($article->getChildren() as $page) {
-            if (!$page instanceof ArticlePageDocument) {
-                continue;
-            }
-
-            $pages[] = [
-                'pageNumber' => $page->getPageNumber(),
-                'title' => $page->getPageTitle(),
-                'route' => $page->getRoutePath(),
-            ];
-        }
-
-        $visitor->addData('pages', $context->accept($pages));
+        $visitor->addData('pages', $context->accept($article->getPages()));
     }
 
     /**
@@ -154,14 +139,18 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $pages = iterator_to_array($article->getChildren());
-        if ($context->attributes->containsKey('pageNumber')) {
+        $children = $article->getChildren();
+
+        $pageNumber = 1;
+        if (null !== $children && $context->attributes->containsKey('pageNumber')) {
+            $pages = array_values(iterator_to_array($children));
             $pageNumber = $context->attributes->get('pageNumber')->get();
             if ($pageNumber !== 1) {
                 $article = $pages[$pageNumber - 2];
             }
         }
 
+        $visitor->addData('page', $pageNumber);
         $content = $this->resolve($article);
         foreach ($content as $name => $value) {
             $visitor->addData($name, $value);

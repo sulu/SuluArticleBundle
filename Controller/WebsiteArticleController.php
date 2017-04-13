@@ -39,7 +39,6 @@ class WebsiteArticleController extends Controller
             $object,
             'array',
             SerializationContext::create()
-                ->enableMaxDepthChecks()
                 ->setSerializeNull(true)
                 ->setGroups(['website', 'content'])
                 ->setAttribute('website', true)

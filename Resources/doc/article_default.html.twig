@@ -2,8 +2,15 @@
 
 {% block content %}
     <h1 property="title">{{ content.title }}</h1>
+    <h2 property="pageTitle">{{ content.pageTitle }}</h2>
 
     <div property="article">
-        {{ content.article|raw }}
+        {{ content.article|default()|raw }}
     </div>
+
+    <ul>
+        {% for page in pages|default([]) %}
+            <li><a href="{{ sulu_content_path(page.routePath) }}">{{ page.title|default('Page '~page.pageNumber) }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

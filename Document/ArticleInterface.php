@@ -41,6 +41,13 @@ interface ArticleInterface
     public function getPageNumber();
 
     /**
+     * Returns page-title.
+     *
+     * @return string
+     */
+    public function getPageTitle();
+
+    /**
      * Returns structure-type.
      *
      * @return string
