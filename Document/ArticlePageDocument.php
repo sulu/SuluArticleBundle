@@ -48,6 +48,11 @@ class ArticlePageDocument implements
     private $title;
 
     /**
+     * @var string
+     */
+    private $pageTitle;
+
+    /**
      * @var ArticleDocument
      */
     private $parent;
@@ -129,6 +134,30 @@ class ArticlePageDocument implements
     public function setTitle($title)
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * Returns pageTitle.
+     *
+     * @return string
+     */
+    public function getPageTitle()
+    {
+        return $this->pageTitle;
+    }
+
+    /**
+     * Set pageTitle.
+     *
+     * @param string $pageTitle
+     *
+     * @return $this
+     */
+    public function setPageTitle($pageTitle)
+    {
+        $this->pageTitle = $pageTitle;
 
         return $this;
     }

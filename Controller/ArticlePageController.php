@@ -261,6 +261,8 @@ class ArticlePageController extends RestController implements ClassResourceInter
             [
                 'user' => $this->getUser()->getId(),
                 'clear_missing_content' => false,
+                'auto_name' => false,
+                'auto_rename' => false,
             ]
         );
     }
