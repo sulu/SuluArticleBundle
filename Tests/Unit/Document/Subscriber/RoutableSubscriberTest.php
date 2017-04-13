@@ -13,10 +13,15 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPCR\NodeInterface;
+use Prophecy\Argument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Bundle\RouteBundle\Entity\Route;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -29,6 +34,11 @@ use Sulu\Component\DocumentManager\Event\RemoveEvent;
 
 class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var ChainRouteGeneratorInterface
+     */
+    private $routeGeneratorPool;
+
     /**
      * @var RouteManagerInterface
      */
@@ -55,6 +65,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     private $metadataFactory;
 
     /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
+
+    /**
      * @var RoutableSubscriber
      */
     private $routableSubscriber;
@@ -71,11 +86,13 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->routeGeneratorPool = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
         $this->metadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
+        $this->documentInspector = $this->prophesize(DocumentInspector::class);
 
         $this->document = $this->prophesize(RoutableBehavior::class);
 
@@ -83,11 +100,13 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->routableSubscriber = new RoutableSubscriber(
+            $this->routeGeneratorPool->reveal(),
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
             $this->entityManager->reveal(),
             $this->propertyEncoder->reveal(),
-            $this->metadataFactory->reveal()
+            $this->metadataFactory->reveal(),
+            $this->documentInspector->reveal()
         );
     }
 
@@ -114,9 +133,19 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::FIELD, 'de')
-            ->willReturn('i18n:de-' . RoutableSubscriber::FIELD);
-        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::FIELD, null)->willReturn('/test');
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-' . RoutableSubscriber::ROUTE_FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::ROUTE_FIELD, null)
+            ->willReturn('/test');
+        $this->document->getClass()->willReturn(ArticleDocument::class);
+        $this->document->getUuid()->willReturn('123-123-123');
+
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'de')->willReturn($route->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-' . RoutableSubscriber::ROUTE_FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::ROUTE_FIELD, null)
+            ->willReturn('/test');
 
         $this->document->setRoutePath('/test')->shouldBeCalled();
 
@@ -127,9 +156,12 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $route = $this->prophesize(RouteInterface::class);
         $this->document->setRoute($route->reveal())->shouldBeCalled();
+        $this->document->getUuid()->willReturn('123-123-123');
         $this->document->getOriginalLocale()->willReturn('de');
         $this->document->getStructureType()->willReturn('default');
-        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+        $this->document->getClass()->willReturn(ArticleDocument::class);
+
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'de')->willReturn($route->reveal());
 
         $propertyMetadata = $this->prophesize(PropertyMetadata::class);
         $propertyMetadata->getName()->willReturn('test');
@@ -147,48 +179,79 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
     }
 
-    public function testHandleRoute()
+    public function testHandlePersist()
     {
-        $route = $this->prophesize(RouteInterface::class);
         $this->document->getRoutePath()->willReturn(null);
+        $this->document->setRoutePath('/test')->shouldBeCalled();
         $this->document->setUuid('123-123-123')->shouldBeCalled();
-        $this->routeManager->create($this->document->reveal(), null)->shouldBeCalled()->willReturn($route->reveal());
 
-        $this->entityManager->persist($route->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
+        $this->document->getStructureType()->willReturn('default');
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->routableSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class));
+        $this->routeGeneratorPool->generate($this->document->reveal(), null)
+            ->willReturn(new Route('/test', null, get_class($this->document->reveal())));
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-routePath');
+        $this->node->setProperty('i18n:de-routePath', '/test')->shouldBeCalled();
+
+        $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->persist(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->flush()->shouldNotBeCalled();
+
+        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class));
     }
 
-    public function testHandleRouteWithRoute()
+    public function testHandlePersistWithRoute()
     {
-        $route = $this->prophesize(RouteInterface::class);
         $this->document->getRoutePath()->willReturn(null);
+        $this->document->setRoutePath('/test-1')->shouldBeCalled();
         $this->document->setUuid('123-123-123')->shouldBeCalled();
-        $this->routeManager->create($this->document->reveal(), '/test-1')
-            ->shouldBeCalled()
-            ->willReturn($route->reveal());
 
-        $this->entityManager->persist($route->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
+        $this->document->getStructureType()->willReturn('default');
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->routableSubscriber->handleRoute($this->prophesizeEvent(PersistEvent::class, '/test-1'));
+        $this->routeGeneratorPool->generate($this->document->reveal(), '/test-1')
+            ->willReturn(new Route('/test-1', null, get_class($this->document->reveal())));
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-routePath');
+        $this->node->setProperty('i18n:de-routePath', '/test-1')->shouldBeCalled();
+
+        $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->persist(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->flush()->shouldNotBeCalled();
+
+        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class, '/test-1'));
     }
 
-    public function testHandleRouteUpdate()
+    public function testHandlePersistUpdate()
     {
-        $route = $this->prophesize(RouteInterface::class);
-        $newRoute = $this->prophesize(RouteInterface::class);
-        $this->document->getRoute()->willReturn($route->reveal());
-
-        $newRoute->getPath()->willReturn('/test-2');
-
-        $this->routeManager->update($this->document->reveal(), '/test-2')->willReturn($newRoute->reveal());
+        $this->document->getRoutePath()->willReturn('/test-1');
+        $this->document->setUuid('123-123-123')->shouldBeCalled();
         $this->document->setRoutePath('/test-2')->shouldBeCalled();
-        $this->entityManager->persist($newRoute)->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
 
-        $this->routableSubscriber->handleRouteUpdate($this->prophesizeEvent(PersistEvent::class, '/test-2'));
+        $this->document->getStructureType()->willReturn('default');
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->routeGeneratorPool->generate($this->document->reveal(), '/test-2')
+            ->willReturn(new Route('/test-2', null, get_class($this->document->reveal())));
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-routePath');
+        $this->node->setProperty('i18n:de-routePath', '/test-2')->shouldBeCalled();
+
+        $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->persist(Argument::cetera())->shouldNotBeCalled();
+        $this->entityManager->flush()->shouldNotBeCalled();
+
+        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class, '/test-2'));
     }
 
     public function testHandleRemove()

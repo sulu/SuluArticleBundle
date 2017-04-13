@@ -195,14 +195,22 @@ class ArticlePageController extends RestController implements ClassResourceInter
      *
      * @param string $articleUuid
      * @param string $uuid
+     * @param Request $request
      *
      * @return Response
      */
-    public function deleteAction($articleUuid, $uuid)
+    public function deleteAction($articleUuid, $uuid, Request $request)
     {
+        $locale = $this->getRequestParameter($request, 'locale', true);
+
         $documentManager = $this->getDocumentManager();
-        $document = $documentManager->find($uuid);
+        $document = $documentManager->find($uuid, $locale);
         $documentManager->remove($document);
+        $documentManager->flush();
+
+        // FIXME this is a current hack which publishes article automatically when removing a single page
+        $document = $documentManager->find($articleUuid, $locale);
+        $documentManager->publish($document, $locale);
         $documentManager->flush();
 
         return $this->handleView($this->view(null));
