@@ -71,6 +71,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         return [
             'object' => $object,
             'view' => $metadata->view,
+            'pageNumber' => $object->getPageNumber(),
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
             '_controller' => $metadata->controller,
         ];

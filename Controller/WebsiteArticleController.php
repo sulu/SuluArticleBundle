@@ -28,19 +28,22 @@ class WebsiteArticleController extends Controller
      *
      * @param Request $request
      * @param ArticleInterface $object
+     * @param int $pageNumber
      * @param string $view
      *
      * @return Response
      */
-    public function indexAction(Request $request, ArticleInterface $object, $view)
+    public function indexAction(Request $request, ArticleInterface $object, $pageNumber, $view)
     {
         $content = $this->get('jms_serializer')->serialize(
             $object,
             'array',
             SerializationContext::create()
+                ->enableMaxDepthChecks()
                 ->setSerializeNull(true)
                 ->setGroups(['website', 'content'])
                 ->setAttribute('website', true)
+                ->setAttribute('pageNumber', $pageNumber)
         );
 
         return $this->render(

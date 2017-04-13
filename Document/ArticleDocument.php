@@ -504,4 +504,12 @@ class ArticleDocument implements
     {
         return $this->getUuid();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageNumber()
+    {
+        return 1;
+    }
 }
