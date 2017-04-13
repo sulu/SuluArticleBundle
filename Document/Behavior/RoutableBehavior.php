@@ -11,34 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
-use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
-use Sulu\Component\Content\Document\Behavior\StructureBehavior;
-use Sulu\Component\DocumentManager\Behavior\Mapping\LocaleBehavior;
-use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
-
 /**
- * This behavior has to be attached to documents which should have a sulu-route.
+ * This behavior has to be attached to documents which should have a sulu-route and handle their pages.
  */
-interface RoutableBehavior extends RoutableInterface, UuidBehavior, LocaleBehavior, StructureBehavior
+interface RoutableBehavior extends RoutablePageBehavior
 {
-    /**
-     * Returns route-path.
-     *
-     * @return string
-     */
-    public function getRoutePath();
-
-    /**
-     * Set route-path.
-     *
-     * @param string $routePath
-     */
-    public function setRoutePath($routePath);
-
-    /**
-     * Set uuid.
-     *
-     * @param string $uuid
-     */
-    public function setUuid($uuid);
 }
