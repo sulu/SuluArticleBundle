@@ -128,7 +128,7 @@ class PageSubscriber implements EventSubscriberInterface
             }
 
             $childNode = $this->documentInspector->getNode($child);
-            $childNode->setProperty($this->propertyEncoder->systemName(static::FIELD), $page++);
+            $childNode->setProperty($this->propertyEncoder->systemName(static::FIELD), ++$page);
         }
     }
 }
