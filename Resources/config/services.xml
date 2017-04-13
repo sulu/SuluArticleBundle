@@ -128,7 +128,7 @@
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
-            <argument type="service" id="sulu_document_manager.slugifier"/>
+            <argument type="service" id="sulu_document_manager.node_name_slugifier"/>
             <argument type="service" id="sulu_document_manager.name_resolver"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>

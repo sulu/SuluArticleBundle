@@ -98,6 +98,17 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getStructureType()->willReturn('default');
         $this->factory->getStructureMetadata('article_page', 'default')->willReturn($this->metadata->reveal());
 
+        $this->slugifier->slugify(Argument::type('string'))->will(
+            function ($arguments) {
+                return Urlizer::urlize($arguments[0]);
+            }
+        );
+        $this->nameResolver->resolveName(Argument::type(NodeInterface::class), Argument::type('string'))->will(
+            function ($arguments) {
+                return $arguments[1];
+            }
+        );
+
         $this->subscriber = new ArticlePageSubscriber(
             $this->factory->reveal(),
             $this->documentManager->reveal(),
@@ -198,10 +209,6 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
         $structure->getStagedData()->willReturn(['pageTitle' => 'Sulu is awesome']);
         $this->document->getStructure()->willReturn($structure->reveal());
 
-        $this->slugifier->slugify('Sulu is awesome')->willReturn(Urlizer::urlize('Sulu is awesome'));
-        $this->nameResolver->resolveName($parentNode->reveal(), Urlizer::urlize('Sulu is awesome'))
-            ->willReturn(Urlizer::urlize('Sulu is awesome'));
-
         $event = $this->prophesize(PersistEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->hasNode()->willReturn(false);
@@ -230,10 +237,6 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
         $structure = $this->prophesize(StructureInterface::class);
         $structure->getStagedData()->willReturn(['pageTitle' => 'Sulu is awesome']);
         $this->document->getStructure()->willReturn($structure->reveal());
-
-        $this->slugifier->slugify('Sulu is awesome')->willReturn(Urlizer::urlize('Sulu is awesome'));
-        $this->nameResolver->resolveName($parentNode->reveal(), Urlizer::urlize('Sulu is awesome'))
-            ->willReturn(Urlizer::urlize('Sulu is awesome'));
 
         $event = $this->prophesize(PersistEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());

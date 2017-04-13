@@ -146,9 +146,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         // if no page-title exists use a unique-id
         $nodeName = $this->slugifier->slugify($pageTitle ?: uniqid('page-', true));
         $nodeName = $this->resolver->resolveName($event->getParentNode(), $nodeName);
-
-        // jackrabbit can not handle node-names which contains a number followed by "e" e.g. 10e
-        $nodeName = preg_replace('((\d+)([eE]))', '$1-$2', $nodeName);
         $node = $event->getParentNode()->addNode($nodeName);
 
         $event->setNode($node);
