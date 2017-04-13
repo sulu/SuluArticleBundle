@@ -18,8 +18,11 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Events;
+use Sulu\Component\DocumentManager\NameResolver;
+use Symfony\Cmf\Api\Slugifier\SlugifierInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -46,18 +49,34 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     private $documentInspector;
 
     /**
+     * @var SlugifierInterface
+     */
+    private $slugifier;
+
+    /**
+     * @var NameResolver
+     */
+    private $resolver;
+
+    /**
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param DocumentManagerInterface $documentManager
      * @param DocumentInspector $documentInspector
+     * @param SlugifierInterface $slugifier
+     * @param NameResolver $resolver
      */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         DocumentManagerInterface $documentManager,
-        DocumentInspector $documentInspector
+        DocumentInspector $documentInspector,
+        SlugifierInterface $slugifier,
+        NameResolver $resolver
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->documentManager = $documentManager;
         $this->documentInspector = $documentInspector;
+        $this->slugifier = $slugifier;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -67,10 +86,13 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     {
         return [
             Events::PERSIST => [
-                ['setTitleOnPersist', 2048],
-                ['setStructureTypeToParent', -2048],
-                ['setWorkflowStageOnArticle', -2048],
+                ['setTitleOnPersist', 2000],
+                ['setNodeOnPersist', 480],
+                ['setPageTitleOnPersist'],
+                ['setStructureTypeToParent', -2000],
+                ['setWorkflowStageOnArticle', -2000],
             ],
+            Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
     }
 
@@ -86,22 +108,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $pageTitle = uniqid('page-', true);
-        $pageTitleProperty = $this->getPageTitleProperty($document);
-
-        if (!$pageTitleProperty) {
-            $document->setTitle($pageTitle);
-
-            return;
-        }
-
-        if (array_key_exists($pageTitleProperty->getName(), $document->getStructure()->getStagedData())) {
-            $pageTitle = $document->getStructure()->getStagedData()[$pageTitleProperty->getName()];
-        } elseif ($document->getStructure()->hasProperty($pageTitleProperty->getName())) {
-            $pageTitle = $document->getStructure()->getProperty($pageTitleProperty->getName())->getValue();
-        }
-
-        $document->setTitle($pageTitle);
+        $document->setTitle($document->getParent()->getTitle());
     }
 
     /**
@@ -120,6 +127,69 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
         $document->getParent()->setWorkflowStage(WorkflowStage::TEST);
         $this->documentManager->persist($document->getParent(), $event->getLocale(), $event->getOptions());
+    }
+
+    /**
+     * Set node to event on persist.
+     *
+     * @param PersistEvent $event
+     */
+    public function setNodeOnPersist(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument || $event->hasNode()) {
+            return;
+        }
+
+        $pageTitle = $this->getPageTitle($document);
+
+        // if no page-title exists use a unique-id
+        $nodeName = $this->slugifier->slugify($pageTitle ?: uniqid('page-', true));
+        $nodeName = $this->resolver->resolveName($event->getParentNode(), $nodeName);
+        $node = $event->getParentNode()->addNode($nodeName);
+
+        $event->setNode($node);
+    }
+
+    /**
+     * Set page-title on persist event.
+     *
+     * @param PersistEvent $event
+     */
+    public function setPageTitleOnPersist(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document->setPageTitle($this->getPageTitle($document));
+    }
+
+    /**
+     * Returns page-title for node.
+     *
+     * @param ArticlePageDocument $document
+     *
+     * @return string
+     */
+    private function getPageTitle(ArticlePageDocument $document)
+    {
+        $pageTitleProperty = $this->getPageTitleProperty($document);
+        if (!$pageTitleProperty) {
+            return;
+        }
+
+        $stagedData = $document->getStructure()->getStagedData();
+        if (array_key_exists($pageTitleProperty->getName(), $stagedData)) {
+            return $stagedData[$pageTitleProperty->getName()];
+        }
+
+        if (!$document->getStructure()->hasProperty($pageTitleProperty->getName())) {
+            return;
+        }
+
+        return $document->getStructure()->getProperty($pageTitleProperty->getName())->getValue();
     }
 
     /**
@@ -164,5 +234,25 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
         $document->getParent()->setStructureType($document->getStructureType());
         $this->documentManager->persist($document->getParent(), $event->getLocale());
+    }
+
+    /**
+     * Add page-title to metadata.
+     *
+     * @param MetadataLoadEvent $event
+     */
+    public function handleMetadataLoad(MetadataLoadEvent $event)
+    {
+        if ($event->getMetadata()->getClass() !== ArticlePageDocument::class) {
+            return;
+        }
+
+        $event->getMetadata()->addFieldMapping(
+            'pageTitle',
+            [
+                'encoding' => 'system_localized',
+                'property' => 'suluPageTitle',
+            ]
+        );
     }
 }
