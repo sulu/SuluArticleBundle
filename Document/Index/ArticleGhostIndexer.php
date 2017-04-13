@@ -33,12 +33,12 @@ class ArticleGhostIndexer extends ArticleIndexer
     /**
      * @var WebspaceManagerInterface
      */
-    private $webspaceManager;
+    protected $webspaceManager;
 
     /**
      * @var DocumentManagerInterface
      */
-    private $documentManager;
+    protected $documentManager;
 
     /**
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
@@ -93,17 +93,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
         $this->createOrUpdateGhosts($document);
         $this->dispatchIndexEvent($document, $article);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($document)
-    {
-        foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
-            $articleId = $this->getViewDocumentId($document->getUuid(), $localization->getLocale());
-            $this->removeArticle($articleId);
-        }
+        $this->manager->persist($article);
     }
 
     /**
@@ -115,19 +105,25 @@ class ArticleGhostIndexer extends ArticleIndexer
         /** @var Localization $localization */
         foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
             $locale = $localization->getLocale();
-            if ($documentLocale !== $locale) {
-                // Try index the article ghosts.
-                $this->createOrUpdateArticle(
-                    $this->documentManager->find(
-                        $document->getUuid(),
-                        $locale,
-                        [
-                            'load_ghost_content' => true,
-                        ]
-                    ),
-                    $localization->getLocale(),
-                    LocalizationState::GHOST
-                );
+            if ($documentLocale === $locale) {
+                continue;
+            }
+
+            // Try index the article ghosts.
+            $article = $this->createOrUpdateArticle(
+                $this->documentManager->find(
+                    $document->getUuid(),
+                    $locale,
+                    [
+                        'load_ghost_content' => true,
+                    ]
+                ),
+                $localization->getLocale(),
+                LocalizationState::GHOST
+            );
+
+            if ($article) {
+                $this->manager->persist($article);
             }
         }
     }

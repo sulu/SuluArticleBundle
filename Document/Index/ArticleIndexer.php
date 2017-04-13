@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
@@ -42,56 +43,54 @@ class ArticleIndexer implements IndexerInterface
     /**
      * @var StructureMetadataFactoryInterface
      */
-    private $structureMetadataFactory;
+    protected $structureMetadataFactory;
 
     /**
      * @var UserManager
      */
-    private $userManager;
+    protected $userManager;
 
     /**
      * @var ContactRepository
      */
-    private $contactRepository;
+    protected $contactRepository;
 
     /**
      * @var DocumentFactoryInterface
      */
-    private $documentFactory;
+    protected $documentFactory;
 
     /**
      * @var Manager
      */
-    private $manager;
+    protected $manager;
 
     /**
      * @var ExcerptFactory
      */
-    private $excerptFactory;
+    protected $excerptFactory;
 
     /**
      * @var SeoFactory
      */
-    private $seoFactory;
+    protected $seoFactory;
 
     /**
      * @var EventDispatcherInterface
      */
-    private $eventDispatcher;
+    protected $eventDispatcher;
 
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    protected $translator;
 
     /**
      * @var array
      */
-    private $typeConfiguration;
+    protected $typeConfiguration;
 
     /**
-     * ArticleIndexer constructor.
-     *
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param UserManager $userManager
      * @param ContactRepository $contactRepository
@@ -243,25 +242,7 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
-        $this->manager->persist($article);
-
         return $article;
-    }
-
-    /**
-     * @param string $id
-     */
-    protected function removeArticle($id)
-    {
-        $article = $this->manager->find(
-            $this->documentFactory->getClass('article'),
-            $id
-        );
-        if (null === $article) {
-            return;
-        }
-
-        $this->manager->remove($article);
     }
 
     /**
@@ -269,9 +250,13 @@ class ArticleIndexer implements IndexerInterface
      */
     public function remove($document)
     {
-        $this->removeArticle(
-            $this->getViewDocumentId($document->getUuid(), $document->getOriginalLocale())
-        );
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
+        $search = $repository->createSearch()
+            ->addQuery(new TermQuery('uuid', $document->getUuid()))
+            ->setSize(1000);
+        foreach ($repository->execute($search) as $viewDocument) {
+            $this->manager->remove($viewDocument);
+        }
     }
 
     /**
@@ -330,5 +315,6 @@ class ArticleIndexer implements IndexerInterface
     {
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
         $this->dispatchIndexEvent($document, $article);
+        $this->manager->persist($article);
     }
 }
