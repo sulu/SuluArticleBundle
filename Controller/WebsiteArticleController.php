@@ -28,13 +28,31 @@ class WebsiteArticleController extends Controller
      *
      * @param Request $request
      * @param ArticleInterface $object
-     * @param int $pageNumber
      * @param string $view
+     * @param int $pageNumber
      *
      * @return Response
      */
-    public function indexAction(Request $request, ArticleInterface $object, $pageNumber, $view)
+    public function indexAction(Request $request, ArticleInterface $object, $view, $pageNumber = 1)
     {
+        return $this->renderArticle($request, $object, $view, $pageNumber);
+    }
+
+    /**
+     * Render article with given view.
+     *
+     * @param Request $request
+     * @param ArticleInterface $object
+     * @param string $view
+     * @param int $pageNumber
+     *
+     * @return Response
+     */
+    private function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
+    {
+        $requestFormat = $request->getRequestFormat();
+        $viewTemplate = $view . '.' . $requestFormat . '.twig';
+
         $content = $this->get('jms_serializer')->serialize(
             $object,
             'array',
@@ -46,8 +64,8 @@ class WebsiteArticleController extends Controller
         );
 
         return $this->render(
-            $view . '.html.twig',
-            $this->get('sulu_website.resolver.template_attribute')->resolve($content),
+            $viewTemplate,
+            $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
             $this->createResponse($request)
         );
     }

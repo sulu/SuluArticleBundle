@@ -16,9 +16,11 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\VirtualProxyInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 
@@ -192,7 +194,23 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
         $data = $article->getStructure()->toArray();
 
-        $content = $this->proxyFactory->createProxy(
+        return [
+            'content' => $this->createContentProxy($structure, $data),
+            'view' => $this->createViewProxy($structure, $data),
+        ];
+    }
+
+    /**
+     * Create content-proxy for given structure.
+     *
+     * @param StructureInterface $structure
+     * @param array $data
+     *
+     * @return VirtualProxyInterface
+     */
+    private function createContentProxy($structure, $data)
+    {
+        return $this->proxyFactory->createProxy(
             \ArrayObject::class,
             function (
                 &$wrappedObject,
@@ -217,7 +235,19 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
                 return true;
             }
         );
-        $view = $this->proxyFactory->createProxy(
+    }
+
+    /**
+     * Create view-proxy for given structure.
+     *
+     * @param StructureInterface $structure
+     * @param array $data
+     *
+     * @return VirtualProxyInterface
+     */
+    private function createViewProxy($structure, array $data)
+    {
+        return $this->proxyFactory->createProxy(
             \ArrayObject::class,
             function (
                 &$wrappedObject,
@@ -242,7 +272,5 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
                 return true;
             }
         );
-
-        return ['content' => $content, 'view' => $view];
     }
 }

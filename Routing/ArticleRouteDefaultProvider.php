@@ -69,6 +69,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         $pageNumber = $object->getPageNumber();
         if ($object instanceof ArticlePageDocument) {
+            // the article contains the seo/excerpt data and the controller handles the page-number automatically
             $object = $object->getParent();
         }
 
