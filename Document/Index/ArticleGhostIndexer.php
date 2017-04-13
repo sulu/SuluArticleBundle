@@ -97,17 +97,6 @@ class ArticleGhostIndexer extends ArticleIndexer
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function remove($document)
-    {
-        foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
-            $articleId = $this->getViewDocumentId($document->getUuid(), $localization->getLocale());
-            $this->removeArticle($articleId);
-        }
-    }
-
-    /**
      * @param ArticleDocument $document
      */
     private function createOrUpdateGhosts(ArticleDocument $document)
