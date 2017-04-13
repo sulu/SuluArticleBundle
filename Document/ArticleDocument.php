@@ -259,7 +259,6 @@ class ArticleDocument implements
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
-        $this->routePath = $route->getPath();
     }
 
     /**
@@ -285,6 +284,14 @@ class ArticleDocument implements
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClass()
+    {
+        return self::class;
     }
 
     /**

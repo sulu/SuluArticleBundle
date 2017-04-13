@@ -216,7 +216,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $page = $this->post($article);
 
         $client = $this->createAuthenticatedClient();
-        $client->request('DELETE', '/api/articles/' . $article['id'] . '/pages/' . $page['id']);
+        $client->request('DELETE', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de');
 
         $this->assertHttpStatusCode(204, $client->getResponse());
 

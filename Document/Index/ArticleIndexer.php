@@ -142,11 +142,7 @@ class ArticleIndexer implements IndexerInterface
 
         $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
 
-        return $this->translator->trans(
-            $typeTranslationKey,
-            [],
-            'backend'
-        );
+        return $this->translator->trans($typeTranslationKey, [], 'backend');
     }
 
     /**

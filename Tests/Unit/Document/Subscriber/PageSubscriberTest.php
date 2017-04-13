@@ -146,8 +146,8 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
 
-        $childNode2->setProperty('sulu:' . PageSubscriber::FIELD, 1)->shouldBeCalled();
-        $childNode3->setProperty('sulu:' . PageSubscriber::FIELD, 2)->shouldBeCalled();
+        $childNode2->setProperty('sulu:' . PageSubscriber::FIELD, 2)->shouldBeCalled();
+        $childNode3->setProperty('sulu:' . PageSubscriber::FIELD, 3)->shouldBeCalled();
 
         $this->pageSubscriber->handleRemove($event->reveal());
     }
