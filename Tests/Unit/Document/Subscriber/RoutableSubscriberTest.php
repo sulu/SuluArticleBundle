@@ -19,9 +19,9 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Bundle\RouteBundle\Entity\Route;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Generator\GeneratedRoute;
-use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorPoolInterface;
+use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -35,7 +35,7 @@ use Sulu\Component\DocumentManager\Event\RemoveEvent;
 class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var RouteGeneratorPoolInterface
+     * @var ChainRouteGeneratorInterface
      */
     private $routeGeneratorPool;
 
@@ -86,7 +86,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->routeGeneratorPool = $this->prophesize(RouteGeneratorPoolInterface::class);
+        $this->routeGeneratorPool = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
@@ -191,7 +191,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
         $this->routeGeneratorPool->generate($this->document->reveal(), null)
-            ->willReturn(new GeneratedRoute($this->document->reveal(), '/test'));
+            ->willReturn(new Route('/test', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');
@@ -216,7 +216,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
         $this->routeGeneratorPool->generate($this->document->reveal(), '/test-1')
-            ->willReturn(new GeneratedRoute($this->document->reveal(), '/test-1'));
+            ->willReturn(new Route('/test-1', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');
@@ -241,7 +241,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
         $this->routeGeneratorPool->generate($this->document->reveal(), '/test-2')
-            ->willReturn(new GeneratedRoute($this->document->reveal(), '/test-2'));
+            ->willReturn(new Route('/test-2', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');

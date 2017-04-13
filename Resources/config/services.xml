@@ -108,7 +108,7 @@
         </service>
         <service id="sulu_article.subscriber.routable"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
-            <argument type="service" id="sulu_route.generator_pool"/>
+            <argument type="service" id="sulu_route.chain_generator"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>

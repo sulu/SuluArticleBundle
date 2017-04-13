@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^5.5 || ^7.0",
-        "sulu/sulu": "dev-feature/route-generator-pool",
+        "sulu/sulu": "dev-develop",
         "ongr/elasticsearch-bundle": "~1.0"
     },
     "require-dev": {
@@ -23,12 +23,6 @@
         "php-task/task-bundle": "@dev",
         "php-task/php-task": "@dev"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/wachterjohannes/sulu"
-        }
-    ],
     "keywords": [
         "articles"
     ],

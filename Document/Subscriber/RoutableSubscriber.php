@@ -18,7 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorPoolInterface;
+use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -37,11 +37,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RoutableSubscriber implements EventSubscriberInterface
 {
     const ROUTE_FIELD = 'routePath';
+    const ROUTES_PROPERTY = 'suluRoutes';
     const TAG_NAME = 'sulu_article.article_route';
-    const ROUTES_FIELD = 'routes';
 
     /**
-     * @var RouteGeneratorPoolInterface
+     * @var ChainRouteGeneratorInterface
      */
     private $routeGeneratorPool;
 
@@ -76,7 +76,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $documentInspector;
 
     /**
-     * @param RouteGeneratorPoolInterface $routeGeneratorPool
+     * @param ChainRouteGeneratorInterface $routeGeneratorPool
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
@@ -85,7 +85,7 @@ class RoutableSubscriber implements EventSubscriberInterface
      * @param DocumentInspector $documentInspector
      */
     public function __construct(
-        RouteGeneratorPoolInterface $routeGeneratorPool,
+        ChainRouteGeneratorInterface $routeGeneratorPool,
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
         EntityManagerInterface $entityManager,
@@ -183,7 +183,7 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $this->entityManager->persist($this->createOrUpdateRoute($document, $event->getLocale()));
 
-        $propertyName = $this->getPropertyName($event->getLocale(), self::ROUTES_FIELD);
+        $propertyName = $this->getPropertyName($event->getLocale(), self::ROUTES_PROPERTY);
 
         // check if nodes previous generated routes exists and remove them if not
         $oldRoutes = $event->getNode()->getPropertyValueWithDefault($propertyName, []);
@@ -196,7 +196,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         }
 
         // save the newly generated routes of children
-        $event->getNode()->setProperty($this->getPropertyName($event->getLocale(), self::ROUTES_FIELD), $routes);
+        $event->getNode()->setProperty($this->getPropertyName($event->getLocale(), self::ROUTES_PROPERTY), $routes);
         $this->entityManager->flush();
     }
 
