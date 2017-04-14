@@ -76,6 +76,12 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             $object = $this->documentManager->find($id, $locale);
         }
 
+        $pageNumber = $object->getPageNumber();
+        if ($object instanceof ArticlePageDocument) {
+            // the article contains the seo/excerpt data and the controller handles the page-number automatically
+            $object = $object->getParent();
+        }
+
         $metadata = $this->structureMetadataFactory->getStructureMetadata('article', $object->getStructureType());
 
         // this parameter should not be used
@@ -86,6 +92,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         return [
             'object' => $object,
             'view' => $metadata->view,
+            'pageNumber' => $pageNumber,
             'structure' => $structure,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
             '_controller' => $metadata->controller,

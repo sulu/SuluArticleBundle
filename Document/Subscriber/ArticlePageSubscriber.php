@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Component\Content\Document\LocalizationState;
@@ -159,7 +160,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public function setPageTitleOnPersist(PersistEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof ArticlePageDocument) {
+        if (!$document instanceof ArticleInterface) {
             return;
         }
 
@@ -169,11 +170,11 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Returns page-title for node.
      *
-     * @param ArticlePageDocument $document
+     * @param ArticleInterface $document
      *
      * @return string
      */
-    private function getPageTitle(ArticlePageDocument $document)
+    private function getPageTitle(ArticleInterface $document)
     {
         $pageTitleProperty = $this->getPageTitleProperty($document);
         if (!$pageTitleProperty) {
@@ -195,11 +196,11 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Find page-title property.
      *
-     * @param ArticlePageDocument $document
+     * @param ArticleInterface $document
      *
      * @return PropertyMetadata
      */
-    private function getPageTitleProperty(ArticlePageDocument $document)
+    private function getPageTitleProperty(ArticleInterface $document)
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article_page',
@@ -243,7 +244,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {
-        if ($event->getMetadata()->getClass() !== ArticlePageDocument::class) {
+        if (!$event->getMetadata()->getReflectionClass()->implementsInterface(ArticleInterface::class)) {
             return;
         }
 

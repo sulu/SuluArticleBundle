@@ -80,6 +80,16 @@ class ArticleDocument implements
     private $title;
 
     /**
+     * @var string
+     */
+    private $pageTitle;
+
+    /**
+     * @var array
+     */
+    private $pages;
+
+    /**
      * @var RouteInterface
      */
     private $route;
@@ -510,5 +520,59 @@ class ArticleDocument implements
     public function getPageUuid()
     {
         return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageNumber()
+    {
+        return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageTitle()
+    {
+        return $this->pageTitle;
+    }
+
+    /**
+     * Set pageTitle.
+     *
+     * @param string $pageTitle
+     *
+     * @return $this
+     */
+    public function setPageTitle($pageTitle)
+    {
+        $this->pageTitle = $pageTitle;
+
+        return $this;
+    }
+
+    /**
+     * Returns pages.
+     *
+     * @return array
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * Set pages.
+     *
+     * @param array $pages
+     *
+     * @return $this
+     */
+    public function setPages($pages)
+    {
+        $this->pages = $pages;
+
+        return $this;
     }
 }

@@ -12,12 +12,12 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use PHPCR\NodeInterface;
-use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\PropertyEncoder;
 
@@ -72,8 +72,6 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $child3 = $this->prophesize(PageBehavior::class);
         $child3->getUuid()->willReturn('1-2-2');
 
-        $this->documentInspector->getNode($this->document->reveal())->willReturn($this->node->reveal());
-
         $event = $this->prophesize(PersistEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getNode()->willReturn($this->node->reveal());
@@ -96,22 +94,6 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
 
         $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 3)->shouldBeCalled();
-
-        $this->pageSubscriber->handlePersist($event->reveal());
-    }
-
-    public function testHandlePersistAlreadySet()
-    {
-        $event = $this->prophesize(PersistEvent::class);
-        $event->getDocument()->willReturn($this->document->reveal());
-        $event->getNode()->willReturn($this->node->reveal());
-
-        $this->node->hasProperty('sulu:pageNumber')->willReturn(true);
-
-        $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
-
-        $this->document->getPageNumber()->willReturn(2);
-        $this->document->setPageNumber(Argument::any())->shouldNotBeCalled();
 
         $this->pageSubscriber->handlePersist($event->reveal());
     }
@@ -150,5 +132,19 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $childNode3->setProperty('sulu:' . PageSubscriber::FIELD, 3)->shouldBeCalled();
 
         $this->pageSubscriber->handleRemove($event->reveal());
+    }
+
+    public function testHandlePublish()
+    {
+        $event = $this->prophesize(PublishEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($this->node->reveal());
+
+        $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
+
+        $this->document->getPageNumber()->willReturn(1);
+        $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 1)->shouldBeCalled();
+
+        $this->pageSubscriber->handlePublish($event->reveal());
     }
 }
