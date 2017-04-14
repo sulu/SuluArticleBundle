@@ -30,6 +30,10 @@ define([
 
         startPreview: function(component, data) {
             var pageData = getPage(component.options.page, data);
+            if (!pageData.id) {
+                return;
+            }
+
             if (!!pageData.type && pageData.type.name === 'ghost') {
                 pageData = {id: pageData.id};
             }
