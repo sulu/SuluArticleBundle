@@ -34,6 +34,20 @@ interface ArticleInterface
     public function getPageUuid();
 
     /**
+     * Returns page-number.
+     *
+     * @return int
+     */
+    public function getPageNumber();
+
+    /**
+     * Returns page-title.
+     *
+     * @return string
+     */
+    public function getPageTitle();
+
+    /**
      * Returns structure-type.
      *
      * @return string

@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
 use Sulu\Component\DocumentManager\PropertyEncoder;
@@ -55,6 +56,7 @@ class PageSubscriber implements EventSubscriberInterface
         return [
             Events::HYDRATE => ['handleHydrate'],
             Events::PERSIST => [['handlePersist', -1024]],
+            Events::PUBLISH => [['handlePublish', -1024]],
             Events::REMOVE => [['handleRemove', 5]],
         ];
     }
@@ -87,7 +89,7 @@ class PageSubscriber implements EventSubscriberInterface
         $document = $event->getDocument();
         $node = $event->getNode();
         $propertyName = $this->propertyEncoder->systemName(static::FIELD);
-        if (!$document instanceof PageBehavior || $node->hasProperty($propertyName)) {
+        if (!$document instanceof PageBehavior) {
             return;
         }
 
@@ -100,11 +102,31 @@ class PageSubscriber implements EventSubscriberInterface
             }
 
             ++$page;
+
+            if ($child === $document) {
+                break;
+            }
         }
 
-        $childNode = $this->documentInspector->getNode($document);
-        $childNode->setProperty($propertyName, $page);
+        $node->setProperty($propertyName, $page);
         $document->setPageNumber($page);
+    }
+
+    /**
+     * Copy page-number to live workspace.
+     *
+     * @param PublishEvent $event
+     */
+    public function handlePublish(PublishEvent $event)
+    {
+        $document = $event->getDocument();
+        $node = $event->getNode();
+        $propertyName = $this->propertyEncoder->systemName(static::FIELD);
+        if (!$document instanceof PageBehavior) {
+            return;
+        }
+
+        $node->setProperty($propertyName, $document->getPageNumber());
     }
 
     /**
