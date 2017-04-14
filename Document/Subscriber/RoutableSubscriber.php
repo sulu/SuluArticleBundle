@@ -43,7 +43,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * @var ChainRouteGeneratorInterface
      */
-    private $routeGeneratorPool;
+    private $chainRouteGenerator;
 
     /**
      * @var RouteManagerInterface
@@ -76,7 +76,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $documentInspector;
 
     /**
-     * @param ChainRouteGeneratorInterface $routeGeneratorPool
+     * @param ChainRouteGeneratorInterface $chainRouteGenerator
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
@@ -85,7 +85,7 @@ class RoutableSubscriber implements EventSubscriberInterface
      * @param DocumentInspector $documentInspector
      */
     public function __construct(
-        ChainRouteGeneratorInterface $routeGeneratorPool,
+        ChainRouteGeneratorInterface $chainRouteGenerator,
         RouteManagerInterface $routeManager,
         RouteRepositoryInterface $routeRepository,
         EntityManagerInterface $entityManager,
@@ -93,7 +93,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         StructureMetadataFactoryInterface $metadataFactory,
         DocumentInspector $documentInspector
     ) {
-        $this->routeGeneratorPool = $routeGeneratorPool;
+        $this->chainRouteGenerator = $chainRouteGenerator;
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
@@ -158,7 +158,7 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $document->setUuid($event->getNode()->getIdentifier());
 
-        $generatedRoute = $this->routeGeneratorPool->generate(
+        $generatedRoute = $this->chainRouteGenerator->generate(
             $document,
             $event->getOption('route_path') ?: $document->getRoutePath()
         );
@@ -208,7 +208,27 @@ class RoutableSubscriber implements EventSubscriberInterface
      *
      * @return RouteInterface
      */
-    private function createOrUpdateRoute(RoutablePageBehavior $document, $locale)
+    private function createOrUpdatePageRoute(RoutablePageBehavior $document, $locale)
+    {
+        $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
+        if ($route) {
+            $document->setRoute($route);
+
+            return $this->routeManager->update($document);
+        }
+
+        return $this->routeManager->create($document);
+    }
+
+    /**
+     * Create or update for given document.
+     *
+     * @param RoutableBehavior $document
+     * @param string $locale
+     *
+     * @return RouteInterface
+     */
+    private function createOrUpdateRoute(RoutableBehavior $document, $locale)
     {
         $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
         if ($route) {
@@ -231,7 +251,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     {
         foreach ($oldRoutes as $oldRoute) {
             $oldRouteEntity = $this->routeRepository->findByPath($oldRoute, $locale);
-            if (!$this->nodeExists($session, $oldRouteEntity->getEntityId())) {
+            if ($oldRouteEntity && !$this->nodeExists($session, $oldRouteEntity->getEntityId())) {
                 $this->entityManager->remove($oldRouteEntity);
             }
         }
@@ -255,7 +275,7 @@ class RoutableSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $childRoute = $this->createOrUpdateRoute($child, $locale);
+            $childRoute = $this->createOrUpdatePageRoute($child, $locale);
             $this->entityManager->persist($childRoute);
 
             $child->setRoutePath($childRoute->getPath());

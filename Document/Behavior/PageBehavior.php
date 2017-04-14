@@ -12,12 +12,13 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
 use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
+use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 
 /**
  * This behavior has to be attached to documents which should have a page-number property.
  */
-interface PageBehavior extends ParentBehavior, UuidBehavior
+interface PageBehavior extends ParentBehavior, UuidBehavior, PathBehavior
 {
     /**
      * Returns page-number.

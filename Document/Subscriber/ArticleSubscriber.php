@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
+use PHPCR\NodeInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
@@ -115,6 +116,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::PUBLISH => [
                 ['handleScheduleIndexLive', 0],
                 ['handleScheduleIndex', 0],
+                ['synchronizeChildren', 0],
                 ['publishChildren', 0],
                 ['persistPageData', -2000],
             ],
@@ -166,6 +168,47 @@ class ArticleSubscriber implements EventSubscriberInterface
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
+    }
+
+    /**
+     * Syncs children between live and draft.
+     *
+     * @param PublishEvent $event
+     */
+    public function synchronizeChildren(PublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $liveNode = $event->getNode();
+        $draftNode = $this->documentInspector->getNode($document);
+
+        $liveChildren = $this->getChildren($liveNode);
+        $draftChildren = $this->getChildren($draftNode);
+        $removedChildrenIds = array_diff(array_keys($liveChildren), array_keys($draftChildren));
+
+        foreach ($removedChildrenIds as $removedChildrenId) {
+            $liveChildren[$removedChildrenId]->remove();
+        }
+    }
+
+    /**
+     * Returns children of given node.
+     *
+     * @param NodeInterface $node
+     *
+     * @return NodeInterface[]
+     */
+    private function getChildren(NodeInterface $node)
+    {
+        $result = [];
+        foreach ($node->getNodes() as $child) {
+            $result[$child->getIdentifier()] = $child;
+        }
+
+        return $result;
     }
 
     /**

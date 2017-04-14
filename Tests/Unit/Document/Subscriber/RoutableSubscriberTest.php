@@ -37,7 +37,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @var ChainRouteGeneratorInterface
      */
-    private $routeGeneratorPool;
+    private $chainGenerator;
 
     /**
      * @var RouteManagerInterface
@@ -86,7 +86,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->routeGeneratorPool = $this->prophesize(ChainRouteGeneratorInterface::class);
+        $this->chainGenerator = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);
         $this->routeRepository = $this->prophesize(RouteRepositoryInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
@@ -100,7 +100,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->routableSubscriber = new RoutableSubscriber(
-            $this->routeGeneratorPool->reveal(),
+            $this->chainGenerator->reveal(),
             $this->routeManager->reveal(),
             $this->routeRepository->reveal(),
             $this->entityManager->reveal(),
@@ -190,7 +190,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->routeGeneratorPool->generate($this->document->reveal(), null)
+        $this->chainGenerator->generate($this->document->reveal(), null)
             ->willReturn(new Route('/test', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
@@ -215,7 +215,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->routeGeneratorPool->generate($this->document->reveal(), '/test-1')
+        $this->chainGenerator->generate($this->document->reveal(), '/test-1')
             ->willReturn(new Route('/test-1', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
@@ -240,7 +240,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
         $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
 
-        $this->routeGeneratorPool->generate($this->document->reveal(), '/test-2')
+        $this->chainGenerator->generate($this->document->reveal(), '/test-2')
             ->willReturn(new Route('/test-2', null, get_class($this->document->reveal())));
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')

@@ -21,6 +21,7 @@ use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
 use Sulu\Component\DocumentManager\NameResolver;
 use Symfony\Cmf\Api\Slugifier\SlugifierInterface;
@@ -93,6 +94,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
                 ['setStructureTypeToParent', -2000],
                 ['setWorkflowStageOnArticle', -2000],
             ],
+            Events::REMOVE => ['setWorkflowStageOnArticle'],
             Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
     }
@@ -115,9 +117,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Set workflow-stage to test for article.
      *
-     * @param PersistEvent $event
+     * @param PersistEvent|RemoveEvent $event
      */
-    public function setWorkflowStageOnArticle(PersistEvent $event)
+    public function setWorkflowStageOnArticle($event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument
@@ -127,7 +129,11 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         }
 
         $document->getParent()->setWorkflowStage(WorkflowStage::TEST);
-        $this->documentManager->persist($document->getParent(), $event->getLocale(), $event->getOptions());
+        $this->documentManager->persist(
+            $document->getParent(),
+            $this->documentInspector->getLocale($document),
+            $event instanceof PersistEvent ? $event->getOptions() : []
+        );
     }
 
     /**
@@ -238,7 +244,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Add page-title to metadata.
+     * Extend metadata for article-page.
      *
      * @param MetadataLoadEvent $event
      */
@@ -248,7 +254,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->getMetadata()->addFieldMapping(
+        $metadata = $event->getMetadata();
+        $metadata->setSyncRemoveLive(false);
+        $metadata->addFieldMapping(
             'pageTitle',
             [
                 'encoding' => 'system_localized',

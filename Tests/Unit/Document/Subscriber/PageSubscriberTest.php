@@ -60,7 +60,8 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node = $this->prophesize(NodeInterface::class);
 
         $this->pageSubscriber = new PageSubscriber(
-            $this->documentInspector->reveal(), $this->propertyEncoder->reveal()
+            $this->documentInspector->reveal(),
+            $this->propertyEncoder->reveal()
         );
     }
 
@@ -134,7 +135,7 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->pageSubscriber->handleRemove($event->reveal());
     }
 
-    public function testHandlePublish()
+    public function testHandlePublishPageNumber()
     {
         $event = $this->prophesize(PublishEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
@@ -145,6 +146,6 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getPageNumber()->willReturn(1);
         $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 1)->shouldBeCalled();
 
-        $this->pageSubscriber->handlePublish($event->reveal());
+        $this->pageSubscriber->handlePublishPageNumber($event->reveal());
     }
 }
