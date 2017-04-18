@@ -119,10 +119,20 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
+        if ($article instanceof ArticlePageDocument) {
+            $article = $article->getParent();
+        }
+
         if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website')) {
             return;
         }
 
+        $pageNumber = 1;
+        if ($context->attributes->containsKey('pageNumber')) {
+            $pageNumber = $context->attributes->get('pageNumber')->get();
+        }
+
+        $visitor->addData('page', $pageNumber);
         $visitor->addData('pages', $context->accept($article->getPages()));
     }
 
@@ -143,7 +153,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
         $children = $article->getChildren();
 
-        $pageNumber = 1;
         if (null !== $children && $context->attributes->containsKey('pageNumber')) {
             $pages = array_values(iterator_to_array($children));
             $pageNumber = $context->attributes->get('pageNumber')->get();
@@ -152,7 +161,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             }
         }
 
-        $visitor->addData('page', $pageNumber);
         $content = $this->resolve($article);
         foreach ($content as $name => $value) {
             $visitor->addData($name, $value);
