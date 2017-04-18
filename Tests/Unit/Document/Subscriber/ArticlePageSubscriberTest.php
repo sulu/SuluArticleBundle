@@ -156,6 +156,7 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getParent()->willReturn($this->parentDocument->reveal());
 
         $this->documentInspector->getLocalizationState($this->parentDocument->reveal())->willReturn(LocalizationState::LOCALIZED);
+        $this->documentInspector->getLocale($this->document->reveal())->willReturn($this->locale);
 
         $this->parentDocument->setWorkflowStage(WorkflowStage::TEST)->shouldBeCalled();
         $this->documentManager->persist($this->parentDocument->reveal(), $this->locale, Argument::any())->shouldBeCalled();
