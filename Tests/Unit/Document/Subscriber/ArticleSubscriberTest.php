@@ -209,6 +209,114 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->publishChildren($this->prophesizeEvent(PublishEvent::class, $this->locale));
     }
 
+    public function testSynchronizeChildren()
+    {
+        $document = $this->prophesize(ArticleDocument::class);
+        $liveNode = $this->prophesize(NodeInterface::class);
+        $draftNode = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(PublishEvent::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getNode()->willReturn($liveNode->reveal());
+
+        $this->documentInspector->getNode($document->reveal())->willReturn($draftNode->reveal());
+
+        $children = [
+            $this->createNodeMock('123-123-123'),
+            $this->createNodeMock('456-456-456'),
+        ];
+
+        $liveNode->getNodes()->willReturn($children);
+        $draftNode->getNodes()->willReturn($children);
+
+        $this->articleSubscriber->synchronizeChildren($event->reveal());
+    }
+
+    public function testSynchronizeChildrenDifferenceRemove()
+    {
+        $document = $this->prophesize(ArticleDocument::class);
+        $liveNode = $this->prophesize(NodeInterface::class);
+        $draftNode = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(PublishEvent::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getNode()->willReturn($liveNode->reveal());
+
+        $this->documentInspector->getNode($document->reveal())->willReturn($draftNode->reveal());
+
+        $children = [
+            $this->createNodeMock('123-123-123'),
+            $this->createNodeMock('456-456-456', true),
+        ];
+
+        $liveNode->getNodes()->willReturn($children);
+        $draftNode->getNodes()->willReturn([$children[0]]);
+
+        $this->articleSubscriber->synchronizeChildren($event->reveal());
+    }
+
+    public function testSynchronizeChildrenDifferenceAdd()
+    {
+        $document = $this->prophesize(ArticleDocument::class);
+        $liveNode = $this->prophesize(NodeInterface::class);
+        $draftNode = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(PublishEvent::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getNode()->willReturn($liveNode->reveal());
+
+        $this->documentInspector->getNode($document->reveal())->willReturn($draftNode->reveal());
+
+        $children = [
+            $this->createNodeMock('123-123-123'),
+            $this->createNodeMock('456-456-456'),
+        ];
+
+        $liveNode->getNodes()->willReturn([$children[0]]);
+        $draftNode->getNodes()->willReturn($children);
+
+        // nothing should happen because publish new children will be done somewhere else
+
+        $this->articleSubscriber->synchronizeChildren($event->reveal());
+    }
+
+    public function testSynchronizeChildrenDifferenceAddAndRemove()
+    {
+        $document = $this->prophesize(ArticleDocument::class);
+        $liveNode = $this->prophesize(NodeInterface::class);
+        $draftNode = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(PublishEvent::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getNode()->willReturn($liveNode->reveal());
+
+        $this->documentInspector->getNode($document->reveal())->willReturn($draftNode->reveal());
+
+        $children = [
+            $this->createNodeMock('123-123-123', true),
+            $this->createNodeMock('456-456-456'),
+        ];
+
+        $liveNode->getNodes()->willReturn([$children[0]]);
+        $draftNode->getNodes()->willReturn([$children[1]]);
+
+        $this->articleSubscriber->synchronizeChildren($event->reveal());
+    }
+
+    private function createNodeMock($uuid, $removeCall = false)
+    {
+        $node = $this->prophesize(NodeInterface::class);
+        $node->getIdentifier()->willReturn($uuid);
+
+        if ($removeCall) {
+            $node->remove()->shouldBeCalled();
+        } else {
+            $node->remove()->shouldNotBeCalled();
+        }
+
+        return $node->reveal();
+    }
+
     public function testRemoveDraftChildren()
     {
         $children = [

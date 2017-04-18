@@ -208,11 +208,6 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $documentManager->remove($document);
         $documentManager->flush();
 
-        // FIXME this is a current hack which publishes article automatically when removing a single page
-        $document = $documentManager->find($articleUuid, $locale);
-        $documentManager->publish($document, $locale);
-        $documentManager->flush();
-
         return $this->handleView($this->view(null));
     }
 

@@ -56,8 +56,8 @@ class PageSubscriber implements EventSubscriberInterface
         return [
             Events::HYDRATE => ['handleHydrate'],
             Events::PERSIST => [['handlePersist', -1024]],
-            Events::PUBLISH => [['handlePublish', -1024]],
             Events::REMOVE => [['handleRemove', 5]],
+            Events::PUBLISH => [['handlePublishPageNumber', -1024]],
         ];
     }
 
@@ -117,7 +117,7 @@ class PageSubscriber implements EventSubscriberInterface
      *
      * @param PublishEvent $event
      */
-    public function handlePublish(PublishEvent $event)
+    public function handlePublishPageNumber(PublishEvent $event)
     {
         $document = $event->getDocument();
         $node = $event->getNode();
@@ -141,10 +141,8 @@ class PageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $parentDocument = $document->getParent();
-
         $page = 1;
-        foreach ($parentDocument->getChildren() as $child) {
+        foreach ($document->getParent()->getChildren() as $child) {
             if (!$child instanceof PageBehavior || $child->getUuid() === $document->getUuid()) {
                 continue;
             }

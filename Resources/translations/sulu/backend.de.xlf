@@ -152,7 +152,7 @@
             </trans-unit>
             <trans-unit id="multi-page-02">
                 <source>sulu_article.edit.new-page</source>
-                <target>Neue Seite erstellen</target>
+                <target>Seite hinzufügen</target>
             </trans-unit>
         </body>
     </file>
