@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
@@ -33,6 +34,7 @@ class ArticlePageDocument implements
     AutoNameBehavior,
     PathBehavior,
     StructureBehavior,
+    LocalizedStructureBehavior,
     RoutablePageBehavior,
     PageBehavior,
     ArticleInterface

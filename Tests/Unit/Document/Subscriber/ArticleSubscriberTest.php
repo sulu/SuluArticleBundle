@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use PHPCR\NodeInterface;
+use PHPCR\PathNotFoundException;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -331,6 +332,23 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
             $this->documentManager->removeDraft($child, $this->locale)->shouldBeCalled();
         }
+
+        $this->articleSubscriber->removeDraftChildren($this->prophesizeEvent(RemoveDraftEvent::class, $this->locale));
+    }
+
+    public function testRemoveDraftChildrenNotExists()
+    {
+        $child = $this->prophesize(ArticlePageDocument::class)->reveal();
+
+        $this->document->getChildren()->willReturn([$child]);
+
+        $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+        $this->documentManager->removeDraft($child, $this->locale)->shouldBeCalled()
+            ->willThrow(new PathNotFoundException());
+
+        $node = $this->prophesize(NodeInterface::class);
+        $node->remove()->shouldBeCalled();
+        $this->documentInspector->getNode($child)->willReturn($node->reveal());
 
         $this->articleSubscriber->removeDraftChildren($this->prophesizeEvent(RemoveDraftEvent::class, $this->locale));
     }

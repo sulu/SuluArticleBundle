@@ -12,11 +12,13 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\Events;
 use Sulu\Component\DocumentManager\PropertyEncoder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -58,6 +60,7 @@ class PageSubscriber implements EventSubscriberInterface
             Events::PERSIST => [['handlePersist', -1024]],
             Events::REMOVE => [['handleRemove', 5]],
             Events::PUBLISH => [['handlePublishPageNumber', -1024]],
+            Events::RESTORE => [['handleRestore', -1024]],
         ];
     }
 
@@ -144,6 +147,29 @@ class PageSubscriber implements EventSubscriberInterface
         $page = 1;
         foreach ($document->getParent()->getChildren() as $child) {
             if (!$child instanceof PageBehavior || $child->getUuid() === $document->getUuid()) {
+                continue;
+            }
+
+            $childNode = $this->documentInspector->getNode($child);
+            $childNode->setProperty($this->propertyEncoder->systemName(static::FIELD), ++$page);
+        }
+    }
+
+    /**
+     * Adjust the page-numbers of siblings when restoring a page.
+     *
+     * @param RestoreEvent $event
+     */
+    public function handleRestore(RestoreEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ChildrenBehavior) {
+            return;
+        }
+
+        $page = 1;
+        foreach ($document->getChildren() as $child) {
+            if (!$child instanceof PageBehavior) {
                 continue;
             }
 
