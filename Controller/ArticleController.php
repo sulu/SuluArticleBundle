@@ -16,10 +16,10 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
-use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
+use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
@@ -180,7 +180,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string $uuid
+     * @param string  $uuid
      * @param Request $request
      *
      * @return Response
@@ -233,7 +233,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Update articles.
      *
      * @param Request $request
-     * @param string $uuid
+     * @param string  $uuid
      *
      * @return Response
      */
@@ -308,7 +308,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @Post("/articles/{uuid}")
      *
-     * @param string $uuid
+     * @param string  $uuid
      * @param Request $request
      *
      * @return Response
@@ -343,7 +343,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
                     break;
                 default:
-                    throw new RestException('Unrecognized action: ' . $action);
+                    throw new RestException('Unrecognized action: '.$action);
             }
 
             // prepare view
@@ -367,7 +367,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given information.
      *
-     * @param array $data
+     * @param array  $data
      * @param object $document
      * @param string $locale
      *
