@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Search;
@@ -28,7 +27,7 @@ use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
 class ArticleLinkProvider implements LinkProviderInterface
 {
     /**
-     * @var Repository
+     * @var Manager
      */
     private $manager;
 
@@ -43,11 +42,11 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $types;
 
     /**
-     * @param Manager $manager
+     * @param Manager         $manager
      * @param DocumentFactory $documentFactory
-     * @param array $types
+     * @param array           $types
      */
-    public function __construct(Repository $manager, DocumentFactory $documentFactory, array $types)
+    public function __construct(Manager $manager, DocumentFactory $documentFactory, array $types)
     {
         $this->manager = $manager;
         $this->documentFactory = $documentFactory;
