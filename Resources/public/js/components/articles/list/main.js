@@ -46,6 +46,7 @@ define([
             filterMe: 'sulu_article.list.filter.me',
             filterAll: 'sulu_article.list.filter.all',
             filterBy: 'sulu_article.list.filter.by',
+            filterByCategory: 'sulu_article.list.filter.by-category',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -172,11 +173,14 @@ define([
             this.$el.html(this.templates.list());
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
-            var contactFilter = this.getContactFilterFromStorage();
-            var filterTitle = this.getContactFilterTitle(contactFilter.filterKey, contactFilter.contact);
+            var filter = this.getFilterFromStorage();
+            var filterTitle = this.getFilterTitle(filter.filterKey, filter.contact, filter.category);
 
-            if (!!contactFilter.contact) {
-                urlArticleApi += '&contactId=' + contactFilter.contact.id;
+            if (!!filter.contact) {
+                urlArticleApi += '&contactId=' + filter.contact.id;
+            }
+            if (!!filter.category) {
+                urlArticleApi += '&categoryId=' + filter.category.id;
             }
 
             this.sandbox.sulu.initListToolbarAndList.call(this,
@@ -341,7 +345,7 @@ define([
             }.bind(this));
 
             this.sandbox.on('husky.toolbar.articles.initialized', function() {
-                this.sandbox.emit('husky.toolbar.articles.item.mark', this.getContactFilterFromStorage().filterKey);
+                this.sandbox.emit('husky.toolbar.articles.item.mark', this.getFilterFromStorage().filterKey);
             }.bind(this));
         },
 
@@ -361,7 +365,7 @@ define([
                         ]
                     }
                 },
-                contactIdFilter: {
+                filter: {
                     options: {
                         icon: 'filter',
                         group: 2,
@@ -399,6 +403,14 @@ define([
                                 id: 'filterBy',
                                 title: this.translations.filterBy + '...',
                                 callback: this.openContactSelectionOverlay.bind(this)
+                            },
+                            {
+                                divider: true
+                            },
+                            {
+                                id: 'filterByCategory',
+                                title: this.translations.filterByCategory,
+                                callback: this.openCategorySelectionOverlay.bind(this)
                             }
                         ]
                     }
@@ -420,7 +432,7 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        contact: this.getContactFilterFromStorage.call(this).contact
+                        contact: this.getFilterFromStorage().contact
                     },
                     selectCallback: function(data) {
                         this.applyFilterToList.call(
@@ -428,7 +440,34 @@ define([
                             'filterBy',
                             data.contactItem
                         );
-                        this.sandbox.emit('husky.overlay.contact-selection.close');
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        /**
+         * Opens contact selection overlay.
+         */
+        openCategorySelectionOverlay: function() {
+            var $container = $('<div/>');
+
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'articles/list/category-selection@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: {
+                        category: this.getFilterFromStorage().category
+                    },
+                    selectCallback: function(data) {
+                        this.applyFilterToList.call(
+                            this,
+                            'category',
+                            null,
+                            data.categoryItem
+                        );
                     }.bind(this)
                 }
             }]);
@@ -440,15 +479,23 @@ define([
          *
          * @param {string} filterKey
          * @param {Object} contact
+         * @param {Object} category
          */
-        applyFilterToList: function(filterKey, contact) {
-            this.storage.set('contactFilter', {
+        applyFilterToList: function(filterKey, contact, category) {
+            this.storage.set('filter', {
                 contact: contact,
+                category: category,
                 filterKey: filterKey
             });
-            this.sandbox.emit('husky.datagrid.articles.url.update', {contactId: contact ? contact.id : null});
-            this.sandbox.emit('husky.toolbar.articles.button.set', 'contactIdFilter', {
-                title: this.getContactFilterTitle(filterKey, contact)
+
+            var update = {
+                contactId: contact ? contact.id : null,
+                categoryId: category ? category.id : null
+            };
+
+            this.sandbox.emit('husky.datagrid.articles.url.update', update);
+            this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {
+                title: this.getFilterTitle(filterKey, contact, category)
             });
         },
 
@@ -457,8 +504,8 @@ define([
          *
          * @returns {Object}
          */
-        getContactFilterFromStorage: function() {
-            return this.storage.getWithDefault('contactFilter', {filterKey: 'all', contact: null});
+        getFilterFromStorage: function() {
+            return this.storage.getWithDefault('filter', {filterKey: 'all', contact: null, category: null});
         },
 
         /**
@@ -466,9 +513,10 @@ define([
          *
          * @param {String} filterKey
          * @param {Object} contact
+         * @param {Object} category
          * @return {String}
          */
-        getContactFilterTitle: function(filterKey, contact) {
+        getFilterTitle: function(filterKey, contact, category) {
             var title = '';
 
             switch(filterKey) {
@@ -476,10 +524,13 @@ define([
                     title = this.translations.filterAll;
                     break;
                 case 'filterBy':
-                    title = this.translations.filterBy + ' ' + contact.firstName + ' ' + contact.lastName
+                    title = this.translations.filterBy + ' ' + contact.firstName + ' ' + contact.lastName;
                     break;
                 case 'me':
                     title = this.translations.filterMe;
+                    break;
+                case 'category':
+                    title = this.translations.filterByCategory + ' ' + category.name;
                     break;
             }
 
