@@ -244,14 +244,21 @@ class ArticleDocument implements
     }
 
     /**
-     * Set route.
-     *
-     * @param RouteInterface $route
+     * {@inheritdoc}
      */
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
         $this->routePath = $route->getPath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeRoute()
+    {
+        $this->route = null;
+        $this->routePath = null;
     }
 
     /**
