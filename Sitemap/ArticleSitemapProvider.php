@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Sitemap;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\Sitemap;
@@ -72,11 +72,11 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     private function getBulk(Repository $repository, $from, $size)
     {
         $search = $repository->createSearch()
-            ->addQuery(new TermQuery('seo.hide_in_sitemap', false))
+            ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'))
             ->setFrom($from)
             ->setSize($size);
 
-        return $repository->execute($search);
+        return $repository->findDocuments($search);
     }
 
     /**
@@ -94,7 +94,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
-            ->addQuery(new TermQuery('seo.hide_in_sitemap', false));
+            ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'));
 
         return ceil($repository->count($search) / self::PAGE_SIZE);
     }
