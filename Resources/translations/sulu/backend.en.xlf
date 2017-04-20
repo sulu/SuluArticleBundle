@@ -126,13 +126,21 @@
                 <source>sulu_article.list.filter.all</source>
                 <target>All</target>
             </trans-unit>
-            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by">
-                <source>sulu_article.list.filter.all</source>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by-author">
+                <source>sulu_article.list.filter.by-author</source>
                 <target>Only from</target>
+            </trans-unit>
+            <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
+                <source>sulu_article.list.filter.by-category</source>
+                <target>Only Category</target>
             </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filter article by contact</target>
+            </trans-unit>
+            <trans-unit id="copy-01">
+                <source>sulu_article.edit.copy</source>
+                <target>Copy Article</target>
             </trans-unit>
         </body>
     </file>

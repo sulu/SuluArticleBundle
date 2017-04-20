@@ -23,6 +23,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
@@ -131,6 +132,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             $boolQuery->add(new MatchQuery('creator_contact_id', $contactId), BoolQuery::SHOULD);
             $boolQuery->add(new MatchQuery('author_id', $contactId), BoolQuery::SHOULD);
             $search->addQuery($boolQuery);
+        }
+
+        if (null !== ($categoryId = $request->get('categoryId'))) {
+            $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
         }
 
         if (null === $search->getQueries()) {
@@ -341,6 +346,14 @@ class ArticleController extends RestController implements ClassResourceInterface
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    break;
+                case 'copy':
+                    /** @var ArticleDocument $document */
+                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                    $copiedPath = $this->getDocumentManager()->copy($document, dirname($document->getPath()));
+                    $this->getDocumentManager()->flush();
+
+                    $data = $this->getDocumentManager()->find($copiedPath, $locale);
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);

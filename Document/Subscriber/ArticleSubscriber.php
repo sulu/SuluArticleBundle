@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
+use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
@@ -78,6 +79,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::UNPUBLISH => 'handleUnpublish',
             Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
+            Events::COPY => ['handleCopy'],
         ];
     }
 
@@ -227,5 +229,24 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $this->liveIndexer->remove($document);
         $this->liveIndexer->flush();
+    }
+
+    /**
+     * Schedule document to index.
+     *
+     * @param CopyEvent $event
+     */
+    public function handleCopy(CopyEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $uuid = $event->getCopiedNode()->getIdentifier();
+        $this->documents[$uuid] = [
+            'uuid' => $uuid,
+            'locale' => $document->getLocale(),
+        ];
     }
 }

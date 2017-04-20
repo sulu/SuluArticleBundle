@@ -28,6 +28,11 @@ interface RoutableBehavior extends RoutableInterface, UuidBehavior, LocaleBehavi
     public function getRoutePath();
 
     /**
+     * Remove route.
+     */
+    public function removeRoute();
+
+    /**
      * Set route-path.
      *
      * @param string $routePath
