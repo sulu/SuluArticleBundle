@@ -129,7 +129,7 @@ define([
                             }.bind(this)
                         }
                     }
-                }
+                };
             }
 
             if (SecurityChecker.hasPermission(this.data, 'live')) {
@@ -196,8 +196,7 @@ define([
                     }
                 };
             }
-            
-            
+
             if (!this.sandbox.util.isEmpty(editDropdown)) {
                 buttons.edit = {
                     options: {
@@ -591,7 +590,7 @@ define([
 
         copy: function() {
             ArticleManager.copy(this.data.id, this.options.locale).done(function(data) {
-                this.toEdit(this.options.locale, data.id);
+                ArticleRouter.toEdit(data.id, this.options.locale);
             }.bind(this));
         },
 
