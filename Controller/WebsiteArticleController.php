@@ -50,7 +50,7 @@ class WebsiteArticleController extends Controller
      *
      * @return Response
      */
-    private function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
+    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
     {
         if ($object instanceof ArticlePageDocument) {
             // this is necessary because the preview system passes an article-page here.
