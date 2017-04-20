@@ -343,7 +343,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
                     break;
                 default:
-                    throw new RestException('Unrecognized action: '.$action);
+                    throw new RestException('Unrecognized action: ' . $action);
             }
 
             // prepare view

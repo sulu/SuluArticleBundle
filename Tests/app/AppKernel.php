@@ -35,14 +35,14 @@ class AppKernel extends SuluTestKernel
         parent::registerContainerConfiguration($loader);
 
         if (getenv('SYMFONY__PHPCR__TRANSPORT') === 'jackrabbit') {
-            $loader->load(__DIR__.'/config/versioning.yml');
+            $loader->load(__DIR__ . '/config/versioning.yml');
         }
 
         // If version is lower then 5.6 it is an testcase for elasticsearch 2.*, so different ONGR config is needed
         if (phpversion() < 5.6) {
-            $loader->load(__DIR__.'/config/config_es2.yml');
+            $loader->load(__DIR__ . '/config/config_es2.yml');
         } else {
-            $loader->load(__DIR__.'/config/config.yml');
+            $loader->load(__DIR__ . '/config/config.yml');
         }
     }
 }
