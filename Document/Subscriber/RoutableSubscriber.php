@@ -14,13 +14,13 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPCR\ItemNotFoundException;
 use PHPCR\SessionInterface;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
+use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -29,7 +29,6 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
-use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -85,6 +84,11 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $metadataFactory;
 
     /**
+     * @var ConflictResolverInterface
+     */
+    private $conflictResolver;
+
+    /**
      * @param ChainRouteGeneratorInterface $chainRouteGenerator
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
@@ -93,6 +97,7 @@ class RoutableSubscriber implements EventSubscriberInterface
      * @param DocumentInspector $documentInspector
      * @param PropertyEncoder $propertyEncoder
      * @param StructureMetadataFactoryInterface $metadataFactory
+     * @param ConflictResolverInterface $conflictResolver
      */
     public function __construct(
         ChainRouteGeneratorInterface $chainRouteGenerator,
@@ -102,7 +107,8 @@ class RoutableSubscriber implements EventSubscriberInterface
         DocumentManagerInterface $documentManager,
         DocumentInspector $documentInspector,
         PropertyEncoder $propertyEncoder,
-        StructureMetadataFactoryInterface $metadataFactory
+        StructureMetadataFactoryInterface $metadataFactory,
+        ConflictResolverInterface $conflictResolver
     ) {
         $this->chainRouteGenerator = $chainRouteGenerator;
         $this->routeManager = $routeManager;
@@ -112,6 +118,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         $this->documentInspector = $documentInspector;
         $this->propertyEncoder = $propertyEncoder;
         $this->metadataFactory = $metadataFactory;
+        $this->conflictResolver = $conflictResolver;
     }
 
     /**
@@ -131,7 +138,6 @@ class RoutableSubscriber implements EventSubscriberInterface
             ],
             Events::PUBLISH => ['handlePublish', -2000],
             Events::COPY => ['handleCopy', -2000],
-            Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
@@ -195,7 +201,16 @@ class RoutableSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->entityManager->persist($this->createOrUpdateRoute($document, $event->getLocale()));
+        $node = $this->documentInspector->getNode($document);
+
+        $route = $this->createOrUpdateRoute($document, $event->getLocale());
+        $document->setRoutePath($route->getPath());
+        $this->entityManager->persist($route);
+
+        $node->setProperty(
+            $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale()),
+            $route->getPath()
+        );
 
         $propertyName = $this->getPropertyName($event->getLocale(), self::ROUTES_PROPERTY);
 
@@ -210,7 +225,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         }
 
         // save the newly generated routes of children
-        $event->getNode()->setProperty($this->getPropertyName($event->getLocale(), self::ROUTES_PROPERTY), $routes);
+        $event->getNode()->setProperty($propertyName, $routes);
         $this->entityManager->flush();
     }
 
@@ -228,10 +243,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $document->setRoute($route);
 
-            return $this->routeManager->update($document);
+            return $this->conflictResolver->resolve($this->routeManager->update($document));
         }
 
-        return $this->routeManager->create($document);
+        return $this->conflictResolver->resolve($this->routeManager->create($document));
     }
 
     /**
@@ -248,10 +263,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $document->setRoute($route);
 
-            return $this->routeManager->update($document, $document->getRoutePath());
+            return $this->conflictResolver->resolve($this->routeManager->update($document, $document->getRoutePath()));
         }
 
-        return $this->routeManager->create($document, $document->getRoutePath());
+        return $this->conflictResolver->resolve($this->routeManager->create($document, $document->getRoutePath()));
     }
 
     /**
@@ -344,21 +359,25 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $locales = $this->documentInspector->getLocales($document);
         foreach ($locales as $locale) {
-            /** @var ArticleDocument $localizedDocument */
             $localizedDocument = $this->documentManager->find($event->getCopiedPath(), $locale);
 
-            $localizedDocument->removeRoute();
-            $route = $this->routeManager->create($localizedDocument);
-            $document->setRoutePath($route->getPath());
-            $this->entityManager->persist($route);
+            $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($localizedDocument));
+            $localizedDocument->setRoutePath($route->getPath());
 
-            $event->getCopiedNode()->setProperty(
-                $this->propertyEncoder->localizedSystemName(self::ROUTE_FIELD, $locale),
+            $node = $this->documentInspector->getNode($localizedDocument);
+            $node->setProperty(
+                $this->getRoutePathPropertyName($localizedDocument->getStructureType(), $locale),
                 $route->getPath()
             );
-        }
 
-        $this->entityManager->flush();
+            $propertyName = $this->getRoutePathPropertyName($localizedDocument->getStructureType(), $locale);
+            $node = $this->documentInspector->getNode($localizedDocument);
+            $node->setProperty($propertyName, $route->getPath());
+
+            if ($localizedDocument instanceof ChildrenBehavior) {
+                $this->generateChildRoutes($localizedDocument, $locale);
+            }
+        }
     }
 
     /**
@@ -390,27 +409,6 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $this->entityManager->remove($route);
         }
-    }
-
-    /**
-     * Add route to metadata.
-     *
-     * @param MetadataLoadEvent $event
-     */
-    public function handleMetadataLoad(MetadataLoadEvent $event)
-    {
-        if (!$event->getMetadata()->getReflectionClass()->implementsInterface(RoutableBehavior::class)) {
-            return;
-        }
-
-        $metadata = $event->getMetadata();
-        $metadata->addFieldMapping(
-            self::ROUTE_FIELD,
-            [
-                'encoding' => 'system_localized',
-                'property' => self::ROUTE_FIELD,
-            ]
-        );
     }
 
     /**

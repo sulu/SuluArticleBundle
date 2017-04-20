@@ -148,11 +148,11 @@
             </trans-unit>
             <trans-unit id="multi-page-01">
                 <source>sulu_article.edit.page-of</source>
-                <target>Page %s sur %s</target>
+                <target>Page %s of %s</target>
             </trans-unit>
             <trans-unit id="multi-page-02">
                 <source>sulu_article.edit.new-page</source>
-                <target>Créer une nouvelle page</target>
+                <target>Create new page</target>
             </trans-unit>
         </body>
     </file>

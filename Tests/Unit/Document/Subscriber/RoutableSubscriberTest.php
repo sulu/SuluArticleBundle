@@ -22,6 +22,7 @@ use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\Route;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
+use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -77,6 +78,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     private $metadataFactory;
 
     /**
+     * @var ConflictResolverInterface
+     */
+    private $conflictResolver;
+
+    /**
      * @var RoutableSubscriber
      */
     private $routableSubscriber;
@@ -102,11 +108,19 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
         $this->metadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
+        $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
+        $this->conflictResolver = $this->prophesize(ConflictResolverInterface::class);
 
         $this->document = $this->prophesize(RoutableBehavior::class);
 
         $this->node = $this->prophesize(NodeInterface::class);
         $this->node->getIdentifier()->willReturn('123-123-123');
+
+        $this->conflictResolver->resolve(Argument::type(RouteInterface::class))->will(
+            function (array $arguments) {
+                return $arguments[0];
+            }
+        );
 
         $this->routableSubscriber = new RoutableSubscriber(
             $this->chainGenerator->reveal(),
@@ -117,7 +131,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->documentInspector->reveal(),
             $this->propertyEncoder->reveal(),
             $this->metadataFactory->reveal(),
-            $this->documentInspector->reveal()
+            $this->conflictResolver->reveal()
         );
     }
 
@@ -281,34 +295,31 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routableSubscriber->handleRemove($event->reveal());
     }
 
-    public function testCopy()
+    public function testHandleCopy()
     {
         $event = $this->prophesize(CopyEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getCopiedPath()->willReturn('/cmf/articles/2017/04/test-article');
 
         $this->documentInspector->getLocales($this->document->reveal())->willReturn(['de']);
-
         $this->documentManager->find('/cmf/articles/2017/04/test-article', 'de')->willReturn($this->document->reveal());
-        $this->document->removeRoute()->shouldBeCalled();
 
         $route = $this->prophesize(RouteInterface::class);
         $route->getPath()->willReturn('/test');
-        $this->routeManager->create($this->document->reveal())->willReturn($route->reveal());
 
+        $this->chainGenerator->generate($this->document->reveal())->willReturn($route->reveal());
+
+        $this->document->getStructureType()->willReturn('default');
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
+            ->willReturn('i18n:de-routePath');
+        $this->node->setProperty('i18n:de-routePath', '/test')->shouldBeCalled();
         $this->document->setRoutePath('/test')->shouldBeCalled();
 
-        $this->entityManager->persist($route->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
-
-        $node = $this->prophesize(NodeInterface::class);
-        $event->getCopiedNode()->willReturn($node->reveal());
-
-        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')->willReturn(
-                'i18n:de-routePath'
-            );
-
-        $node->setProperty('i18n:de-routePath', '/test');
+        $this->documentInspector->getNode($this->document->reveal())->willReturn($this->node->reveal());
 
         $this->routableSubscriber->handleCopy($event->reveal());
     }
