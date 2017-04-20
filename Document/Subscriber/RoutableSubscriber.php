@@ -12,11 +12,16 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
+use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -27,6 +32,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RoutableSubscriber implements EventSubscriberInterface
 {
+    const ROUTE_FIELD = 'routePath';
+
     /**
      * @var RouteManagerInterface
      */
@@ -43,15 +50,42 @@ class RoutableSubscriber implements EventSubscriberInterface
     private $entityManager;
 
     /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
+
+    /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
      * @param RouteManagerInterface $routeManager
      * @param RouteRepositoryInterface $routeRepository
      * @param EntityManagerInterface $entityManager
+     * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $documentInspector
+     * @param PropertyEncoder $propertyEncoder
      */
-    public function __construct(RouteManagerInterface $routeManager, RouteRepositoryInterface $routeRepository, EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        RouteManagerInterface $routeManager,
+        RouteRepositoryInterface $routeRepository,
+        EntityManagerInterface $entityManager,
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $documentInspector,
+        PropertyEncoder $propertyEncoder
+    ) {
         $this->routeManager = $routeManager;
         $this->routeRepository = $routeRepository;
         $this->entityManager = $entityManager;
+        $this->documentManager = $documentManager;
+        $this->documentInspector = $documentInspector;
+        $this->propertyEncoder = $propertyEncoder;
     }
 
     /**
@@ -63,6 +97,7 @@ class RoutableSubscriber implements EventSubscriberInterface
             Events::HYDRATE => [['handleHydrate', -500]],
             Events::PERSIST => [['handleRouteUpdate', 1], ['handleRoute', 0]],
             Events::REMOVE => [['handleRemove', -500]],
+            Events::COPY => ['handleCopy', -2000],
             Events::METADATA_LOAD => 'handleMetadataLoad',
             Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
@@ -150,6 +185,37 @@ class RoutableSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Update routes for copied article.
+     *
+     * @param CopyEvent $event
+     */
+    public function handleCopy(CopyEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutableBehavior) {
+            return;
+        }
+
+        $locales = $this->documentInspector->getLocales($document);
+        foreach ($locales as $locale) {
+            /** @var ArticleDocument $localizedDocument */
+            $localizedDocument = $this->documentManager->find($event->getCopiedPath(), $locale);
+
+            $localizedDocument->removeRoute();
+            $route = $this->routeManager->create($localizedDocument);
+            $document->setRoutePath($route->getPath());
+            $this->entityManager->persist($route);
+
+            $event->getCopiedNode()->setProperty(
+                $this->propertyEncoder->localizedSystemName(self::ROUTE_FIELD, $locale),
+                $route->getPath()
+            );
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
      * Add route to metadata.
      *
      * @param MetadataLoadEvent $event
@@ -162,10 +228,10 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $metadata = $event->getMetadata();
         $metadata->addFieldMapping(
-            'routePath',
+            self::ROUTE_FIELD,
             [
                 'encoding' => 'system_localized',
-                'property' => 'routePath',
+                'property' => self::ROUTE_FIELD,
             ]
         );
     }

@@ -134,6 +134,10 @@
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Artikel nach Kontakt filtern</target>
             </trans-unit>
+            <trans-unit id="copy-01">
+                <source>sulu_article.edit.copy</source>
+                <target>Artikel kopieren</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

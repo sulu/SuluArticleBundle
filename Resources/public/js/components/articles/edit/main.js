@@ -42,6 +42,7 @@ define([
                 unpublishConfirmTitle: 'sulu-content.unpublish-confirm-title',
                 deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
                 deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text',
+                copy: 'sulu_article.edit.copy',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -161,6 +162,16 @@ define([
                 }
             };
 
+            if (SecurityChecker.hasPermission(this.data, 'edit')) {
+                editDropdown.copy = {
+                    options: {
+                        title: this.translations.copy,
+                        callback: this.copy.bind(this)
+                    }
+                };
+            }
+            
+            
             if (!this.sandbox.util.isEmpty(editDropdown)) {
                 buttons.edit = {
                     options: {
@@ -532,6 +543,12 @@ define([
                     this.translations.unpublishConfirmTextNoDraft :
                     this.translations.unpublishConfirmTextWithDraft
             });
+        },
+
+        copy: function() {
+            ArticleManager.copy(this.data.id, this.options.locale).done(function(data) {
+                this.toEdit(this.options.locale, data.id);
+            }.bind(this));
         },
 
         saved: function(id, data, action) {
