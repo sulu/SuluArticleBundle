@@ -19,6 +19,7 @@ use Sulu\Component\DocumentManager\DocumentInspector;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\PropertyEncoder;
 
 class PageSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -147,5 +148,23 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 1)->shouldBeCalled();
 
         $this->pageSubscriber->handlePublishPageNumber($event->reveal());
+    }
+
+    public function testHandleRestore()
+    {
+        $event = $this->prophesize(RestoreEvent::class);
+
+        $parentDocument = $this->prophesize(ChildrenBehavior::class);
+        $parentDocument->getChildren()->willReturn([$this->document->reveal()]);
+
+        $event->getDocument()->willReturn($parentDocument->reveal());
+        $this->documentInspector->getNode($this->document->reveal())->willReturn($this->node->reveal());
+
+        $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
+
+        $this->document->getPageNumber()->willReturn(2);
+        $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 2)->shouldBeCalled();
+
+        $this->pageSubscriber->handleRestore($event->reveal());
     }
 }

@@ -480,13 +480,7 @@ define([
                     ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
                     }.bind(this)).then(function(response) {
-                        // reload page
-                        this.sandbox.emit(
-                            'sulu.router.navigate',
-                            this.sandbox.mvc.history.fragment,
-                            true,
-                            true
-                        );
+                        ArticleRouter.toEdit(this.options.id, this.options.locale);
                         this.saved(response.id, response);
                     }.bind(this)).fail(function() {
                         this.sandbox.emit('husky.label.header.reset');
