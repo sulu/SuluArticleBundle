@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ev
 
+echo $ES_VERSION;
+
 if [[ "${ES_VERSION}" = "2.4.4" ]]; then
         wget https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz
         tar -xzf elasticsearch-${ES_VERSION}.tar.gz
