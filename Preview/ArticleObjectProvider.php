@@ -112,16 +112,23 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function serialize($object)
     {
+        $pageNumber = $object->getPageNumber();
         if ($object instanceof ArticlePageDocument) {
             // resolve proxy to ensure that this will also be serialized
-            $object->getParent()->getTitle();
+            $object = $object->getParent();
+
+            $object->getTitle();
         }
 
-        return $this->serializer->serialize(
+        $result = $this->serializer->serialize(
             $object,
             'json',
-            SerializationContext::create()->setSerializeNull(true)->setGroups(['preview'])
+            SerializationContext::create()
+                ->setSerializeNull(true)
+                ->setGroups(['preview'])
         );
+
+        return json_encode(['pageNumber' => $pageNumber, 'object' => $result]);
     }
 
     /**
@@ -131,11 +138,26 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function deserialize($serializedObject, $objectClass)
     {
-        return $this->serializer->deserialize(
-            $serializedObject,
-            $objectClass,
+        $result = json_decode($serializedObject, true);
+
+        $article = $this->serializer->deserialize(
+            $result['object'],
+            ArticleDocument::class,
             'json',
-            DeserializationContext::create()->setSerializeNull(true)->setGroups(['preview'])
+            DeserializationContext::create()
+                ->setSerializeNull(true)
+                ->setGroups(['preview'])
         );
+
+        if ($result['pageNumber'] === 1) {
+            return $article;
+        }
+
+        $children = array_values($article->getChildren());
+
+        $object = $children[$result['pageNumber'] - 2];
+        $object->setParent($article);
+
+        return $object;
     }
 }

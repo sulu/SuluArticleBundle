@@ -32,6 +32,9 @@
         <property name="created" type="DateTime" groups="website,defaultArticle,preview"/>
         <property name="changed" type="DateTime" groups="website,defaultArticle,preview"/>
         <property name="pages" type="array" groups="preview"/>
+        <property name="children" groups="preview">
+            <type><![CDATA[array<string,Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument>]]></type>
+        </property>
 
         <property name="published" type="DateTime" groups="website,defaultArticle,smallArticle,preview"/>
         <property name="author" type="integer" groups="website,defaultArticle,preview"/>
