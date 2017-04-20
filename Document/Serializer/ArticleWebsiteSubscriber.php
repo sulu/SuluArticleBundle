@@ -154,7 +154,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $children = $article->getChildren();
 
         if (null !== $children && $context->attributes->containsKey('pageNumber')) {
-            $pages = array_values(iterator_to_array($children));
+            $pages = array_values(is_array($children) ? $children : iterator_to_array($children));
             $pageNumber = $context->attributes->get('pageNumber')->get();
             if ($pageNumber !== 1) {
                 $article = $pages[$pageNumber - 2];

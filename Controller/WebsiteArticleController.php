@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\HttpCache\HttpCache;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,8 +50,13 @@ class WebsiteArticleController extends Controller
      *
      * @return Response
      */
-    private function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
+    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
     {
+        if ($object instanceof ArticlePageDocument) {
+            // this is necessary because the preview system passes an article-page here.
+            $object = $object->getParent();
+        }
+
         $requestFormat = $request->getRequestFormat();
         $viewTemplate = $view . '.' . $requestFormat . '.twig';
 

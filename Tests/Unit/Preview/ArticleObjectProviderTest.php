@@ -16,6 +16,7 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -85,6 +86,7 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $object = $this->prophesize(ArticleDocument::class);
+        $object->getPageNumber()->willReturn(1);
 
         $this->serializer->serialize(
             $object->reveal(),
@@ -97,7 +99,38 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
             )
         )->shouldBeCalled()->willReturn('{"title": "test"}');
 
-        $this->assertEquals('{"title": "test"}', $this->provider->serialize($object->reveal()));
+        $this->assertEquals(
+            '{"pageNumber":1,"object":"{\"title\": \"test\"}"}',
+            $this->provider->serialize($object->reveal())
+        );
+    }
+
+    public function testSerializePage()
+    {
+        $article = $this->prophesize(ArticleDocument::class);
+        $article->getPageNumber()->willReturn(1);
+        $article->getTitle()->willReturn('page 1');
+
+        $object = $this->prophesize(ArticlePageDocument::class);
+        $object->getPageNumber()->willReturn(2);
+        $object->getTitle()->willReturn('page 2');
+        $object->getParent()->willReturn($article->reveal());
+
+        $this->serializer->serialize(
+            $article->reveal(),
+            'json',
+            Argument::that(
+                function (SerializationContext $context) {
+                    return $context->shouldSerializeNull()
+                           && $context->attributes->get('groups')->get() === ['preview'];
+                }
+            )
+        )->shouldBeCalled()->willReturn('{"title": "test"}');
+
+        $this->assertEquals(
+            '{"pageNumber":2,"object":"{\"title\": \"test\"}"}',
+            $this->provider->serialize($object->reveal())
+        );
     }
 
     public function testDeserialize()
@@ -106,7 +139,7 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer->deserialize(
             '{"title": "test"}',
-            get_class($object->reveal()),
+            ArticleDocument::class,
             'json',
             Argument::that(
                 function (DeserializationContext $context) {
@@ -118,7 +151,40 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $object->reveal(),
-            $this->provider->deserialize('{"title": "test"}', get_class($object->reveal()))
+            $this->provider->deserialize(
+                '{"pageNumber":1,"object":"{\"title\": \"test\"}"}',
+                get_class($object->reveal())
+            )
+        );
+    }
+
+    public function testDeserializePage()
+    {
+        $article = $this->prophesize(ArticleDocument::class);
+
+        $object = $this->prophesize(ArticlePageDocument::class);
+
+        $this->serializer->deserialize(
+            '{"title": "test"}',
+            ArticleDocument::class,
+            'json',
+            Argument::that(
+                function (DeserializationContext $context) {
+                    return $context->shouldSerializeNull()
+                           && $context->attributes->get('groups')->get() === ['preview'];
+                }
+            )
+        )->shouldBeCalled()->willReturn($article->reveal());
+
+        $article->getChildren()->willReturn(['page-1' => $object->reveal()]);
+        $object->setParent($article->reveal())->shouldBeCalled();
+
+        $this->assertEquals(
+            $object->reveal(),
+            $this->provider->deserialize(
+                '{"pageNumber":2,"object":"{\"title\": \"test\"}"}',
+                get_class($object->reveal())
+            )
         );
     }
 }
