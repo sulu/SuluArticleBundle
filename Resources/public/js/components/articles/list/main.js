@@ -45,7 +45,7 @@ define([
             publishedWithDraft: 'public.published-with-draft',
             filterMe: 'sulu_article.list.filter.me',
             filterAll: 'sulu_article.list.filter.all',
-            filterBy: 'sulu_article.list.filter.by',
+            filterByAuthor: 'sulu_article.list.filter.by-author',
             filterByCategory: 'sulu_article.list.filter.by-category',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
@@ -400,8 +400,8 @@ define([
                                 }.bind(this)
                             },
                             {
-                                id: 'filterBy',
-                                title: this.translations.filterBy + '...',
+                                id: 'filterByAuthor',
+                                title: this.translations.filterByAuthor + '...',
                                 callback: this.openContactSelectionOverlay.bind(this)
                             },
                             {
@@ -437,7 +437,7 @@ define([
                     selectCallback: function(data) {
                         this.applyFilterToList.call(
                             this,
-                            'filterBy',
+                            'filterByAuthor',
                             data.contactItem
                         );
                     }.bind(this)
@@ -523,8 +523,8 @@ define([
                 case 'all':
                     title = this.translations.filterAll;
                     break;
-                case 'filterBy':
-                    title = this.translations.filterBy + ' ' + contact.firstName + ' ' + contact.lastName;
+                case 'filterByAuthor':
+                    title = this.translations.filterByAuthor + ' ' + contact.firstName + ' ' + contact.lastName;
                     break;
                 case 'me':
                     title = this.translations.filterMe;

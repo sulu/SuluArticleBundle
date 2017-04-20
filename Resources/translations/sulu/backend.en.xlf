@@ -126,8 +126,8 @@
                 <source>sulu_article.list.filter.all</source>
                 <target>All</target>
             </trans-unit>
-            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by">
-                <source>sulu_article.list.filter.all</source>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by-author">
+                <source>sulu_article.list.filter.by-author</source>
                 <target>Only from</target>
             </trans-unit>
             <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
