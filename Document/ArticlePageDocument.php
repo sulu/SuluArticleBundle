@@ -279,6 +279,15 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
+    public function removeRoute()
+    {
+        $this->route = null;
+        $this->routePath = null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRoutePath()
     {
         return $this->routePath;
