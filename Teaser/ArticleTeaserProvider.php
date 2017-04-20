@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
 use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
@@ -88,7 +88,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $search->addQuery(new IdsQuery($articleIds));
 
         $result = [];
-        foreach ($repository->execute($search) as $item) {
+        foreach ($repository->findDocuments($search) as $item) {
             $excerpt = $item->getExcerpt();
             $result[] = new Teaser(
                 $item->getUuid(),

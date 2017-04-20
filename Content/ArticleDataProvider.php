@@ -13,9 +13,9 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 
 use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -249,7 +249,7 @@ class ArticleDataProvider implements DataProviderInterface
             $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
         }
 
-        return $repository->execute($search);
+        return $repository->findDocuments($search);
     }
 
     /**

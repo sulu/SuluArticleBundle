@@ -12,8 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
-use ONGR\ElasticsearchDSL\Query\RangeQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory;
@@ -42,9 +42,9 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $types;
 
     /**
-     * @param Manager $manager
+     * @param Manager         $manager
      * @param DocumentFactory $documentFactory
-     * @param array $types
+     * @param array           $types
      */
     public function __construct(Manager $manager, DocumentFactory $documentFactory, array $types)
     {
@@ -87,7 +87,8 @@ class ArticleLinkProvider implements LinkProviderInterface
             $search->addQuery(new RangeQuery('authored', ['lte' => 'now']));
         }
 
-        $documents = $this->manager->execute([$this->documentFactory->getClass('article')], $search);
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
+        $documents = $repository->findDocuments($search);
 
         $result = [];
         /** @var ArticleViewDocumentInterface $document */
