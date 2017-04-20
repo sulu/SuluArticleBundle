@@ -192,7 +192,9 @@ define([
             this.sandbox.dom.html(this.formId, this.sandbox.util.template(template, {
                 translate: this.sandbox.translate,
                 content: this.data,
-                options: this.options
+                options: this.options,
+                entityClass: 'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
+                entityId: this.options.id
             }));
 
             var data = this.options.adapter.prepareData(this.data, this);
