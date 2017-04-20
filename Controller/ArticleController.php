@@ -134,6 +134,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery($boolQuery);
         }
 
+        if (null !== ($categoryId = $request->get('categoryId'))) {
+            $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
+        }
+
         if (null === $search->getQueries()) {
             $search->addQuery(new MatchAllQuery());
         }

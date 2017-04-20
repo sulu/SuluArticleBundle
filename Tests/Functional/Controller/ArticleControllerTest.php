@@ -13,6 +13,8 @@ namespace Functional\Controller;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\CategoryBundle\Entity\Category;
+use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
@@ -767,6 +769,38 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
     }
 
+    public function testCgetFilterByCategory()
+    {
+        $title = 'Test-Article';
+        $template = 'default';
+        $category = $this->createCategory();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'ext' => ['excerpt' => ['categories' => [$category->getId()]]],
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $article1 = json_decode($client->getResponse()->getContent(), true);
+        // create second article which should not appear in response
+        $article2 = $this->testPost();
+
+        $client->request('GET', '/api/articles?locale=de&categoryId=' . $category->getId());
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $result = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $result['_embedded']['articles']);
+        $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
+    }
+
     /**
      * @return Media
      */
@@ -783,6 +817,18 @@ class ArticleControllerTest extends SuluTestCase
         $this->getEntityManager()->flush();
 
         return $media;
+    }
+
+    private function createCategory()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $category = new Category();
+        $category->setDefaultLocale('de');
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        return $category;
     }
 
     private function purgeIndex()
