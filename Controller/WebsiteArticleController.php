@@ -45,6 +45,7 @@ class WebsiteArticleController extends Controller
      * @param ArticleInterface $object
      * @param string $view
      * @param int $pageNumber
+     * @param array $attributes
      *
      * @return Response
      */

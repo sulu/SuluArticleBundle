@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use PHPCR\NodeInterface;
+use PHPCR\PathNotFoundException;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
@@ -306,8 +307,16 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         foreach ($document->getChildren() as $child) {
-            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST) {
+            if ($this->documentInspector->getLocalizationState($child) === LocalizationState::GHOST) {
+                continue;
+            }
+
+            try {
                 $this->documentManager->removeDraft($child, $event->getLocale());
+            } catch (PathNotFoundException $exception) {
+                // child is not available in live workspace
+                $node = $this->documentInspector->getNode($child);
+                $node->remove();
             }
         }
     }
