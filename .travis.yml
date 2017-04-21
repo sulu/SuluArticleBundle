@@ -39,7 +39,6 @@ matrix:
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
-  - chmod +x ./Tests/scripts/install-travis-es.sh
   - |
     if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
