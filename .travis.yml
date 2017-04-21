@@ -19,7 +19,7 @@ matrix:
   include:
     - php: 5.5
       env:
-        - SULU_VERSION="~1.5.1"
+        - SULU_VERSION="~1.5.3"
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
     - php: 7.0
       env:
@@ -29,7 +29,7 @@ matrix:
     - php: 7.0
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        - SULU_VERSION="~1.5.1"
+        - SULU_VERSION="~1.5.3"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
