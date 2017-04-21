@@ -33,8 +33,14 @@ matrix:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SULU_VERSION="~1.5.3"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 
 before_install:
+  # Container based PHP image ues PHP 5.6.5, once it will be upgraded sudo will be not necessary
+  - sudo apt-get install -y oracle-java8-set-default
   - |
     if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
