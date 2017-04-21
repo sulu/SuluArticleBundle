@@ -275,31 +275,6 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($pageTitle, $response['pageTitle']);
     }
 
-    public function testCopyLocale()
-    {
-        $article = $this->createArticle();
-        $page = $this->post($article);
-
-        $article = $this->createArticleLocale($article);
-
-        $client = $this->createAuthenticatedClient();
-        $client->request(
-            'POST',
-            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?action=copy-locale&locale=de&dest=en'
-        );
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $client->request('GET', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en');
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $this->assertArrayNotHasKey('type', $response);
-        $this->assertEquals($page['id'], $response['id']);
-        $this->assertEquals($page['pageTitle'], $response['pageTitle']);
-    }
-
     private function purgeIndex()
     {
         /** @var IndexerInterface $indexer */

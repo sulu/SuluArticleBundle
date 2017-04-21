@@ -35,6 +35,8 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
+use Sulu\Component\Security\Authorization\PermissionTypes;
+use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -347,7 +349,19 @@ class ArticleController extends RestController implements ClassResourceInterface
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
-                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    $destLocales = explode(',', $destLocales);
+
+                    $securityChecker = $this->get('sulu_security.security_checker');
+                    foreach ($destLocales as $destLocale) {
+                        $securityChecker->checkPermission(
+                            new SecurityCondition($this->getSecurityContext(), $destLocale),
+                            PermissionTypes::EDIT
+                        );
+                    }
+
+                    $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */

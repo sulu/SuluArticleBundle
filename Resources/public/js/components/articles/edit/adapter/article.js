@@ -16,10 +16,6 @@ define([
     'use strict';
 
     return {
-        getCopyLocaleUrl: function(id, dataId, src, dest) {
-            return ArticleManager.getCopyLocaleUrl(id, src, dest);
-        },
-
         startPreview: function(component, data) {
             var pageData = data;
             if (!!pageData.type && pageData.type.name === 'ghost') {

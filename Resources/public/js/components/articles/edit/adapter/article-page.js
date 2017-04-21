@@ -24,10 +24,6 @@ define([
     };
 
     return {
-        getCopyLocaleUrl: function(id, dataId, src, dest) {
-            return ArticleManager.getCopyPageLocaleUrl(id, dataId, src, dest);
-        },
-
         startPreview: function(component, data) {
             var pageData = getPage(component.options.page, data);
             if (!pageData.id) {

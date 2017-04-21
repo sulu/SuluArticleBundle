@@ -631,9 +631,7 @@ define([
          * @returns {string}
          */
         getCopyLocaleUrl: function(id, src, dest) {
-            var data = this.getAdapter().prepareData(this.data, this);
-
-            return this.getAdapter().getCopyLocaleUrl(id, data.id, src, dest);
+            return ArticleManager.getCopyLocaleUrl(id, src, dest);
         },
 
         startPageSwitcher: function() {

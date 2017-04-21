@@ -175,22 +175,6 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
-         * Returns url for copy article-page from a given locale to a array of other locales url.
-         *
-         * @param {String} articleId
-         * @param {String} pageId
-         * @param {String} src
-         * @param {String[]} dest
-         *
-         * @returns {String}
-         */
-        getCopyPageLocaleUrl: function(articleId, pageId, src, dest) {
-            return [
-                templates.pageUrl({articleId: articleId, pageId: pageId, locale: src, action: 'copy-locale'}), '&dest=', dest
-            ].join('');
-        },
-
-        /**
          * Returns get versions url for given id and locale.
          *
          * @param {String} id
