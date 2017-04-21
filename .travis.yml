@@ -35,8 +35,6 @@ matrix:
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
-  # Container based PHP image ues PHP 5.5, once it will be upgraded sudo will be not necessary
-  - sudo apt-get install -y oracle-java8-set-default
   - |
     if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
