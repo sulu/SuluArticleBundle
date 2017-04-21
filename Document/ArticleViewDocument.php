@@ -50,6 +50,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
+     *         "fielddata":true,
      *         "fields":{
      *            "raw":{"type":"string", "index":"not_analyzed"},
      *            "value":{"type":"string"}
