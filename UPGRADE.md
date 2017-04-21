@@ -13,3 +13,9 @@ with the cachelifetime resolver.
 Reindex elastic search indexes:
 * bin/adminconsole sulu:article:index-rebuild ###LOCALE### -live
 * bin/adminconsole sulu:article:index-rebuild ###LOCALE###
+
+
+## 0.5.0
+
+Now also support for ElasticSearch 5. To still be compatible with ^2.2, make sure you run: 
+* composer require ongr/elasticsearch-bundle:1.2.9
