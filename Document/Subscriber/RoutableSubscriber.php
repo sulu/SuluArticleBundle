@@ -331,15 +331,24 @@ class RoutableSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
-        if (!$route) {
-            return;
-        }
+        $locales = $this->documentInspector->getLocales($document);
+        foreach ($locales as $locale) {
+            $localizedDocument = $this->documentManager->find($document->getUuid(), $locale);
 
-        $this->entityManager->remove($route);
+            $route = $this->routeRepository->findByEntity(
+                $localizedDocument->getClass(),
+                $localizedDocument->getUuid(),
+                $locale
+            );
+            if (!$route) {
+                continue;
+            }
 
-        if ($document instanceof ChildrenBehavior) {
-            $this->removeChildRoutes($document);
+            $this->entityManager->remove($route);
+
+            if ($document instanceof ChildrenBehavior) {
+                $this->removeChildRoutes($document);
+            }
         }
 
         $this->entityManager->flush();
