@@ -281,15 +281,64 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleRemove()
     {
+        $this->documentInspector->getLocales($this->document->reveal())->willReturn(['de', 'en']);
+
         $event = $this->prophesize(RemoveEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
 
-        $route = $this->prophesize(RouteInterface::class);
+        $this->document->getUuid()->willReturn('123-123-123');
+        $this->document->getRoutePath()->willReturn('/test');
+        $this->document->getClass()->willReturn(ArticleDocument::class);
+        $this->document->getOriginalLocale()->willReturn('de');
+
+        $this->documentManager->find('123-123-123', 'de')->willReturn($this->document->reveal());
+        $this->documentManager->find('123-123-123', 'en')->willReturn($this->document->reveal());
+
+        $routeDE = $this->prophesize(RouteInterface::class);
+        $routeEN = $this->prophesize(RouteInterface::class);
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'de')
+            ->willReturn($routeDE->reveal());
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'en')
+            ->willReturn($routeEN->reveal());
+
+        $this->entityManager->remove($routeDE->reveal())->shouldBeCalled();
+        $this->entityManager->remove($routeEN->reveal())->shouldBeCalled();
+        $this->entityManager->flush()->shouldBeCalled();
+
+        $this->routableSubscriber->handleRemove($event->reveal());
+    }
+
+    public function testHandleRemoveWithChildren()
+    {
+        $this->document->willImplement(ChildrenBehavior::class);
+
+        $this->documentInspector->getLocales($this->document->reveal())->willReturn(['de']);
+
+        $event = $this->prophesize(RemoveEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+
+        $this->document->getUuid()->willReturn('123-123-123');
         $this->document->getRoutePath()->willReturn('/test');
         $this->document->getOriginalLocale()->willReturn('de');
-        $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+        $this->document->getClass()->willReturn(ArticleDocument::class);
+        $route1 = $this->prophesize(RouteInterface::class);
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'de')
+            ->willReturn($route1->reveal());
 
-        $this->entityManager->remove($route->reveal())->shouldBeCalled();
+        $this->documentManager->find('123-123-123', 'de')->willReturn($this->document->reveal());
+
+        $child = $this->prophesize(RoutableBehavior::class);
+        $child->willImplement(ChildrenBehavior::class);
+        $child->getChildren()->willReturn([]);
+        $this->document->getChildren()->willReturn([$child->reveal()]);
+
+        $child->getRoutePath()->willReturn('/test/test-2');
+        $child->getOriginalLocale()->willReturn('de');
+        $route2 = $this->prophesize(RouteInterface::class);
+        $this->routeRepository->findByPath('/test/test-2', 'de')->willReturn($route2->reveal());
+
+        $this->entityManager->remove($route1->reveal())->shouldBeCalled();
+        $this->entityManager->remove($route2->reveal())->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
         $this->routableSubscriber->handleRemove($event->reveal());
@@ -322,34 +371,5 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->documentInspector->getNode($this->document->reveal())->willReturn($this->node->reveal());
 
         $this->routableSubscriber->handleCopy($event->reveal());
-    }
-
-    public function testHandleRemoveWithChildren()
-    {
-        $this->document->willImplement(ChildrenBehavior::class);
-
-        $event = $this->prophesize(RemoveEvent::class);
-        $event->getDocument()->willReturn($this->document->reveal());
-
-        $this->document->getRoutePath()->willReturn('/test');
-        $this->document->getOriginalLocale()->willReturn('de');
-        $route1 = $this->prophesize(RouteInterface::class);
-        $this->routeRepository->findByPath('/test', 'de')->willReturn($route1->reveal());
-
-        $child = $this->prophesize(RoutableBehavior::class);
-        $child->willImplement(ChildrenBehavior::class);
-        $child->getChildren()->willReturn([]);
-        $this->document->getChildren()->willReturn([$child->reveal()]);
-
-        $child->getRoutePath()->willReturn('/test/test-2');
-        $child->getOriginalLocale()->willReturn('de');
-        $route2 = $this->prophesize(RouteInterface::class);
-        $this->routeRepository->findByPath('/test/test-2', 'de')->willReturn($route2->reveal());
-
-        $this->entityManager->remove($route1->reveal())->shouldBeCalled();
-        $this->entityManager->remove($route2->reveal())->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
-
-        $this->routableSubscriber->handleRemove($event->reveal());
     }
 }
