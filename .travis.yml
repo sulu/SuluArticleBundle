@@ -4,20 +4,16 @@ language: php
 
 env:
   global:
+    - JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre"
     - JACKRABBIT_VERSION=2.12.0
     - SYMFONY__PHPCR__TRANSPORT=doctrinedbal
     - ES_VERSION="5.3.0"
-    - ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+    - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
 
 cache:
   directories:
     - "downloads"
     - "$HOME/.composer/cache"
-
-addons:
-  apt:
-    packages:
-      - oracle-java8-set-default
 
 matrix:
   include:
@@ -26,7 +22,7 @@ matrix:
         - SULU_VERSION="~1.5.3"
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
         - ES_VERSION="2.4.4"
-        - ES_DOWNLOAD_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
+        - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
     - php: 7.0
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
@@ -39,6 +35,8 @@ matrix:
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 before_install:
+  # Container based PHP image ues PHP 5.5, once it will be upgraded sudo will be not necessary
+  - sudo apt-get install -y oracle-java8-set-default
   - |
     if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
@@ -51,9 +49,9 @@ before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update
-  - wget ${ES_DOWNLOAD_URL}
-  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
-  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
+  - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
+  - unzip elasticsearch.zip
+  - ./elasticsearch-*/bin/elasticsearch -d
 
 install:
   - travis_retry composer require sulu/sulu:$SULU_VERSION $COMPOSER_FLAGS
