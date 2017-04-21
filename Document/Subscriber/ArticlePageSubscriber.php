@@ -250,7 +250,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {
-        if (!$event->getMetadata()->getReflectionClass()->implementsInterface(ArticleInterface::class)) {
+        if ($event->getMetadata()->getClass() !== ArticlePageDocument::class) {
             return;
         }
 

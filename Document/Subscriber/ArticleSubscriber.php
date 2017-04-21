@@ -24,6 +24,7 @@ use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
+use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
@@ -126,6 +127,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
             Events::COPY => ['handleCopy'],
+            Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
     }
 
@@ -490,5 +492,25 @@ class ArticleSubscriber implements EventSubscriberInterface
                 $this->documentManager->persist($child, $event->getLocale(), $event->getOptions());
             }
         }
+    }
+
+    /**
+     * Extend metadata for article-page.
+     *
+     * @param MetadataLoadEvent $event
+     */
+    public function handleMetadataLoad(MetadataLoadEvent $event)
+    {
+        if ($event->getMetadata()->getClass() !== ArticleDocument::class) {
+            return;
+        }
+
+        $event->getMetadata()->addFieldMapping(
+            'pageTitle',
+            [
+                'encoding' => 'system_localized',
+                'property' => 'suluPageTitle',
+            ]
+        );
     }
 }
