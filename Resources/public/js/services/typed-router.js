@@ -12,17 +12,21 @@ define(['services/husky/mediator', 'suluarticle/services/base-router'], function
     'use strict';
 
     var routes = {
-            list: _.template('articles:<%= type %>/<%= locale %>'),
+            list: _.template('articles<% if (!!type) { %>:<%= type %><% } %>/<%= locale %>'),
             add: _.template('articles/<%= locale %>/add:<%= type %>')
         },
 
-        goto = function(route) {
-            Mediator.emit('sulu.router.navigate', route);
+        goto = function(route, trigger, force) {
+            if (typeof trigger === 'undefined') {
+                trigger = true;
+            }
+
+            Mediator.emit('sulu.router.navigate', route, trigger, (force || false));
         };
 
     return {
-        toList: function(locale, type) {
-            goto(routes.list({locale: locale, type: type}));
+        toList: function(locale, type, trigger, force) {
+            goto(routes.list({locale: locale, type: type}), trigger, force);
         },
         toAdd: function(locale, type) {
             goto(routes.add({locale: locale, type: type}));

@@ -302,7 +302,7 @@ define([
             this.options.type = item.key;
 
             this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: this.options.type});
-            ArticleRouter.toEditUpdate(this.options.locale, this.options.type);
+            ArticleRouter.toList(this.options.locale, this.options.type, false, false);
             this.storage.set('type', this.options.type);
         },
 
