@@ -824,7 +824,11 @@ class ArticleControllerTest extends SuluTestCase
 
         // request copy-locale post action for article1
         $client->request('POST', '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&dest=' . $destLocale . '&action=copy-locale');
+        $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertEquals($article1['id'], $response['id']);
+        $this->assertEquals([$locale, $destLocale], $response['concreteLanguages']);
 
         // get all articles in dest locale (now only one should be a ghost)
         $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog');
