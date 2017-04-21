@@ -6,7 +6,8 @@ env:
   global:
     - JACKRABBIT_VERSION=2.12.0
     - SYMFONY__PHPCR__TRANSPORT=doctrinedbal
-    - ES_VERSION=5.3.0
+    - ES_VERSION="5.3.0"
+    - ES_DOWNLOAD_URL=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
 
 cache:
   directories:
@@ -24,8 +25,8 @@ matrix:
       env:
         - SULU_VERSION="~1.5.3"
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
-        - ES_VERSION=2.4.4
-        - ES_DOWNLOAD_URL=https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz
+        - ES_VERSION="2.4.4"
+        - ES_DOWNLOAD_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
     - php: 7.0
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
@@ -51,7 +52,9 @@ before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update
-  - ./Tests/scripts/install-travis-es.sh
+  - wget ${ES_DOWNLOAD_URL}
+  - tar -xzf elasticsearch-${ES_VERSION}.tar.gz
+  - ./elasticsearch-${ES_VERSION}/bin/elasticsearch > /dev/null 2>&1 &
 
 install:
   - travis_retry composer require sulu/sulu:$SULU_VERSION $COMPOSER_FLAGS
