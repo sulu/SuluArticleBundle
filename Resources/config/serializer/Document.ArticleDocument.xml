@@ -27,7 +27,9 @@
 
         <property name="published" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
         <property name="author" type="integer" groups="website,defaultPage,preview"/>
-        <property name="authored" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
+        <property name="authored" groups="website,defaultPage,smallPage,preview">
+            <type><![CDATA[DateTime<'Y-m-d'>]]></type>
+        </property>
         <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultPage,preview"/>
     </class>
 </serializer>
