@@ -198,17 +198,7 @@ define([
             }));
 
             var data = this.options.adapter.prepareData(this.data, this);
-
-            if (!data.id || (data.type && data.type.name === 'ghost')) {
-                // route-path will be generator on post-request
-                this.$find('#routePath').parent().remove();
-                this.data.routePath = null;
-            }
-
             if (data.type && data.type.name === 'ghost') {
-                var titleProperty = this.getTitleProperty(),
-                    pageTitleProperty = this.getPageTitleProperty();
-
                 this.ghost = {
                     locale: data.type.value,
                     title: titleProperty ? data[titleProperty.name] : '',

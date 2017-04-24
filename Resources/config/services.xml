@@ -262,5 +262,12 @@
 
             <tag name="sulu.content.type" alias="article_selection"/>
         </service>
+
+        <service id="sulu_article.content_types.page_tree_route"
+                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType">
+            <argument>%sulu_article.content-type.page_tree_route.template%</argument>
+
+            <tag name="sulu.content.type" alias="page_tree_route"/>
+        </service>
     </services>
 </container>

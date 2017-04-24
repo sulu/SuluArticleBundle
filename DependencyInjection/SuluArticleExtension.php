@@ -143,6 +143,11 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             $config['content_types']['article']['template']
         );
 
+        $container->setParameter(
+            'sulu_article.content-type.page_tree_route.template',
+            $config['content_types']['page_tree_route']['template']
+        );
+
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
 
