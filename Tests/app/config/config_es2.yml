@@ -14,15 +14,18 @@ sulu_core:
                     type: "article"
 
 ongr_elasticsearch:
+    connections:
+        default:
+            index_name: su_articles_test
+        live:
+            index_name: su_articles_test_live
     managers:
         default:
-            index:
-                index_name: su_articles_test
+            connection: default
             mappings:
                 - SuluArticleBundle
         live:
-            index:
-                index_name: su_articles_test_live
+            connection: live
             mappings:
                 - SuluArticleBundle
 # Sulu Routing

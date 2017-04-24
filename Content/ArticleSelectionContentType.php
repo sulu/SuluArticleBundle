@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Compat\PropertyInterface;
@@ -72,7 +72,7 @@ class ArticleSelectionContentType extends SimpleContentType
 
         $result = [];
         /** @var ArticleViewDocumentInterface $articleDocument */
-        foreach ($repository->execute($search) as $articleDocument) {
+        foreach ($repository->findDocuments($search) as $articleDocument) {
             $result[array_search($articleDocument->getUuid(), $value, false)] = $articleDocument;
         }
 

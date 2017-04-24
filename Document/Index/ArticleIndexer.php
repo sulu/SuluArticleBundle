@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
@@ -254,7 +254,7 @@ class ArticleIndexer implements IndexerInterface
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('uuid', $document->getUuid()))
             ->setSize(1000);
-        foreach ($repository->execute($search) as $viewDocument) {
+        foreach ($repository->findDocuments($search) as $viewDocument) {
             $this->manager->remove($viewDocument);
         }
     }
@@ -279,7 +279,7 @@ class ArticleIndexer implements IndexerInterface
             ->setSize($pageSize);
 
         do {
-            $result = $repository->execute($search);
+            $result = $repository->findDocuments($search);
             foreach ($result as $document) {
                 $this->manager->remove($document);
             }

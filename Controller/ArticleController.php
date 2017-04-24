@@ -15,12 +15,12 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
-use ONGR\ElasticsearchDSL\Query\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
-use ONGR\ElasticsearchDSL\Query\MatchQuery;
-use ONGR\ElasticsearchDSL\Query\MultiMatchQuery;
-use ONGR\ElasticsearchDSL\Query\TermQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -154,7 +154,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
-        foreach ($repository->execute($search) as $document) {
+        foreach ($repository->findDocuments($search) as $document) {
             if (false !== ($index = array_search($document->getUuid(), $ids))) {
                 $result[$index] = $document;
             } else {
@@ -185,7 +185,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string $uuid
+     * @param string  $uuid
      * @param Request $request
      *
      * @return Response
@@ -238,7 +238,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Update articles.
      *
      * @param Request $request
-     * @param string $uuid
+     * @param string  $uuid
      *
      * @return Response
      */
@@ -313,7 +313,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @Post("/articles/{uuid}")
      *
-     * @param string $uuid
+     * @param string  $uuid
      * @param Request $request
      *
      * @return Response
@@ -380,7 +380,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given information.
      *
-     * @param array $data
+     * @param array  $data
      * @param object $document
      * @param string $locale
      *

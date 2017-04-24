@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
-use ONGR\ElasticsearchDSL\Query\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType;
@@ -64,7 +64,7 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
                 }
             )
         )->shouldBeCalled();
-        $repository->execute($search->reveal())->willReturn($articles);
+        $repository->findDocuments($search->reveal())->willReturn($articles);
 
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
