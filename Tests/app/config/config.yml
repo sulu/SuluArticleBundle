@@ -17,18 +17,6 @@ sulu_core:
                     path: "%kernel.root_dir%/Resources/articles"
                     type: "article_page"
 
-ongr_elasticsearch:
-    managers:
-        default:
-            index:
-                index_name: su_articles_test
-            mappings:
-                - SuluArticleBundle
-        live:
-            index:
-                index_name: su_articles_test_live
-            mappings:
-                - SuluArticleBundle
 # Sulu Routing
 sulu_route:
     mappings:
