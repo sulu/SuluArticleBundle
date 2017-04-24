@@ -38,7 +38,9 @@ class AppKernel extends SuluTestKernel
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
 
-        if (getenv('ES_VERSION') == '2.4.4') {
+        $esVersion = getenv('ES_VERSION');
+        if (version_compare($esVersion, '2.2', '>=') &&
+            version_compare($esVersion, '5.0', '<')) {
             $loader->load(__DIR__ . '/config/config_es2.yml');
         } else {
             $loader->load(__DIR__ . '/config/config.yml');

@@ -1,7 +1,5 @@
 # Installation
 
-If you w
-
 ## Install ElasticSearch
 
 The sulu article bundle requires a running elasticsearch `^2.2` or `^5.0`.

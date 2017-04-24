@@ -70,6 +70,5 @@ script:
   - ./vendor/bin/phpunit $CODE_COVERAGE
 
 after_script:
-  - cat elasticsearch.log
   - if [[ -n $CODE_COVERAGE ]]; then wget https://scrutinizer-ci.com/ocular.phar ; fi
   - if [[ -n $CODE_COVERAGE ]]; then php ocular.phar code-coverage:upload --format=php-clover coverage.clover ; fi
