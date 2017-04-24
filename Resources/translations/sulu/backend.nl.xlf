@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="de" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1" resname="sulu_article.title">
+                <source>sulu_article.title</source>
+                <target>Artikel</target>
+            </trans-unit>
+            <trans-unit id="2" resname="sulu_article.list.title">
+                <source>sulu_article.list.title</source>
+                <target>Artikel</target>
+            </trans-unit>
+            <trans-unit id="3" resname="sulu_article.list.creator">
+                <source>sulu_article.list.creator</source>
+                <target>Aangemaakt door</target>
+            </trans-unit>
+            <trans-unit id="4" resname="sulu_article.list.changer">
+                <source>sulu_article.list.changer</source>
+                <target>Aangepast door</target>
+            </trans-unit>
+            <trans-unit id="5" resname="sulu_article.list.type">
+                <source>sulu_article.list.type</source>
+                <target>Type</target>
+            </trans-unit>
+            <trans-unit id="6" resname="sulu_article.edit.details">
+                <source>sulu_article.edit.details</source>
+                <target>Details</target>
+            </trans-unit>
+            <trans-unit id="7" resname="sulu_article.authored">
+                <source>sulu_article.authored</source>
+                <target>Geschreven op</target>
+            </trans-unit>
+            <trans-unit id="8" resname="sulu_article.author">
+                <source>sulu_article.author</source>
+                <target>Auteur</target>
+            </trans-unit>
+            <trans-unit id="9" resname="sulu_article.teaser">
+                <source>sulu_article.teaser</source>
+                <target>Artikel</target>
+            </trans-unit>
+            <trans-unit id="10" resname="search-overlay.index.article.title">
+                <source>search-overlay.index.article.title</source>
+                <target>Artikel</target>
+            </trans-unit>
+            <trans-unit id="11" resname="sulu_article.ckeditor.link">
+                <source>sulu_article.ckeditor.link</source>
+                <target>Artikel</target>
+            </trans-unit>
+            <trans-unit id="12" resname="sulu_article.selection.no-result">
+                <source>sulu_article.selection.no-result</source>
+                <target>Geen artikel gekozen</target>
+            </trans-unit>
+            <trans-unit id="13" resname="sulu_article.settings.open-ghost-overlay.info">
+                <source>sulu_article.settings.open-ghost-overlay.info</source>
+                <target><![CDATA[Dit artikel bestaat niet in deze taal.<br/>Selecteer een van de volgende opties:]]></target>
+            </trans-unit>
+            <trans-unit id="14" resname="sulu_article.settings.open-ghost-overlay.new">
+                <source>sulu_article.settings.open-ghost-overlay.new</source>
+                <target><![CDATA[Maak een nieuw <b>leeg artikel</b> aan in deze taal]]></target>
+            </trans-unit>
+            <trans-unit id="15" resname="sulu_article.settings.open-ghost-overlay.copy">
+                <source>sulu_article.settings.open-ghost-overlay.copy</source>
+                <target><![CDATA[Maak een nieuw artikel aan in deze taal en <b>kopieer de content van</b>:]]></target>
+            </trans-unit>
+            <trans-unit id="16" resname="sulu_article.settings.open-ghost-overlay.ok">
+                <source>sulu_article.settings.open-ghost-overlay.ok</source>
+                <target>Maak artikel</target>
+            </trans-unit>
+            <trans-unit id="17" resname="sulu_article.settings.copy-locale-overlay.info">
+                <source>sulu_article.settings.copy-locale-overlay.info</source>
+                <target>Nieuw artikel wordt gemaakt</target>
+            </trans-unit>
+            <trans-unit id="18" resname="sulu_article.form.settings.changelog">
+                <source>sulu_article.form.settings.changelog</source>
+                <target>Changelog</target>
+            </trans-unit>
+            <trans-unit id="19" resname="sulu_article.form.settings.changelog.changed">
+                <source>sulu_article.form.settings.changelog.changed</source>
+                <target>Laatste aanpassing van %(changer)s op %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="20" resname="sulu_article.form.settings.changelog.changed-only">
+                <source>sulu_article.form.settings.changelog.changed-only</source>
+                <target>Laatste aanpassing op %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="21" resname="sulu_article.form.settings.changelog.created">
+                <source>sulu_article.form.settings.changelog.created</source>
+                <target>Aangemaakt door %(creator)s op %(created)s</target>
+            </trans-unit>
+            <trans-unit id="22" resname="sulu_article.form.settings.changelog.created-only">
+                <source>sulu_article.form.settings.changelog.created-only</source>
+                <target>Aangemaakt door %(created)s</target>
+            </trans-unit>
+            <trans-unit id="23" resname="sulu_article.form.settings.changelog.authored">
+                <source>sulu_article.form.settings.changelog.authored</source>
+                <target>Geschreven door %(author)s op %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="24" resname="sulu_article.form.settings.changelog.authored-only">
+                <source>sulu_article.form.settings.changelog.authored-only</source>
+                <target>Geschreven door %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="25" resname="sulu_article.smart-content.published">
+                <source>sulu_article.smart-content.published</source>
+                <target>Gepubliceerd (datum)</target>
+            </trans-unit>
+            <trans-unit id="26" resname="sulu_article.smart-content.authored">
+                <source>sulu_article.smart-content.authored</source>
+                <target>Geschreven (datum)</target>
+            </trans-unit>
+            <trans-unit id="27" resname="sulu_article.smart-content.created">
+                <source>sulu_article.smart-content.created</source>
+                <target>Aangemaakt (datum)</target>
+            </trans-unit>
+            <trans-unit id="28" resname="sulu_article.smart-content.title">
+                <source>sulu_article.smart-content.title</source>
+                <target>Titel (alfabetisch)</target>
+            </trans-unit>
+            <trans-unit id="29" resname="sulu_article.smart-content.author-full-name">
+                <source>sulu_article.smart-content.author-full-name</source>
+                <target>Auteur (alfabetisch)</target>
+            </trans-unit>
+            <trans-unit id="list-filter-01" resname="sulu_article.list.filter.me">
+                <source>sulu_article.list.filter.me</source>
+                <target>Alleen van mij</target>
+            </trans-unit>
+            <trans-unit id="list-filter-02" resname="sulu_article.list.filter.all">
+                <source>sulu_article.list.filter.all</source>
+                <target>Alle</target>
+            </trans-unit>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by-author">
+                <source>sulu_article.list.filter.by-author</source>
+                <target>Alleen van</target>
+            </trans-unit>
+            <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
+                <source>sulu_article.list.filter.by-category</source>
+                <target>Alleen categorie/target>
+            </trans-unit>
+            <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
+                <source>sulu_article.contact-selection-overlay.title</source>
+                <target>Filter artikel voor contact</target>
+            </trans-unit>
+            <trans-unit id="copy-01">
+                <source>sulu_article.edit.copy</source>
+                <target>Kopieer artikel</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
