@@ -1,11 +1,20 @@
 <?php
 
+/*
+ * This file is part of Sulu.
+ *
+ * (c) MASSIVE ART WebServices GmbH
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use Sulu\Component\Content\SimpleContentType;
 
 /**
- * TODO add description here
+ * Provides page_tree_route content-type.
  */
 class PageTreeRouteContentType extends SimpleContentType
 {

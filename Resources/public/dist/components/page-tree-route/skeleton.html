@@ -1,0 +1,16 @@
+<div class="route">
+    <div class="single-internal-link container form-element" style="display: inline-block; width: 30%;">
+        <a class="fa-link icon action choose" href="#"></a>
+        <a class="fa-times-circle clear" href="#" style="display: none;"></a>
+        <input type="text" class="form-element preview-update trigger-save-button prefix" readonly="readonly"/>
+    </div>
+
+    <span>&nbsp;/&nbsp;</span>
+    <input type="text" class="form-element preview-update trigger-save-button suffix" style="width: 30%;"/>
+
+    <div class="history" style="display: inline-block;"
+         data-aura-component="resource-locator/history@sulucontent"
+         data-aura-result-key="<%= options.historyResultKey %>"
+         data-aura-url="<%= options.historyApi %>"
+         data-aura-path-key="<%= options.historyPathKey %>"></div>
+</div>

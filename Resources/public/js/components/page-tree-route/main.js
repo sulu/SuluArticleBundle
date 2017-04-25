@@ -7,20 +7,121 @@
  * with this source code in the file LICENSE.
  */
 
-define([], function() {
+define(['text!./skeleton.html'], function(skeletonTemplate) {
 
     'use strict';
 
     var defaults = {
-        defaults: {},
-        templates: {},
-        translations: {}
-    };
+            options: {
+                historyApi: null,
+                historyResultKey: 'routes',
+                historyPathKey: 'path'
+            },
+            templates: {
+                skeleton: skeletonTemplate
+            },
+            translations: {
+                showHistory: 'public.show-history'
+            }
+        },
+
+        trimSlash = function(string) {
+            return string.replace(/\/+$/g, '');
+        };
 
     return {
         defaults: defaults,
 
         initialize: function() {
+            this.bindCustomEvents();
+
+            this.render();
+
+            var data = this.getData(),
+                page = data.page || {};
+
+            this.$prefix.val(page.path || '');
+            this.$suffix.val(data.suffix || '');
+        },
+
+        bindCustomEvents: function() {
+        },
+
+        render: function() {
+            this.html(this.templates.skeleton({translations: this.translations, options: this.options}));
+
+            this.$prefix = this.$el.find('.prefix');
+            this.$suffix = this.$el.find('.suffix');
+            this.$choose = this.$el.find('.choose');
+
+            this.bindDomEvents();
+        },
+
+        bindDomEvents: function() {
+            this.$suffix.on('change', function(event) {
+                this.setSuffix($(event.currentTarget).val());
+            }.bind(this));
+
+            this.$choose.on('click', function() {
+                this.pageSelectClicked();
+
+                return false;
+            }.bind(this));
+        },
+
+        pageSelectClicked: function() {
+            var $container = $('<div/>'),
+            data = this.getData();
+
+            this.$el.append($container);
+
+            this.sandbox.start(
+                [
+                    {
+                        name: 'page-tree-route/page-select@suluarticle',
+                        options: {
+                            el: $container,
+                            selected: (data.page || {}).uuid || null,
+                            locale: this.options.locale,
+                            selectCallback: this.setParentPage.bind(this)
+                        }
+                    }
+                ]
+            );
+        },
+
+        setParentPage: function(item) {
+            var data = this.getData();
+            data.page = {uuid: item.id, path: (item.url || '/')};
+
+            if (!!data.suffix && data.suffix.length > 0) {
+                data.path = trimSlash(data.page.path) + '/' + data.suffix;
+            }
+
+            this.setData(data);
+
+            this.$prefix.val(trimSlash(data.page.path));
+        },
+
+        setSuffix: function(suffix) {
+            var data = this.getData();
+            data.suffix = suffix;
+
+            if (!!data.page) {
+                data.path = trimSlash(data.page.path) + '/' + data.suffix;
+            }
+
+            this.setData(data);
+        },
+
+        setData: function(data) {
+            this.$el.data('value', data);
+
+            console.warn(data);
+        },
+
+        getData: function() {
+            return this.$el.data('value') || {};
         }
     };
 });
