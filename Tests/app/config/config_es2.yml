@@ -1,18 +1,3 @@
-# Doctrine Configuration
-doctrine:
-    dbal:
-        dbname:   "su_articles_test"
-
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/articles"
-                    type: "article"
-
 ongr_elasticsearch:
     connections:
         default:
@@ -28,10 +13,3 @@ ongr_elasticsearch:
             connection: live
             mappings:
                 - SuluArticleBundle
-# Sulu Routing
-sulu_route:
-    mappings:
-        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: schema
-            options:
-                route_schema: /articles/{object.getTitle()}

@@ -15,6 +15,7 @@ use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\PreviewBundle\Preview\Object\PreviewObjectProviderInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -49,7 +50,14 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function getObject($id, $locale)
     {
-        return $this->documentManager->find($id, $locale);
+        return $this->documentManager->find(
+            $id,
+            $locale,
+            [
+                'load_ghost_content' => false,
+                'load_shadow_content' => true,
+            ]
+        );
     }
 
     /**
@@ -104,11 +112,23 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function serialize($object)
     {
-        return $this->serializer->serialize(
+        $pageNumber = $object->getPageNumber();
+        if ($object instanceof ArticlePageDocument) {
+            // resolve proxy to ensure that this will also be serialized
+            $object = $object->getParent();
+
+            $object->getTitle();
+        }
+
+        $result = $this->serializer->serialize(
             $object,
             'json',
-            SerializationContext::create()->setSerializeNull(true)->setGroups(['preview'])
+            SerializationContext::create()
+                ->setSerializeNull(true)
+                ->setGroups(['preview'])
         );
+
+        return json_encode(['pageNumber' => $pageNumber, 'object' => $result]);
     }
 
     /**
@@ -118,11 +138,26 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     public function deserialize($serializedObject, $objectClass)
     {
-        return $this->serializer->deserialize(
-            $serializedObject,
-            $objectClass,
+        $result = json_decode($serializedObject, true);
+
+        $article = $this->serializer->deserialize(
+            $result['object'],
+            ArticleDocument::class,
             'json',
-            DeserializationContext::create()->setSerializeNull(true)->setGroups(['preview'])
+            DeserializationContext::create()
+                ->setSerializeNull(true)
+                ->setGroups(['preview'])
         );
+
+        if ($result['pageNumber'] === 1) {
+            return $article;
+        }
+
+        $children = array_values($article->getChildren());
+
+        $object = $children[$result['pageNumber'] - 2];
+        $object->setParent($article);
+
+        return $object;
     }
 }

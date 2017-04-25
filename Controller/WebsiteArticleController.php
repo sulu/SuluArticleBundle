@@ -12,7 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\HttpCache\HttpCache;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,13 +28,38 @@ class WebsiteArticleController extends Controller
      * Article index action.
      *
      * @param Request $request
-     * @param ArticleDocument $object
+     * @param ArticleInterface $object
      * @param string $view
+     * @param int $pageNumber
      *
      * @return Response
      */
-    public function indexAction(Request $request, ArticleDocument $object, $view)
+    public function indexAction(Request $request, ArticleInterface $object, $view, $pageNumber = 1)
     {
+        return $this->renderArticle($request, $object, $view, $pageNumber);
+    }
+
+    /**
+     * Render article with given view.
+     *
+     * @param Request $request
+     * @param ArticleInterface $object
+     * @param string $view
+     * @param int $pageNumber
+     * @param array $attributes
+     *
+     * @return Response
+     */
+    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
+    {
+        if ($object instanceof ArticlePageDocument) {
+            // this is necessary because the preview system passes an article-page here.
+            $object = $object->getParent();
+        }
+
+        $requestFormat = $request->getRequestFormat();
+        $viewTemplate = $view . '.' . $requestFormat . '.twig';
+
         $content = $this->get('jms_serializer')->serialize(
             $object,
             'array',
@@ -41,11 +67,12 @@ class WebsiteArticleController extends Controller
                 ->setSerializeNull(true)
                 ->setGroups(['website', 'content'])
                 ->setAttribute('website', true)
+                ->setAttribute('pageNumber', $pageNumber)
         );
 
         return $this->render(
-            $view . '.html.twig',
-            $this->get('sulu_website.resolver.template_attribute')->resolve($content),
+            $viewTemplate,
+            $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
             $this->createResponse($request)
         );
     }

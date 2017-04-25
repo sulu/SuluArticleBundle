@@ -102,20 +102,44 @@
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
         <service id="sulu_article.subscriber.routable"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
+            <argument type="service" id="sulu_route.chain_generator"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+        <service id="sulu_article.subscriber.page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber">
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_document_manager.live_session"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.subscriber.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticlePageSubscriber">
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.node_name_slugifier"/>
+            <argument type="service" id="sulu_document_manager.name_resolver"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+
         <service id="sulu_article.initializer"
                  class="Sulu\Bundle\ArticleBundle\Document\Initializer\ArticleInitializer">
             <argument type="service" id="sulu_document_manager.node_manager"/>
@@ -125,12 +149,24 @@
             <!-- This needs to happen after the content repository has been initialized !-->
             <tag name="sulu_document_manager.initializer" priority="-127"/>
         </service>
-        <service id="sulu_article.serializer.type"
+
+        <service id="sulu_article.serializer.article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
+            <argument type="service" id="sulu.content.structure_manager"/>
+
+            <tag name="jms_serializer.event_subscriber" />
+        </service>
+
+        <service id="sulu_article.serializer.website_article"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
 
+            <tag name="jms_serializer.event_subscriber" />
+        </service>
+        <service id="sulu_article.serializer.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticlePageSubscriber">
             <tag name="jms_serializer.event_subscriber" />
         </service>
         <service id="sulu_article.routing.default_provider"
@@ -156,6 +192,13 @@
             <argument type="service" id="sulu_route.generator.route_generator"/>
 
             <tag name="sulu.route_generator" alias="template"/>
+        </service>
+        <service id="sulu_article.route_generator.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticlePageRouteGenerator">
+            <argument type="service" id="sulu_route.generator.route_generator"/>
+            <argument type="service" id="sulu_route.generator.expression_token_provider"/>
+
+            <tag name="sulu.route_generator" alias="article_page"/>
         </service>
 
         <!-- content -->
@@ -198,6 +241,7 @@
             <argument type="service" id="serializer"/>
 
             <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticleDocument"/>
+            <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument"/>
         </service>
 
         <!-- link -->

@@ -12,7 +12,11 @@
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
+use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
+use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -37,6 +41,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         'structure' => [
                             'type_map' => [
                                 'article' => ArticleBridge::class,
+                                'article_page' => ArticlePageBridge::class,
                             ],
                         ],
                     ],
@@ -67,6 +72,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     'search' => [
                         'mapping' => [
                             ArticleDocument::class => ['index' => 'article'],
+                            ArticlePageDocument::class => ['index' => 'article_page'],
                         ],
                     ],
                 ]
@@ -79,9 +85,41 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'mapping' => [
                         'article' => ['class' => ArticleDocument::class, 'phpcr_type' => 'sulu:article'],
+                        'article_page' => ['class' => ArticlePageDocument::class, 'phpcr_type' => 'sulu:articlepage'],
                     ],
                     'path_segments' => [
                         'articles' => 'articles',
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_route')) {
+            $container->prependExtensionConfig(
+                'sulu_route',
+                [
+                    'mappings' => [
+                        ArticlePageDocument::class => [
+                            'generator' => 'article_page',
+                            'options' => [
+                                'route_schema' => '/{translator.trans("page")}-{object.getPageNumber()}',
+                                'parent' => '{object.getParent().getRoutePath()}',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('fos_rest')) {
+            $container->prependExtensionConfig(
+                'fos_rest',
+                [
+                    'exception' => [
+                        'codes' => [
+                            ParameterNotAllowedException::class => 400,
+                            ArticlePageNotFoundException::class => 404,
+                        ],
                     ],
                 ]
             );

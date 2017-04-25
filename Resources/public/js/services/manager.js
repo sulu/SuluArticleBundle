@@ -19,6 +19,12 @@ define(['jquery', 'services/husky/util'], function($, Util) {
             '?locale=<%= locale %>' +
             '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>' +
             '<% if (typeof ids !== "undefined") { %>&ids=<%= ids.join(",") %><% } %>'
+        ),
+        pageUrl: _.template(
+            '/admin/api/articles/<%= articleId %>/pages' +
+            '<% if (typeof pageId !== "undefined" && !!pageId) { %>/<%= pageId %><% } %>' +
+            '?locale=<%= locale %>' +
+            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
         )
     };
 
@@ -36,6 +42,20 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
+         * Load article synchronous.
+         *
+         * @param {String} id
+         * @param {String} locale
+         */
+        loadSync: function(id, locale) {
+            return Util.ajax({
+                url: templates.url({id: id, locale: locale}),
+                dataType: 'json',
+                async: false
+            });
+        },
+
+        /**
          * Save article.
          *
          * @param {Array} data
@@ -45,6 +65,23 @@ define(['jquery', 'services/husky/util'], function($, Util) {
          */
         save: function(data, id, locale, action) {
             return Util.save(templates.url({id: id, locale: locale, action: action}), !id ? 'POST' : 'PUT', data);
+        },
+
+        /**
+         * Save article-page.
+         *
+         * @param {Array} data
+         * @param {String} articleId
+         * @param {String} pageId
+         * @param {String} locale
+         * @param {String} action
+         */
+        savePage: function(data, articleId, pageId, locale, action) {
+            return Util.save(
+                templates.pageUrl({articleId: articleId, pageId: pageId, locale: locale, action: action}),
+                pageId ? 'PUT' : 'POST',
+                data
+            );
         },
 
         /**
@@ -59,6 +96,17 @@ define(['jquery', 'services/husky/util'], function($, Util) {
             }
 
             return Util.save(templates.url({ids: id, locale: locale}), 'DELETE');
+        },
+
+        /**
+         * Remove article-page.
+         *
+         * @param {String} articleId
+         * @param {String} pageId
+         * @param {String} locale
+         */
+        removePage: function(articleId, pageId, locale) {
+            return Util.save(templates.pageUrl({articleId: articleId, pageId: pageId, locale: locale}), 'DELETE');
         },
 
         /**
@@ -112,7 +160,7 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
-         * Returns copy article from a given locale to a array of other locales url.
+         * Returns url for copy article from a given locale to a array of other locales url.
          *
          * @param {String} id
          * @param {String} src

@@ -11,8 +11,12 @@
 
 namespace Functional\Controller;
 
+use Ferrandini\Urlizer;
+use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
@@ -21,6 +25,7 @@ use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManager;
@@ -30,6 +35,8 @@ use Sulu\Component\DocumentManager\DocumentManager;
  */
 class ArticleControllerTest extends SuluTestCase
 {
+    use ArticleViewDocumentIdTrait;
+
     private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
 
     /**
@@ -40,6 +47,7 @@ class ArticleControllerTest extends SuluTestCase
         parent::setUp();
 
         $this->initPhpcr();
+        $this->purgeDatabase();
 
         $collectionTypes = new LoadCollectionTypes();
         $collectionTypes->load($this->getEntityManager());
@@ -47,28 +55,7 @@ class ArticleControllerTest extends SuluTestCase
         $mediaTypes->load($this->getEntityManager());
     }
 
-    public function testPostWithoutAuthor($title = 'Test-Article', $template = 'default')
-    {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
-            'POST',
-            '/api/articles?locale=de',
-            ['title' => $title, 'template' => $template, 'authored' => '2016-01-01']
-        );
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
-        $this->assertEquals($template, $response['template']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
-        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
-
-        return $response;
-    }
-
-    public function testPost($title = 'Test-Article', $template = 'default')
+    protected function post($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -78,7 +65,42 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => $template,
                 'authored' => '2016-01-01',
-                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    public function testPost($title = 'Test-Article', $template = 'default')
+    {
+        $response = $this->post($title, $template);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals($this->getRoute($title), $response['route']);
+        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
+        $this->assertEquals($template, $response['template']);
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
+
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        return $response;
+    }
+
+    public function testPostWithAuthor($title = 'Sulu is awesome', $locale = 'de')
+    {
+        $user = $this->createContact();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles?locale=' . $locale,
+            [
+                'title' => $title,
+                'template' => 'default',
+                'authored' => '2016-01-01',
+                'author' => $user->getId(),
             ]
         );
 
@@ -86,12 +108,11 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(self::$typeMap[$template], $response['articleType']);
-        $this->assertEquals($template, $response['template']);
+        $this->assertEquals($this->getRoute($title), $response['route']);
         $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
-        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
+        $this->assertEquals($user->getId(), $response['author']);
 
-        return $response;
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
     public function testGet()
@@ -109,10 +130,10 @@ class ArticleControllerTest extends SuluTestCase
         }
     }
 
-    public function testPut($title = 'Sulu is awesome', $locale = 'de', $article = null)
+    protected function put($title = 'Sulu is awesome', $locale = 'de', $article = null)
     {
         if (!$article) {
-            $article = $this->testPost();
+            $article = $this->post();
         }
 
         $client = $this->createAuthenticatedClient();
@@ -123,25 +144,73 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'default',
                 'authored' => '2016-01-01',
-                'author' => $this->getTestUser()->getContact()->getId(),
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    public function testPut($title = 'Sulu is awesome', $locale = 'de', $article = null)
+    {
+        if (!$article) {
+            $article = $this->testPost();
+        }
+
+        $response = $this->put($title, $locale, $article);
+        $this->assertNotEquals($article['title'], $response['title']);
+        $this->assertEquals($article['route'], $response['route']);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
+
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        return $article;
+    }
+
+    public function testPutWithAuthor($title = 'Sulu is awesome', $locale = 'de')
+    {
+        $user = $this->createContact();
+
+        $article = $this->testPost();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
+            [
+                'title' => $title,
+                'template' => 'default',
+                'authored' => '2016-01-01',
+                'author' => $user->getId(),
             ]
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals($article['route'], $response['route']);
+        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals($user->getId(), $response['author']);
+
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+    }
+
+    public function testPutTranslation($title = 'Sulu is nice')
+    {
+        $article = $this->put('Sulu ist toll', 'de');
+        $response = $this->put($title, 'en', $article);
+
         $this->assertNotEquals($article['title'], $response['title']);
+        $this->assertEquals($this->getRoute($title), $response['route']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
-        return $article;
-    }
-
-    public function testPutTranslation()
-    {
-        $article = $this->testPut('Sulu ist toll', 'de');
-        $this->testPut('Sulu is nice', 'en', $article);
+        $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
     public function testGetGhost()
@@ -167,12 +236,13 @@ class ArticleControllerTest extends SuluTestCase
         $this->purgeIndex();
 
         $title1 = 'Sulu ist toll - Test 1';
-        $article1 = $this->testPut($title1, 'de');
+        $article1 = $this->put($title1, 'de');
 
         $title2 = 'Sulu ist toll - Test 2';
-        $article2 = $this->testPut($title2, 'de');
+        $article2 = $this->put($title2, 'de');
+
         $title2_EN = $title2 . ' (EN)';
-        $this->testPut($title2_EN, 'en', $article2);
+        $this->put($title2_EN, 'en', $article2);
 
         $client = $this->createAuthenticatedClient();
 
@@ -675,6 +745,8 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
+
+        $this->assertNull($this->findViewDocument($article['id'], 'de'));
     }
 
     public function testCDelete()
@@ -697,6 +769,9 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
+
+        $this->assertNull($this->findViewDocument($article1['id'], 'de'));
+        $this->assertNull($this->findViewDocument($article2['id'], 'de'));
     }
 
     public function testCopyLocale()
@@ -749,7 +824,11 @@ class ArticleControllerTest extends SuluTestCase
 
         // request copy-locale post action for article1
         $client->request('POST', '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&dest=' . $destLocale . '&action=copy-locale');
+        $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertEquals($article1['id'], $response['id']);
+        $this->assertEquals([$locale, $destLocale], $response['concreteLanguages']);
 
         // get all articles in dest locale (now only one should be a ghost)
         $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog');
@@ -791,7 +870,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $article1 = json_decode($client->getResponse()->getContent(), true);
         // create second article which should not appear in response
-        $article2 = $this->testPost();
+        $article2 = $this->post();
 
         $client->request('GET', '/api/articles?locale=de&categoryId=' . $category->getId());
         $this->assertHttpStatusCode(200, $client->getResponse());
@@ -831,6 +910,19 @@ class ArticleControllerTest extends SuluTestCase
         return $category;
     }
 
+    private function createContact()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $contact = new Contact();
+        $contact->setFirstName('Max');
+        $contact->setLastName('Mustermann');
+        $entityManager->persist($contact);
+        $entityManager->flush();
+
+        return $contact;
+    }
+
     private function purgeIndex()
     {
         /** @var IndexerInterface $indexer */
@@ -843,5 +935,18 @@ class ArticleControllerTest extends SuluTestCase
         /** @var IndexerInterface $indexer */
         $indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
         $indexer->flush();
+    }
+
+    private function findViewDocument($uuid, $locale)
+    {
+        /** @var Manager $manager */
+        $manager = $this->getContainer()->get('es.manager.default');
+
+        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+    }
+
+    private function getRoute($title)
+    {
+        return '/articles/' . Urlizer::urlize($title);
     }
 }

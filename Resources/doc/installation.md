@@ -9,7 +9,6 @@ There is an different installation and configuration depending on which version 
 If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation_es2.md)
 else read: [Installation for ElasticSearch 5.0](installation_es5.md) 
 
-
 ## Configure the routing
 
 ```yml

@@ -11,12 +11,23 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
+use PHPCR\NodeInterface;
+use PHPCR\PathNotFoundException;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
+use Sulu\Component\DocumentManager\Event\HydrateEvent;
+use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
+use Sulu\Component\DocumentManager\Event\PersistEvent;
+use Sulu\Component\DocumentManager\Event\PublishEvent;
+use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -27,6 +38,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ArticleSubscriber implements EventSubscriberInterface
 {
+    const PAGES_PROPERTY = 'suluPages';
+
     /**
      * @var IndexerInterface
      */
@@ -43,6 +56,16 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $documentManager;
 
     /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
+
+    /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
      * @var array
      */
     private $documents = [];
@@ -56,15 +79,21 @@ class ArticleSubscriber implements EventSubscriberInterface
      * @param IndexerInterface $indexer
      * @param IndexerInterface $liveIndexer
      * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $documentInspector
+     * @param PropertyEncoder $propertyEncoder
      */
     public function __construct(
         IndexerInterface $indexer,
         IndexerInterface $liveIndexer,
-        DocumentManagerInterface $documentManager
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $documentInspector,
+        PropertyEncoder $propertyEncoder
     ) {
         $this->indexer = $indexer;
         $this->liveIndexer = $liveIndexer;
         $this->documentManager = $documentManager;
+        $this->documentInspector = $documentInspector;
+        $this->propertyEncoder = $propertyEncoder;
     }
 
     /**
@@ -73,13 +102,32 @@ class ArticleSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PERSIST => [['handleScheduleIndex', -500]],
-            Events::REMOVE => [['handleRemove', -500], ['handleRemoveLive', -500]],
-            Events::PUBLISH => [['handleScheduleIndexLive', 0], ['handleScheduleIndex', 0]],
+            Events::HYDRATE => [
+                ['hydratePageData', -2000],
+            ],
+            Events::PERSIST => [
+                ['handleScheduleIndex', -500],
+                ['setChildrenStructureType', 0],
+                ['persistPageData', -2000],
+            ],
+            Events::REMOVE => [
+                ['handleRemove', -500],
+                ['handleRemoveLive', -500],
+                ['handleRemovePage', -500],
+                ['handleRemovePageLive', -500],
+            ],
+            Events::PUBLISH => [
+                ['handleScheduleIndexLive', 0],
+                ['handleScheduleIndex', 0],
+                ['synchronizeChildren', 0],
+                ['publishChildren', 0],
+                ['persistPageData', -2000],
+            ],
             Events::UNPUBLISH => 'handleUnpublish',
-            Events::REMOVE_DRAFT => ['handleScheduleIndex', -1024],
+            Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
             Events::COPY => ['handleCopy'],
+            Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
     }
 
@@ -92,7 +140,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
-            return;
+            if (!$document instanceof ArticlePageDocument) {
+                return;
+            }
+
+            $document = $document->getParent();
         }
 
         $this->documents[$document->getUuid()] = [
@@ -110,13 +162,165 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
-            return;
+            if (!$document instanceof ArticlePageDocument) {
+                return;
+            }
+
+            $document = $document->getParent();
         }
 
         $this->liveDocuments[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
+    }
+
+    /**
+     * Syncs children between live and draft.
+     *
+     * @param PublishEvent $event
+     */
+    public function synchronizeChildren(PublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $liveNode = $event->getNode();
+        $draftNode = $this->documentInspector->getNode($document);
+
+        $liveChildren = $this->getChildren($liveNode);
+        $draftChildren = $this->getChildren($draftNode);
+        $removedChildrenIds = array_diff(array_keys($liveChildren), array_keys($draftChildren));
+
+        foreach ($removedChildrenIds as $removedChildrenId) {
+            $liveChildren[$removedChildrenId]->remove();
+        }
+    }
+
+    /**
+     * Returns children of given node.
+     *
+     * @param NodeInterface $node
+     *
+     * @return NodeInterface[]
+     */
+    private function getChildren(NodeInterface $node)
+    {
+        $result = [];
+        foreach ($node->getNodes() as $child) {
+            $result[$child->getIdentifier()] = $child;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Publish pages when article will be published.
+     *
+     * @param PublishEvent $event
+     */
+    public function publishChildren(PublishEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $children = iterator_to_array($document->getChildren());
+        foreach ($children as $child) {
+            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST) {
+                $this->documentManager->publish($child, $event->getLocale());
+            }
+        }
+    }
+
+    /**
+     * Persist page-data.
+     *
+     * @param PersistEvent|PublishEvent $event
+     */
+    public function persistPageData($event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $pages = [
+            [
+                'uuid' => $document->getUuid(),
+                'title' => $document->getPageTitle() ?: $document->getTitle(),
+                'routePath' => $document->getRoutePath(),
+                'pageNumber' => $document->getPageNumber(),
+            ],
+        ];
+
+        foreach ($document->getChildren() as $child) {
+            if ($child instanceof ArticlePageDocument
+                && $this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST
+            ) {
+                $pages[] = [
+                    'uuid' => $child->getUuid(),
+                    'title' => $child->getPageTitle(),
+                    'routePath' => $child->getRoutePath(),
+                    'pageNumber' => $child->getPageNumber(),
+                ];
+            }
+        }
+
+        $document->setPages($pages);
+        $event->getNode()->setProperty(
+            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $event->getLocale()),
+            json_encode($pages)
+        );
+    }
+
+    /**
+     * Hydrate page-data.
+     *
+     * @param HydrateEvent $event
+     */
+    public function hydratePageData(HydrateEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $pages = $event->getNode()->getPropertyValueWithDefault(
+            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $event->getLocale()),
+            json_encode([])
+        );
+        $document->setPages(json_decode($pages, true));
+    }
+
+    /**
+     * Remove draft from children.
+     *
+     * @param RemoveDraftEvent $event
+     */
+    public function removeDraftChildren(RemoveDraftEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if ($this->documentInspector->getLocalizationState($child) === LocalizationState::GHOST) {
+                continue;
+            }
+
+            try {
+                $this->documentManager->removeDraft($child, $event->getLocale());
+            } catch (PathNotFoundException $exception) {
+                // child is not available in live workspace
+                $node = $this->documentInspector->getNode($child);
+                $node->remove();
+            }
+        }
     }
 
     /**
@@ -130,13 +334,11 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($this->documents as $document) {
-            $this->indexer->index(
-                $this->documentManager->find(
-                    $document['uuid'],
-                    $document['locale']
-                )
-            );
+        foreach ($this->documents as $documentData) {
+            $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
+            $this->documentManager->refresh($document, $documentData['locale']);
+
+            $this->indexer->index($document);
         }
         $this->indexer->flush();
         $this->documents = [];
@@ -153,32 +355,14 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        foreach ($this->liveDocuments as $document) {
-            $this->liveIndexer->index(
-                $this->documentManager->find(
-                    $document['uuid'],
-                    $document['locale']
-                )
-            );
+        foreach ($this->liveDocuments as $documentData) {
+            $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
+            $this->documentManager->refresh($document, $documentData['locale']);
+
+            $this->liveIndexer->index($document);
         }
         $this->liveIndexer->flush();
         $this->liveDocuments = [];
-    }
-
-    /**
-     * Indexes for article-document in live index.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleIndexLive(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        $this->liveIndexer->index($document);
-        $this->liveIndexer->flush();
     }
 
     /**
@@ -197,6 +381,44 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->liveIndexer->flush();
 
         $this->indexer->setUnpublished($document->getUuid());
+    }
+
+    /**
+     * Reindex article if a page was removed.
+     *
+     * @param RemoveEvent $event
+     */
+    public function handleRemovePage(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document = $document->getParent();
+        $this->documents[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
+    }
+
+    /**
+     * Reindex article live if a page was removed.
+     *
+     * @param RemoveEvent $event
+     */
+    public function handleRemovePageLive(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document = $document->getParent();
+        $this->liveDocuments[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
     }
 
     /**
@@ -248,5 +470,47 @@ class ArticleSubscriber implements EventSubscriberInterface
             'uuid' => $uuid,
             'locale' => $document->getLocale(),
         ];
+    }
+
+    /**
+     * Set structure-type to pages.
+     *
+     * @param PersistEvent $event
+     */
+    public function setChildrenStructureType(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST
+                && $document->getStructureType() !== $child->getStructureType()
+            ) {
+                $child->setStructureType($document->getStructureType());
+                $this->documentManager->persist($child, $event->getLocale(), $event->getOptions());
+            }
+        }
+    }
+
+    /**
+     * Extend metadata for article-page.
+     *
+     * @param MetadataLoadEvent $event
+     */
+    public function handleMetadataLoad(MetadataLoadEvent $event)
+    {
+        if ($event->getMetadata()->getClass() !== ArticleDocument::class) {
+            return;
+        }
+
+        $event->getMetadata()->addFieldMapping(
+            'pageTitle',
+            [
+                'encoding' => 'system_localized',
+                'property' => 'suluPageTitle',
+            ]
+        );
     }
 }
