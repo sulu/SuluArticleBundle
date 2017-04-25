@@ -27,7 +27,6 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
-use Sulu\Component\DocumentManager\Event\ConfigureOptionsEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
@@ -138,7 +137,6 @@ class RoutableSubscriber implements EventSubscriberInterface
             ],
             Events::PUBLISH => ['handlePublish', -2000],
             Events::COPY => ['handleCopy', -2000],
-            Events::CONFIGURE_OPTIONS => 'configureOptions',
         ];
     }
 
@@ -178,15 +176,13 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $document->setUuid($event->getNode()->getIdentifier());
 
-        $generatedRoute = $this->chainRouteGenerator->generate(
-            $document,
-            $event->getOption('route_path') ?: $document->getRoutePath()
-        );
-
-        $document->setRoutePath($generatedRoute->getPath());
-
         $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
-        $event->getNode()->setProperty($propertyName, $generatedRoute->getPath());
+        $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
+
+        $route = $this->chainRouteGenerator->generate($document, $routePath);
+        $document->setRoutePath($route->getPath());
+
+        $event->getNode()->setProperty($propertyName, $route->getPath());
     }
 
     /**
@@ -418,17 +414,6 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $this->entityManager->remove($route);
         }
-    }
-
-    /**
-     * Add route-path to options.
-     *
-     * @param ConfigureOptionsEvent $event
-     */
-    public function configureOptions(ConfigureOptionsEvent $event)
-    {
-        $options = $event->getOptions();
-        $options->setDefaults(['route_path' => null]);
     }
 
     /**

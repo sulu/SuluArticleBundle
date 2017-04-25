@@ -11,6 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use PHPCR\NodeInterface;
+use PHPCR\PropertyType;
+use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
 /**
@@ -28,7 +31,7 @@ class PageTreeRouteContentType extends SimpleContentType
      */
     public function __construct($template)
     {
-        parent::__construct('PageTreeRoute', ['uuid' => null, 'path' => '']);
+        parent::__construct('PageTreeRoute');
 
         $this->template = $template;
     }
@@ -36,17 +39,41 @@ class PageTreeRouteContentType extends SimpleContentType
     /**
      * {@inheritdoc}
      */
-    protected function encodeValue($value)
+    public function read(NodeInterface $node, PropertyInterface $property, $webspaceKey, $languageCode, $segmentKey)
     {
-        return json_encode(parent::encodeValue($value));
+        $propertyName = $property->getName();
+        $value = [
+            'page' => $this->readPage($propertyName, $node),
+            'path' => $node->getPropertyValueWithDefault($propertyName, ''),
+            'suffix' => $node->getPropertyValueWithDefault($propertyName . '-suffix', ''),
+        ];
+
+        $property->setValue($value);
+
+        return $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function decodeValue($value)
-    {
-        return json_decode(parent::decodeValue($value));
+    public function write(
+        NodeInterface $node,
+        PropertyInterface $property,
+        $userId,
+        $webspaceKey,
+        $languageCode,
+        $segmentKey
+    ) {
+        $value = $property->getValue();
+        if (!$value) {
+            return $this->remove($node, $property, $webspaceKey, $languageCode, $segmentKey);
+        }
+
+        $propertyName = $property->getName();
+        $node->setProperty($propertyName, $value['path']);
+        $node->setProperty($propertyName . '-suffix', $value['suffix']);
+        $node->setProperty($propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE);
+        $node->setProperty($propertyName . '-page-path', $value['page']['path']);
     }
 
     /**
@@ -55,5 +82,26 @@ class PageTreeRouteContentType extends SimpleContentType
     public function getTemplate()
     {
         return $this->template;
+    }
+
+    /**
+     * Read page-information from given node.
+     *
+     * @param string $propertyName
+     * @param NodeInterface $node
+     *
+     * @return array
+     */
+    private function readPage($propertyName, NodeInterface $node)
+    {
+        $pagePropertyName = $propertyName . '-page';
+        if (!$node->hasProperty($pagePropertyName)) {
+            return;
+        }
+
+        return [
+            'uuid' => $node->getPropertyValue($pagePropertyName, PropertyType::STRING),
+            'path' => $node->getPropertyValueWithDefault($pagePropertyName . '-path', ''),
+        ];
     }
 }
