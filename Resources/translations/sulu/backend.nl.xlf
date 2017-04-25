@@ -132,7 +132,7 @@
             </trans-unit>
             <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
                 <source>sulu_article.list.filter.by-category</source>
-                <target>Alleen categorie/target>
+                <target>Alleen categorie</target>
             </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
