@@ -11,8 +11,10 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use Ferrandini\Urlizer;
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 
@@ -27,13 +29,20 @@ class PageTreeRouteContentType extends SimpleContentType
     private $template;
 
     /**
-     * @param string $template
+     * @var PropertyEncoder
      */
-    public function __construct($template)
+    private $propertyEncoder;
+
+    /**
+     * @param string $template
+     * @param PropertyEncoder $propertyEncoder
+     */
+    public function __construct($template, PropertyEncoder $propertyEncoder)
     {
         parent::__construct('PageTreeRoute');
 
         $this->template = $template;
+        $this->propertyEncoder = $propertyEncoder;
     }
 
     /**
@@ -69,11 +78,23 @@ class PageTreeRouteContentType extends SimpleContentType
             return $this->remove($node, $property, $webspaceKey, $languageCode, $segmentKey);
         }
 
+        $titlePropertyName = $this->propertyEncoder->localizedContentName('title', $languageCode);
+        $title = $node->getPropertyValueWithDefault($titlePropertyName, null);
+
+        $path = $this->getAttribute('path', $value, '');
+        $page = $this->getAttribute('page', $value, ['uuid' => null, 'path' => '/']);
+        $suffix = $this->getAttribute('suffix', $value, Urlizer::urlize($title));
+
+        // generate url if not set
+        if (!$path) {
+            $path = rtrim($page['path'], '/') . '/' . $suffix;
+        }
+
         $propertyName = $property->getName();
-        $node->setProperty($propertyName, $value['path']);
-        $node->setProperty($propertyName . '-suffix', $value['suffix']);
-        $node->setProperty($propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE);
-        $node->setProperty($propertyName . '-page-path', $value['page']['path']);
+        $node->setProperty($propertyName, $path);
+        $node->setProperty($propertyName . '-suffix', $suffix);
+        $node->setProperty($propertyName . '-page', $page['uuid'], PropertyType::WEAKREFERENCE);
+        $node->setProperty($propertyName . '-page-path', $page['path']);
     }
 
     /**
@@ -103,5 +124,23 @@ class PageTreeRouteContentType extends SimpleContentType
             'uuid' => $node->getPropertyValue($pagePropertyName, PropertyType::STRING),
             'path' => $node->getPropertyValueWithDefault($pagePropertyName . '-path', ''),
         ];
+    }
+
+    /**
+     * Returns value of array or default.
+     *
+     * @param string $name
+     * @param array $value
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    private function getAttribute($name, array $value, $default = null)
+    {
+        if (!array_key_exists($name, $value)) {
+            return $default;
+        }
+
+        return $value[$name];
     }
 }
