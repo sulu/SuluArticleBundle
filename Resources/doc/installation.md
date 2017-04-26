@@ -1,15 +1,57 @@
 # Installation
 
-## Install ElasticSearch
+## Install the bundle
+ 
+```bash
+composer require sulu/article-bundle
+```
 
-The sulu article bundle requires a running elasticsearch `^2.2` or `^5.0`.
+### ElasticSearch
+
+The SuluArticleBundle requires a running elasticsearch `^2.2` or `^5.0`.
 
 There is an different installation and configuration depending on which version of ElasticSearch you are using.
 
 If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation_es2.md)
 else read: [Installation for ElasticSearch 5.0](installation_es5.md) 
 
-## Configure the routing
+### Add bundles to AbstractKernel
+
+```php
+/* app/AbstractKernel.php */
+
+new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
+new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+```
+
+### Configure SuluArticleBundle and sulu core
+
+```yml
+# app/config/config.yml
+
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: schema
+            options:
+                route_schema: /articles/{object.getTitle()}
+
+sulu_core:
+    content:
+        structure:
+            default_type:
+                article: "article_default"
+                article_page: "article_default"
+            paths:
+                article:
+                    path: "%kernel.root_dir%/Resources/templates/articles"
+                    type: "article"
+                article_page:
+                    path: "%kernel.root_dir%/Resources/templates/articles"
+                    type: "article_page"
+```
+
+### Configure the routing
 
 ```yml
 # app/config/admin/routing.yml
