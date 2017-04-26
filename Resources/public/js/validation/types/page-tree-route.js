@@ -24,11 +24,13 @@ define(['type/default'], function(Default) {
                 },
 
                 needsValidation: function() {
-                    return false;
+                    return true;
                 },
 
                 validate: function() {
-                    return true;
+                    var value = this.getValue();
+
+                    return value && value.page && value.page.uuid;
                 }
             };
 

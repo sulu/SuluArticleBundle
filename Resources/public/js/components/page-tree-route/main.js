@@ -71,7 +71,7 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
 
         pageSelectClicked: function() {
             var $container = $('<div/>'),
-            data = this.getData();
+                data = this.getData();
 
             this.$el.append($container);
 
