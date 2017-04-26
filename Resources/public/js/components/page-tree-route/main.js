@@ -116,8 +116,6 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
 
         setData: function(data) {
             this.$el.data('value', data);
-
-            console.warn(data);
         },
 
         getData: function() {

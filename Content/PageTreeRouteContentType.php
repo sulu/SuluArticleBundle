@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use Ferrandini\Urlizer;
+use PHPCR\ItemNotFoundException;
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
@@ -23,6 +24,8 @@ use Sulu\Component\Content\SimpleContentType;
  */
 class PageTreeRouteContentType extends SimpleContentType
 {
+    const NAME = 'page_tree_route';
+
     /**
      * @var string
      */
@@ -93,8 +96,13 @@ class PageTreeRouteContentType extends SimpleContentType
         $propertyName = $property->getName();
         $node->setProperty($propertyName, $path);
         $node->setProperty($propertyName . '-suffix', $suffix);
-        $node->setProperty($propertyName . '-page', $page['uuid'], PropertyType::WEAKREFERENCE);
-        $node->setProperty($propertyName . '-page-path', $page['path']);
+
+        $pagePropertyName = $propertyName . '-page';
+        if ($node->hasProperty($pagePropertyName)) {
+            $node->getProperty($pagePropertyName)->remove();
+        }
+        $node->setProperty($pagePropertyName, $page['uuid'], PropertyType::WEAKREFERENCE);
+        $node->setProperty($pagePropertyName . '-path', $page['path']);
     }
 
     /**
@@ -120,8 +128,14 @@ class PageTreeRouteContentType extends SimpleContentType
             return;
         }
 
+        try {
+            $pageUuid = $node->getPropertyValue($pagePropertyName, PropertyType::STRING);
+        } catch (ItemNotFoundException $exception) {
+            return;
+        }
+
         return [
-            'uuid' => $node->getPropertyValue($pagePropertyName, PropertyType::STRING),
+            'uuid' => $pageUuid,
             'path' => $node->getPropertyValueWithDefault($pagePropertyName . '-path', ''),
         ];
     }
