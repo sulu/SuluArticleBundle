@@ -235,4 +235,36 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals($this->template, $this->contentType->getTemplate());
     }
+
+    public function testGetContentData()
+    {
+        $value = [
+            'page' => [
+                'uuid' => '123-123-123',
+                'path' => '/test-page',
+            ],
+            'path' => '/test-page/test-article',
+            'suffix' => 'test-article',
+        ];
+
+        $this->property->getValue()->willReturn($value);
+
+        $this->assertEquals($value['path'], $this->contentType->getContentData($this->property->reveal()));
+    }
+
+    public function testGetViewData()
+    {
+        $value = [
+            'page' => [
+                'uuid' => '123-123-123',
+                'path' => '/test-page',
+            ],
+            'path' => '/test-page/test-article',
+            'suffix' => 'test-article',
+        ];
+
+        $this->property->getValue()->willReturn($value);
+
+        $this->assertEquals($value, $this->contentType->getViewData($this->property->reveal()));
+    }
 }

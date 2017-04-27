@@ -114,6 +114,24 @@ class PageTreeRouteContentType extends SimpleContentType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getContentData(PropertyInterface $property)
+    {
+        $value = parent::getContentData($property);
+
+        return $value['path'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getViewData(PropertyInterface $property)
+    {
+        return $property->getValue();
+    }
+
+    /**
      * Read page-information from given node.
      *
      * @param string $propertyName
