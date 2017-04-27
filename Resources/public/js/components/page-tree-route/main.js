@@ -27,6 +27,10 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
 
         trimSlash = function(string) {
             return string.replace(/\/+$/g, '');
+        },
+
+        generatePath = function(pagePath, suffix) {
+            return trimSlash(pagePath) + '/' + suffix;
         };
 
     return {
@@ -94,8 +98,9 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
             var data = this.getData();
             data.page = {uuid: item.id, path: (item.url || '/')};
 
+            data.path = null;
             if (!!data.suffix && data.suffix.length > 0) {
-                data.path = trimSlash(data.page.path) + '/' + data.suffix;
+                data.path = generatePath(data.page.path, data.suffix);
             }
 
             this.setData(data);
@@ -107,8 +112,9 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
             var data = this.getData();
             data.suffix = suffix;
 
+            data.path = null;
             if (!!data.page) {
-                data.path = trimSlash(data.page.path) + '/' + data.suffix;
+                data.path = generatePath(data.page.path, data.suffix);
             }
 
             this.setData(data);
