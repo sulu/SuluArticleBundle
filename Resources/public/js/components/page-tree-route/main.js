@@ -26,10 +26,6 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
         },
 
         trimSlash = function(string) {
-            if (string === '/') {
-                return string;
-            }
-
             return string.replace(/\/+$/g, '');
         },
 
@@ -41,6 +37,9 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
         defaults: defaults,
 
         initialize: function() {
+            // FIXME this adds the required class to the label
+            this.$el.closest('.form-group').find('label').addClass('required');
+
             this.bindCustomEvents();
 
             this.render();
@@ -109,7 +108,7 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
 
             this.setData(data);
 
-            this.$prefix.val(trimSlash(data.page.path)).trigger('change');
+            this.$prefix.val(data.page.path === '/' ? data.page.path : trimSlash(data.page.path)).trigger('change');
         },
 
         setSuffix: function(suffix) {

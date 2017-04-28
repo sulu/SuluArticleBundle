@@ -31,6 +31,8 @@ define(function() {
         },
 
         initialize: function() {
+            this.id = this.options.selected;
+
             var $container = $('<div/>');
             var $componentContainer = $('<div/>');
             this.$el.append($container);
@@ -43,6 +45,7 @@ define(function() {
                         openOnStart: true,
                         removeOnClose: true,
                         skin: 'medium',
+                        instanceName: 'page-select',
                         slides: [
                             {
                                 title: this.translations.overlayTitle,
@@ -81,12 +84,28 @@ define(function() {
                             instanceNamePrefix: '',
                             showStatus: true,
                             selectCallback: function(id, path, title, item) {
-                                this.item = item;
+                                if (this.id === id) {
+                                    return this.setItem(null, null);
+                                }
+
+                                this.setItem(item, id);
                             }.bind(this)
                         }
                     }
                 ]
             );
+        },
+
+        setItem: function(item, id) {
+            this.item = item;
+            this.id = id;
+
+            var action = 'activate';
+            if (!item) {
+                action = 'deactivate';
+            }
+
+            this.sandbox.emit('husky.overlay.page-select.okbutton.' + action);
         }
     };
 });
