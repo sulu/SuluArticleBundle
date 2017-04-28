@@ -71,9 +71,10 @@ define(function() {
                         name: 'content-datasource@sulucontent',
                         options: {
                             el: $componentContainer,
+                            singleMarkable: true,
                             selected: this.options.selected,
                             locale: this.options.locale,
-                            selectedUrl: '/admin/api/nodes/{datasource}?tree=true&language={locale}&fields=title,order,published&webspace-nodes=all',
+                            selectedUrl: '/admin/api/nodes/{datasource}?tree=true&language={locale}&fields=title,order,published,url&webspace-nodes=all',
                             rootUrl: '/admin/api/nodes?language={locale}&fields=title,order,published&webspace-nodes=all',
                             resultKey: 'nodes',
                             instanceName: 'internal-link',

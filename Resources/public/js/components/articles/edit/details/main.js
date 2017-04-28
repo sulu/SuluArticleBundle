@@ -55,6 +55,7 @@ define([
 
         listenForChange: function() {
             this.sandbox.dom.on(this.$el, 'keyup', _.debounce(this.setDirty.bind(this), 10), 'input, textarea');
+            this.sandbox.dom.on(this.$el, 'change', _.debounce(this.setDirty.bind(this), 10), 'input, textarea');
             this.sandbox.dom.on(this.$el, 'change', _.debounce(this.setDirty.bind(this), 10), 'input[type="checkbox"], select');
             this.sandbox.on('sulu.content.changed', this.setDirty.bind(this));
         },

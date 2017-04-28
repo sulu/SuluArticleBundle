@@ -26,6 +26,10 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
         },
 
         trimSlash = function(string) {
+            if (string === '/') {
+                return string;
+            }
+
             return string.replace(/\/+$/g, '');
         },
 
@@ -105,7 +109,7 @@ define(['text!./skeleton.html'], function(skeletonTemplate) {
 
             this.setData(data);
 
-            this.$prefix.val(trimSlash(data.page.path));
+            this.$prefix.val(trimSlash(data.page.path)).trigger('change');
         },
 
         setSuffix: function(suffix) {
