@@ -13,17 +13,24 @@ namespace Functional\Content;
 
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
-use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
-use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
+use Sulu\Component\DocumentManager\DocumentRegistry;
 
 class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var PropertyEncoder
+     * @var DocumentRegistry
      */
-    private $propertyEncoder;
+    private $documentRegistry;
+
+    /**
+     * @var ChainRouteGeneratorInterface
+     */
+    private $chainRouteGenerator;
 
     /**
      * @var PageTreeRouteContentType
@@ -62,19 +69,18 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
+        $this->documentRegistry = $this->prophesize(DocumentRegistry::class);
+        $this->chainRouteGenerator = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->property = $this->prophesize(PropertyInterface::class);
         $this->node = $this->prophesize(NodeInterface::class);
 
         $this->property->getName()->willReturn($this->propertyName);
-        $this->node->getPropertyValueWithDefault('i18n:' . $this->locale . '-title', null)->willReturn('Test article');
-        $this->propertyEncoder->localizedContentName(Argument::type('string'), $this->locale)->will(
-            function ($arguments) {
-                return 'i18n:' . $arguments[1] . '-' . $arguments[0];
-            }
-        );
 
-        $this->contentType = new PageTreeRouteContentType($this->template, $this->propertyEncoder->reveal());
+        $this->contentType = new PageTreeRouteContentType(
+            $this->template,
+            $this->documentRegistry->reveal(),
+            $this->chainRouteGenerator->reveal()
+        );
     }
 
     public function testRead()
@@ -201,6 +207,14 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteGeneratePath()
     {
+        $route = $this->prophesize(RouteInterface::class);
+        $route->getPath()->willReturn('/test-article');
+
+        $document = $this->prophesize(ArticleDocument::class);
+        $this->chainRouteGenerator->generate($document->reveal())->willReturn($route->reveal());
+        $this->documentRegistry->getDocumentForNode($this->node->reveal(), $this->locale)
+            ->willReturn($document->reveal());
+
         $value = [
             'page' => [
                 'uuid' => '123-123-123',

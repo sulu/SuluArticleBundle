@@ -913,14 +913,14 @@ class ArticleControllerTest extends SuluTestCase
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
             ],
-            'suffix' => 'test-article',
-            'path' => '/test-page/test-article',
+            'suffix' => 'articles/test-article',
+            'path' => '/test-page/articles/test-article',
         ];
 
         $response = $this->postPageTreeRoute(['page' => $routePathData['page']]);
 
         $this->assertEquals('Test Article', $response['title']);
-        $this->assertEquals('/test-page/test-article', $response['route']);
+        $this->assertEquals('/test-page/articles/test-article', $response['route']);
         $this->assertEquals($routePathData, $response['routePath']);
     }
 
@@ -933,8 +933,8 @@ class ArticleControllerTest extends SuluTestCase
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
             ],
-            'suffix' => 'test-article',
-            'path' => '/test-page/test-article',
+            'suffix' => 'articles/test-article',
+            'path' => '/test-page/articles/test-article',
         ];
 
         $article = $this->postPageTreeRoute(['page' => $routePathData['page']]);
@@ -953,15 +953,15 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
-        $this->assertEquals('/test-page-2/test-article', $response['route']);
+        $this->assertEquals('/test-page-2/articles/test-article', $response['route']);
         $this->assertEquals(
             [
                 'page' => [
                     'uuid' => $page->getUuid(),
                     'path' => $page->getResourceSegment(),
                 ],
-                'suffix' => 'test-article',
-                'path' => '/test-page-2/test-article',
+                'suffix' => 'articles/test-article',
+                'path' => '/test-page-2/articles/test-article',
             ],
             $response['routePath']
         );
@@ -978,7 +978,7 @@ class ArticleControllerTest extends SuluTestCase
                 'path' => $page1->getResourceSegment(),
             ],
             'suffix' => 'test-article',
-            'path' => '/test-page/test-article',
+            'path' => '/test-page/articles/test-article',
         ];
 
         $article = $this->postPageTreeRoute(['page' => $routePathData['page']]);
@@ -996,15 +996,15 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
-        $this->assertEquals('/page-2/page-1/test-article', $response['route']);
+        $this->assertEquals('/page-2/page-1/articles/test-article', $response['route']);
         $this->assertEquals(
             [
                 'page' => [
                     'uuid' => $page1->getUuid(),
                     'path' => $page1->getResourceSegment(),
                 ],
-                'suffix' => 'test-article',
-                'path' => '/page-2/page-1/test-article',
+                'suffix' => 'articles/test-article',
+                'path' => '/page-2/page-1/articles/test-article',
             ],
             $response['routePath']
         );
@@ -1019,8 +1019,8 @@ class ArticleControllerTest extends SuluTestCase
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
             ],
-            'suffix' => 'test-article',
-            'path' => '/test-page/test-article',
+            'suffix' => 'articles/test-article',
+            'path' => '/test-page/articles/test-article',
         ];
 
         $article = $this->postPageTreeRoute($routePathData);
@@ -1036,12 +1036,12 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
-        $this->assertEquals('/test-page/test-article', $response['route']);
+        $this->assertEquals('/test-page/articles/test-article', $response['route']);
         $this->assertEquals(
             [
                 'page' => null,
-                'suffix' => 'test-article',
-                'path' => '/test-page/test-article',
+                'suffix' => 'articles/test-article',
+                'path' => '/test-page/articles/test-article',
             ],
             $response['routePath']
         );
