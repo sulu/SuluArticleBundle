@@ -16,6 +16,7 @@ use PHPCR\PropertyType;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
+use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\DocumentManager\DocumentRegistry;
@@ -31,6 +32,11 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
      * @var ChainRouteGeneratorInterface
      */
     private $chainRouteGenerator;
+
+    /**
+     * @var ConflictResolverInterface
+     */
+    private $conflictResolver;
 
     /**
      * @var PageTreeRouteContentType
@@ -71,6 +77,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->documentRegistry = $this->prophesize(DocumentRegistry::class);
         $this->chainRouteGenerator = $this->prophesize(ChainRouteGeneratorInterface::class);
+        $this->conflictResolver = $this->prophesize(ConflictResolverInterface::class);
         $this->property = $this->prophesize(PropertyInterface::class);
         $this->node = $this->prophesize(NodeInterface::class);
 
@@ -78,8 +85,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->contentType = new PageTreeRouteContentType(
             $this->template,
-            $this->documentRegistry->reveal(),
-            $this->chainRouteGenerator->reveal()
+            $this->documentRegistry->reveal(), $this->chainRouteGenerator->reveal(), $this->conflictResolver->reveal()
         );
     }
 
@@ -209,6 +215,14 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $route = $this->prophesize(RouteInterface::class);
         $route->getPath()->willReturn('/test-article');
+
+        $route->setPath('/test-page/test-article')->shouldBeCalled()->will(
+            function () use ($route) {
+                $route->getPath()->willReturn('/test-page/test-article');
+            }
+        );
+
+        $this->conflictResolver->resolve($route)->shouldBeCalled()->willReturn($route);
 
         $document = $this->prophesize(ArticleDocument::class);
         $this->chainRouteGenerator->generate($document->reveal())->willReturn($route->reveal());

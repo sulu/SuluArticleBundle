@@ -15,6 +15,7 @@ use PHPCR\ItemNotFoundException;
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
+use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 use Sulu\Component\DocumentManager\DocumentRegistry;
@@ -42,20 +43,28 @@ class PageTreeRouteContentType extends SimpleContentType
     private $chainRouteGenerator;
 
     /**
+     * @var ConflictResolverInterface
+     */
+    private $conflictResolver;
+
+    /**
      * @param string $template
      * @param DocumentRegistry $documentRegistry
      * @param ChainRouteGeneratorInterface $chainRouteGenerator
+     * @param ConflictResolverInterface $conflictResolver
      */
     public function __construct(
         $template,
         DocumentRegistry $documentRegistry,
-        ChainRouteGeneratorInterface $chainRouteGenerator
+        ChainRouteGeneratorInterface $chainRouteGenerator,
+        ConflictResolverInterface $conflictResolver
     ) {
         parent::__construct('PageTreeRoute');
 
         $this->template = $template;
         $this->documentRegistry = $documentRegistry;
         $this->chainRouteGenerator = $chainRouteGenerator;
+        $this->conflictResolver = $conflictResolver;
     }
 
     /**
@@ -96,7 +105,7 @@ class PageTreeRouteContentType extends SimpleContentType
 
         $suffix = $this->getAttribute('suffix', $value);
         if (!$suffix) {
-            $suffix = $this->generateSuffix($node, $languageCode);
+            $suffix = $this->generateSuffix($node, $languageCode, $page['path']);
         }
 
         // generate url if not set
@@ -192,14 +201,18 @@ class PageTreeRouteContentType extends SimpleContentType
      *
      * @param NodeInterface $node
      * @param string $locale
+     * @param string $pagePath
      *
      * @return string
      */
-    private function generateSuffix(NodeInterface $node, $locale)
+    private function generateSuffix(NodeInterface $node, $locale, $pagePath)
     {
         $document = $this->documentRegistry->getDocumentForNode($node, $locale);
         $route = $this->chainRouteGenerator->generate($document);
+        $route->setPath($pagePath . '/' . ltrim($route->getPath(), '/'));
 
-        return ltrim($route->getPath(), '/');
+        $route = $this->conflictResolver->resolve($route);
+
+        return substr($route->getPath(), strlen($pagePath) + 1);
     }
 }
