@@ -11,13 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
-use Ferrandini\Urlizer;
 use PHPCR\ItemNotFoundException;
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
-use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
+use Sulu\Component\DocumentManager\DocumentRegistry;
 
 /**
  * Provides page_tree_route content-type.
@@ -32,20 +32,30 @@ class PageTreeRouteContentType extends SimpleContentType
     private $template;
 
     /**
-     * @var PropertyEncoder
+     * @var DocumentRegistry
      */
-    private $propertyEncoder;
+    private $documentRegistry;
+
+    /**
+     * @var ChainRouteGeneratorInterface
+     */
+    private $chainRouteGenerator;
 
     /**
      * @param string $template
-     * @param PropertyEncoder $propertyEncoder
+     * @param DocumentRegistry $documentRegistry
+     * @param ChainRouteGeneratorInterface $chainRouteGenerator
      */
-    public function __construct($template, PropertyEncoder $propertyEncoder)
-    {
+    public function __construct(
+        $template,
+        DocumentRegistry $documentRegistry,
+        ChainRouteGeneratorInterface $chainRouteGenerator
+    ) {
         parent::__construct('PageTreeRoute');
 
         $this->template = $template;
-        $this->propertyEncoder = $propertyEncoder;
+        $this->documentRegistry = $documentRegistry;
+        $this->chainRouteGenerator = $chainRouteGenerator;
     }
 
     /**
@@ -81,12 +91,13 @@ class PageTreeRouteContentType extends SimpleContentType
             return $this->remove($node, $property, $webspaceKey, $languageCode, $segmentKey);
         }
 
-        $titlePropertyName = $this->propertyEncoder->localizedContentName('title', $languageCode);
-        $title = $node->getPropertyValueWithDefault($titlePropertyName, null);
-
         $path = $this->getAttribute('path', $value, '');
         $page = $this->getAttribute('page', $value, ['uuid' => null, 'path' => '/']);
-        $suffix = $this->getAttribute('suffix', $value, Urlizer::urlize($title));
+
+        $suffix = $this->getAttribute('suffix', $value);
+        if (!$suffix) {
+            $suffix = $this->generateSuffix($node, $languageCode);
+        }
 
         // generate url if not set
         if (!$path) {
@@ -174,5 +185,21 @@ class PageTreeRouteContentType extends SimpleContentType
         }
 
         return $value[$name];
+    }
+
+    /**
+     * Generate a new suffix for document.
+     *
+     * @param NodeInterface $node
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function generateSuffix(NodeInterface $node, $locale)
+    {
+        $document = $this->documentRegistry->getDocumentForNode($node, $locale);
+        $route = $this->chainRouteGenerator->generate($document);
+
+        return ltrim($route->getPath(), '/');
     }
 }

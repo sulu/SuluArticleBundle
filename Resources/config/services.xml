@@ -276,7 +276,8 @@
         <service id="sulu_article.content_types.page_tree_route"
                  class="Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType">
             <argument>%sulu_article.content-type.page_tree_route.template%</argument>
-            <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_document_manager.document_registry"/>
+            <argument type="service" id="sulu_route.chain_generator"/>
 
             <tag name="sulu.content.type" alias="page_tree_route"/>
         </service>
