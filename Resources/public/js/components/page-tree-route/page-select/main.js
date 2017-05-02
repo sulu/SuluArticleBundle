@@ -71,7 +71,7 @@ define(function() {
             this.sandbox.start(
                 [
                     {
-                        name: 'content-datasource@sulucontent',
+                        name: 'page-tree-route/content-datasource@suluarticle',
                         options: {
                             el: $componentContainer,
                             selected: this.options.selected,
