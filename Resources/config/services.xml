@@ -139,6 +139,16 @@
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+        <service id="sulu_article.subscriber.page_tree_route"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\PageTreeRouteSubscriber">
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_document_manager.live_session"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
 
         <service id="sulu_article.initializer"
                  class="Sulu\Bundle\ArticleBundle\Document\Initializer\ArticleInitializer">
@@ -261,6 +271,14 @@
             <argument>%sulu_article.content-type.article.template%</argument>
 
             <tag name="sulu.content.type" alias="article_selection"/>
+        </service>
+
+        <service id="sulu_article.content_types.page_tree_route"
+                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType">
+            <argument>%sulu_article.content-type.page_tree_route.template%</argument>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+
+            <tag name="sulu.content.type" alias="page_tree_route"/>
         </service>
     </services>
 </container>

@@ -52,3 +52,17 @@
   margin-top: 10px;
   border-bottom: 2px solid #999;
 }
+
+/* line 2, ../../scss/modules/page-tree-route.scss */
+.page-tree-route .single-internal-link {
+  display: inline-block;
+  width: 30%;
+}
+/* line 7, ../../scss/modules/page-tree-route.scss */
+.page-tree-route .suffix {
+  width: 30%;
+}
+/* line 11, ../../scss/modules/page-tree-route.scss */
+.page-tree-route .history {
+  display: inline-block;
+}

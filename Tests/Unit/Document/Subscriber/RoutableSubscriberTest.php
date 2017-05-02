@@ -135,13 +135,12 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function prophesizeEvent($className, $routePath = null)
+    protected function prophesizeEvent($className)
     {
         $event = $this->prophesize($className);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getLocale()->willReturn('de');
         $event->getNode()->willReturn($this->node->reveal());
-        $event->getOption('route_path')->willReturn($routePath);
 
         return $event->reveal();
     }
@@ -206,7 +205,6 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testHandlePersist()
     {
-        $this->document->getRoutePath()->willReturn(null);
         $this->document->setRoutePath('/test')->shouldBeCalled();
         $this->document->setUuid('123-123-123')->shouldBeCalled();
 
@@ -220,6 +218,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');
+        $this->node->getPropertyValueWithDefault('i18n:de-routePath', null)->willReturn(null);
         $this->node->setProperty('i18n:de-routePath', '/test')->shouldBeCalled();
 
         $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
@@ -245,18 +244,18 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');
+        $this->node->getPropertyValueWithDefault('i18n:de-routePath', null)->willReturn('/test-1');
         $this->node->setProperty('i18n:de-routePath', '/test-1')->shouldBeCalled();
 
         $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
         $this->entityManager->persist(Argument::cetera())->shouldNotBeCalled();
         $this->entityManager->flush()->shouldNotBeCalled();
 
-        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class, '/test-1'));
+        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class));
     }
 
     public function testHandlePersistUpdate()
     {
-        $this->document->getRoutePath()->willReturn('/test-1');
         $this->document->setUuid('123-123-123')->shouldBeCalled();
         $this->document->setRoutePath('/test-2')->shouldBeCalled();
 
@@ -270,13 +269,14 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'de')
             ->willReturn('i18n:de-routePath');
+        $this->node->getPropertyValueWithDefault('i18n:de-routePath', null)->willReturn('/test-2');
         $this->node->setProperty('i18n:de-routePath', '/test-2')->shouldBeCalled();
 
         $this->routeManager->create(Argument::cetera())->shouldNotBeCalled();
         $this->entityManager->persist(Argument::cetera())->shouldNotBeCalled();
         $this->entityManager->flush()->shouldNotBeCalled();
 
-        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class, '/test-2'));
+        $this->routableSubscriber->handlePersist($this->prophesizeEvent(PersistEvent::class));
     }
 
     public function testHandleRemove()

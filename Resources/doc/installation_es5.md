@@ -1,49 +1,13 @@
-# Installation
-
-## Install ElasticSearch
-
-The sulu article bundle requires a running elasticsearch `^2.2` or `^5.0`.
-
-## Install bundle over composer:
+# Installation using ElasticSearch ^5.0
 
 ```bash
-composer require sulu/article-bundle
-```
-
-**Add bundle to AbstractKernel:**
-
-```php
-/* app/AbstractKernel.php */
-
-new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
-new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+composer require ongr/elasticsearch-bundle:^5.0
 ```
 
 ## Configure the bundles:
 
 ```yml
 # app/config/config.yml
-
-sulu_route:
-    mappings:
-        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: schema
-            options:
-                route_schema: /articles/{object.getTitle()}
-
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "article_default"
-                article_page: "article_default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/templates/articles"
-                    type: "article"
-                article_page:
-                    path: "%kernel.root_dir%/Resources/templates/articles"
-                    type: "article_page"
 
 ongr_elasticsearch:
     managers:

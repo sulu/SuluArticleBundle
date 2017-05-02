@@ -13,6 +13,7 @@ require.config({
         suluarticlecss: '../../suluarticle/css',
 
         'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
+        'type/page-tree-route': '../../suluarticle/js/validation/types/page-tree-route',
 
         'services/suluarticle/article-manager': '../../suluarticle/js/services/manager',
         'services/suluarticle/article-router': '../../suluarticle/js/services/router',
