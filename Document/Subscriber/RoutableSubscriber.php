@@ -343,7 +343,7 @@ class RoutableSubscriber implements EventSubscriberInterface
             $this->entityManager->remove($route);
 
             if ($document instanceof ChildrenBehavior) {
-                $this->removeChildRoutes($document);
+                $this->removeChildRoutes($document, $locale);
             }
         }
 
@@ -389,16 +389,17 @@ class RoutableSubscriber implements EventSubscriberInterface
      * Iterate over children and remove routes.
      *
      * @param ChildrenBehavior $document
+     * @param string $locale
      */
-    private function removeChildRoutes(ChildrenBehavior $document)
+    private function removeChildRoutes(ChildrenBehavior $document, $locale)
     {
         foreach ($document->getChildren() as $child) {
             if ($child instanceof RoutablePageBehavior) {
-                $this->removeChildRoute($child);
+                $this->removeChildRoute($child, $locale);
             }
 
             if ($child instanceof ChildrenBehavior) {
-                $this->removeChildRoutes($child);
+                $this->removeChildRoutes($child, $locale);
             }
         }
     }
@@ -407,10 +408,11 @@ class RoutableSubscriber implements EventSubscriberInterface
      * Removes route if exists.
      *
      * @param RoutablePageBehavior $document
+     * @param string $locale
      */
-    private function removeChildRoute(RoutablePageBehavior $document)
+    private function removeChildRoute(RoutablePageBehavior $document, $locale)
     {
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $document->getOriginalLocale());
+        $route = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
         if ($route) {
             $this->entityManager->remove($route);
         }
