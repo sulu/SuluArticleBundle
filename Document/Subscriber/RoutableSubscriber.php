@@ -235,7 +235,12 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private function createOrUpdatePageRoute(RoutablePageBehavior $document, $locale)
     {
-        $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
+        $route = $document->getRoute();
+
+        if (!$route) {
+            $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
+        }
+
         if ($route) {
             $document->setRoute($route);
 
@@ -255,7 +260,12 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private function createOrUpdateRoute(RoutableBehavior $document, $locale)
     {
-        $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
+        $route = $document->getRoute();
+
+        if (!$route) {
+            $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
+        }
+
         if ($route) {
             $document->setRoute($route);
 
