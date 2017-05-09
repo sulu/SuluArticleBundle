@@ -165,8 +165,8 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
         $query = $this->documentManager->createQuery(
             sprintf(
-                'SELECT * FROM [nt:unstructured] WHERE [jcr:mixinTypes] = "sulu:article" AND %s',
-                implode(' AND ', $where)
+                'SELECT * FROM [nt:unstructured] WHERE [jcr:mixinTypes] = "sulu:article" AND (%s)',
+                implode(' OR ', $where)
             ),
             $locale
         );
