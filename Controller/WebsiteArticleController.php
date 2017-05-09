@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use JMS\Serializer\SerializationContext;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\HttpCache\HttpCache;
@@ -52,15 +53,48 @@ class WebsiteArticleController extends Controller
      */
     protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
     {
-        if ($object instanceof ArticlePageDocument) {
-            // this is necessary because the preview system passes an article-page here.
-            $object = $object->getParent();
-        }
+        $object = $this->normalizeArticle($object);
 
         $requestFormat = $request->getRequestFormat();
         $viewTemplate = $view . '.' . $requestFormat . '.twig';
 
-        $content = $this->get('jms_serializer')->serialize(
+        $content = $this->serializeArticle($object, $pageNumber);
+
+        return $this->render(
+            $viewTemplate,
+            $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
+            $this->createResponse($request)
+        );
+    }
+
+    /**
+     * Returns all the times the article-document.
+     * This is necessary because the preview system passes an article-page here.
+     *
+     * @param ArticleInterface $object
+     *
+     * @return ArticleDocument
+     */
+    protected function normalizeArticle(ArticleInterface $object)
+    {
+        if ($object instanceof ArticlePageDocument) {
+            return $object->getParent();
+        }
+
+        return $object;
+    }
+
+    /**
+     * Serialize given article with page-number.
+     *
+     * @param ArticleInterface $object
+     * @param int $pageNumber
+     *
+     * @return array
+     */
+    protected function serializeArticle(ArticleInterface $object, $pageNumber)
+    {
+        return $this->get('jms_serializer')->serialize(
             $object,
             'array',
             SerializationContext::create()
@@ -68,12 +102,6 @@ class WebsiteArticleController extends Controller
                 ->setGroups(['website', 'content'])
                 ->setAttribute('website', true)
                 ->setAttribute('pageNumber', $pageNumber)
-        );
-
-        return $this->render(
-            $viewTemplate,
-            $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
-            $this->createResponse($request)
         );
     }
 
