@@ -209,10 +209,10 @@ class PageTreeRouteContentType extends SimpleContentType
     {
         $document = $this->documentRegistry->getDocumentForNode($node, $locale);
         $route = $this->chainRouteGenerator->generate($document);
-        $route->setPath($pagePath . '/' . ltrim($route->getPath(), '/'));
+        $route->setPath(rtrim($pagePath, '/') . '/' . ltrim($route->getPath(), '/'));
 
         $route = $this->conflictResolver->resolve($route);
 
-        return substr($route->getPath(), strlen($pagePath) + 1);
+        return substr($route->getPath(), strlen(rtrim($pagePath, '/')) + 1);
     }
 }

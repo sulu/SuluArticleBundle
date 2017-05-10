@@ -259,6 +259,54 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testWriteGeneratePathRoot()
+    {
+        $route = $this->prophesize(RouteInterface::class);
+        $route->getPath()->willReturn('/test-article');
+
+        $route->setPath('/test-article')->shouldBeCalled()->will(
+            function () use ($route) {
+                $route->getPath()->willReturn('/test-article');
+            }
+        );
+
+        $this->conflictResolver->resolve($route)->shouldBeCalled()->willReturn($route);
+
+        $document = $this->prophesize(ArticleDocument::class);
+        $this->chainRouteGenerator->generate($document->reveal())->willReturn($route->reveal());
+        $this->documentRegistry->getDocumentForNode($this->node->reveal(), $this->locale)
+            ->willReturn($document->reveal());
+
+        $value = [
+            'page' => [
+                'uuid' => '123-123-123',
+                'path' => '/',
+            ],
+        ];
+
+        $this->property->getValue()->willReturn($value);
+
+        $this->node->setProperty($this->propertyName, '/test-article')->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-suffix', 'test-article')->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE)
+            ->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page-path', $value['page']['path'])->shouldBeCalled();
+
+        $pageProperty = $this->prophesize(\PHPCR\PropertyInterface::class);
+        $pageProperty->remove()->shouldBeCalled();
+        $this->node->hasProperty($this->propertyName . '-page')->willReturn(true);
+        $this->node->getProperty($this->propertyName . '-page')->willReturn($pageProperty->reveal());
+
+        $this->contentType->write(
+            $this->node->reveal(),
+            $this->property->reveal(),
+            1,
+            $this->webspaceKey,
+            $this->locale,
+            null
+        );
+    }
+
     public function testGetTemplate()
     {
         $this->assertEquals($this->template, $this->contentType->getTemplate());
