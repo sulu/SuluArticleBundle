@@ -9,9 +9,10 @@
 
 define([
     'underscore',
+    'config',
     'services/suluarticle/article-manager',
     'services/sulupreview/preview'
-], function(_, ArticleManager, Preview) {
+], function(_, Config, ArticleManager, Preview) {
 
     'use strict';
 
@@ -22,7 +23,7 @@ define([
                 pageData = {id: pageData.id};
             }
 
-            var preview = Preview.initialize({});
+            var preview = Preview.initialize(Config.get('sulu_security.contexts')['sulu.modules.articles']);
             preview.start(
                 'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
                 pageData.id,
