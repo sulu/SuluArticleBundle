@@ -181,7 +181,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
         $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
 
-        $route = $this->chainRouteGenerator->generate($document, $routePath);
+        $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($document, $routePath));
         $document->setRoutePath($route->getPath());
 
         $event->getNode()->setProperty($propertyName, $route->getPath());

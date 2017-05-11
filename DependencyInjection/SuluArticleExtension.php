@@ -155,5 +155,14 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         }
+
+        $container->setAlias(
+            'sulu_article.page_tree_route.updater',
+            'sulu_article.page_tree_route.updater.' . $config['content_types']['page_tree_route']['page_route_cascade']
+        );
+
+        if ($config['content_types']['page_tree_route']['page_route_cascade'] !== 'off') {
+            $loader->load('page_tree_update.xml');
+        }
     }
 }
