@@ -139,7 +139,7 @@ define([
                 this.saved(data);
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
-                this.sandbox.emit('sulu.article.error', xhr.status, data);
+                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
             }.bind(this));
         },
 

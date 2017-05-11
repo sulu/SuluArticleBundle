@@ -46,7 +46,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
     /**
      * @var PropertyEncoder
      */
-    protected $properyEncoder;
+    protected $propertyEncoder;
 
     /**
      * @var DocumentInspector
@@ -65,20 +65,20 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * @param DocumentManagerInterface $documentManager
-     * @param PropertyEncoder $properyEncoder
+     * @param PropertyEncoder $propertyEncoder
      * @param DocumentInspector $documentInspector
      * @param StructureMetadataFactoryInterface $metadataFactory
      * @param SessionInterface $liveSession
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
-        PropertyEncoder $properyEncoder,
+        PropertyEncoder $propertyEncoder,
         DocumentInspector $documentInspector,
         StructureMetadataFactoryInterface $metadataFactory,
         SessionInterface $liveSession
     ) {
         $this->documentManager = $documentManager;
-        $this->properyEncoder = $properyEncoder;
+        $this->propertyEncoder = $propertyEncoder;
         $this->documentInspector = $documentInspector;
         $this->metadataFactory = $metadataFactory;
         $this->liveSession = $liveSession;
@@ -156,9 +156,9 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
             $where[] = sprintf(
                 '([%s] = "%s" AND [%s-page] = "%s")',
-                $this->properyEncoder->localizedSystemName('template', $locale),
+                $this->propertyEncoder->localizedSystemName('template', $locale),
                 $metadata->getName(),
-                $this->properyEncoder->localizedSystemName($property->getName(), $locale),
+                $this->propertyEncoder->localizedSystemName($property->getName(), $locale),
                 $uuid
             );
         }
@@ -184,7 +184,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
     private function updateArticle(ArticleDocument $article, $resourceSegment, $locale)
     {
         $property = $this->getRoutePathPropertyNameByStructureType($article->getStructureType());
-        $propertyName = $this->properyEncoder->localizedContentName($property->getName(), $locale);
+        $propertyName = $this->propertyEncoder->localizedContentName($property->getName(), $locale);
 
         $node = $this->documentInspector->getNode($article);
         $node->setProperty($propertyName . '-page-path', $resourceSegment);
@@ -213,7 +213,10 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
         $metadata = $this->metadataFactory->getStructureMetadata('page', $document->getStructureType());
 
         $urlProperty = $metadata->getPropertyByTagName('sulu.rlp');
-        $urlPropertyName = $this->properyEncoder->localizedContentName($urlProperty->getName(), $document->getLocale());
+        $urlPropertyName = $this->propertyEncoder->localizedContentName(
+            $urlProperty->getName(),
+            $document->getLocale()
+        );
 
         $liveNode = $this->getLiveNode($document);
 

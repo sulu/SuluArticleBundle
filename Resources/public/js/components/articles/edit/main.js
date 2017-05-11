@@ -25,8 +25,11 @@ define([
     'use strict';
 
     var constants = {
-        headerRightSelector: '.right-container'
-    };
+            headerRightSelector: '.right-container'
+        },
+        errorCodes = {
+            resourceLocatorAlreadyExists: 1103
+        };
 
     return {
 
@@ -314,12 +317,21 @@ define([
         /**
          * Handles the error based on its error code.
          *
+         * @param {Number} statusCode
          * @param {Number} errorCode
          * @param {Object} data
          * @param {string} action
          */
-        handleError: function(errorCode, data, action) {
+        handleError: function(statusCode, errorCode, data, action) {
             switch (errorCode) {
+                case errorCodes.resourceLocatorAlreadyExists:
+                    this.sandbox.emit(
+                        'sulu.labels.error.show',
+                        'labels.error.content-save-resource-locator',
+                        'labels.error'
+                    );
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');
+                    break;
                 default:
                     this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
                     this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');

@@ -19,10 +19,12 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Bundle\RouteBundle\Exception\RouteIsNotUniqueException;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -189,6 +191,8 @@ class RoutableSubscriber implements EventSubscriberInterface
      * Handle publish event and generate route and the child-routes.
      *
      * @param PublishEvent $event
+     *
+     * @throws ResourceLocatorAlreadyExistsException
      */
     public function handlePublish(PublishEvent $event)
     {
@@ -199,7 +203,12 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $node = $this->documentInspector->getNode($document);
 
-        $route = $this->createOrUpdateRoute($document, $event->getLocale());
+        try {
+            $route = $this->createOrUpdateRoute($document, $event->getLocale());
+        } catch (RouteIsNotUniqueException $exception) {
+            throw new ResourceLocatorAlreadyExistsException($exception->getRoute()->getPath(), $document->getPath());
+        }
+
         $document->setRoutePath($route->getPath());
         $this->entityManager->persist($route);
 
@@ -244,10 +253,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $document->setRoute($route);
 
-            return $this->conflictResolver->resolve($this->routeManager->update($document));
+            return $this->routeManager->update($document);
         }
 
-        return $this->conflictResolver->resolve($this->routeManager->create($document));
+        return $this->routeManager->create($document);
     }
 
     /**
@@ -269,10 +278,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $document->setRoute($route);
 
-            return $this->conflictResolver->resolve($this->routeManager->update($document, $document->getRoutePath()));
+            return $this->routeManager->update($document, $document->getRoutePath(), false);
         }
 
-        return $this->conflictResolver->resolve($this->routeManager->create($document, $document->getRoutePath()));
+        return $this->routeManager->create($document, $document->getRoutePath(), false);
     }
 
     /**

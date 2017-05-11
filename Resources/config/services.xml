@@ -278,6 +278,7 @@
             <argument>%sulu_article.content-type.page_tree_route.template%</argument>
             <argument type="service" id="sulu_document_manager.document_registry"/>
             <argument type="service" id="sulu_route.chain_generator"/>
+            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
 
             <tag name="sulu.content.type" alias="page_tree_route"/>
         </service>
