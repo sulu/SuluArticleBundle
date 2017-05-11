@@ -43,3 +43,21 @@ own parent-page and can so be coupled to the page.
 To use this approach you have to change the content-type of the property `routePath` to
 `page_tree_route`. This will change the UI for this property in the Sulu-Admin and behind the 
 scenes the routes will be handled in a different way.  
+
+**Route update**
+
+When changing a url of a page the system also update the routes of all the linked articles.
+By default this behaviour will be called immediately on publishing the page. This could consume
+a lot of time when lots of articles are linked to the saved page.
+
+To omit this the bundle provides a way to asynchronously call this route-update via the 
+SuluAutomationBundle. To enable it you have to install the
+[SuluAutomationBundle](https://github.com/sulu/SuluAutomationBundle) and add following
+configuration to `app/config/admin/config.yml`:
+
+```yaml
+sulu_article:
+    content_types:
+        page_tree_route:
+            update: task # "request" or "off" 
+```

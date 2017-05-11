@@ -13,16 +13,11 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use PHPCR\NodeInterface;
 use PHPCR\SessionInterface;
-use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
 use Sulu\Bundle\ContentBundle\Document\PageDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
-use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
-use Sulu\Component\Content\Metadata\PropertyMetadata;
-use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
@@ -64,24 +59,32 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
     protected $liveSession;
 
     /**
+     * @var PageTreeUpdaterInterface
+     */
+    protected $routeUpdater;
+
+    /**
      * @param DocumentManagerInterface $documentManager
      * @param PropertyEncoder $propertyEncoder
      * @param DocumentInspector $documentInspector
      * @param StructureMetadataFactoryInterface $metadataFactory
      * @param SessionInterface $liveSession
+     * @param PageTreeUpdaterInterface $routeUpdater
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
         PropertyEncoder $propertyEncoder,
         DocumentInspector $documentInspector,
         StructureMetadataFactoryInterface $metadataFactory,
-        SessionInterface $liveSession
+        SessionInterface $liveSession,
+        PageTreeUpdaterInterface $routeUpdater
     ) {
         $this->documentManager = $documentManager;
         $this->propertyEncoder = $propertyEncoder;
         $this->documentInspector = $documentInspector;
         $this->metadataFactory = $metadataFactory;
         $this->liveSession = $liveSession;
+        $this->routeUpdater = $routeUpdater;
     }
 
     /**
@@ -109,11 +112,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $locale = $event->getLocale();
-        $articles = $this->findLinkedArticles($document->getUuid(), $locale);
-        foreach ($articles as $article) {
-            $this->updateArticle($article, $document->getResourceSegment(), $locale);
-        }
+        $this->routeUpdater->update($document);
     }
 
     /**
@@ -129,75 +128,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
         }
 
         foreach ($this->documentInspector->getLocales($document) as $locale) {
-            $localizedDocument = $this->documentManager->find($document->getUuid(), $locale);
-            $articles = $this->findLinkedArticles($localizedDocument->getUuid(), $locale);
-            foreach ($articles as $article) {
-                $this->updateArticle($article, $localizedDocument->getResourceSegment(), $locale);
-            }
-        }
-    }
-
-    /**
-     * Find articles linked to the given page.
-     *
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return ArticleInterface[]
-     */
-    private function findLinkedArticles($uuid, $locale)
-    {
-        $where = [];
-        foreach ($this->metadataFactory->getStructures('article') as $metadata) {
-            $property = $this->getRoutePathPropertyName($metadata);
-            if (null === $property || PageTreeRouteContentType::NAME !== $property->getType()) {
-                continue;
-            }
-
-            $where[] = sprintf(
-                '([%s] = "%s" AND [%s-page] = "%s")',
-                $this->propertyEncoder->localizedSystemName('template', $locale),
-                $metadata->getName(),
-                $this->propertyEncoder->localizedSystemName($property->getName(), $locale),
-                $uuid
-            );
-        }
-
-        $query = $this->documentManager->createQuery(
-            sprintf(
-                'SELECT * FROM [nt:unstructured] WHERE [jcr:mixinTypes] = "sulu:article" AND (%s)',
-                implode(' OR ', $where)
-            ),
-            $locale
-        );
-
-        return $query->execute();
-    }
-
-    /**
-     * Update route of given article.
-     *
-     * @param ArticleDocument $article
-     * @param string $resourceSegment
-     * @param string $locale
-     */
-    private function updateArticle(ArticleDocument $article, $resourceSegment, $locale)
-    {
-        $property = $this->getRoutePathPropertyNameByStructureType($article->getStructureType());
-        $propertyName = $this->propertyEncoder->localizedContentName($property->getName(), $locale);
-
-        $node = $this->documentInspector->getNode($article);
-        $node->setProperty($propertyName . '-page-path', $resourceSegment);
-
-        $suffix = $node->getPropertyValueWithDefault($propertyName . '-suffix', null);
-        if ($suffix) {
-            $path = rtrim($resourceSegment, '/') . '/' . $suffix;
-            $node->setProperty($propertyName, $path);
-            $article->setRoutePath($path);
-        }
-
-        if (WorkflowStage::PUBLISHED === $article->getWorkflowStage()) {
-            $this->documentManager->publish($article, $locale);
+            $this->routeUpdater->update($this->documentManager->find($document->getUuid(), $locale));
         }
     }
 
@@ -221,43 +152,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
         $liveNode = $this->getLiveNode($document);
 
         return $liveNode->getPropertyValueWithDefault($urlPropertyName, null) !== $document->getResourceSegment();
-    }
-
-    /**
-     * Returns "routePath" property.
-     *
-     * @param string $structureType
-     *
-     * @return PropertyMetadata
-     */
-    private function getRoutePathPropertyNameByStructureType($structureType)
-    {
-        $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
-        if ($metadata->hasTag(self::TAG_NAME)) {
-            return $metadata->getPropertyByTagName(self::TAG_NAME);
-        }
-
-        return $metadata->getProperty(self::ROUTE_PROPERTY);
-    }
-
-    /**
-     * Returns "routePath" property.
-     *
-     * @param StructureMetadata $metadata
-     *
-     * @return PropertyMetadata
-     */
-    private function getRoutePathPropertyName(StructureMetadata $metadata)
-    {
-        if ($metadata->hasTag(self::TAG_NAME)) {
-            return $metadata->getPropertyByTagName(self::TAG_NAME);
-        }
-
-        if (!$metadata->hasProperty(self::ROUTE_PROPERTY)) {
-            return;
-        }
-
-        return $metadata->getProperty(self::ROUTE_PROPERTY);
     }
 
     /**

@@ -16,5 +16,19 @@
             <tag name="sulu_admin.content_navigation" alias="article"/>
             <tag name="sulu.context" context="admin"/>
         </service>
+
+        <service id="sulu_article.page_tree_route.updater.task"
+                 class="Sulu\Bundle\ArticleBundle\PageTree\AutomationPageTreeUpdater">
+            <argument type="service" id="sulu_automation.tasks.manager"/>
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+
+        <service id="sulu_article.automation.route_update_handler"
+                 class="Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler">
+            <argument type="service" id="sulu_article.page_tree_route.updater.request"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+
+            <tag name="task.handler"/>
+        </service>
     </services>
 </container>
