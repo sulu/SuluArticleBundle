@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
 use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
@@ -99,13 +100,25 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 $excerpt->more,
                 $item->getRoutePath(),
                 count($excerpt->images) ? $excerpt->images[0]->id : $item->getTeaserMediaId(),
-                [
-                    'structureType' => $item->getStructureType(),
-                    'type' => $item->getType(),
-                ]
+                $this->getAttributes($item)
             );
         }
 
         return $result;
+    }
+
+    /**
+     * Returns attributes for teaser.
+     *
+     * @param ArticleViewDocument $viewDocument
+     *
+     * @return array
+     */
+    protected function getAttributes(ArticleViewDocument $viewDocument)
+    {
+        return [
+            'structureType' => $viewDocument->getStructureType(),
+            'type' => $viewDocument->getType(),
+        ];
     }
 }
