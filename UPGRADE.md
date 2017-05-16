@@ -1,5 +1,11 @@
 # Upgrade
 
+## dev-develop
+
+### DocumentManager
+
+Removed persist option `route_path` use the method `setRoutePath` instead.
+
 ## 0.5.0
 
 ### Elasticsearch 5.0
