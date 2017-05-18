@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
-use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -188,14 +187,14 @@ class ArticleDataProvider implements DataProviderInterface
      * Returns flag "hasNextPage".
      * It combines the limit/query-count with the page and page-size.
      *
-     * @param DocumentIterator $queryResult
+     * @param \Countable $queryResult
      * @param int $limit
      * @param int $page
      * @param int $pageSize
      *
      * @return bool
      */
-    private function hasNextPage(DocumentIterator $queryResult, $limit, $page, $pageSize)
+    private function hasNextPage(\Countable $queryResult, $limit, $page, $pageSize)
     {
         $count = $queryResult->count();
         if ($limit && $limit < $count) {
@@ -214,14 +213,14 @@ class ArticleDataProvider implements DataProviderInterface
      * @param int $pageSize
      * @param string $locale
      *
-     * @return DocumentIterator
+     * @return \Countable
      */
     private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
         if (!$search) {
-            return [];
+            return new \ArrayIterator([]);
         }
 
         $this->addPagination($search, $pageSize, $page, $limit);
