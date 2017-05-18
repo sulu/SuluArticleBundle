@@ -137,6 +137,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.documents', $config['documents']);
         $container->setParameter('sulu_article.view_document.article.class', $config['documents']['article']['view']);
         $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
+        $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
 
         $container->setParameter(
             'sulu_article.content-type.article.template',

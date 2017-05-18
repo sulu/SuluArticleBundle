@@ -217,8 +217,19 @@
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
+        </service>
+        <service id="sulu_article.content.page_tree_data_provider"
+                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.smart_content.default_limit%</argument>
+
+            <tag name="sulu.smart_content.data_provider" alias="articles_page_tree"/>
         </service>
         <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
             <argument type="service" id="es.manager.live"/>
