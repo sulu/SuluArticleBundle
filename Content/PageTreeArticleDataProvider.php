@@ -42,6 +42,10 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
      */
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
+        if (!$datasource) {
+            return;
+        }
+
         $document = $this->documentManager->find($datasource, $options['locale']);
 
         return new DatasourceItem($document->getUuid(), $document->getTitle(), $document->getResourceSegment());
@@ -52,7 +56,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
      */
     protected function createSearch(Search $search, array $filters, $locale)
     {
-        if (!array_key_exists('dataSource', $filters) || $filters['dataSource'] === '') {
+        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
             return;
         }
 

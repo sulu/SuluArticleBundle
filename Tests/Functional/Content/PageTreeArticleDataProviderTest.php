@@ -17,6 +17,7 @@ use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ContentBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\SmartContent\DataProviderResult;
+use Sulu\Component\SmartContent\DatasourceItem;
 
 class PageTreeArticleDataProviderTest extends SuluTestCase
 {
@@ -54,6 +55,25 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
         $this->assertEquals($articles[0]['id'], $result->getItems()[0]->getId());
+    }
+
+    public function testResolveDataSource()
+    {
+        $page = $this->createPage('Test Page', '/page');
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
+        $result = $dataProvider->resolveDatasource($page->getUuid(), [], ['locale' => 'de']);
+
+        $this->assertInstanceOf(DatasourceItem::class, $result);
+        $this->assertEquals($page->getUuid(), $result->getId());
+        $this->assertEquals($page->getTitle(), $result->getTitle());
+    }
+
+    public function testResolveDataSourceNull()
+    {
+        $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
+
+        $this->assertNull($dataProvider->resolveDatasource(null, [], ['locale' => 'de']));
     }
 
     private function createArticle(PageDocument $page, $title = 'Test-Article', $template = 'page_tree_route')
