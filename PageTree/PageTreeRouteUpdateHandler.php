@@ -16,11 +16,12 @@ use Sulu\Bundle\AutomationBundle\TaskHandler\TaskHandlerConfiguration;
 use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Task\Lock\LockingTaskHandlerInterface;
 
 /**
  * Task-Handler to update page-tree-routes.
  */
-class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface
+class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, LockingTaskHandlerInterface
 {
     /**
      * @var PageTreeUpdaterInterface
@@ -78,5 +79,13 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface
         $this->routeUpdater->update($this->documentManager->find($workload['id'], $workload['locale']));
 
         $this->documentManager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLockKey($workload)
+    {
+        return self::class;
     }
 }
