@@ -224,14 +224,7 @@ class ArticleDataProvider implements DataProviderInterface
             return [];
         }
 
-        if (null !== $pageSize) {
-            $this->addPagination($search, $pageSize, $page, $limit);
-        } elseif (null !== $limit) {
-            $search->setSize($limit);
-        } else {
-            // FIXME find better way to achieve this
-            $search->setSize($this->defaultLimit);
-        }
+        $this->addPagination($search, $pageSize, $page, $limit);
 
         if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
             $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
@@ -334,19 +327,26 @@ class ArticleDataProvider implements DataProviderInterface
      */
     private function addPagination(Search $search, $pageSize, $page, $limit)
     {
-        $pageSize = intval($pageSize);
-        $offset = ($page - 1) * $pageSize;
-
-        $position = $pageSize * $page;
-        if ($limit !== null && $position >= $limit) {
-            $pageSize = $limit - $offset;
-            $loadLimit = $pageSize;
-        } else {
-            $loadLimit = $pageSize;
+        $offset = 0;
+        if ($pageSize) {
+            $pageSize = intval($pageSize);
+            $offset = ($page - 1) * $pageSize;
         }
 
-        $search->setSize($loadLimit);
+        if ($limit === null) {
+            $limit = $this->defaultLimit;
+        }
+
+        if ($pageSize === null || $offset + $pageSize > $limit) {
+            $pageSize = $limit - $offset;
+
+            if ($pageSize < 0) {
+                $pageSize = 0;
+            }
+        }
+
         $search->setFrom($offset);
+        $search->setSize($pageSize);
     }
 
     /**
