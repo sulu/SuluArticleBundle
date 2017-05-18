@@ -23,8 +23,8 @@
         "massive/search-bundle": "@dev",
 
         "sulu/automation-bundle": "^1.0",
-        "php-task/task-bundle": "dev-develop as 1.1.0",
-        "php-task/php-task": "dev-develop as 1.1.0"
+        "php-task/task-bundle": "dev-master as 1.1.0",
+        "php-task/php-task": "dev-master as 1.1.0"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
