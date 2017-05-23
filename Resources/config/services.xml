@@ -202,15 +202,9 @@
         </service>
 
         <!-- content -->
-        <service id="sulu_article.content.data_provider.proxy_factory.configuration" class="ProxyManager\Configuration"
-                 public="false">
-            <call method="setProxiesTargetDir">
-                <argument>%sulu.cache_dir%/documents</argument>
-            </call>
-        </service>
         <service id="sulu_article.content.data_provider.proxy_factory"
                  class="ProxyManager\Factory\LazyLoadingValueHolderFactory">
-            <argument type="service" id="sulu_article.content.data_provider.proxy_factory.configuration"/>
+            <argument type="service" id="sulu_core.proxy_manager.configuration"/>
         </service>
         <service id="sulu_article.content.data_provider" class="Sulu\Bundle\ArticleBundle\Content\ArticleDataProvider">
             <argument type="service" id="es.manager.live"/>
