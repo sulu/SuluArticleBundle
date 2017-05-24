@@ -210,6 +210,7 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
@@ -220,6 +221,7 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
@@ -258,10 +260,17 @@
             <tag name="sulu.link.provider" alias="article"/>
         </service>
 
+        <!-- reference-store -->
+        <service id="sulu_article.reference_store.article"
+                 class="Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStore">
+            <tag name="sulu_website.reference_store" alias="article"/>
+        </service>
+
         <!-- content-type -->
         <service id="sulu_article.content_types.article_selection"
                  class="Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType">
             <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
             <argument>%sulu_article.view_document.article.class%</argument>
             <argument>%sulu_article.content-type.article.template%</argument>
 

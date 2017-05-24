@@ -192,6 +192,104 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertFalse($result->getHasNextPage());
     }
 
+    public function testResolveDataItemsPaginationWithExcluded()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(['excluded' => [$items[0]['id']]], [], ['locale' => 'de']);
+
+        $this->assertCount(3, $result->getItems());
+        for ($i = 0; $i < 3; ++$i) {
+            $this->assertEquals($items[$i + 1]['id'], $result->getItems()[$i]->getId());
+        }
+    }
+
+    public function testResolveDataItemsPaginationWithReferenceStore()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        $referenceStore = $this->getContainer()->get('sulu_article.reference_store.article');
+        $referenceStore->add($items[0]['id']);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['exclude_duplicates' => new PropertyParameter('exclude_duplicates', true)],
+            ['locale' => 'de']
+        );
+
+        $this->assertCount(3, $result->getItems());
+        for ($i = 0; $i < 3; ++$i) {
+            $this->assertEquals($items[$i + 1]['id'], $result->getItems()[$i]->getId());
+        }
+    }
+
+    public function testResolveDataItemsPaginationExludeDuplicatedFalse()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        $referenceStore = $this->getContainer()->get('sulu_article.reference_store.article');
+        $referenceStore->add($items[0]['id']);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['exclude_duplicates' => new PropertyParameter('exclude_duplicates', false)],
+            ['locale' => 'de']
+        );
+
+        $this->assertCount(4, $result->getItems());
+        for ($i = 0; $i < 4; ++$i) {
+            $this->assertEquals($items[$i]['id'], $result->getItems()[$i]->getId());
+        }
+    }
+
+    public function testResolveDataItemsPaginationExludeDuplicatedNull()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        $referenceStore = $this->getContainer()->get('sulu_article.reference_store.article');
+        $referenceStore->add($items[0]['id']);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(
+            [],
+            [],
+            ['locale' => 'de']
+        );
+
+        $this->assertCount(4, $result->getItems());
+        for ($i = 0; $i < 4; ++$i) {
+            $this->assertEquals($items[$i]['id'], $result->getItems()[$i]->getId());
+        }
+    }
+
     private function createArticle($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();

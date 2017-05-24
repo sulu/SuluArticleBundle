@@ -60,6 +60,8 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
             return;
         }
 
+        $search = parent::createSearch($search, $filters, $locale);
+
         $document = $this->documentManager->find($filters['dataSource'], $locale);
         if ($document) {
             // the selected data-source could be removed

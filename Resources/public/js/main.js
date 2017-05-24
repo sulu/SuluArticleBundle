@@ -21,7 +21,11 @@ require.config({
     }
 });
 
-define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) {
+define([
+    'underscore',
+    'config',
+    'css!suluarticlecss/main'
+], function(_, Config) {
 
     'use strict';
 

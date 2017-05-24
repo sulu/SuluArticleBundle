@@ -21,17 +21,19 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\SmartContent\Configuration\Builder;
 use Sulu\Component\SmartContent\Configuration\BuilderInterface;
+use Sulu\Component\SmartContent\DataProviderAliasInterface;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
 
 /**
  * Introduces articles in smart-content.
  */
-class ArticleDataProvider implements DataProviderInterface
+class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInterface
 {
     /**
      * @var Manager
@@ -49,6 +51,11 @@ class ArticleDataProvider implements DataProviderInterface
     protected $proxyFactory;
 
     /**
+     * @var ReferenceStoreInterface
+     */
+    private $referenceStore;
+
+    /**
      * @var string
      */
     protected $articleDocumentClass;
@@ -62,6 +69,7 @@ class ArticleDataProvider implements DataProviderInterface
      * @param Manager $searchManager
      * @param DocumentManagerInterface $documentManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @param ReferenceStoreInterface $referenceStore
      * @param string $articleDocumentClass
      * @param int $defaultLimit
      */
@@ -69,12 +77,14 @@ class ArticleDataProvider implements DataProviderInterface
         Manager $searchManager,
         DocumentManagerInterface $documentManager,
         LazyLoadingValueHolderFactory $proxyFactory,
+        ReferenceStoreInterface $referenceStore,
         $articleDocumentClass,
         $defaultLimit
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
         $this->proxyFactory = $proxyFactory;
+        $this->referenceStore = $referenceStore;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
     }
@@ -132,6 +142,7 @@ class ArticleDataProvider implements DataProviderInterface
         $pageSize = null
     ) {
         $filters['types'] = $this->getTypesProperty($propertyParameter);
+        $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -158,6 +169,7 @@ class ArticleDataProvider implements DataProviderInterface
         $pageSize = null
     ) {
         $filters['types'] = $this->getTypesProperty($propertyParameter);
+        $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
@@ -165,6 +177,8 @@ class ArticleDataProvider implements DataProviderInterface
         $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
         foreach ($queryResult as $document) {
+            $this->referenceStore->add($document->getUuid());
+
             $uuids[] = $document->getUuid();
             $result[] = new ArticleResourceItem(
                 $document,
@@ -244,6 +258,12 @@ class ArticleDataProvider implements DataProviderInterface
      */
     protected function createSearch(Search $search, array $filters, $locale)
     {
+        if (0 < count($filters['excluded'])) {
+            foreach ($filters['excluded'] as $uuid) {
+                $search->addQuery(new TermQuery('uuid', $uuid), BoolQuery::MUST_NOT);
+            }
+        }
+
         $query = new BoolQuery();
 
         $queriesCount = 0;
@@ -270,9 +290,9 @@ class ArticleDataProvider implements DataProviderInterface
         }
 
         if (0 === $queriesCount) {
-            $search->addQuery(new MatchAllQuery());
+            $search->addQuery(new MatchAllQuery(), BoolQuery::MUST);
         } else {
-            $search->addQuery($query);
+            $search->addQuery($query, BoolQuery::MUST);
         }
 
         return $search;
@@ -298,6 +318,26 @@ class ArticleDataProvider implements DataProviderInterface
         }
 
         return $filterTypes;
+    }
+
+    /**
+     * Returns excluded articles.
+     *
+     * @param array $filters
+     * @param PropertyParameter[] $propertyParameter
+     *
+     * @return array
+     */
+    private function getExcludedFilter(array $filters, array $propertyParameter)
+    {
+        $excluded = array_key_exists('excluded', $filters) ? $filters['excluded'] : [];
+        if (array_key_exists('exclude_duplicates', $propertyParameter)
+            && $propertyParameter['exclude_duplicates']->getValue()
+        ) {
+            $excluded = array_merge($excluded, $this->referenceStore->getAll());
+        }
+
+        return $excluded;
     }
 
     /**
@@ -443,5 +483,13 @@ class ArticleDataProvider implements DataProviderInterface
                 return true;
             }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return 'article';
     }
 }
