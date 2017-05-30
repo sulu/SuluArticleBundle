@@ -18,9 +18,10 @@ define([
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main',
+    'services/sulucontent/smart-content-manager',
     './adapter/article',
     './adapter/article-page'
-], function($, _, config, Util, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, Article, ArticlePage) {
+], function($, _, config, Util, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, SmartContentManager, Article, ArticlePage) {
 
     'use strict';
 
@@ -244,6 +245,7 @@ define([
 
         initialize: function() {
             this.$el.addClass('article-form');
+            SmartContentManager.initialize();
 
             this.startPageSwitcher();
 
