@@ -123,6 +123,8 @@ class WebsiteArticleController extends Controller
                 HttpCache::HEADER_REVERSE_PROXY_TTL,
                 $cacheLifetime
             );
+            $response->setMaxAge($this->getParameter('sulu_http_cache.handler.public.max_age'));
+            $response->setSharedMaxAge($this->getParameter('sulu_http_cache.handler.public.shared_max_age'));
         }
 
         return $response;
