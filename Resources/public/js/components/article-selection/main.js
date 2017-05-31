@@ -15,10 +15,11 @@
 define([
     'underscore',
     'config',
+    'services/suluwebsite/reference-store',
     'text!./overlay.html',
     'text!./contentItem.html',
     'text!/admin/api/articles/fields'
-], function(_, Config, overlayTemplate, contentItemTemplate, fieldsResponse) {
+], function(_, Config, referenceStore, overlayTemplate, contentItemTemplate, fieldsResponse) {
 
     'use strict';
 
@@ -259,6 +260,7 @@ define([
         initialize: function() {
             // sandbox event handling
             bindCustomEvents.call(this);
+            this.prefillReferenceStore();
 
             this.render();
 
@@ -298,6 +300,15 @@ define([
             }
 
             this.setData(data, false);
+        },
+
+        prefillReferenceStore: function() {
+            var data = this.getData();
+            for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    referenceStore.add('article', data[key]);
+                }
+            }
         }
     };
 });

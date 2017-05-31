@@ -253,6 +253,8 @@ define([
                         this.bindFormEvents();
                         deferred.resolve();
 
+                        this.sandbox.emit('sulu.content.initialized');
+
                         if (!!this.options.preview) {
                             this.options.preview.bindDomEvents(this.$el);
                             var data = this.options.adapter.prepareData(this.data, this);

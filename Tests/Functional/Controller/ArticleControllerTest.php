@@ -313,6 +313,7 @@ class ArticleControllerTest extends SuluTestCase
                     'displayOption' => 'top',
                     'ids' => [1],
                 ],
+                'audience_targeting_groups' => [],
             ],
         ]
     ) {
