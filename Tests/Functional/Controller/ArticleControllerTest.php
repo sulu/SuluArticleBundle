@@ -74,6 +74,24 @@ class ArticleControllerTest extends SuluTestCase
         return json_decode($client->getResponse()->getContent(), true);
     }
 
+    protected function postPage($article, $pageTitle = 'Test-Page')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles/' . $article['id'] . '/pages?locale=de',
+            [
+                'pageTitle' => $pageTitle,
+                'template' => $article['template'],
+                'authored' => '2016-01-01',
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
     public function testPost($title = 'Test-Article', $template = 'default')
     {
         $response = $this->post($title, $template);
@@ -1046,6 +1064,33 @@ class ArticleControllerTest extends SuluTestCase
             ],
             $response['routePath']
         );
+    }
+
+    public function testOrderPages()
+    {
+        $article = $this->post();
+        $pages = [
+            $this->postPage($article, 'Page 1'),
+            $this->postPage($article, 'Page 2'),
+            $this->postPage($article, 'Page 3'),
+        ];
+        $expectedPages = [$pages[1]['id'], $pages[2]['id'], $pages[0]['id']];
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles/' . $article['id'] . '?action=order&locale=de',
+            ['pages' => $expectedPages]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $responsePages = $response['_embedded']['pages'];
+        for ($i = 0; $i < count($expectedPages); ++$i) {
+            $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
+            $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);
+        }
     }
 
     private function postPageTreeRoute($routePathData, $title = 'Test Article')

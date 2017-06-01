@@ -29,6 +29,7 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
 class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -450,5 +451,57 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
 
         $this->articleSubscriber->persistPageData($event->reveal());
+    }
+
+    public function testPersistPageDataOnReorder()
+    {
+        $node = $this->prophesize(NodeInterface::class);
+
+        $orderedDocument = $this->prophesize(ArticlePageDocument::class);
+        $orderedDocument->getParent()->willReturn($this->document->reveal());
+        $this->document->getLocale()->willReturn($this->locale);
+        $this->documentInspector->getNode($this->document->reveal())->willReturn($node->reveal());
+
+        $event = $this->prophesize(ReorderEvent::class);
+        $event->getDocument()->willReturn($orderedDocument->reveal());
+
+        $pages = [
+            [
+                'uuid' => '123-123-123',
+                'title' => 'Test article: page 1',
+                'routePath' => '/test-article',
+                'pageNumber' => 1,
+            ],
+            [
+                'uuid' => '321-321-321',
+                'title' => 'Test article: page 2',
+                'routePath' => '/test-article/page-2',
+                'pageNumber' => 2,
+            ],
+        ];
+
+        $this->document->getUuid()->willReturn($pages[0]['uuid']);
+        $this->document->getPageTitle()->willReturn($pages[0]['title']);
+        $this->document->getRoutePath()->willReturn($pages[0]['routePath']);
+        $this->document->getPageNumber()->willReturn($pages[0]['pageNumber']);
+
+        $child = $this->prophesize(ArticlePageDocument::class);
+        $child->getUuid()->willReturn($pages[1]['uuid']);
+        $child->getPageTitle()->willReturn($pages[1]['title']);
+        $child->getRoutePath()->willReturn($pages[1]['routePath']);
+        $child->getPageNumber()->willReturn($pages[1]['pageNumber']);
+        $this->document->getChildren()->willReturn(new \ArrayIterator([$child->reveal()]));
+
+        $this->documentInspector->getLocalizationState($child->reveal())->willReturn(LocalizationState::LOCALIZED);
+
+        $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
+        $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)->willReturn(
+                $propertyName
+            );
+
+        $this->document->setPages($pages)->shouldBeCalled();
+        $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
+
+        $this->articleSubscriber->persistPageDataOnReorder($event->reveal());
     }
 }
