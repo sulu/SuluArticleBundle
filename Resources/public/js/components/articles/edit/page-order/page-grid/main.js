@@ -41,7 +41,9 @@ define(['jquery', 'text!./grid.html'], function($, gridTemplate) {
 
         defaults: {
             options: {
-                pages: []
+                pages: [],
+                updateCallback: function(pages) {
+                }
             },
             templates: {
                 grid: gridTemplate
@@ -69,7 +71,8 @@ define(['jquery', 'text!./grid.html'], function($, gridTemplate) {
 
         orderTable: function($item) {
             var id = $item.data('id'),
-                rows = this.$el.find('tbody tr').get();
+                rows = this.$el.find('tbody tr').get(),
+                pages = [];
 
             rows.sort(function(a, b) {
                 return compare(id, $(a), $(b));
@@ -77,12 +80,15 @@ define(['jquery', 'text!./grid.html'], function($, gridTemplate) {
 
             $.each(rows, function(index, row) {
                 $(row).find('input').val(index + 1);
+                pages.push($(row).data('id'));
 
                 this.$el.find('table').children('tbody').append(row);
             }.bind(this));
 
             highlight($item);
             focus($item);
+
+            this.options.updateCallback(pages);
         }
     }
 });

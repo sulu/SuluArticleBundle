@@ -727,7 +727,14 @@ define([
                 name: 'articles/edit/page-order@suluarticle',
                 options: {
                     el: $container,
-                    pages: data
+                    pages: data,
+                    saveCallback: function(pages) {
+                        return ArticleManager.orderPages(this.options.id, pages, this.options.locale).done(function() {
+                            ArticleRouter.toEditForce(this.options.id, this.options.locale, this.options.content);
+                        }.bind(this)).fail(function() {
+                            this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
+                        }.bind(this));
+                    }.bind(this)
                 }
             }]);
         }

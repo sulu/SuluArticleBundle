@@ -160,6 +160,17 @@ define(['jquery', 'services/husky/util'], function($, Util) {
         },
 
         /**
+         * Copy given article-pages.
+         *
+         * @param {String} id
+         * @param {String[]} pages
+         * @param {String} locale
+         */
+        orderPages: function(id, pages, locale) {
+            return Util.save(templates.url({id: id, locale: locale, action: 'order'}), 'POST', {pages: pages});
+        },
+
+        /**
          * Returns url for copy article from a given locale to a array of other locales url.
          *
          * @param {String} id
