@@ -153,6 +153,7 @@
         <service id="sulu_article.serializer.article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
 
             <tag name="jms_serializer.event_subscriber" />
         </service>
