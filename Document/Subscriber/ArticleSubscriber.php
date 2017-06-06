@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Document\LocalizationState;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
@@ -255,6 +256,14 @@ class ArticleSubscriber implements EventSubscriberInterface
         $node = $this->documentInspector->getNode($document);
 
         $this->setPageData($document, $node, $document->getLocale());
+
+        $document->setWorkflowStage(WorkflowStage::TEST);
+        $this->documentManager->persist($document, $this->documentInspector->getLocale($document));
+
+        $this->documents[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
     }
 
     /**

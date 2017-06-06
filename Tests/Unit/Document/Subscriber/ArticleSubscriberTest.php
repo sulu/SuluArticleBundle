@@ -21,6 +21,7 @@ use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Document\LocalizationState;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
@@ -493,6 +494,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->document->getChildren()->willReturn(new \ArrayIterator([$child->reveal()]));
 
         $this->documentInspector->getLocalizationState($child->reveal())->willReturn(LocalizationState::LOCALIZED);
+        $this->documentInspector->getLocale($this->document->reveal())->willReturn('de');
 
         $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
         $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)->willReturn(
@@ -501,6 +503,10 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->document->setPages($pages)->shouldBeCalled();
         $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
+        $this->document->setWorkflowStage(WorkflowStage::TEST)->shouldBeCalled();
+        $this->document->setWorkflowStage(WorkflowStage::TEST);
+
+        $this->documentManager->persist($this->document->reveal(), 'de')->shouldBeCalled();
 
         $this->articleSubscriber->persistPageDataOnReorder($event->reveal());
     }
