@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Document\LocalizationState;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
@@ -29,8 +30,10 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
+use Sulu\Component\Util\SortUtils;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -123,6 +126,7 @@ class ArticleSubscriber implements EventSubscriberInterface
                 ['publishChildren', 0],
                 ['persistPageData', -2000],
             ],
+            Events::REORDER => [['persistPageDataOnReorder', -2000]],
             Events::UNPUBLISH => 'handleUnpublish',
             Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
@@ -237,6 +241,32 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Persist page-data for reordering children.
+     *
+     * @param ReorderEvent $event
+     */
+    public function persistPageDataOnReorder(ReorderEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $document = $document->getParent();
+        $node = $this->documentInspector->getNode($document);
+
+        $this->setPageData($document, $node, $document->getLocale());
+
+        $document->setWorkflowStage(WorkflowStage::TEST);
+        $this->documentManager->persist($document, $this->documentInspector->getLocale($document));
+
+        $this->documents[$document->getUuid()] = [
+            'uuid' => $document->getUuid(),
+            'locale' => $document->getLocale(),
+        ];
+    }
+
+    /**
      * Persist page-data.
      *
      * @param PersistEvent|PublishEvent $event
@@ -248,6 +278,18 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->setPageData($document, $event->getNode(), $event->getLocale());
+    }
+
+    /**
+     * Set page-data for given document on given node.
+     *
+     * @param ArticleDocument $document
+     * @param NodeInterface $node
+     * @param string $locale
+     */
+    private function setPageData(ArticleDocument $document, NodeInterface $node, $locale)
+    {
         $pages = [
             [
                 'uuid' => $document->getUuid(),
@@ -270,9 +312,11 @@ class ArticleSubscriber implements EventSubscriberInterface
             }
         }
 
+        $pages = SortUtils::multisort($pages, '[pageNumber]');
+
         $document->setPages($pages);
-        $event->getNode()->setProperty(
-            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $event->getLocale()),
+        $node->setProperty(
+            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $locale),
             json_encode($pages)
         );
     }

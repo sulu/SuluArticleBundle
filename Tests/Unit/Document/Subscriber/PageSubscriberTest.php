@@ -16,9 +16,11 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\PropertyEncoder;
 
@@ -33,6 +35,11 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
      * @var PropertyEncoder
      */
     private $propertyEncoder;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
 
     /**
      * @var PageSubscriber
@@ -56,13 +63,13 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
+        $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
 
         $this->document = $this->prophesize(PageBehavior::class);
         $this->node = $this->prophesize(NodeInterface::class);
 
         $this->pageSubscriber = new PageSubscriber(
-            $this->documentInspector->reveal(),
-            $this->propertyEncoder->reveal()
+            $this->documentInspector->reveal(), $this->propertyEncoder->reveal(), $this->documentManager->reveal()
         );
     }
 
@@ -166,5 +173,58 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty('sulu:' . PageSubscriber::FIELD, 2)->shouldBeCalled();
 
         $this->pageSubscriber->handleRestore($event->reveal());
+    }
+
+    public function testHandleReorder()
+    {
+        $parentDocument = $this->prophesize(ChildrenBehavior::class);
+        $this->document->getParent()->willReturn($parentDocument->reveal());
+
+        $nodes = [
+            $this->prophesize(NodeInterface::class),
+            $this->prophesize(NodeInterface::class),
+            $this->prophesize(NodeInterface::class),
+        ];
+
+        $nodes[0]->getIdentifier()->willReturn('1-1-1');
+        $nodes[1]->getIdentifier()->willReturn('1-2-2');
+        $nodes[2]->getIdentifier()->willReturn('1-2-3');
+
+        $parentNode = $this->prophesize(NodeInterface::class);
+        $parentNode->getNodes()->willReturn(
+            array_map(
+                function ($item) {
+                    return $item->reveal();
+                },
+                $nodes
+            )
+        );
+
+        $this->documentInspector->getNode($parentDocument->reveal())->willReturn($parentNode->reveal());
+
+        $documents = [
+            $this->prophesize(PageBehavior::class),
+            $this->prophesize(PageBehavior::class),
+            $this->prophesize(PageBehavior::class),
+        ];
+
+        $this->documentManager->find('1-1-1', 'de')->willReturn($documents[0]->reveal());
+        $this->documentManager->find('1-2-2', 'de')->willReturn($documents[1]->reveal());
+        $this->documentManager->find('1-2-3', 'de')->willReturn($documents[2]->reveal());
+
+        $event = $this->prophesize(ReorderEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+        $event->getLocale()->willReturn('de');
+
+        $this->propertyEncoder->systemName(PageSubscriber::FIELD)->willReturn('sulu:' . PageSubscriber::FIELD);
+
+        $documents[0]->setPageNumber(2)->shouldBeCalled();
+        $nodes[0]->setProperty('sulu:' . PageSubscriber::FIELD, 2)->shouldBeCalled();
+        $documents[1]->setPageNumber(3)->shouldBeCalled();
+        $nodes[1]->setProperty('sulu:' . PageSubscriber::FIELD, 3)->shouldBeCalled();
+        $documents[2]->setPageNumber(4)->shouldBeCalled();
+        $nodes[2]->setProperty('sulu:' . PageSubscriber::FIELD, 4)->shouldBeCalled();
+
+        $this->pageSubscriber->handleReorder($event->reveal());
     }
 }

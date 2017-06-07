@@ -23,9 +23,10 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
+use Sulu\Component\Util\SortUtils;
 
 /**
- * Extends serializer with addtional functionallity to prepare article(-page) data.
+ * Extends serializer with additional functionality to prepare article(-page) data.
  */
 class ArticleWebsiteSubscriber implements EventSubscriberInterface
 {
@@ -155,6 +156,8 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
         if (null !== $children && $context->attributes->containsKey('pageNumber')) {
             $pages = array_values(is_array($children) ? $children : iterator_to_array($children));
+            $pages = SortUtils::multisort($pages, 'pageNumber');
+
             $pageNumber = $context->attributes->get('pageNumber')->get();
             if ($pageNumber !== 1) {
                 $article = $pages[$pageNumber - 2];

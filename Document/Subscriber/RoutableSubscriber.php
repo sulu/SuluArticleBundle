@@ -27,11 +27,13 @@ use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -138,6 +140,7 @@ class RoutableSubscriber implements EventSubscriberInterface
                 ['handleRemove', 1024],
             ],
             Events::PUBLISH => ['handlePublish', -2000],
+            Events::REORDER => ['handleReorder', -1000],
             Events::COPY => ['handleCopy', -2000],
         ];
     }
@@ -185,6 +188,35 @@ class RoutableSubscriber implements EventSubscriberInterface
         $document->setRoutePath($route->getPath());
 
         $event->getNode()->setProperty($propertyName, $route->getPath());
+    }
+
+    /**
+     * Regenerate routes for siblings on reorder.
+     *
+     * @param ReorderEvent $event
+     */
+    public function handleReorder(ReorderEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutablePageBehavior || !$document instanceof ParentBehavior) {
+            return;
+        }
+
+        $parentDocument = $document->getParent();
+        if (!$parentDocument instanceof ChildrenBehavior) {
+            return;
+        }
+
+        $locale = $this->documentInspector->getLocale($parentDocument);
+        $propertyName = $this->getRoutePathPropertyName($parentDocument->getStructureType(), $locale);
+        foreach ($parentDocument->getChildren() as $childDocument) {
+            $node = $this->documentInspector->getNode($childDocument);
+
+            $route = $this->chainRouteGenerator->generate($childDocument);
+            $childDocument->setRoutePath($route->getPath());
+
+            $node->setProperty($propertyName, $route->getPath());
+        }
     }
 
     /**
@@ -244,8 +276,12 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private function createOrUpdatePageRoute(RoutablePageBehavior $document, $locale)
     {
-        $route = $document->getRoute();
+        $route = $this->reallocateExistingRoute($document, $locale);
+        if ($route) {
+            return $route;
+        }
 
+        $route = $document->getRoute();
         if (!$route) {
             $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
         }
@@ -253,10 +289,32 @@ class RoutableSubscriber implements EventSubscriberInterface
         if ($route) {
             $document->setRoute($route);
 
-            return $this->routeManager->update($document);
+            return $this->routeManager->update($document, null, false);
         }
 
         return $this->routeManager->create($document);
+    }
+
+    /**
+     * Reallocates existing route to given document.
+     *
+     * @param RoutablePageBehavior $document
+     * @param string $locale
+     *
+     * @return RouteInterface
+     */
+    private function reallocateExistingRoute(RoutablePageBehavior $document, $locale)
+    {
+        $route = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
+        if (!$route) {
+            return;
+        }
+
+        $route->setEntityClass(get_class($document));
+        $route->setEntityId($document->getId());
+        $route->setHistory(false);
+
+        return $route;
     }
 
     /**

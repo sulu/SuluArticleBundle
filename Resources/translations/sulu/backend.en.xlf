@@ -154,6 +154,14 @@
                 <source>sulu_article.edit.new-page</source>
                 <target>Create new page</target>
             </trans-unit>
+            <trans-unit id="multi-page-03">
+                <source>sulu_article.edit.order-page</source>
+                <target>Order pages</target>
+            </trans-unit>
+            <trans-unit id="multi-page-04">
+                <source>sulu_article.edit.page</source>
+                <target>Page</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
