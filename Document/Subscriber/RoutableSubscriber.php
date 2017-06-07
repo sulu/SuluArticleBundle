@@ -312,7 +312,7 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $route->setEntityClass(get_class($document));
         $route->setEntityId($document->getId());
-        $route->setHistory($document->getId());
+        $route->setHistory(false);
 
         return $route;
     }
