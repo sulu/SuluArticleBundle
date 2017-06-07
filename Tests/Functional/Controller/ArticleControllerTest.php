@@ -269,7 +269,9 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
-        $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
+        foreach ($extensions['excerpt'] as $key => $value) {
+            $this->assertEquals($value, $response['ext']['excerpt'][$key]);
+        }
     }
 
     public function testPutDifferentTemplate($title = 'Sulu', $description = 'Sulu is awesome')
