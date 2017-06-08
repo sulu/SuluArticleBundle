@@ -106,6 +106,10 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
             );
         }
 
+        if (0 === count($where)) {
+            return [];
+        }
+
         $query = $this->documentManager->createQuery(
             sprintf(
                 'SELECT * FROM [nt:unstructured] WHERE [jcr:mixinTypes] = "sulu:article" AND (%s)',
