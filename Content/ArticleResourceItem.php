@@ -89,7 +89,7 @@ class ArticleResourceItem implements ResourceItemInterface
      */
     public function getChanger()
     {
-        return $this->article->getChanger();
+        return $this->article->getChangerFullName();
     }
 
     /**
@@ -99,7 +99,7 @@ class ArticleResourceItem implements ResourceItemInterface
      */
     public function getCreator()
     {
-        return $this->article->getCreator();
+        return $this->article->getCreatorFullName();
     }
 
     /**
@@ -120,6 +120,16 @@ class ArticleResourceItem implements ResourceItemInterface
     public function getCreated()
     {
         return $this->article->getCreated();
+    }
+
+    /**
+     * Returns published.
+     *
+     * @return \DateTime
+     */
+    public function getPublished()
+    {
+        return $this->article->getPublished();
     }
 
     /**
