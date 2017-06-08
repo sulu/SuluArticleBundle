@@ -716,7 +716,7 @@ define([
 
             for (var i = 0, length = pages.length; i < length; i++) {
                 var title = this.translations.page + ' ' + pages[i].pageNumber;
-                if (pageTitleProperty) {
+                if (pageTitleProperty && pages[i][pageTitleProperty]) {
                     title = pages[i][pageTitleProperty];
                 }
 
