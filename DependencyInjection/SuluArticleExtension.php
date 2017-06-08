@@ -17,6 +17,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -112,5 +113,10 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         }
+
+        // ensure existing cache folder for documents proxies
+        $documentsProxyDir = $container->getParameterBag()->resolveValue('%sulu.cache_dir%/documents');
+        $filesystem = new Filesystem();
+        $filesystem->mkdir($documentsProxyDir);
     }
 }
