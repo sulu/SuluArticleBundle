@@ -142,6 +142,26 @@
                 <source>sulu_article.edit.copy</source>
                 <target>Kopieer artikel</target>
             </trans-unit>
+            <trans-unit id="edit-delete-page">
+                <source>sulu_article.edit.delete_page</source>
+                <target>Verwijder pagina</target>
+            </trans-unit>
+            <trans-unit id="multi-page-01">
+                <source>sulu_article.edit.page-of</source>
+                <target>Pagina %s van %s</target>
+            </trans-unit>
+            <trans-unit id="multi-page-02">
+                <source>sulu_article.edit.new-page</source>
+                <target>Nieuwe pagina aanmaken</target>
+            </trans-unit>
+            <trans-unit id="multi-page-03">
+                <source>sulu_article.edit.order-page</source>
+                <target>Pagina's sorteren</target>
+            </trans-unit>
+            <trans-unit id="multi-page-04">
+                <source>sulu_article.edit.page</source>
+                <target>Pagina</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
