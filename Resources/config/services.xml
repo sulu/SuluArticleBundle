@@ -131,7 +131,14 @@
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
 
-            <tag name="jms_serializer.event_subscriber" />
+            <tag name="jms_serializer.event_subscriber"/>
+        </service>
+        <service id="sulu_article.serializer.urls"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="sulu.repository.route"/>
+
+            <tag name="jms_serializer.event_subscriber"/>
         </service>
         <service id="sulu_article.routing.default_provider"
                  class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider">
@@ -193,7 +200,8 @@
         </service>
 
         <!-- preview -->
-        <service id="sulu_article.preview.object_provider" class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
+        <service id="sulu_article.preview.object_provider"
+                 class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="serializer"/>
 
