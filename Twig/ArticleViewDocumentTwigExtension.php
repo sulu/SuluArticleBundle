@@ -102,7 +102,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
 
                 if (!$types) {
                     $types = [
-                        $articleDocument->getStructureType()
+                        $articleDocument->getStructureType(),
                     ];
                 }
             }
@@ -144,7 +144,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
 
                 if (!$types) {
                     $types = [
-                        $articleDocument->getStructureType()
+                        $articleDocument->getStructureType(),
                     ];
                 }
             }

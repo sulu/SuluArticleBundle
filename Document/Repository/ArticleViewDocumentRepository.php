@@ -108,7 +108,7 @@ class ArticleViewDocumentRepository
             new MoreLikeThisQuery(
                 null,
                 [
-                    "fields" => $this->searchFields,
+                    'fields' => $this->searchFields,
                     'min_term_freq' => 1,
                     'min_doc_freq' => 2,
                     'ids' => [$this->getViewDocumentId($uuid, $locale)],
@@ -135,7 +135,7 @@ class ArticleViewDocumentRepository
 
         $typesQuery = new BoolQuery();
         foreach ($types as $type) {
-                $typesQuery->add(new TermQuery('type', $type), BoolQuery::SHOULD);
+            $typesQuery->add(new TermQuery('type', $type), BoolQuery::SHOULD);
         }
         $search->addQuery($typesQuery);
 
