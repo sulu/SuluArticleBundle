@@ -64,6 +64,8 @@ define([
                 deletePage: 'sulu_article.edit.delete_page',
                 pageOf: 'sulu_article.edit.page-of',
                 newPage: 'sulu_article.edit.new-page',
+                orderPage: 'sulu_article.edit.order-page',
+                page: 'sulu_article.edit.page',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -650,7 +652,8 @@ define([
 
         startPageSwitcher: function() {
             var page = this.options.page,
-                max = (this.data._embedded.pages || []).length + 1,
+                pages = this.data._embedded.pages || [],
+                max = pages.length + 1,
                 data = [];
 
             if (!page) {
@@ -667,6 +670,11 @@ define([
                     {divider: true},
                     {id: 'add', title: this.translations.newPage}
                 ]);
+            }
+
+            // ordering is only available if more than one page exists
+            if (pages.length > 1) {
+                data.push({id: 'order', title: this.translations.orderPage});
             }
 
             this.$dropdownElement = $(this.templates.pageSwitcher({label: Util.sprintf(this.translations.pageOf, page, max)}));
@@ -686,11 +694,46 @@ define([
                     clickCallback: function(item) {
                         if (item.id === 'add') {
                             return ArticleRouter.toPageAdd(this.options.id, this.options.locale);
+                        } else if (item.id === 'order') {
+                            return this.orderPages();
                         } else if (item.id === 1) {
                             return ArticleRouter.toEdit(this.options.id, this.options.locale);
                         }
 
                         return ArticleRouter.toPageEdit(this.options.id, item.id, this.options.locale);
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        orderPages: function() {
+            var $container = $('<div/>'),
+                pages = (this.data._embedded.pages || []),
+                pageTitleProperty = this.data._pageTitlePropertyName,
+                data = [];
+
+            this.$el.append($container);
+
+            for (var i = 0, length = pages.length; i < length; i++) {
+                var title = this.translations.page + ' ' + pages[i].pageNumber;
+                if (pageTitleProperty && pages[i][pageTitleProperty]) {
+                    title = pages[i][pageTitleProperty];
+                }
+
+                data.push({id: pages[i].id, title: title});
+            }
+
+            this.sandbox.start([{
+                name: 'articles/edit/page-order@suluarticle',
+                options: {
+                    el: $container,
+                    pages: data,
+                    saveCallback: function(pages) {
+                        return ArticleManager.orderPages(this.options.id, pages, this.options.locale).done(function() {
+                            ArticleRouter.toEditForce(this.options.id, this.options.locale, this.options.content);
+                        }.bind(this)).fail(function() {
+                            this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
+                        }.bind(this));
                     }.bind(this)
                 }
             }]);

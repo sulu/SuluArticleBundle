@@ -77,14 +77,14 @@ Add xml template for structure in configured folder:
 Example is located in Bundle
 [article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.xml).
 
-Add template for article type in configured folder: ``
+Add template for article type in configured folder:
 
 ```
 %kernel.root_dir%/Resources/views/articles/article_default.html.twig
 ```
 
 Example is located in Bundle
-[article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
+[article_default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
 
 ## Initialize bundle
 
@@ -110,6 +110,7 @@ Create elasticsearch index:
 
 ```bash
 php bin/console ongr:es:index:create
+php bin/console ongr:es:index:create --manager=live
 ```
 
 ## Possible bundle configurations:

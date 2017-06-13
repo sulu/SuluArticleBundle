@@ -24,7 +24,7 @@ class AppKernel extends SuluTestKernel
      */
     public function registerBundles()
     {
-        return array_merge([new SuluArticleBundle(), new ONGRElasticsearchBundle()], parent::registerBundles());
+        return array_merge(parent::registerBundles(), [new SuluArticleBundle(), new ONGRElasticsearchBundle()]);
     }
 
     /**

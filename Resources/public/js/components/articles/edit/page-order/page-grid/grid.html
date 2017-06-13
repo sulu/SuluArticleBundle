@@ -1,0 +1,16 @@
+<table class="table">
+    <thead>
+        <tr class="row">
+            <th class="header-cell" width="100"><span class="cell-content"><%= translations.order %></span></th>
+            <th class="header-cell"><span class="cell-content"><%= translations.title %></span></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% _.each(pages, function(page, index) { %>
+        <tr class="row inactive item" data-id="<%= page.id %>">
+            <td><input type="text" value="<%= index+1 %>" class="form-element"/></td>
+            <td><span class="cell-content"><%= page.title %></span></td>
+        </tr>
+        <% }) %>
+    </tbody>
+</table>

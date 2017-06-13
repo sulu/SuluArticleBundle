@@ -19,7 +19,6 @@
         "phpunit/phpunit": "^4.8 || ^5.0",
 
         "sulu/document-manager": "0.10-RC1 as 0.9.0",
-        "massive/search-bundle": "@dev",
 
         "sulu/automation-bundle": "^1.0",
         "php-task/task-bundle": "dev-master as 1.1.0",

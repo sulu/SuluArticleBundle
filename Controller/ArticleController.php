@@ -375,6 +375,13 @@ class ArticleController extends RestController implements ClassResourceInterface
 
                     $data = $this->getDocumentManager()->find($copiedPath, $locale);
                     break;
+                case 'order':
+                    $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
+                    $this->getDocumentManager()->flush();
+                    $this->getDocumentManager()->clear();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
             }
@@ -391,6 +398,22 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Ordering given pages.
+     *
+     * @param array $pages
+     * @param string $locale
+     */
+    private function orderPages(array $pages, $locale)
+    {
+        $documentManager = $this->getDocumentManager();
+
+        for ($i = 0; $i < count($pages); ++$i) {
+            $document = $documentManager->find($pages[$i], $locale);
+            $documentManager->reorder($document, null);
+        }
     }
 
     /**

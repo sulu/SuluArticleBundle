@@ -16,6 +16,7 @@ use PHPCR\NodeInterface;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
@@ -25,15 +26,18 @@ use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
 class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -371,5 +375,65 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->documentInspector->getNode($this->document->reveal())->willReturn($this->node->reveal());
 
         $this->routableSubscriber->handleCopy($event->reveal());
+    }
+
+    public function testHandleReorder()
+    {
+        $this->document->willImplement(ParentBehavior::class);
+
+        $event = $this->prophesize(ReorderEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+
+        $parentDocument = $this->prophesize(ChildrenBehavior::class);
+        $parentDocument->willImplement(StructureBehavior::class);
+        $this->document->getParent()->willReturn($parentDocument->reveal());
+        $this->documentInspector->getLocale($parentDocument)->willReturn('de');
+
+        $parentDocument->getStructureType()->willReturn('default');
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(Argument::any())->willReturn(false);
+
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+        $this->propertyEncoder->localizedSystemName('routePath', 'de')->willReturn('i18n:de-routePath');
+
+        $children = [
+            $this->prophesize(RoutablePageBehavior::class),
+            $this->prophesize(RoutablePageBehavior::class),
+            $this->prophesize(RoutablePageBehavior::class),
+        ];
+        $parentDocument->getChildren()
+            ->willReturn([$children[0]->reveal(), $children[1]->reveal(), $children[2]->reveal()]);
+
+        $nodes = [
+            $this->prophesize(NodeInterface::class),
+            $this->prophesize(NodeInterface::class),
+            $this->prophesize(NodeInterface::class),
+        ];
+        $this->documentInspector->getNode($children[0]->reveal())->willReturn($nodes[0]->reveal());
+        $this->documentInspector->getNode($children[1]->reveal())->willReturn($nodes[1]->reveal());
+        $this->documentInspector->getNode($children[2]->reveal())->willReturn($nodes[2]->reveal());
+
+        $routes = [
+            $this->prophesize(RouteInterface::class),
+            $this->prophesize(RouteInterface::class),
+            $this->prophesize(RouteInterface::class),
+        ];
+        $routes[0]->getPath()->willReturn('/test-1');
+        $routes[1]->getPath()->willReturn('/test-2');
+        $routes[2]->getPath()->willReturn('/test-3');
+        $this->chainGenerator->generate($children[0]->reveal())->willReturn($routes[0]->reveal());
+        $this->chainGenerator->generate($children[1]->reveal())->willReturn($routes[1]->reveal());
+        $this->chainGenerator->generate($children[2]->reveal())->willReturn($routes[2]->reveal());
+
+        $children[0]->setRoutePath('/test-1')->shouldBeCalled();
+        $children[1]->setRoutePath('/test-2')->shouldBeCalled();
+        $children[2]->setRoutePath('/test-3')->shouldBeCalled();
+
+        $nodes[0]->setProperty('i18n:de-routePath', '/test-1')->shouldBeCalled();
+        $nodes[1]->setProperty('i18n:de-routePath', '/test-2')->shouldBeCalled();
+        $nodes[2]->setProperty('i18n:de-routePath', '/test-3')->shouldBeCalled();
+
+        $this->routableSubscriber->handleReorder($event->reveal());
     }
 }

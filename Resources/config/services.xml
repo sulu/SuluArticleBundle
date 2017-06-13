@@ -125,7 +125,7 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber">
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
-            <argument type="service" id="sulu_document_manager.live_session"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
@@ -153,6 +153,7 @@
         <service id="sulu_article.serializer.article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
 
             <tag name="jms_serializer.event_subscriber" />
         </service>
@@ -163,7 +164,14 @@
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
 
-            <tag name="jms_serializer.event_subscriber" />
+            <tag name="jms_serializer.event_subscriber"/>
+        </service>
+        <service id="sulu_article.serializer.urls"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="sulu.repository.route"/>
+
+            <tag name="jms_serializer.event_subscriber"/>
         </service>
         <service id="sulu_article.serializer.article_page"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticlePageSubscriber">
@@ -245,7 +253,8 @@
         </service>
 
         <!-- preview -->
-        <service id="sulu_article.preview.object_provider" class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
+        <service id="sulu_article.preview.object_provider"
+                 class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="serializer"/>
 

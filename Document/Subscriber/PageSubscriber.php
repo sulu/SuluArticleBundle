@@ -14,10 +14,12 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\DocumentInspector;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\Events;
 use Sulu\Component\DocumentManager\PropertyEncoder;
@@ -39,15 +41,24 @@ class PageSubscriber implements EventSubscriberInterface
      * @var PropertyEncoder
      */
     private $propertyEncoder;
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
 
     /**
      * @param DocumentInspector $documentInspector
      * @param PropertyEncoder $propertyEncoder
+     * @param DocumentManagerInterface $documentManager
      */
-    public function __construct(DocumentInspector $documentInspector, PropertyEncoder $propertyEncoder)
-    {
+    public function __construct(
+        DocumentInspector $documentInspector,
+        PropertyEncoder $propertyEncoder,
+        DocumentManagerInterface $documentManager
+    ) {
         $this->documentInspector = $documentInspector;
         $this->propertyEncoder = $propertyEncoder;
+        $this->documentManager = $documentManager;
     }
 
     /**
@@ -60,6 +71,7 @@ class PageSubscriber implements EventSubscriberInterface
             Events::PERSIST => [['handlePersist', -1024]],
             Events::REMOVE => [['handleRemove', 5]],
             Events::PUBLISH => [['handlePublishPageNumber', -1024]],
+            Events::REORDER => [['handleReorder', 0]],
             Events::RESTORE => [['handleRestore', -1024]],
         ];
     }
@@ -113,6 +125,33 @@ class PageSubscriber implements EventSubscriberInterface
 
         $node->setProperty($propertyName, $page);
         $document->setPageNumber($page);
+    }
+
+    /**
+     * Adjust the page-numbers of siblings when reordering a page.
+     *
+     * @param ReorderEvent $event
+     */
+    public function handleReorder(ReorderEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof PageBehavior) {
+            return;
+        }
+
+        $propertyName = $this->propertyEncoder->systemName(static::FIELD);
+        $parentNode = $this->documentInspector->getNode($document->getParent());
+
+        $page = 1;
+        foreach ($parentNode->getNodes() as $childNode) {
+            $child = $this->documentManager->find($childNode->getIdentifier(), $event->getLocale());
+            if (!$child instanceof PageBehavior) {
+                continue;
+            }
+
+            $childNode->setProperty($propertyName, ++$page);
+            $child->setPageNumber($page);
+        }
     }
 
     /**

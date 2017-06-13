@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="13" resname="sulu_article.settings.open-ghost-overlay.info">
                 <source>sulu_article.settings.open-ghost-overlay.info</source>
-                <target><![CDATA[This article does not exists in this language.<br/>Please select one of the following options:]]></target>
+                <target><![CDATA[This article does not exist in this language.<br/>Please select one of the following options:]]></target>
             </trans-unit>
             <trans-unit id="14" resname="sulu_article.settings.open-ghost-overlay.new">
                 <source>sulu_article.settings.open-ghost-overlay.new</source>
@@ -153,6 +153,14 @@
             <trans-unit id="multi-page-02">
                 <source>sulu_article.edit.new-page</source>
                 <target>Create new page</target>
+            </trans-unit>
+            <trans-unit id="multi-page-03">
+                <source>sulu_article.edit.order-page</source>
+                <target>Order pages</target>
+            </trans-unit>
+            <trans-unit id="multi-page-04">
+                <source>sulu_article.edit.page</source>
+                <target>Page</target>
             </trans-unit>
         </body>
     </file>
