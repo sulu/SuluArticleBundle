@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 class ArticleResourceItemFactory
@@ -44,11 +44,11 @@ class ArticleResourceItemFactory
     /**
      * Creates and returns article source item with proxy document.
      *
-     * @param ArticleViewDocument $articleViewDocument
+     * @param ArticleViewDocumentInterface $articleViewDocument
      *
      * @return ArticleResourceItem
      */
-    public function getResourceItem(ArticleViewDocument $articleViewDocument)
+    public function getResourceItem(ArticleViewDocumentInterface $articleViewDocument)
     {
         return new ArticleResourceItem(
             $articleViewDocument,
