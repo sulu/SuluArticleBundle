@@ -71,15 +71,15 @@ class ArticleViewDocumentRepository
      * Finds recent articles for given parameters sorted by field `published`.
      *
      * @param null|string $excludeUuid
-     * @param array $types
+     * @param int $limit
+     * @param null|array $types
      * @param string $locale
-     * @param int $maxItems
      *
      * @return DocumentIterator
      */
-    public function findRecent($excludeUuid = null, array $types, $locale, $maxItems)
+    public function findRecent($excludeUuid = null, $limit, array $types = null, $locale)
     {
-        $search = $this->createSearch($types, $locale, $maxItems);
+        $search = $this->createSearch($limit, $types, $locale);
 
         if ($excludeUuid) {
             $search->addQuery(new TermQuery('uuid', $excludeUuid), BoolQuery::MUST_NOT);
@@ -94,15 +94,15 @@ class ArticleViewDocumentRepository
      * Finds similar articles for given `uuid` with given parameters.
      *
      * @param string $uuid
-     * @param array $types
+     * @param int $limit
+     * @param null|array $types
      * @param string $locale
-     * @param int $maxItems
      *
      * @return DocumentIterator
      */
-    public function findSimilar($uuid, array $types, $locale, $maxItems)
+    public function findSimilar($uuid, $limit, array $types = null, $locale)
     {
-        $search = $this->createSearch($types, $locale, $maxItems);
+        $search = $this->createSearch($limit, $types, $locale);
 
         $search->addQuery(
             new MoreLikeThisQuery(
@@ -120,24 +120,26 @@ class ArticleViewDocumentRepository
     }
 
     /**
-     * @param array $types
+     * @param int $limit
+     * @param null|array $types
      * @param string $locale
-     * @param int $maxItems
      *
      * @return Search
      */
-    private function createSearch(array $types, $locale, $maxItems)
+    private function createSearch($limit, array $types = null, $locale)
     {
         $search = $this->repository->createSearch();
 
         $search->addQuery(new TermQuery('locale', $locale), BoolQuery::FILTER);
-        $search->setSize($maxItems);
+        $search->setSize($limit);
 
-        $typesQuery = new BoolQuery();
-        foreach ($types as $type) {
-            $typesQuery->add(new TermQuery('type', $type), BoolQuery::SHOULD);
+        if ($types) {
+            $typesQuery = new BoolQuery();
+            foreach ($types as $type) {
+                $typesQuery->add(new TermQuery('type', $type), BoolQuery::SHOULD);
+            }
+            $search->addQuery($typesQuery);
         }
-        $search->addQuery($typesQuery);
 
         return $search;
     }

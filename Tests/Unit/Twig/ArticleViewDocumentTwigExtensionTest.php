@@ -19,6 +19,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStore;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactory;
+use Sulu\Component\Content\Metadata\StructureMetadata;
+use Sulu\Component\DocumentManager\Metadata\MetadataFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -30,15 +33,16 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         $articleViewDocuments = $this->getArticleViewDocuments($articleDocuments);
         $articleResourceItems = $this->getArticleResourceItems($articleDocuments, $articleViewDocuments);
         $documentIterator = $this->getDocumentIterator($articleViewDocuments);
+        $metadataFactory = $this->getMetadataFactory();
 
         $articleViewDocumentRepository = $this->prophesize(ArticleViewDocumentRepository::class);
         $articleViewDocumentRepository->findSimilar(
             $articleDocuments[0]->getUuid(),
+            5,
             [
                 $articleDocuments[0]->getStructureType(),
             ],
-            $articleDocuments[0]->getLocale(),
-            5
+            $articleDocuments[0]->getLocale()
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
@@ -47,6 +51,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
 
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
+        $request->getLocale()->willReturn('de');
 
         $requestStack = $this->prophesize(RequestStack::class);
         $requestStack->getCurrentRequest()->wilLReturn($request);
@@ -59,6 +64,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
             $articleViewDocumentRepository->reveal(),
             $articleResourceItemFactory->reveal(),
             $referenceStore->reveal(),
+            $metadataFactory->reveal(),
             $requestStack->reveal()
         );
 
@@ -77,15 +83,16 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         $articleViewDocuments = $this->getArticleViewDocuments($articleDocuments);
         $articleResourceItems = $this->getArticleResourceItems($articleDocuments, $articleViewDocuments);
         $documentIterator = $this->getDocumentIterator($articleViewDocuments);
+        $metadataFactory = $this->getMetadataFactory();
 
         $articleViewDocumentRepository = $this->prophesize(ArticleViewDocumentRepository::class);
         $articleViewDocumentRepository->findRecent(
             $articleDocuments[0]->getUuid(),
+            5,
             [
                 $articleDocuments[0]->getStructureType(),
             ],
-            $articleDocuments[0]->getLocale(),
-            5
+            $articleDocuments[0]->getLocale()
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
@@ -94,6 +101,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
 
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
+        $request->getLocale()->willReturn('de');
 
         $requestStack = $this->prophesize(RequestStack::class);
         $requestStack->getCurrentRequest()->wilLReturn($request);
@@ -106,6 +114,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
             $articleViewDocumentRepository->reveal(),
             $articleResourceItemFactory->reveal(),
             $referenceStore->reveal(),
+            $metadataFactory->reveal(),
             $requestStack->reveal()
         );
 
@@ -116,6 +125,20 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             $extension->loadRecent()
         );
+    }
+
+    /**
+     * @return MetadataFactory
+     */
+    private function getMetadataFactory()
+    {
+        $metadata = new StructureMetadata();
+        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'blog']];
+
+        $metadataFactory = $this->prophesize(StructureMetadataFactory::class);
+        $metadataFactory->getStructureMetadata('article', 'blog')->willReturn($metadata);
+
+        return $metadataFactory;
     }
 
     /**

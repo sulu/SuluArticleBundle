@@ -17,7 +17,13 @@ use Sulu\Bundle\ArticleBundle\Content\ArticleResourceItemFactory;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
+use Sulu\Bundle\ArticleBundle\Exception\ArticleInRequestNotFoundException;
+use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Rest\Exception\MissingParameterException;
+use Sulu\Component\SmartContent\Exception\NotSupportedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -26,6 +32,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ArticleViewDocumentTwigExtension extends \Twig_Extension
 {
+    use ArticleTypeTrait;
+
     /**
      * @var ArticleViewDocumentRepository
      */
@@ -47,20 +55,28 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     protected $requestStack;
 
     /**
+     * @var StructureMetadataFactoryInterface
+     */
+    protected $structureMetadataFactory;
+
+    /**
      * @param ArticleViewDocumentRepository $articleViewDocumentRepository
      * @param ArticleResourceItemFactory $articleResourceItemFactory
      * @param ReferenceStoreInterface $referenceStore
+     * @param StructureMetadataFactoryInterface $structureMetadataFactory
      * @param RequestStack $requestStack
      */
     public function __construct(
         ArticleViewDocumentRepository $articleViewDocumentRepository,
         ArticleResourceItemFactory $articleResourceItemFactory,
         ReferenceStoreInterface $referenceStore,
+        StructureMetadataFactoryInterface $structureMetadataFactory,
         RequestStack $requestStack
     ) {
         $this->articleViewDocumentRepository = $articleViewDocumentRepository;
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->referenceStore = $referenceStore;
+        $this->structureMetadataFactory = $structureMetadataFactory;
         $this->requestStack = $requestStack;
     }
 
@@ -80,48 +96,33 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     /**
      * Loads recent articles with given parameters.
      *
-     * @param null|string $excludeUuid
-     * @param bool $shouldExcludeUuid
+     * @param int $limit
      * @param null|array $types
      * @param null|string $locale
-     * @param int $maxItems
      *
      * @return ArticleResourceItem[]
      */
-    public function loadRecent(
-        $excludeUuid = null,
-        $shouldExcludeUuid = true,
-        array $types = null,
-        $locale = null,
-        $maxItems = 5
-    ) {
-        if (!$locale || (!$excludeUuid && $shouldExcludeUuid) || !$types) {
-            /** @var Request $request */
-            $request = $this->requestStack->getCurrentRequest();
-            $articleDocument = $request->get('object');
-            if ($articleDocument instanceof ArticleDocument) {
-                if (!$locale) {
-                    $locale = $articleDocument->getLocale();
-                }
+    public function loadRecent($limit = 5, array $types = null, $locale = null)
+    {
+        $excludeUuid = null;
 
-                if (!$excludeUuid && $shouldExcludeUuid) {
-                    $excludeUuid = $articleDocument->getUuid();
-                }
+        /** @var Request $request */
+        $request = $this->requestStack->getCurrentRequest();
 
-                if (!$types) {
-                    $types = [
-                        $articleDocument->getStructureType(),
-                    ];
-                }
+        $articleDocument = $request->get('object');
+        if ($articleDocument instanceof ArticleDocument) {
+            $excludeUuid = $articleDocument->getUuid();
+
+            if (!$types) {
+                $types = [$this->getArticleType($articleDocument)];
             }
         }
 
-        $articleViewDocuments = $this->articleViewDocumentRepository->findRecent(
-            $excludeUuid,
-            $types,
-            $locale,
-            $maxItems
-        );
+        if (!$locale) {
+            $locale = $request->getLocale();
+        }
+
+        $articleViewDocuments = $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale);
 
         return $this->getResourceItems($articleViewDocuments);
     }
@@ -129,38 +130,48 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     /**
      * Loads similar articles with given parameters.
      *
-     * @param null|string $uuid
-     * @param null|array $types
-     * @param null|string $locale
-     * @param int $maxItems
+     * @param int $limit
+     * @param array|null $types
+     * @param null $locale
+     *
+     * @throws ArticleInRequestNotFoundException
      *
      * @return ArticleResourceItem[]
      */
-    public function loadSimilar($uuid = null, array $types = null, $locale = null, $maxItems = 5)
+    public function loadSimilar($limit = 5, array $types = null, $locale = null)
     {
-        if (!$locale || !$uuid || !$types) {
-            $request = $this->requestStack->getCurrentRequest();
-            $articleDocument = $request->get('object');
-            if ($articleDocument instanceof ArticleDocument) {
-                if (!$locale) {
-                    $locale = $articleDocument->getLocale();
-                }
+        $uuid = null;
 
-                if (!$uuid) {
-                    $uuid = $articleDocument->getUuid();
-                }
+        $request = $this->requestStack->getCurrentRequest();
 
-                if (!$types) {
-                    $types = [
-                        $articleDocument->getStructureType(),
-                    ];
-                }
+        $articleDocument = $request->get('object');
+        if ($articleDocument instanceof ArticleDocument) {
+            $uuid = $articleDocument->getUuid();
+
+            if (!$types) {
+                $types = [$this->getArticleType($articleDocument)];
             }
         }
 
-        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar($uuid, $types, $locale, $maxItems);
+        if (!$uuid) {
+            throw new ArticleInRequestNotFoundException();
+        }
+
+        if (!$locale) {
+            $locale = $request->getLocale();
+        }
+
+        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar($uuid, $limit, $types, $locale);
 
         return $this->getResourceItems($articleViewDocuments);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'sulu_article.article_view_document';
     }
 
     /**
@@ -182,10 +193,17 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritdoc}
+     * @param ArticleDocument $articleDocument
+     *
+     * @return string
      */
-    public function getName()
+    private function getArticleType(ArticleDocument $articleDocument)
     {
-        return 'sulu_article.article_view_document';
+        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article',
+            $articleDocument->getStructureType()
+        );
+
+        return $this->getType($structureMetadata);
     }
 }

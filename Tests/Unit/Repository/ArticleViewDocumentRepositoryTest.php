@@ -73,9 +73,9 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param string $uuid
      * @param array $types
      * @param string $locale
-     * @param int $maxItems
+     * @param int $limit
      */
-    public function testFindSimilar($uuid = '123-123-123', array $types = ['blog'], $locale = 'de', $maxItems = 12)
+    public function testFindSimilar($uuid = '123-123-123', array $types = ['blog'], $locale = 'de', $limit = 12)
     {
         $termQuery = [];
         foreach ($types as $type) {
@@ -112,16 +112,16 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
 
-        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $maxItems) {
+        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
-            $this->assertEquals($maxItems, $search->getSize());
+            $this->assertEquals($limit, $search->getSize());
 
             return true;
         }))->willReturn($documentIterator->reveal());
 
         $this->assertSame(
             $documentIterator->reveal(),
-            $this->articleViewDocumentRepository->findSimilar($uuid, $types, $locale, $maxItems)
+            $this->articleViewDocumentRepository->findSimilar($uuid, $limit, $types, $locale)
         );
     }
 
@@ -131,13 +131,13 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param string $excludeUuid
      * @param array $types
      * @param string $locale
-     * @param int $maxItems
+     * @param int $limit
      */
     public function testFindRecent(
         $excludeUuid = '123-123-123',
         array $types = ['blog'],
         $locale = 'de',
-        $maxItems = 12
+        $limit = 12
     ) {
         $termQuery = [];
         foreach ($types as $type) {
@@ -172,16 +172,16 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
 
-        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $maxItems) {
+        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
-            $this->assertEquals($maxItems, $search->getSize());
+            $this->assertEquals($limit, $search->getSize());
 
             return true;
         }))->willReturn($documentIterator->reveal());
 
         $this->assertSame(
             $documentIterator->reveal(),
-            $this->articleViewDocumentRepository->findRecent($excludeUuid, $types, $locale, $maxItems)
+            $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale)
         );
     }
 }

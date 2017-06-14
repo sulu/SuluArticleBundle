@@ -1,25 +1,27 @@
-# Content-Types
+# Twig Extensions
 
 Twig Extensions
 
 * Load recent articles: `sulu_article_load_recent`
-* Load similar articles: `sulu_article_load_recent` 
+* Load similar articles: `sulu_article_load_similar` 
 
-## Article-Selection
+## `sulu_article_load_recent`
 
-Allows to select articles and assign them to another page or article.
+Returns 
 
-### Parameters
+### Arguments
 
-No parameters.
+- **limit**: *integer* - optional: set the limit - default: 5
+- **types**: *array* - optional: filter for article types - default: type of the requested article
+- **locale**: *string* - optional: load data from excerpt tab
 
 ### Returns
 
-The content-type returns a list of `ArticleViewDocumentInterface` instances.
+The content-type returns a list of `ArticleResourceItem` instances.
 
 ### Example
 
-```xml
+```twig
 <property name="articles" type="article_selection">
    <meta>
         <title lang="en">Articles</title>

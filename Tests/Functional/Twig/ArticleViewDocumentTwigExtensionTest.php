@@ -12,7 +12,12 @@
 namespace Functional\Twig;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
 {
@@ -43,14 +48,19 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
             $this->createArticle('YYY 4'),
         ];
 
-        $twigExtension = $this->getContainer()->get('sulu_article.twig.view_document_repository');
+        $fakeRequest = Request::create('/', 'GET');
+        $fakeRequest->setLocale('de');
+        $fakeRequest->attributes->set('object', $this->getArticleDocument($items[0]['id']));
+
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->push($fakeRequest);
 
         // test 'loadRecent' => all others should be returned
-        $result = $twigExtension->loadRecent($items[0]['id'], [$items[0]['articleType']], self::LOCALE);
+        $result = $this->getTwigExtension()->loadRecent();
         $this->assertCount(count($items) - 1, $result);
 
         // test 'loadSimilar' => only article with title 'XXX 2' should be returned
-        $result = $twigExtension->loadSimilar($items[0]['id'], [$items[0]['articleType']], self::LOCALE);
+        $result = $this->getTwigExtension()->loadSimilar();
         $this->assertCount(1, $result);
         $this->assertEquals($items[1]['title'], $result[0]->getTitle());
     }
@@ -65,5 +75,25 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
         );
 
         return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    /**
+     * @param string $uuid
+     *
+     * @return ArticleDocument
+     */
+    private function getArticleDocument($uuid)
+    {
+        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
+
+        return $documentManager->find($uuid, self::LOCALE);
+    }
+
+    /**
+     * @return ArticleViewDocumentTwigExtension
+     */
+    private function getTwigExtension()
+    {
+        return $this->getContainer()->get('sulu_article.twig.view_document_repository');
     }
 }

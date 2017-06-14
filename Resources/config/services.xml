@@ -319,6 +319,7 @@
             <argument type="service" id="sulu_article.repository.view_document"/>
             <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="request_stack"/>
 
             <tag name="twig.extension"/>
