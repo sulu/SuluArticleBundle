@@ -46,8 +46,8 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
-        $articleResourceItemFactory->getResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
-        $articleResourceItemFactory->getResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
+        $articleResourceItemFactory->createResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
+        $articleResourceItemFactory->createResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
 
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
@@ -96,8 +96,8 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
-        $articleResourceItemFactory->getResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
-        $articleResourceItemFactory->getResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
+        $articleResourceItemFactory->createResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
+        $articleResourceItemFactory->createResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
 
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
