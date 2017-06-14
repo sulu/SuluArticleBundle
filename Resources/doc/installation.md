@@ -17,6 +17,8 @@ else read: [Installation for ElasticSearch 5.0](installation_es5.md)
 
 ### Add bundles to AbstractKernel
 
+The bundle should be registered after the `SuluCoreBundle`.
+
 ```php
 /* app/AbstractKernel.php */
 
@@ -41,14 +43,10 @@ sulu_core:
         structure:
             default_type:
                 article: "article_default"
-                article_page: "article_default"
             paths:
                 article:
                     path: "%kernel.root_dir%/Resources/templates/articles"
                     type: "article"
-                article_page:
-                    path: "%kernel.root_dir%/Resources/templates/articles"
-                    type: "article_page"
 ```
 
 ### Configure the routing
