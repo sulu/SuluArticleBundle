@@ -56,6 +56,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     private $referenceStore;
 
     /**
+     * @var ArticleResourceItemFactory
+     */
+    protected $articleResourceItemFactory;
+
+    /**
      * @var string
      */
     protected $articleDocumentClass;
@@ -70,6 +75,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param DocumentManagerInterface $documentManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
      * @param ReferenceStoreInterface $referenceStore
+     * @param ArticleResourceItemFactory $articleResourceItemFactory
      * @param string $articleDocumentClass
      * @param int $defaultLimit
      */
@@ -78,6 +84,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         DocumentManagerInterface $documentManager,
         LazyLoadingValueHolderFactory $proxyFactory,
         ReferenceStoreInterface $referenceStore,
+        ArticleResourceItemFactory $articleResourceItemFactory,
         $articleDocumentClass,
         $defaultLimit
     ) {
@@ -85,6 +92,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->documentManager = $documentManager;
         $this->proxyFactory = $proxyFactory;
         $this->referenceStore = $referenceStore;
+        $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
     }
@@ -180,10 +188,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $this->referenceStore->add($document->getUuid());
 
             $uuids[] = $document->getUuid();
-            $result[] = new ArticleResourceItem(
-                $document,
-                $this->getResource($document->getUuid(), $document->getLocale())
-            );
+            $result[] = $this->articleResourceItemFactory->createResourceItem($document);
         }
 
         return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);

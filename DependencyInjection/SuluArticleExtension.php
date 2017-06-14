@@ -21,7 +21,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -139,6 +138,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.view_document.article.class', $config['documents']['article']['view']);
         $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
         $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
+        $container->setParameter('sulu_article.search_fields', $config['search_fields']);
 
         $container->setParameter(
             'sulu_article.content-type.article.template',

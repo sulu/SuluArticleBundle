@@ -49,7 +49,7 @@ the articles.
 
 ### Returns
 
-The content-type returns a list of `ArticleViewDocumentInterface` instances.
+The content-type returns a list of `ArticleResourceItem` instances.
 
 ## Teaser-Selection
 

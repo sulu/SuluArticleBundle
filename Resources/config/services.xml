@@ -219,6 +219,7 @@
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
             <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
@@ -230,6 +231,7 @@
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
             <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
@@ -294,6 +296,33 @@
             <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
 
             <tag name="sulu.content.type" alias="page_tree_route"/>
+        </service>
+
+        <!-- article resource item factory -->
+        <service id="sulu_article.factory.resource_item"
+                 class="Sulu\Bundle\ArticleBundle\Content\ArticleResourceItemFactory">
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+        </service>
+
+        <!-- article view document repository -->
+        <service id="sulu_article.repository.view_document"
+                 class="Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument>%sulu_article.search_fields%</argument>
+        </service>
+
+        <!-- twig extension -->
+        <service id="sulu_article.twig.view_document_repository"
+                 class="Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension">
+            <argument type="service" id="sulu_article.repository.view_document"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="request_stack"/>
+
+            <tag name="twig.extension"/>
         </service>
     </services>
 </container>

@@ -7,3 +7,4 @@ This documentation covers basic-topics to install and use this bundle.
 * [Installation](installation.md)
 * [Routing](routing.md)
 * [Content-Types](content-types.md)
+* [Twig-Extensions](twig-extensions.md)

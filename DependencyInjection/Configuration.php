@@ -86,6 +86,17 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('display_tab_all')->defaultTrue()->info("Display tab 'all' in list view")->end()
+                ->arrayNode('search_fields')
+                    ->prototype('scalar')->end()->defaultValue([
+                        'title',
+                        'excerpt.title',
+                        'excerpt.description',
+                        'excerpt.seo.title',
+                        'excerpt.seo.description',
+                        'excerpt.seo.keywords',
+                        'teaser_description',
+                    ])
+                ->end()
             ->end();
 
         return $treeBuilder;
