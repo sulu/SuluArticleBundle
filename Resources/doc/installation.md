@@ -135,6 +135,8 @@ sulu_article:
         # Prototype
         name:
             translation_key:      ~
+            multipage:
+                enabled:              false
 
     # Display tab 'all' in list view
     display_tab_all:      true
