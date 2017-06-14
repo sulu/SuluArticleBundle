@@ -54,7 +54,7 @@ define([
             });
 
             if (!!component.data.type && component.data.type.name === 'ghost') {
-                component.data['_hash'] = null;
+                delete component.data['_hash'];
             }
 
             return ArticleManager.save(component.data, component.data.id, component.options.locale, action);
