@@ -81,15 +81,21 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      * Loads recent articles with given parameters.
      *
      * @param null|string $excludeUuid
+     * @param bool $shouldExcludeUuid
      * @param null|array $types
      * @param null|string $locale
      * @param int $maxItems
      *
      * @return ArticleResourceItem[]
      */
-    public function loadRecent($excludeUuid = null, array $types = null, $locale = null, $maxItems = 5)
-    {
-        if (!$locale || !$excludeUuid) {
+    public function loadRecent(
+        $excludeUuid = null,
+        $shouldExcludeUuid = true,
+        array $types = null,
+        $locale = null,
+        $maxItems = 5
+    ) {
+        if (!$locale || (!$excludeUuid && $shouldExcludeUuid) || !$types) {
             /** @var Request $request */
             $request = $this->requestStack->getCurrentRequest();
             $articleDocument = $request->get('object');
@@ -98,7 +104,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
                     $locale = $articleDocument->getLocale();
                 }
 
-                if (!$excludeUuid) {
+                if (!$excludeUuid && $shouldExcludeUuid) {
                     $excludeUuid = $articleDocument->getUuid();
                 }
 
