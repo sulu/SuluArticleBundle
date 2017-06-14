@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Search;
+use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
@@ -115,6 +116,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
             $this->assertEquals($limit, $search->getSize());
+            $this->assertCount(0, $search->getSorts());
 
             return true;
         }))->willReturn($documentIterator->reveal());
@@ -175,6 +177,8 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
             $this->assertEquals($limit, $search->getSize());
+            $this->assertCount(1, $search->getSorts());
+            $this->assertEquals(new FieldSort('authored', FieldSort::DESC), current($search->getSorts()));
 
             return true;
         }))->willReturn($documentIterator->reveal());

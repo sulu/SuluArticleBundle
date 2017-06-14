@@ -90,7 +90,7 @@ class ArticleViewDocumentRepository
             $search->addQuery(new TermQuery('uuid', $excludeUuid), BoolQuery::MUST_NOT);
         }
 
-        $search->addSort(new FieldSort('authored'));
+        $search->addSort(new FieldSort('authored', FieldSort::DESC));
 
         return $this->repository->findDocuments($search);
     }
