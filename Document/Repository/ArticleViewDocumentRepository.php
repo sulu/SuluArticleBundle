@@ -82,7 +82,6 @@ class ArticleViewDocumentRepository
      *
      * @return DocumentIterator
      */
-     */
     public function findRecent($excludeUuid = null, $limit = self::DEFAULT_LIMIT, array $types = null, $locale = null)
     {
         $search = $this->createSearch($limit, $types, $locale);
