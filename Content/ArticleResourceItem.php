@@ -133,6 +133,16 @@ class ArticleResourceItem implements ResourceItemInterface
     }
 
     /**
+     * Returns authored.
+     *
+     * @return \DateTime
+     */
+    public function getAuthored()
+    {
+        return $this->article->getAuthored();
+    }
+
+    /**
      * Returns excerpt.
      *
      * @return ExcerptViewObject
