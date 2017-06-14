@@ -22,6 +22,9 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
+/**
+ * Find article view documents in elasticsearch index.
+ */
 class ArticleViewDocumentRepository
 {
     use ArticleViewDocumentIdTrait;
@@ -68,7 +71,7 @@ class ArticleViewDocumentRepository
     }
 
     /**
-     * Finds recent articles for given parameters sorted by field `published`.
+     * Finds recent articles for given parameters sorted by field `authored`.
      *
      * @param null|string $excludeUuid
      * @param int $limit
@@ -85,7 +88,7 @@ class ArticleViewDocumentRepository
             $search->addQuery(new TermQuery('uuid', $excludeUuid), BoolQuery::MUST_NOT);
         }
 
-        $search->addSort(new FieldSort('published'));
+        $search->addSort(new FieldSort('authored'));
 
         return $this->repository->findDocuments($search);
     }
@@ -120,6 +123,8 @@ class ArticleViewDocumentRepository
     }
 
     /**
+     * Creates search with default queries.
+     *
      * @param int $limit
      * @param null|array $types
      * @param string $locale

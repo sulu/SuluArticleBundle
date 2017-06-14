@@ -17,6 +17,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
+/**
+ * Creates article resource items for given article view document.
+ */
 class ArticleResourceItemFactory
 {
     /**
@@ -48,7 +51,7 @@ class ArticleResourceItemFactory
      *
      * @return ArticleResourceItem
      */
-    public function getResourceItem(ArticleViewDocumentInterface $articleViewDocument)
+    public function createResourceItem(ArticleViewDocumentInterface $articleViewDocument)
     {
         return new ArticleResourceItem(
             $articleViewDocument,

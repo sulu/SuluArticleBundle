@@ -188,7 +188,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $this->referenceStore->add($document->getUuid());
 
             $uuids[] = $document->getUuid();
-            $result[] = $this->articleResourceItemFactory->getResourceItem($document);
+            $result[] = $this->articleResourceItemFactory->createResourceItem($document);
         }
 
         return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);

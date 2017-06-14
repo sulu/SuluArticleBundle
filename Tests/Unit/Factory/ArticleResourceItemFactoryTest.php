@@ -39,7 +39,7 @@ class ArticleResourceItemFactoryTest extends \PHPUnit_Framework_TestCase
                 $this->prophesize(ArticleDocument::class)->willImplement(VirtualProxyInterface::class)->reveal()
             );
 
-        $result = $articleResourceItemFactory->getResourceItem($articleViewDocument);
+        $result = $articleResourceItemFactory->createResourceItem($articleViewDocument);
 
         $this->assertInstanceOf(VirtualProxyInterface::class, $result->getResource());
         $this->assertInstanceOf(ArticleDocument::class, $result->getResource());

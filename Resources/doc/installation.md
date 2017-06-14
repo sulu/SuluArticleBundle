@@ -118,10 +118,21 @@ php bin/console ongr:es:index:create --manager=live
 ```yml
 # app/config/config.yml
 
+# Default configuration for extension with alias: "sulu_article"
 sulu_article:
+    smart_content:
+        default_limit:        100
+    content_types:
+        article:
+            template:             'SuluArticleBundle:Template:content-types/article-selection.html.twig'
+        page_tree_route:
+            template:             'SuluArticleBundle:Template:content-types/page-tree-route.html.twig'
+            page_route_cascade:   request # One of "request"; "task"; "off"
     documents:
         article:
-            view: Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
+            view:                 Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
+        article_page:
+            view:                 Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject
     types:
 
         # Prototype
@@ -130,6 +141,16 @@ sulu_article:
 
     # Display tab 'all' in list view
     display_tab_all:      true
+    search_fields:
+
+        # Defaults:
+        - title
+        - excerpt.title
+        - excerpt.description
+        - excerpt.seo.title
+        - excerpt.seo.description
+        - excerpt.seo.keywords
+        - teaser_description
 ```
 
 

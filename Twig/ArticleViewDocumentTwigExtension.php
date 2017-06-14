@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Extension for content form generation.
+ * Twig extension to retrieve article resource items from the article view document repository.
  */
 class ArticleViewDocumentTwigExtension extends \Twig_Extension
 {
@@ -186,7 +186,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
         /** @var ArticleViewDocument $articleViewDocument */
         foreach ($articleViewDocuments as $articleViewDocument) {
             $this->referenceStore->add($articleViewDocument->getUuid());
-            $articleResourceItems[] = $this->articleResourceItemFactory->getResourceItem($articleViewDocument);
+            $articleResourceItems[] = $this->articleResourceItemFactory->createResourceItem($articleViewDocument);
         }
 
         return $articleResourceItems;
