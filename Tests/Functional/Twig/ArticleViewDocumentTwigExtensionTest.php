@@ -16,8 +16,6 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
 {
