@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -89,6 +90,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     public function loadRecent($excludeUuid = null, array $types = null, $locale = null, $maxItems = 5)
     {
         if (!$locale || !$excludeUuid) {
+            /** @var Request $request */
             $request = $this->requestStack->getCurrentRequest();
             $articleDocument = $request->get('object');
             if ($articleDocument instanceof ArticleDocument) {
@@ -130,7 +132,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      */
     public function loadSimilar($uuid = null, array $types = null, $locale = null, $maxItems = 5)
     {
-        if (!$locale || !$uuid) {
+        if (!$locale || !$uuid || !$types) {
             $request = $this->requestStack->getCurrentRequest();
             $articleDocument = $request->get('object');
             if ($articleDocument instanceof ArticleDocument) {
@@ -150,12 +152,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
             }
         }
 
-        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar(
-            $uuid,
-            $types,
-            $locale,
-            $maxItems
-        );
+        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar($uuid, $types, $locale, $maxItems);
 
         return $this->getResourceItems($articleViewDocuments);
     }
@@ -176,5 +173,13 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
         }
 
         return $articleResourceItems;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'sulu_article.article_view_document';
     }
 }
