@@ -29,6 +29,8 @@ class ArticleViewDocumentRepository
 {
     use ArticleViewDocumentIdTrait;
 
+    const DEFAULT_LIMIT = 5;
+
     /**
      * @var Manager
      */
@@ -76,11 +78,12 @@ class ArticleViewDocumentRepository
      * @param null|string $excludeUuid
      * @param int $limit
      * @param null|array $types
-     * @param string $locale
+     * @param null|string $locale
      *
      * @return DocumentIterator
      */
-    public function findRecent($excludeUuid = null, $limit, array $types = null, $locale)
+     */
+    public function findRecent($excludeUuid = null, $limit = self::DEFAULT_LIMIT, array $types = null, $locale = null)
     {
         $search = $this->createSearch($limit, $types, $locale);
 
@@ -99,11 +102,11 @@ class ArticleViewDocumentRepository
      * @param string $uuid
      * @param int $limit
      * @param null|array $types
-     * @param string $locale
+     * @param null|string $locale
      *
      * @return DocumentIterator
      */
-    public function findSimilar($uuid, $limit, array $types = null, $locale)
+    public function findSimilar($uuid, $limit = self::DEFAULT_LIMIT, array $types = null, $locale = null)
     {
         $search = $this->createSearch($limit, $types, $locale);
 
@@ -123,21 +126,27 @@ class ArticleViewDocumentRepository
     }
 
     /**
-     * Creates search with default queries.
+     * Creates search with default queries (size, locale, types).
      *
      * @param int $limit
      * @param null|array $types
-     * @param string $locale
+     * @param null|string $locale
      *
      * @return Search
      */
-    private function createSearch($limit, array $types = null, $locale)
+    private function createSearch($limit, array $types = null, $locale = null)
     {
         $search = $this->repository->createSearch();
 
-        $search->addQuery(new TermQuery('locale', $locale), BoolQuery::FILTER);
+        // set size
         $search->setSize($limit);
 
+        // filter by locale if provided
+        if ($locale) {
+            $search->addQuery(new TermQuery('locale', $locale), BoolQuery::FILTER);
+        }
+
+        // filter by types if provided
         if ($types) {
             $typesQuery = new BoolQuery();
             foreach ($types as $type) {

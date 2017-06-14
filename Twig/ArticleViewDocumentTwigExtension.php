@@ -99,8 +99,11 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      *
      * @return ArticleResourceItem[]
      */
-    public function loadRecent($limit = 5, array $types = null, $locale = null)
-    {
+    public function loadRecent(
+        $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
+        array $types = null,
+        $locale = null
+    ) {
         $excludeUuid = null;
 
         /** @var Request $request */
@@ -135,8 +138,11 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      *
      * @return ArticleResourceItem[]
      */
-    public function loadSimilar($limit = 5, array $types = null, $locale = null)
-    {
+    public function loadSimilar(
+        $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
+        array $types = null,
+        $locale = null
+    ) {
         $uuid = null;
 
         $request = $this->requestStack->getCurrentRequest();
