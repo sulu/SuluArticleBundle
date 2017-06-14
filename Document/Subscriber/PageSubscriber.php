@@ -41,6 +41,7 @@ class PageSubscriber implements EventSubscriberInterface
      * @var PropertyEncoder
      */
     private $propertyEncoder;
+
     /**
      * @var DocumentManagerInterface
      */

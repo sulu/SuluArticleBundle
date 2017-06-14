@@ -77,6 +77,7 @@ class ArticleJsConfig implements JsConfigInterface
                 $config['types'][$type] = [
                     'default' => $structure->getKey(),
                     'title' => $this->getTitle($type),
+                    'multipage' => $this->getMultipage($type),
                 ];
             }
         }
@@ -106,5 +107,21 @@ class ArticleJsConfig implements JsConfigInterface
         }
 
         return $this->typeConfiguration[$type]['translation_key'];
+    }
+
+    /**
+     * Returns multipage configuration for given type.
+     *
+     * @param string $type
+     *
+     * @return array
+     */
+    private function getMultipage($type)
+    {
+        if (!array_key_exists($type, $this->typeConfiguration)) {
+            return ['enabled' => false];
+        }
+
+        return $this->typeConfiguration[$type]['multipage'];
     }
 }

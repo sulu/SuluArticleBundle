@@ -651,6 +651,10 @@ define([
         },
 
         startPageSwitcher: function() {
+            if (!this.options.config[(this.options.type || this.data.articleType)].multipage.enabled) {
+                return;
+            }
+
             var page = this.options.page,
                 pages = this.data._embedded.pages || [],
                 max = pages.length + 1,
