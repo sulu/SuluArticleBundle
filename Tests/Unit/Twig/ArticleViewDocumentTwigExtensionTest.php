@@ -35,7 +35,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         $articleViewDocumentRepository->findSimilar(
             $articleDocuments[0]->getUuid(),
             [
-                $articleDocuments[0]->getStructureType()
+                $articleDocuments[0]->getStructureType(),
             ],
             $articleDocuments[0]->getLocale(),
             5
@@ -82,7 +82,7 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
         $articleViewDocumentRepository->findRecent(
             $articleDocuments[0]->getUuid(),
             [
-                $articleDocuments[0]->getStructureType()
+                $articleDocuments[0]->getStructureType(),
             ],
             $articleDocuments[0]->getLocale(),
             5

@@ -60,7 +60,7 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',
-            '/api/articles?locale=' . self::LOCALE .'&action=publish',
+            '/api/articles?locale=' . self::LOCALE . '&action=publish',
             ['title' => $title, 'template' => $template]
         );
 

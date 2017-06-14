@@ -54,7 +54,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->articleViewDocumentRepository = new ArticleViewDocumentRepository(
             $this->searchManager->reveal(),
             ArticleViewDocument::class,
-            ['title','teaser_description']
+            ['title', 'teaser_description']
         );
     }
 
@@ -62,7 +62,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [],
-            ['123-123-123', ['blog','article']],
+            ['123-123-123', ['blog', 'article']],
             ['321-321-321', ['blog'], 'en', 10],
         ];
     }
@@ -80,7 +80,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $termQuery = [];
         foreach ($types as $type) {
             $termQuery[] = [
-                'term' => ['type' => $type]
+                'term' => ['type' => $type],
             ];
         }
 
@@ -89,7 +89,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
                 'filter' => [
                     [
                         'term' => ['locale' => $locale],
-                    ]
+                    ],
                 ],
                 'must' => [
                     [
@@ -99,15 +99,15 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
                     ],
                     [
                         'more_like_this' => [
-                            'like' => NULL,
+                            'like' => null,
                             'fields' => ['title', 'teaser_description'],
                             'min_term_freq' => 1,
                             'min_doc_freq' => 2,
                             'ids' => [$uuid . '-' . $locale],
-                        ]
-                    ]
-                ]
-            ]
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
@@ -142,7 +142,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $termQuery = [];
         foreach ($types as $type) {
             $termQuery[] = [
-                'term' => ['type' => $type]
+                'term' => ['type' => $type],
             ];
         }
 
@@ -151,23 +151,23 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
                 'filter' => [
                     [
                         'term' => ['locale' => $locale],
-                    ]
+                    ],
                 ],
                 'must' => [
                     [
                         'bool' => [
                             'should' => $termQuery,
                         ],
-                    ]
+                    ],
                 ],
                 'must_not' => [
                     [
                         'term' => [
                             'uuid' => $excludeUuid,
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
