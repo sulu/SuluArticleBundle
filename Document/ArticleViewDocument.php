@@ -78,6 +78,13 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
+     * @Property(type="string", options={"analyzer": "keyword"})
+     */
+    protected $parentPageUuid;
+
+    /**
+     * @var string
+     *
      * @Property(
      *     type="string",
      *     options={
@@ -348,6 +355,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentPageUuid()
+    {
+        return $this->parentPageUuid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParentPageUuid($parentPageUuid)
+    {
+        $this->parentPageUuid = $parentPageUuid;
+
+        return $this;
     }
 
     /**

@@ -99,6 +99,22 @@ interface ArticleViewDocumentInterface
     public function setRoutePath($routePath);
 
     /**
+     * Returns parent-page-uuid.
+     *
+     * @return string
+     */
+    public function getParentPageUuid();
+
+    /**
+     * Set parent-page-uuid.
+     *
+     * @param string $parentPageUuid
+     *
+     * @return $this
+     */
+    public function setParentPageUuid($parentPageUuid);
+
+    /**
      * Returns type.
      *
      * @return string
