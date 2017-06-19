@@ -416,6 +416,7 @@ define([
                             el: $componentContainer,
                             locale: this.options.locale,
                             data: {author: this.data.author, authored: this.data.authored},
+                            nullableAuthor: true,
                             selectCallback: function(data) {
                                 this.setAuthor(data);
 
