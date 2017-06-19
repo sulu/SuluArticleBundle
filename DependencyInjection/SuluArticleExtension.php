@@ -84,11 +84,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 'sulu_document_manager',
                 [
                     'mapping' => [
-                        'article' => [
-                            'class' => ArticleDocument::class,
-                            'phpcr_type' => 'sulu:article',
-                            'set_default_author' => false,
-                        ],
+                        'article' => ['class' => ArticleDocument::class, 'phpcr_type' => 'sulu:article'],
                         'article_page' => ['class' => ArticlePageDocument::class, 'phpcr_type' => 'sulu:articlepage'],
                     ],
                     'path_segments' => [
@@ -170,5 +166,26 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if ($config['content_types']['page_tree_route']['page_route_cascade'] !== 'off') {
             $loader->load('page_tree_update.xml');
         }
+
+        $this->appendDefaultAuthor($config, $container);
+    }
+
+    /**
+     * Append configuration for article "set_default_author".
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function appendDefaultAuthor(array $config, ContainerBuilder $container)
+    {
+        $mapping = $container->getParameter('sulu_document_manager.mapping');
+        foreach ($mapping as $key => $item) {
+            if ($item['alias'] === 'article') {
+                $mapping[$key]['set_default_author'] = $config['default_author'];
+            }
+        }
+
+        $container->setParameter('sulu_document_manager.mapping', $mapping);
+        $container->setParameter('sulu_article.default_author', $config['default_author']);
     }
 }

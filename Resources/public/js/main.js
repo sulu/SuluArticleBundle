@@ -60,7 +60,8 @@ define([
                     settingsKey: 'articleLanguage',
                     typeNames: Object.keys(Config.get('sulu_article').types),
                     types: Config.get('sulu_article').types,
-                    displayTabAll: Config.get('sulu_article').displayTabAll
+                    displayTabAll: Config.get('sulu_article').displayTabAll,
+                    defaultAuthor: Config.get('sulu_article').defaultAuthor
                 };
             Config.set('sulu_article', config);
 
