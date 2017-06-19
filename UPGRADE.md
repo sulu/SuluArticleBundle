@@ -2,6 +2,21 @@
 
 ## dev-develop
 
+### Index mapping has changed
+
+Recreate the index and reindex your articles:
+
+```bash
+bin/adminconsole ongr:es:index:drop -m default --force
+bin/websiteconsole ongr:es:index:drop -m live --force
+
+bin/adminconsole ongr:es:index:create -m default
+bin/websiteconsole ongr:es:index:create -m live
+
+bin/adminconsole sulu:article:index-rebuild ###LOCALE###
+bin/websiteconsole sulu:article:index-rebuild ###LOCALE### -live
+```
+
 ### DocumentManager
 
 Removed persist option `route_path` use the method `setRoutePath` instead.
@@ -66,6 +81,9 @@ with the cachelifetime resolver.
 ## 0.2.0
 
 Reindex elastic search indexes:
-* bin/adminconsole sulu:article:index-rebuild ###LOCALE### -live
-* bin/adminconsole sulu:article:index-rebuild ###LOCALE###
+
+```bash
+bin/adminconsole sulu:article:index-rebuild ###LOCALE### -live
+bin/adminconsole sulu:article:index-rebuild ###LOCALE###
+```
 

@@ -15,11 +15,13 @@ use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
+use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
@@ -29,6 +31,8 @@ use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -177,6 +181,7 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
+        $this->setParentPageUuid($structureMetadata, $document, $article);
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
@@ -282,6 +287,56 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $article->setPages(new Collection($pages));
+    }
+
+    /**
+     * Set parent-page-uuid to view-document.
+     *
+     * @param StructureMetadata $metadata
+     * @param ArticleDocument $document
+     * @param ArticleViewDocumentInterface $article
+     */
+    private function setParentPageUuid(
+        StructureMetadata $metadata,
+        ArticleDocument $document,
+        ArticleViewDocumentInterface $article
+    ) {
+        $propertyMetadata = $this->getRoutePathProperty($metadata);
+        if (!$propertyMetadata) {
+            return;
+        }
+
+        $property = $document->getStructure()->getProperty($propertyMetadata->getName());
+        if (!$property || $propertyMetadata->getType() !== PageTreeRouteContentType::NAME || !$property->getValue()) {
+            return;
+        }
+
+        $value = $property->getValue();
+        if (!$value || !isset($value['page']) || !isset($value['page']['uuid'])) {
+            return;
+        }
+
+        $article->setParentPageUuid($value['page']['uuid']);
+    }
+
+    /**
+     * Returns property-metadata for route-path property.
+     *
+     * @param StructureMetadata $metadata
+     *
+     * @return PropertyMetadata
+     */
+    private function getRoutePathProperty(StructureMetadata $metadata)
+    {
+        if ($metadata->hasTag(RoutableSubscriber::TAG_NAME)) {
+            return $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME);
+        }
+
+        if (!$metadata->hasProperty(RoutableSubscriber::ROUTE_FIELD)) {
+            return;
+        }
+
+        return $metadata->getProperty(RoutableSubscriber::ROUTE_FIELD);
     }
 
     /**

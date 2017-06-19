@@ -55,18 +55,19 @@ class ReindexCommand extends ContainerAwareCommand
 
         $indexer = $this->getContainer()->get($id);
         $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $query = $documentManager->createQuery($sql2);
+        $query = $documentManager->createQuery($sql2, $input->getArgument('locale'));
 
         if ($input->getOption('clear')) {
             $indexer->clear();
         }
 
-        $progessBar = new ProgressBar($output);
-        $progessBar->setFormat('debug_nomax');
+        $result = $query->execute();
+
+        $progessBar = new ProgressBar($output, count($result));
+        $progessBar->setFormat('debug');
         $progessBar->start();
 
-        $query->setLocale($input->getArgument('locale'));
-        foreach ($query->execute() as $document) {
+        foreach ($result as $document) {
             $indexer->index($document);
             $progessBar->advance();
         }
