@@ -84,7 +84,11 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 'sulu_document_manager',
                 [
                     'mapping' => [
-                        'article' => ['class' => ArticleDocument::class, 'phpcr_type' => 'sulu:article'],
+                        'article' => [
+                            'class' => ArticleDocument::class,
+                            'phpcr_type' => 'sulu:article',
+                            'set_default_author' => false,
+                        ],
                         'article_page' => ['class' => ArticlePageDocument::class, 'phpcr_type' => 'sulu:articlepage'],
                     ],
                     'path_segments' => [
