@@ -266,6 +266,7 @@ define([
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
             this.sandbox.on('sulu.article.error', this.handleError.bind(this));
+            this.sandbox.on('sulu.article.update-page-switcher', this.updatePageSwitcher.bind(this));
             this.sandbox.on('husky.tabs.header.item.select', this.tabChanged.bind(this));
             this.sandbox.on('sulu.header.language-changed', this.languageChanged.bind(this));
         },
@@ -651,11 +652,6 @@ define([
         },
 
         startPageSwitcher: function() {
-            var template = this.data.template || this.options.config.types[this.options.type].default;
-            if (!this.options.config.templates[template].multipage.enabled) {
-                return;
-            }
-
             var page = this.options.page,
                 pages = this.data._embedded.pages || [],
                 max = pages.length + 1,
@@ -709,6 +705,17 @@ define([
                     }.bind(this)
                 }
             }]);
+
+            this.updatePageSwitcher();
+        },
+
+        updatePageSwitcher: function(template) {
+            template = template || this.data.template || this.options.config.types[this.options.type].default;
+            if (!this.options.config.templates[template].multipage.enabled) {
+                return this.$dropdownElement.hide();
+            }
+
+            this.$dropdownElement.show();
         },
 
         orderPages: function() {

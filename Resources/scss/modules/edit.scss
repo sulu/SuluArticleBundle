@@ -3,6 +3,11 @@ $toolbarRowPageChangerColor: $white !default;
 .sulu-header .toolbar-row .right-container.wide {
     width: 200px;
 
+    .language-changer {
+        float: right;
+        margin-right: 15px;
+    }
+
     .page-changer {
         display: inline-block;
         vertical-align: top;

@@ -162,6 +162,8 @@ define([
                 this.data = this.sandbox.util.extend({}, data, this.data);
             }
 
+            this.sandbox.emit('sulu.article.update-page-switcher', template);
+
             require([this.getTemplateUrl(template)], this.renderFormTemplate.bind(this));
         },
 
