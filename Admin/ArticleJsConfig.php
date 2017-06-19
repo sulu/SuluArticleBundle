@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\JsConfigInterface;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleJsConfig implements JsConfigInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var StructureManagerInterface
@@ -67,6 +67,7 @@ class ArticleJsConfig implements JsConfigInterface
     {
         $config = [
             'types' => [],
+            'templates' => [],
             'displayTabAll' => $this->displayTabAll,
             'defaultAuthor' => $this->defaultAuthor,
         ];
@@ -77,9 +78,12 @@ class ArticleJsConfig implements JsConfigInterface
                 $config['types'][$type] = [
                     'default' => $structure->getKey(),
                     'title' => $this->getTitle($type),
-                    'multipage' => $this->getMultipage($type),
                 ];
             }
+
+            $config['templates'][$structure->getKey()] = [
+                'multipage' => ['enabled' => $this->getMultipage($structure->getStructure())],
+            ];
         }
 
         return $config;
@@ -107,21 +111,5 @@ class ArticleJsConfig implements JsConfigInterface
         }
 
         return $this->typeConfiguration[$type]['translation_key'];
-    }
-
-    /**
-     * Returns multipage configuration for given type.
-     *
-     * @param string $type
-     *
-     * @return array
-     */
-    private function getMultipage($type)
-    {
-        if (!array_key_exists($type, $this->typeConfiguration)) {
-            return ['enabled' => false];
-        }
-
-        return $this->typeConfiguration[$type]['multipage'];
     }
 }

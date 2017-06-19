@@ -651,7 +651,8 @@ define([
         },
 
         startPageSwitcher: function() {
-            if (!this.options.config[(this.options.type || this.data.articleType)].multipage.enabled) {
+            var template = this.data.template || this.options.config.types[this.options.type].default;
+            if (!this.options.config.templates[template].multipage.enabled) {
                 return;
             }
 

@@ -82,7 +82,6 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode('translation_key')->end()
-                            ->arrayNode('multipage')->canBeEnabled()->end()
                         ->end()
                     ->end()
                 ->end()

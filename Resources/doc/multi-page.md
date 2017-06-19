@@ -6,13 +6,25 @@ so the same content-structure.
 
 ## Configuration
 
-Enable the feature in your type-configuration.
+Enable the feature in your template.
 
 ```yml
-sulu_article:
-    types:
-        customtype:
-            multipage: true
+<?xml version="1.0" ?>
+<template xmlns="http://schemas.sulu.io/template/template"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
+
+    <key>article</key>
+    
+    ...
+
+    <tag name="sulu_article.multipage" enabled="true"/>
+
+    <properties>
+        ...
+    </properties>
+</template>
 ```
 
 ## Routing
