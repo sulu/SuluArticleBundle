@@ -118,7 +118,6 @@ php bin/console ongr:es:index:create --manager=live
 ```yml
 # app/config/config.yml
 
-# Default configuration for extension with alias: "sulu_article"
 sulu_article:
     smart_content:
         default_limit:        100
@@ -141,6 +140,9 @@ sulu_article:
 
     # Display tab 'all' in list view
     display_tab_all:      true
+
+    # Set default author if none isset
+    default_author:       true
     search_fields:
 
         # Defaults:
@@ -152,5 +154,3 @@ sulu_article:
         - excerpt.seo.keywords
         - teaser_description
 ```
-
-
