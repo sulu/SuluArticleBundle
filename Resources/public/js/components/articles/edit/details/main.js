@@ -200,6 +200,9 @@ define([
 
             var data = this.options.adapter.prepareData(this.data, this);
             if (data.type && data.type.name === 'ghost') {
+                var titleProperty = this.getTitleProperty(),
+                    pageTitleProperty = this.getPageTitleProperty();
+
                 this.ghost = {
                     locale: data.type.value,
                     title: titleProperty ? data[titleProperty.name] : '',
