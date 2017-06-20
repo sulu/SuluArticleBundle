@@ -56,7 +56,7 @@ sulu_core:
 ```yml
 # app/config/admin/routing.yml
 
-sulu_arictle_api:
+sulu_article_api:
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
     type: rest
     prefix: /admin/api
