@@ -85,7 +85,8 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('display_tab_all')->defaultTrue()->info("Display tab 'all' in list view")->end()
+                ->scalarNode('display_tab_all')->defaultTrue()->info('Display tab \'all\' in list view')->end()
+                ->scalarNode('default_author')->defaultTrue()->info('Set default author if none isset')->end()
                 ->arrayNode('search_fields')
                     ->prototype('scalar')->end()->defaultValue([
                         'title',

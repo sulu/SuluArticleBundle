@@ -180,11 +180,14 @@ define([
          *
          * @param {String} fullName
          * @param {Object} date
+         * @param {Boolean} remove
          */
-        setAuthorChangelog: function(fullName, date) {
+        setAuthorChangelog: function(fullName, date, remove) {
             var authoredText, formattedDate = this.sandbox.date.format(date);
 
-            fullName = fullName || this.authorFullname;
+            if (!fullName && !remove) {
+                fullName = this.authorFullname;
+            }
 
             if (!!fullName) {
                 this.authorFullname = fullName;
@@ -196,6 +199,7 @@ define([
                     }
                 );
             } else {
+                this.authorFullname = null;
                 authoredText = this.sandbox.util.sprintf(
                     this.translations.authoredOnly,
                     {
@@ -416,6 +420,7 @@ define([
                             el: $componentContainer,
                             locale: this.options.locale,
                             data: {author: this.data.author, authored: this.data.authored},
+                            nullableAuthor: !this.options.config.defaultAuthor,
                             selectCallback: function(data) {
                                 this.setAuthor(data);
 
@@ -431,14 +436,14 @@ define([
             this.setDirty();
 
             this.data.authored = data.authored;
+            this.data.author = data.author;
             if (!data.authorItem) {
-                this.setAuthorChangelog(null, new Date(data.authored));
+                this.setAuthorChangelog(null, new Date(data.authored), true);
 
                 return;
             }
 
             this.setAuthorChangelog(data.authorItem.firstName + ' ' + data.authorItem.lastName, new Date(data.authored));
-            this.data.author = data.author;
         },
 
         restoreVersion: function(versionId, version) {

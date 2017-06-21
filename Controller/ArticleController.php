@@ -450,6 +450,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             throw new InvalidFormException($form);
         }
 
+        if (array_key_exists('author', $data) && null === $data['author']) {
+            $document->setAuthor(null);
+        }
+
         $this->getDocumentManager()->persist(
             $document,
             $locale,

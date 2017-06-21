@@ -20,6 +20,7 @@
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_article.display_tab_all%</argument>
+            <argument>%sulu_article.default_author%</argument>
 
             <tag name="sulu.js_config"/>
             <tag name="sulu.context" context="admin"/>
