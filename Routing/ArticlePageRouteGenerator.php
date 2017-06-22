@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Routing;
 
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Generator\TokenProviderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticlePageRouteGenerator implements RouteGeneratorInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var RouteGeneratorInterface

@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class TemplateController extends Controller
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * Returns template for given article type.

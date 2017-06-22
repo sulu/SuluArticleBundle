@@ -4,6 +4,11 @@
   width: 200px;
 }
 /* line 6, ../../scss/modules/edit.scss */
+.sulu-header .toolbar-row .right-container.wide .language-changer {
+  float: right;
+  margin-right: 15px;
+}
+/* line 11, ../../scss/modules/edit.scss */
 .sulu-header .toolbar-row .right-container.wide .page-changer {
   display: inline-block;
   vertical-align: top;
@@ -17,17 +22,17 @@
   position: relative;
   cursor: pointer;
 }
-/* line 19, ../../scss/modules/edit.scss */
+/* line 24, ../../scss/modules/edit.scss */
 .sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-toggle {
   display: inline-block;
   vertical-align: top;
   padding: 0 8px 0 10px;
 }
-/* line 24, ../../scss/modules/edit.scss */
+/* line 29, ../../scss/modules/edit.scss */
 .sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-toggle:after {
   border-top: 6px solid #fff;
 }
-/* line 29, ../../scss/modules/edit.scss */
+/* line 34, ../../scss/modules/edit.scss */
 .sulu-header .toolbar-row .right-container.wide .page-changer .dropdown-menu {
   right: 0;
   left: auto;
@@ -38,16 +43,16 @@
   color: #000;
 }
 
-/* line 42, ../../scss/modules/edit.scss */
+/* line 47, ../../scss/modules/edit.scss */
 .article-form #content-form .highlight-section .grid-row:last-child {
   margin-bottom: 0;
 }
-/* line 46, ../../scss/modules/edit.scss */
+/* line 51, ../../scss/modules/edit.scss */
 .article-form #content-form .highlight-section .article-title {
   width: 870px;
   padding-left: 0;
 }
-/* line 50, ../../scss/modules/edit.scss */
+/* line 55, ../../scss/modules/edit.scss */
 .article-form #content-form .highlight-section .article-title .content-title.underlined {
   margin-top: 10px;
   border-bottom: 2px solid #999;

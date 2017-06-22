@@ -16,7 +16,7 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
@@ -29,7 +29,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
     const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
 
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var StructureManagerInterface

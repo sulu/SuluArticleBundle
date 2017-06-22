@@ -266,6 +266,7 @@ define([
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
             this.sandbox.on('sulu.article.error', this.handleError.bind(this));
+            this.sandbox.on('sulu.article.update-page-switcher', this.updatePageSwitcher.bind(this));
             this.sandbox.on('husky.tabs.header.item.select', this.tabChanged.bind(this));
             this.sandbox.on('sulu.header.language-changed', this.languageChanged.bind(this));
         },
@@ -704,6 +705,22 @@ define([
                     }.bind(this)
                 }
             }]);
+
+            this.updatePageSwitcher();
+        },
+
+        /**
+         * Updates visibility of page-switcher for given template.
+         *
+         * @param {String} template
+         */
+        updatePageSwitcher: function(template) {
+            template = template || this.data.template || this.options.config.types[this.options.type].default;
+            if (!this.options.config.templates[template].multipage.enabled) {
+                return this.$dropdownElement.hide();
+            }
+
+            this.$dropdownElement.show();
         },
 
         orderPages: function() {

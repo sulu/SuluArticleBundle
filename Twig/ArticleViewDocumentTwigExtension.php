@@ -18,7 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
 use Sulu\Bundle\ArticleBundle\Exception\ArticleInRequestNotFoundException;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ArticleViewDocumentTwigExtension extends \Twig_Extension
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var ArticleViewDocumentRepository

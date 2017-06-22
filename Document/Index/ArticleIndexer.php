@@ -24,8 +24,8 @@ use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
@@ -41,7 +41,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ArticleIndexer implements IndexerInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
     use ArticleViewDocumentIdTrait;
 
     /**
