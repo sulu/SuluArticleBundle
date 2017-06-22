@@ -28,7 +28,7 @@
             </trans-unit>
             <trans-unit id="7" resname="sulu_article.authored">
                 <source>sulu_article.authored</source>
-                <target>Créé à</target>
+                <target>Rédigé le</target>
             </trans-unit>
             <trans-unit id="8" resname="sulu_article.author">
                 <source>sulu_article.author</source>
@@ -45,6 +45,122 @@
             <trans-unit id="11" resname="sulu_article.ckeditor.link">
                 <source>sulu_article.ckeditor.link</source>
                 <target>Article</target>
+            </trans-unit>
+            <trans-unit id="12" resname="sulu_article.selection.no-result">
+                <source>sulu_article.selection.no-result</source>
+                <target>Aucun article séléctionné</target>
+            </trans-unit>
+            <trans-unit id="13" resname="sulu_article.settings.open-ghost-overlay.info">
+                <source>sulu_article.settings.open-ghost-overlay.info</source>
+                <target><![CDATA[Cet article n'existe pas dans cette langue.<br/>Veuillez sélectionner une des options suivantes:]]></target>
+            </trans-unit>
+            <trans-unit id="14" resname="sulu_article.settings.open-ghost-overlay.new">
+                <source>sulu_article.settings.open-ghost-overlay.new</source>
+                <target><![CDATA[Créer un nouvel <b>article vide</b> dans cette langue]]></target>
+            </trans-unit>
+            <trans-unit id="15" resname="sulu_article.settings.open-ghost-overlay.copy">
+                <source>sulu_article.settings.open-ghost-overlay.copy</source>
+                <target><![CDATA[Créer un nouvel article dans cette langue et <b>copier le contenu depuis</b>:]]></target>
+            </trans-unit>
+            <trans-unit id="16" resname="sulu_article.settings.open-ghost-overlay.ok">
+                <source>sulu_article.settings.open-ghost-overlay.ok</source>
+                <target>Créer un article</target>
+            </trans-unit>
+            <trans-unit id="17" resname="sulu_article.settings.copy-locale-overlay.info">
+                <source>sulu_article.settings.copy-locale-overlay.info</source>
+                <target>Un nouvel article va être créé</target>
+            </trans-unit>
+            <trans-unit id="18" resname="sulu_article.form.settings.changelog">
+                <source>sulu_article.form.settings.changelog</source>
+                <target>Historique des modifications</target>
+            </trans-unit>
+            <trans-unit id="19" resname="sulu_article.form.settings.changelog.changed">
+                <source>sulu_article.form.settings.changelog.changed</source>
+                <target>Dernière modification par %(changer)s le %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="20" resname="sulu_article.form.settings.changelog.changed-only">
+                <source>sulu_article.form.settings.changelog.changed-only</source>
+                <target>Dernière modification le %(changed)s</target>
+            </trans-unit>
+            <trans-unit id="21" resname="sulu_article.form.settings.changelog.created">
+                <source>sulu_article.form.settings.changelog.created</source>
+                <target>Créé par %(creator)s le %(created)s</target>
+            </trans-unit>
+            <trans-unit id="22" resname="sulu_article.form.settings.changelog.created-only">
+                <source>sulu_article.form.settings.changelog.created-only</source>
+                <target>Créé par %(created)s</target>
+            </trans-unit>
+            <trans-unit id="23" resname="sulu_article.form.settings.changelog.authored">
+                <source>sulu_article.form.settings.changelog.authored</source>
+                <target>Rédigé par %(author)s le %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="24" resname="sulu_article.form.settings.changelog.authored-only">
+                <source>sulu_article.form.settings.changelog.authored-only</source>
+                <target>Rédigé le %(authored)s</target>
+            </trans-unit>
+            <trans-unit id="25" resname="sulu_article.smart-content.published">
+                <source>sulu_article.smart-content.published</source>
+                <target>Publié (date)</target>
+            </trans-unit>
+            <trans-unit id="26" resname="sulu_article.smart-content.authored">
+                <source>sulu_article.smart-content.authored</source>
+                <target>Rédigé (date)</target>
+            </trans-unit>
+            <trans-unit id="27" resname="sulu_article.smart-content.created">
+                <source>sulu_article.smart-content.created</source>
+                <target>Créé (date)</target>
+            </trans-unit>
+            <trans-unit id="28" resname="sulu_article.smart-content.title">
+                <source>sulu_article.smart-content.title</source>
+                <target>Titre (alphabétique)</target>
+            </trans-unit>
+            <trans-unit id="29" resname="sulu_article.smart-content.author-full-name">
+                <source>sulu_article.smart-content.author-full-name</source>
+                <target>Auteur (alphabétique)</target>
+            </trans-unit>
+            <trans-unit id="list-filter-01" resname="sulu_article.list.filter.me">
+                <source>sulu_article.list.filter.me</source>
+                <target>Uniquement les miens</target>
+            </trans-unit>
+            <trans-unit id="list-filter-02" resname="sulu_article.list.filter.all">
+                <source>sulu_article.list.filter.all</source>
+                <target>Tout</target>
+            </trans-unit>
+            <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by-author">
+                <source>sulu_article.list.filter.by-author</source>
+                <target>Uniquement de</target>
+            </trans-unit>
+            <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
+                <source>sulu_article.list.filter.by-category</source>
+                <target>Uniquement par catégorie</target>
+            </trans-unit>
+            <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
+                <source>sulu_article.contact-selection-overlay.title</source>
+                <target>Filtrer les articles par contact</target>
+            </trans-unit>
+            <trans-unit id="copy-01">
+                <source>sulu_article.edit.copy</source>
+                <target>Copier l'article</target>
+            </trans-unit>
+            <trans-unit id="edit-delete-page">
+                <source>sulu_article.edit.delete_page</source>
+                <target>Supprimer la page</target>
+            </trans-unit>
+            <trans-unit id="multi-page-01">
+                <source>sulu_article.edit.page-of</source>
+                <target>Page %s de %s</target>
+            </trans-unit>
+            <trans-unit id="multi-page-02">
+                <source>sulu_article.edit.new-page</source>
+                <target>Créer une nouvelle page</target>
+            </trans-unit>
+            <trans-unit id="multi-page-03">
+                <source>sulu_article.edit.order-page</source>
+                <target>Ordre des pages</target>
+            </trans-unit>
+            <trans-unit id="multi-page-04">
+                <source>sulu_article.edit.page</source>
+                <target>Page</target>
             </trans-unit>
         </body>
     </file>
