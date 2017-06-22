@@ -19,7 +19,7 @@ Enable the feature in your template.
     
     ...
 
-    <tag name="sulu_article.multipage" enabled="true"/>
+    <tag name="sulu_article.multi_page" enabled="true"/>
 
     <properties>
         ...

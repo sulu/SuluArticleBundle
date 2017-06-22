@@ -709,6 +709,11 @@ define([
             this.updatePageSwitcher();
         },
 
+        /**
+         * Updates visibility of page-switcher for given template.
+         *
+         * @param {String} template
+         */
         updatePageSwitcher: function(template) {
             template = template || this.data.template || this.options.config.types[this.options.type].default;
             if (!this.options.config.templates[template].multipage.enabled) {

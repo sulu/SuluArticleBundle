@@ -11,8 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\SerializationContext;
 use PhpCollection\Map;

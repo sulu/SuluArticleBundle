@@ -32,7 +32,7 @@ trait StructureTagTrait
     }
 
     /**
-     * Returns multipage-status for given structure-metadata.
+     * Returns multipage-configuration for given structure-metadata.
      *
      * @param StructureMetadata $metadata
      *

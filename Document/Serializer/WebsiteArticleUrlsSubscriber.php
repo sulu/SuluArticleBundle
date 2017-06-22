@@ -11,13 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 
-use Doctrine\ORM\NoResultException;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\RequestStack;
