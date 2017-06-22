@@ -168,6 +168,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
 
         $this->appendDefaultAuthor($config, $container);
+        $this->appendArticlePageConfig($container);
     }
 
     /**
@@ -187,5 +188,39 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
         $container->setParameter('sulu_document_manager.mapping', $mapping);
         $container->setParameter('sulu_article.default_author', $config['default_author']);
+    }
+
+    /**
+     * Append configuration for article-page (cloned from article).
+     *
+     * @param ContainerBuilder $container
+     */
+    private function appendArticlePageConfig(ContainerBuilder $container)
+    {
+        $paths = $container->getParameter('sulu.content.structure.paths');
+        $paths['article_page'] = $this->cloneArticleConfig($paths['article'], 'article_page');
+        $container->setParameter('sulu.content.structure.paths', $paths);
+
+        $defaultTypes = $container->getParameter('sulu.content.structure.default_types');
+        $defaultTypes['article_page'] = $defaultTypes['article'];
+        $container->setParameter('sulu.content.structure.default_types', $defaultTypes);
+    }
+
+    /**
+     * Clone given path configuration and use given type.
+     *
+     * @param array $config
+     * @param string $type
+     *
+     * @return array
+     */
+    private function cloneArticleConfig(array $config, $type)
+    {
+        $result = [];
+        foreach ($config as $item) {
+            $result[] = ['path' => $item['path'], 'type' => $type];
+        }
+
+        return $result;
     }
 }
