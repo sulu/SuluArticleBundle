@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\JsConfigInterface;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleJsConfig implements JsConfigInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var StructureManagerInterface
@@ -38,18 +38,26 @@ class ArticleJsConfig implements JsConfigInterface
     private $displayTabAll;
 
     /**
+     * @var bool
+     */
+    private $defaultAuthor;
+
+    /**
      * @param StructureManagerInterface $structureManager
      * @param array $typeConfiguration
      * @param bool $displayTabAll
+     * @param bool $defaultAuthor
      */
     public function __construct(
         StructureManagerInterface $structureManager,
         array $typeConfiguration,
-        $displayTabAll
+        $displayTabAll,
+        $defaultAuthor
     ) {
         $this->structureManager = $structureManager;
         $this->typeConfiguration = $typeConfiguration;
         $this->displayTabAll = $displayTabAll;
+        $this->defaultAuthor = $defaultAuthor;
     }
 
     /**
@@ -59,7 +67,9 @@ class ArticleJsConfig implements JsConfigInterface
     {
         $config = [
             'types' => [],
+            'templates' => [],
             'displayTabAll' => $this->displayTabAll,
+            'defaultAuthor' => $this->defaultAuthor,
         ];
 
         foreach ($this->structureManager->getStructures('article') as $structure) {
@@ -70,6 +80,10 @@ class ArticleJsConfig implements JsConfigInterface
                     'title' => $this->getTitle($type),
                 ];
             }
+
+            $config['templates'][$structure->getKey()] = [
+                'multipage' => ['enabled' => $this->getMultipage($structure->getStructure())],
+            ];
         }
 
         return $config;

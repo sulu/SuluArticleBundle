@@ -11,8 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\SerializationContext;
 use PhpCollection\Map;
@@ -86,50 +84,18 @@ class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
         $event->getContext()->willReturn($context->reveal());
 
         $expected = ['de' => '/seite', 'en' => '/page'];
-        $query = $this->mockQuery();
 
         $entityClass = get_class($article->reveal());
         foreach ($expected as $locale => $path) {
             $route = $this->prophesize(RouteInterface::class);
             $route->getPath()->willReturn($path);
 
-            $localedQuery = $this->prophesize(AbstractQuery::class);
-            $query->setParameters(['entityClass' => $entityClass, 'entityId' => $entityId, 'locale' => $locale])
-                ->willReturn($localedQuery->reveal());
-
-            $localedQuery->getSingleResult()->willReturn($route->reveal());
+            $this->routeRepository->findByEntity($entityClass, $entityId, $locale)->willReturn($route->reveal());
         }
 
         $context->accept($expected)->willReturn($expected)->shouldBeCalled();
         $visitor->addData('urls', $expected)->shouldBeCalled();
 
         $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
-    }
-
-    /**
-     * @return \Prophecy\Prophecy\ObjectProphecy
-     */
-    private function mockQuery()
-    {
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $queryBuilder->andWhere('entity.entityClass = :entityClass')
-            ->shouldBeCalled()
-            ->willReturn($queryBuilder->reveal());
-        $queryBuilder->andWhere('entity.entityId = :entityId')
-            ->shouldBeCalled()
-            ->willReturn($queryBuilder->reveal());
-        $queryBuilder->andWhere('entity.locale = :locale')
-            ->shouldBeCalled()
-            ->willReturn($queryBuilder->reveal());
-        $queryBuilder->andWhere('entity.history = false')
-            ->shouldBeCalled()
-            ->willReturn($queryBuilder->reveal());
-
-        $query = $this->prophesize(AbstractQuery::class);
-
-        $this->routeRepository->createQueryBuilder('entity')->willReturn($queryBuilder->reveal());
-        $queryBuilder->getQuery()->willReturn($query->reveal());
-
-        return $query;
     }
 }

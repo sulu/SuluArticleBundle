@@ -11,21 +11,29 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Component\SmartContent\ItemInterface;
 
 /**
  * Represents a data-item for smart-content data-provider.
+ *
+ * @ExclusionPolicy("all")
  */
 class ArticleDataItem implements ItemInterface
 {
     /**
      * @var string
+     *
+     * @Expose
      */
     private $id;
 
     /**
      * @var string
+     *
+     * @Expose
      */
     private $title;
 

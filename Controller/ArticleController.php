@@ -35,6 +35,8 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
+use Sulu\Component\Security\Authorization\PermissionTypes;
+use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -204,7 +206,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -229,7 +233,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -265,7 +271,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -345,7 +353,19 @@ class ArticleController extends RestController implements ClassResourceInterface
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
-                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    $destLocales = explode(',', $destLocales);
+
+                    $securityChecker = $this->get('sulu_security.security_checker');
+                    foreach ($destLocales as $destLocale) {
+                        $securityChecker->checkPermission(
+                            new SecurityCondition($this->getSecurityContext(), $destLocale),
+                            PermissionTypes::EDIT
+                        );
+                    }
+
+                    $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
@@ -355,18 +375,45 @@ class ArticleController extends RestController implements ClassResourceInterface
 
                     $data = $this->getDocumentManager()->find($copiedPath, $locale);
                     break;
+                case 'order':
+                    $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
+                    $this->getDocumentManager()->flush();
+                    $this->getDocumentManager()->clear();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
             }
 
             // prepare view
-            $view = $this->view($data, $data !== null ? 200 : 204);
-            $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+            $view = $this->view($data);
+            $view->setSerializationContext(
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
+            );
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
         }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Ordering given pages.
+     *
+     * @param array $pages
+     * @param string $locale
+     */
+    private function orderPages(array $pages, $locale)
+    {
+        $documentManager = $this->getDocumentManager();
+
+        for ($i = 0; $i < count($pages); ++$i) {
+            $document = $documentManager->find($pages[$i], $locale);
+            $documentManager->reorder($document, null);
+        }
     }
 
     /**
@@ -403,13 +450,16 @@ class ArticleController extends RestController implements ClassResourceInterface
             throw new InvalidFormException($form);
         }
 
+        if (array_key_exists('author', $data) && null === $data['author']) {
+            $document->setAuthor(null);
+        }
+
         $this->getDocumentManager()->persist(
             $document,
             $locale,
             [
                 'user' => $this->getUser()->getId(),
                 'clear_missing_content' => false,
-                'route_path' => array_key_exists('routePath', $data) ? $data['routePath'] : null,
             ]
         );
     }

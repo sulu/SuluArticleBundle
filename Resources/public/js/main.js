@@ -13,12 +13,19 @@ require.config({
         suluarticlecss: '../../suluarticle/css',
 
         'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
+        'type/page-tree-route': '../../suluarticle/js/validation/types/page-tree-route',
 
-        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager'
+        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager',
+        'services/suluarticle/article-router': '../../suluarticle/js/services/router',
+        'services/suluarticle/property-configuration': '../../suluarticle/js/services/property-configuration'
     }
 });
 
-define(['underscore', 'config'], function(_, Config) {
+define([
+    'underscore',
+    'config',
+    'css!suluarticlecss/main'
+], function(_, Config) {
 
     'use strict';
 
@@ -53,7 +60,9 @@ define(['underscore', 'config'], function(_, Config) {
                     settingsKey: 'articleLanguage',
                     typeNames: Object.keys(Config.get('sulu_article').types),
                     types: Config.get('sulu_article').types,
-                    displayTabAll: Config.get('sulu_article').displayTabAll
+                    templates: Config.get('sulu_article').templates,
+                    displayTabAll: Config.get('sulu_article').displayTabAll,
+                    defaultAuthor: Config.get('sulu_article').defaultAuthor
                 };
             Config.set('sulu_article', config);
 
@@ -128,6 +137,20 @@ define(['underscore', 'config'], function(_, Config) {
                     }
                 });
             }
+
+            app.sandbox.mvc.routes.push({
+                route: 'articles/:locale/edit::id/add-page/:content',
+                callback: function(locale, id, content) {
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="null" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                }
+            });
+
+            app.sandbox.mvc.routes.push({
+                route: 'articles/:locale/edit::id/page::page/:content',
+                callback: function(locale, id, page, content) {
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="' + page + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                }
+            });
 
             app.sandbox.mvc.routes.push({
                 route: 'articles/:locale/edit::id/:content',

@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
+use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Indexable document for articles.
@@ -73,6 +74,13 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * )
      */
     protected $routePath;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string", options={"analyzer": "keyword"})
+     */
+    protected $parentPageUuid;
 
     /**
      * @var string
@@ -247,11 +255,17 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $changerContactId;
 
     /**
+     * @var ArticlePageViewObject[]
+     *
+     * @Embedded(class="SuluArticleBundle:ArticlePageViewObject", multiple=true)
+     */
+    protected $pages = [];
+
+    /**
      * @param string $uuid
      */
-    public function __construct(
-        $uuid = null
-    ) {
+    public function __construct($uuid = null)
+    {
         $this->uuid = $uuid;
     }
 
@@ -341,6 +355,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentPageUuid()
+    {
+        return $this->parentPageUuid;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParentPageUuid($parentPageUuid)
+    {
+        $this->parentPageUuid = $parentPageUuid;
+
+        return $this;
     }
 
     /**
@@ -681,5 +713,23 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function getChangerContactId()
     {
         return $this->changerContactId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPages(Collection $pages)
+    {
+        $this->pages = $pages;
+
+        return $this;
     }
 }

@@ -89,6 +89,6 @@ class ArticleNodeType implements NodeTypeDefinitionInterface
      */
     public function getDeclaredChildNodeDefinitions()
     {
-        return [];
+        return [new ArticlePageNodeDefinition()];
     }
 }

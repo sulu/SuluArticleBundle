@@ -2,8 +2,8 @@
 | --- | ---
 | Bug? | no
 | New Feature? | no
+| SuluArticleBundle Version | Specific version or SHA of a commit
 | Sulu Version | Specific version or SHA of a commit
-| Browser Version | Browser name and version
 
 #### Actual Behavior
 

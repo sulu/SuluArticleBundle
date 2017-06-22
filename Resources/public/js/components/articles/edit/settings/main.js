@@ -14,8 +14,9 @@ define([
     'sulusecurity/components/users/models/user',
     'sulucontact/models/contact',
     'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
     'text!/admin/articles/template/settings.html'
-], function(_, $, Config, User, Contact, ArticleManager, form) {
+], function(_, $, Config, User, Contact, ArticleManager, ArticleRouter, form) {
 
     'use strict';
 
@@ -138,7 +139,7 @@ define([
                 this.saved(data);
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
-                this.sandbox.emit('sulu.article.error', xhr.status, data);
+                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
             }.bind(this));
         },
 
@@ -179,11 +180,14 @@ define([
          *
          * @param {String} fullName
          * @param {Object} date
+         * @param {Boolean} remove
          */
-        setAuthorChangelog: function(fullName, date) {
+        setAuthorChangelog: function(fullName, date, remove) {
             var authoredText, formattedDate = this.sandbox.date.format(date);
 
-            fullName = fullName || this.authorFullname;
+            if (!fullName && !remove) {
+                fullName = this.authorFullname;
+            }
 
             if (!!fullName) {
                 this.authorFullname = fullName;
@@ -195,6 +199,7 @@ define([
                     }
                 );
             } else {
+                this.authorFullname = null;
                 authoredText = this.sandbox.util.sprintf(
                     this.translations.authoredOnly,
                     {
@@ -415,6 +420,7 @@ define([
                             el: $componentContainer,
                             locale: this.options.locale,
                             data: {author: this.data.author, authored: this.data.authored},
+                            nullableAuthor: !this.options.config.defaultAuthor,
                             selectCallback: function(data) {
                                 this.setAuthor(data);
 
@@ -430,14 +436,14 @@ define([
             this.setDirty();
 
             this.data.authored = data.authored;
+            this.data.author = data.author;
             if (!data.authorItem) {
-                this.setAuthorChangelog(null, new Date(data.authored));
+                this.setAuthorChangelog(null, new Date(data.authored), true);
 
                 return;
             }
 
             this.setAuthorChangelog(data.authorItem.firstName + ' ' + data.authorItem.lastName, new Date(data.authored));
-            this.data.author = data.author;
         },
 
         restoreVersion: function(versionId, version) {
@@ -454,12 +460,7 @@ define([
                         }.bind(this))
                         .then(function() {
                             this.sandbox.emit('husky.overlay.alert.close');
-                            this.sandbox.emit(
-                                'sulu.router.navigate',
-                                'articles/' + this.options.locale + '/edit:' + this.data.id + '/details',
-                                true,
-                                true
-                            );
+                            ArticleRouter.toEditForce(this.data.id, this.options.locale);
                         }.bind(this))
                         .fail(function() {
                             this.sandbox.emit(

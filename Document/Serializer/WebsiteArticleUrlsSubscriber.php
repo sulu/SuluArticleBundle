@@ -11,13 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 
-use Doctrine\ORM\NoResultException;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -92,7 +90,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         $urls = [];
         foreach ($webspace->getAllLocalizations() as $localization) {
             $locale = $localization->getLocale();
-            $route = $this->findByEntity(get_class($article), $article->getUuid(), $locale);
+            $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
 
             $urls[$locale] = '/';
             if ($route) {
@@ -101,33 +99,5 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         }
 
         $visitor->addData('urls', $context->accept($urls));
-    }
-
-    /**
-     * Return route for given entity information.
-     *
-     * @param string $entityClass
-     * @param string $entityId
-     * @param string $locale
-     *
-     * TODO replace this with $this->routeRepository->findByEntity when merging to develop
-     *
-     * @return RouteInterface
-     */
-    private function findByEntity($entityClass, $entityId, $locale)
-    {
-        $query = $this->routeRepository->createQueryBuilder('entity')
-            ->andWhere('entity.entityClass = :entityClass')
-            ->andWhere('entity.entityId = :entityId')
-            ->andWhere('entity.locale = :locale')
-            ->andWhere('entity.history = false')
-            ->getQuery()
-            ->setParameters(['entityClass' => $entityClass, 'entityId' => $entityId, 'locale' => $locale]);
-
-        try {
-            return $query->getSingleResult();
-        } catch (NoResultException $e) {
-            return;
-        }
     }
 }

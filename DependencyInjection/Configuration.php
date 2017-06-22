@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -28,6 +29,12 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('sulu_article')
             ->children()
+                ->arrayNode('smart_content')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('default_limit')->defaultValue(100)->end()
+                    ->end()
+                ->end()
                 ->arrayNode('content_types')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -35,7 +42,19 @@ class Configuration implements ConfigurationInterface
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('template')
-                                ->defaultValue('SuluArticleBundle:Template:content-types/article-selection.html.twig')
+                                    ->defaultValue('SuluArticleBundle:Template:content-types/article-selection.html.twig')
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('page_tree_route')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('template')
+                                    ->defaultValue('SuluArticleBundle:Template:content-types/page-tree-route.html.twig')
+                                ->end()
+                                ->enumNode('page_route_cascade')
+                                    ->values(['request', 'task', 'off'])
+                                    ->defaultValue('request')
                                 ->end()
                             ->end()
                         ->end()
@@ -50,6 +69,12 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('view')->defaultValue(ArticleViewDocument::class)->end()
                             ->end()
                         ->end()
+                        ->arrayNode('article_page')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('view')->defaultValue(ArticlePageViewObject::class)->end()
+                            ->end()
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('types')
@@ -60,7 +85,19 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('display_tab_all')->defaultTrue()->info("Display tab 'all' in list view")->end()
+                ->scalarNode('display_tab_all')->defaultTrue()->info('Display tab \'all\' in list view')->end()
+                ->scalarNode('default_author')->defaultTrue()->info('Set default author if none isset')->end()
+                ->arrayNode('search_fields')
+                    ->prototype('scalar')->end()->defaultValue([
+                        'title',
+                        'excerpt.title',
+                        'excerpt.description',
+                        'excerpt.seo.title',
+                        'excerpt.seo.description',
+                        'excerpt.seo.keywords',
+                        'teaser_description',
+                    ])
+                ->end()
             ->end();
 
         return $treeBuilder;
