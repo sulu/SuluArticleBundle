@@ -14,10 +14,12 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 use PHPCR\ItemNotFoundException;
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\DocumentRegistry;
 
 /**
@@ -31,6 +33,16 @@ class PageTreeRouteContentType extends SimpleContentType
      * @var string
      */
     private $template;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
 
     /**
      * @var DocumentRegistry
@@ -49,12 +61,16 @@ class PageTreeRouteContentType extends SimpleContentType
 
     /**
      * @param string $template
+     * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $documentInspector
      * @param DocumentRegistry $documentRegistry
      * @param ChainRouteGeneratorInterface $chainRouteGenerator
      * @param ConflictResolverInterface $conflictResolver
      */
     public function __construct(
         $template,
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $documentInspector,
         DocumentRegistry $documentRegistry,
         ChainRouteGeneratorInterface $chainRouteGenerator,
         ConflictResolverInterface $conflictResolver
@@ -62,6 +78,8 @@ class PageTreeRouteContentType extends SimpleContentType
         parent::__construct('PageTreeRoute');
 
         $this->template = $template;
+        $this->documentManager = $documentManager;
+        $this->documentInspector = $documentInspector;
         $this->documentRegistry = $documentRegistry;
         $this->chainRouteGenerator = $chainRouteGenerator;
         $this->conflictResolver = $conflictResolver;
@@ -101,7 +119,7 @@ class PageTreeRouteContentType extends SimpleContentType
         }
 
         $path = $this->getAttribute('path', $value, '');
-        $page = $this->getAttribute('page', $value, ['uuid' => null, 'path' => '/']);
+        $page = $this->getAttribute('page', $value, ['uuid' => null, 'path' => '/', 'webspace' => $webspaceKey]);
 
         $suffix = $this->getAttribute('suffix', $value);
         if (!$suffix) {
@@ -121,8 +139,11 @@ class PageTreeRouteContentType extends SimpleContentType
         if ($node->hasProperty($pagePropertyName)) {
             $node->getProperty($pagePropertyName)->remove();
         }
+
+        $document = $this->documentManager->find($page['uuid'], $languageCode);
         $node->setProperty($pagePropertyName, $page['uuid'], PropertyType::WEAKREFERENCE);
         $node->setProperty($pagePropertyName . '-path', $page['path']);
+        $node->setProperty($pagePropertyName . '-webspace', $this->documentInspector->getWebspace($document));
     }
 
     /**
@@ -175,6 +196,7 @@ class PageTreeRouteContentType extends SimpleContentType
         return [
             'uuid' => $pageUuid,
             'path' => $node->getPropertyValueWithDefault($pagePropertyName . '-path', ''),
+            'webspace' => $node->getPropertyValueWithDefault($pagePropertyName . '-webspace', null),
         ];
     }
 
