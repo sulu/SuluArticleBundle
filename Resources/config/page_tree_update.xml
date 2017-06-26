@@ -16,7 +16,7 @@
         </service>
 
         <service id="sulu_article.page_tree_route.updater.request"
-                 class="Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdater">
+                 class="Sulu\Bundle\ArticleBundle\PageTree\PageTreeRepository">
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
