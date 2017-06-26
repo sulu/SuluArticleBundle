@@ -61,3 +61,12 @@ sulu_article:
         page_tree_route:
             update: task # "request" or "off" 
 ```
+
+**Route move**
+
+When the parent-page of multiple articles should be changed (e.g. the page was removed) you can use following command to
+update the parent-page of all articles which are related to the given page-url.
+
+```bash
+bin/console sulu:article:page-tree:move /page-1 /page-2 sulu_io de
+```
