@@ -911,6 +911,7 @@ class ArticleControllerTest extends SuluTestCase
             'page' => [
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
+                'webspace' => 'sulu_io',
             ],
             'suffix' => 'test-article',
             'path' => '/test-page/test-article',
@@ -931,6 +932,7 @@ class ArticleControllerTest extends SuluTestCase
             'page' => [
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
+                'webspace' => 'sulu_io',
             ],
             'suffix' => 'articles/test-article',
             'path' => '/test-page/articles/test-article',
@@ -978,6 +980,7 @@ class ArticleControllerTest extends SuluTestCase
                 'page' => [
                     'uuid' => $page->getUuid(),
                     'path' => $page->getResourceSegment(),
+                    'webspace' => 'sulu_io',
                 ],
                 'suffix' => 'articles/test-article',
                 'path' => '/test-page-2/articles/test-article',
@@ -1021,6 +1024,7 @@ class ArticleControllerTest extends SuluTestCase
                 'page' => [
                     'uuid' => $page1->getUuid(),
                     'path' => $page1->getResourceSegment(),
+                    'webspace' => 'sulu_io',
                 ],
                 'suffix' => 'articles/test-article',
                 'path' => '/page-2/page-1/articles/test-article',
@@ -1037,6 +1041,7 @@ class ArticleControllerTest extends SuluTestCase
             'page' => [
                 'uuid' => $page->getUuid(),
                 'path' => $page->getResourceSegment(),
+                'webspace' => 'sulu_io',
             ],
             'suffix' => 'articles/test-article',
             'path' => '/test-page/articles/test-article',

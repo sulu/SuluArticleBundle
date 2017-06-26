@@ -15,14 +15,27 @@ use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\DocumentRegistry;
 
 class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var DocumentInspector
+     */
+    private $documentInspector;
+
     /**
      * @var DocumentRegistry
      */
@@ -54,6 +67,11 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     private $property;
 
     /**
+     * @var BasePageDocument
+     */
+    private $document;
+
+    /**
      * @var string
      */
     private $propertyName = 'i18n:de-routePath';
@@ -73,8 +91,15 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
      */
     private $template = 'test.html.twig';
 
+    /**
+     * @var string
+     */
+    private $uuid = '123-123-123';
+
     public function setUp()
     {
+        $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
+        $this->documentInspector = $this->prophesize(DocumentInspector::class);
         $this->documentRegistry = $this->prophesize(DocumentRegistry::class);
         $this->chainRouteGenerator = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->conflictResolver = $this->prophesize(ConflictResolverInterface::class);
@@ -85,8 +110,16 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->contentType = new PageTreeRouteContentType(
             $this->template,
-            $this->documentRegistry->reveal(), $this->chainRouteGenerator->reveal(), $this->conflictResolver->reveal()
+            $this->documentManager->reveal(),
+            $this->documentInspector->reveal(),
+            $this->documentRegistry->reveal(),
+            $this->chainRouteGenerator->reveal(),
+            $this->conflictResolver->reveal()
         );
+
+        $this->document = $this->prophesize(BasePageDocument::class);
+        $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
+        $this->documentInspector->getWebspace($this->document->reveal())->willReturn($this->webspaceKey);
     }
 
     public function testRead()
@@ -95,8 +128,9 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
             'path' => '/test-page/test-article',
             'suffix' => 'test-article',
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
+                'webspace' => $this->webspaceKey,
             ],
         ];
 
@@ -107,6 +141,8 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn($value['page']['uuid']);
         $this->node->getPropertyValueWithDefault($this->propertyName . '-page-path', '')
             ->willReturn($value['page']['path']);
+        $this->node->getPropertyValueWithDefault($this->propertyName . '-page-webspace', null)
+            ->willReturn($value['page']['webspace']);
 
         $this->property->setValue($value)->shouldBeCalled();
 
@@ -152,8 +188,9 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
             'path' => '/test-page/test-article',
             'suffix' => 'test-article',
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
+                'webspace' => $this->webspaceKey,
             ],
         ];
 
@@ -164,6 +201,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty($this->propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE)
             ->shouldBeCalled();
         $this->node->setProperty($this->propertyName . '-page-path', $value['page']['path'])->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page-webspace', $value['page']['webspace'])->shouldBeCalled();
 
         $this->node->hasProperty($this->propertyName . '-page')->willReturn(false);
 
@@ -183,8 +221,9 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
             'path' => '/test-page/test-article',
             'suffix' => 'test-article',
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
+                'webspace' => $this->webspaceKey,
             ],
         ];
 
@@ -195,6 +234,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty($this->propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE)
             ->shouldBeCalled();
         $this->node->setProperty($this->propertyName . '-page-path', $value['page']['path'])->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page-webspace', $value['page']['webspace'])->shouldBeCalled();
 
         $pageProperty = $this->prophesize(\PHPCR\PropertyInterface::class);
         $pageProperty->remove()->shouldBeCalled();
@@ -231,8 +271,9 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $value = [
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
+                'webspace' => $this->webspaceKey,
             ],
         ];
 
@@ -243,6 +284,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty($this->propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE)
             ->shouldBeCalled();
         $this->node->setProperty($this->propertyName . '-page-path', $value['page']['path'])->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page-webspace', $value['page']['webspace'])->shouldBeCalled();
 
         $pageProperty = $this->prophesize(\PHPCR\PropertyInterface::class);
         $pageProperty->remove()->shouldBeCalled();
@@ -279,8 +321,9 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $value = [
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/',
+                'webspace' => $this->webspaceKey,
             ],
         ];
 
@@ -291,6 +334,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $this->node->setProperty($this->propertyName . '-page', $value['page']['uuid'], PropertyType::WEAKREFERENCE)
             ->shouldBeCalled();
         $this->node->setProperty($this->propertyName . '-page-path', $value['page']['path'])->shouldBeCalled();
+        $this->node->setProperty($this->propertyName . '-page-webspace', $value['page']['webspace'])->shouldBeCalled();
 
         $pageProperty = $this->prophesize(\PHPCR\PropertyInterface::class);
         $pageProperty->remove()->shouldBeCalled();
@@ -316,7 +360,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $value = [
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
             ],
             'path' => '/test-page/test-article',
@@ -332,7 +376,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
     {
         $value = [
             'page' => [
-                'uuid' => '123-123-123',
+                'uuid' => $this->uuid,
                 'path' => '/test-page',
             ],
             'path' => '/test-page/test-article',
