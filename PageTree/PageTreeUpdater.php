@@ -76,7 +76,7 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
     {
         $articles = $this->findLinkedArticles($document->getUuid(), $document->getLocale());
         foreach ($articles as $article) {
-            $this->updateArticle($article, $document->getResourceSegment(), $document->getLocale());
+            $this->updateArticle($article, $document);
         }
     }
 
@@ -125,15 +125,18 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
      * Update route of given article.
      *
      * @param ArticleDocument $article
-     * @param string $resourceSegment
-     * @param string $locale
+     * @param BasePageDocument $document
      */
-    private function updateArticle(ArticleDocument $article, $resourceSegment, $locale)
+    private function updateArticle(ArticleDocument $article, BasePageDocument $document)
     {
+        $locale = $document->getLocale();
+        $resourceSegment = $document->getResourceSegment();
+
         $property = $this->getRoutePathPropertyNameByStructureType($article->getStructureType());
         $propertyName = $this->propertyEncoder->localizedContentName($property->getName(), $locale);
 
         $node = $this->documentInspector->getNode($article);
+        $node->setProperty($propertyName . '-page', $document->getUuid());
         $node->setProperty($propertyName . '-page-path', $resourceSegment);
 
         $suffix = $node->getPropertyValueWithDefault($propertyName . '-suffix', null);
