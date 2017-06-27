@@ -21,6 +21,7 @@ use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\SimpleContentType;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\DocumentRegistry;
+use Sulu\Component\DocumentManager\Exception\DocumentNotFoundException;
 
 /**
  * Provides page_tree_route content-type.
@@ -140,10 +141,20 @@ class PageTreeRouteContentType extends SimpleContentType
             $node->getProperty($pagePropertyName)->remove();
         }
 
-        $document = $this->documentManager->find($page['uuid'], $languageCode);
-        $node->setProperty($pagePropertyName, $page['uuid'], PropertyType::WEAKREFERENCE);
-        $node->setProperty($pagePropertyName . '-path', $page['path']);
-        $node->setProperty($pagePropertyName . '-webspace', $this->documentInspector->getWebspace($document));
+        if (!$page['uuid']) {
+            // no parent-page given
+
+            return;
+        }
+
+        try {
+            $document = $this->documentManager->find($page['uuid'], $languageCode);
+            $node->setProperty($pagePropertyName, $page['uuid'], PropertyType::WEAKREFERENCE);
+            $node->setProperty($pagePropertyName . '-path', $page['path']);
+            $node->setProperty($pagePropertyName . '-webspace', $this->documentInspector->getWebspace($document));
+        } catch (DocumentNotFoundException $exception) {
+            // given document was not found
+        }
     }
 
     /**
