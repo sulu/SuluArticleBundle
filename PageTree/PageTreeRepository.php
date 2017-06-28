@@ -26,7 +26,7 @@ use Sulu\Component\DocumentManager\PropertyEncoder;
 /**
  * Update the route of articles synchronously.
  */
-class PageTreeUpdater implements PageTreeUpdaterInterface
+class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInterface
 {
     const ROUTE_PROPERTY = 'routePath';
     const TAG_NAME = 'sulu_article.article_route';
@@ -74,7 +74,18 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
      */
     public function update(BasePageDocument $document)
     {
-        $articles = $this->findLinkedArticles($document->getUuid(), $document->getLocale());
+        $articles = $this->findLinkedArticles('page', $document->getUuid(), $document->getLocale());
+        foreach ($articles as $article) {
+            $this->updateArticle($article, $document);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function move($source, BasePageDocument $document)
+    {
+        $articles = $this->findLinkedArticles('page-path', $source, $document->getLocale());
         foreach ($articles as $article) {
             $this->updateArticle($article, $document);
         }
@@ -83,12 +94,13 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
     /**
      * Find articles linked to the given page.
      *
-     * @param string $uuid
+     * @param string $field
+     * @param string $value
      * @param string $locale
      *
      * @return ArticleInterface[]
      */
-    private function findLinkedArticles($uuid, $locale)
+    private function findLinkedArticles($field, $value, $locale)
     {
         $where = [];
         foreach ($this->metadataFactory->getStructures('article') as $metadata) {
@@ -98,11 +110,12 @@ class PageTreeUpdater implements PageTreeUpdaterInterface
             }
 
             $where[] = sprintf(
-                '([%s] = "%s" AND [%s-page] = "%s")',
+                '([%s] = "%s" AND [%s-%s] = "%s")',
                 $this->propertyEncoder->localizedSystemName('template', $locale),
                 $metadata->getName(),
                 $this->propertyEncoder->localizedContentName($property->getName(), $locale),
-                $uuid
+                $field,
+                $value
             );
         }
 

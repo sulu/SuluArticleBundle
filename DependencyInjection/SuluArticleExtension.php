@@ -163,6 +163,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             'sulu_article.page_tree_route.updater.' . $config['content_types']['page_tree_route']['page_route_cascade']
         );
 
+        $loader->load('page_tree_move.xml');
         if ($config['content_types']['page_tree_route']['page_route_cascade'] !== 'off') {
             $loader->load('page_tree_update.xml');
         }
