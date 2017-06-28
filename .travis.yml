@@ -17,19 +17,12 @@ matrix:
   include:
     - php: 5.5
       env:
-        # - SULU_VERSION="~1.6.0"
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
     - php: 7.0
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        # - SULU_VERSION="dev-develop"
-        - CODE_COVERAGE="--coverage-clover=coverage.clover"
-    - php: 7.0
-      env:
-        - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        # - SULU_VERSION="~1.6.0"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
 
 addons:
@@ -58,7 +51,6 @@ before_install:
   - ./elasticsearch-*/bin/elasticsearch -d
 
 install:
-  # - travis_retry composer require sulu/sulu:$SULU_VERSION $COMPOSER_FLAGS
   - travis_retry composer update $COMPOSER_FLAGS
   - composer info -i
   - ./Tests/app/console doctrine:database:create
