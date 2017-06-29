@@ -56,7 +56,9 @@ class ArticleIndexBuilder extends SuluBuilder
      */
     private function buildForManager(Manager $manager, $destroy)
     {
+        $name = $manager->getName();
         if (!$manager->indexExists()) {
+            $this->output->writeln(sprintf('Create index for "<comment>%s</comment>" manager.', $name));
             $manager->createIndex();
 
             return;
@@ -66,6 +68,7 @@ class ArticleIndexBuilder extends SuluBuilder
             return;
         }
 
+        $this->output->writeln(sprintf('Drop and create index for "<comment>%s</comment>" manager.', $name));
         $manager->dropAndCreateIndex();
     }
 }
