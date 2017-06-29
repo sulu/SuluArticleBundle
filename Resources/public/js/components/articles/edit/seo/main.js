@@ -22,7 +22,7 @@ define(['services/suluarticle/article-manager'], function(ArticleManager) {
         getUrl: function() {
             var content = this.options.data();
 
-            return this.options.excerptUrlPrefix + content.route;
+            return this.options.excerptUrlPrefix.replace('{locale}', this.options.locale)  + content.route;
         },
 
         save: function(data, action) {
