@@ -1,6 +1,6 @@
 # Upgrade
 
-## dev-develop
+## 0.6.0
 
 ### Index mapping has changed
 
