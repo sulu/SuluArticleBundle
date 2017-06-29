@@ -188,6 +188,22 @@ class RoutableSubscriber implements EventSubscriberInterface
         $document->setRoutePath($route->getPath());
 
         $event->getNode()->setProperty($propertyName, $route->getPath());
+
+        if (!$document instanceof ChildrenBehavior) {
+            return;
+        }
+
+        foreach ($document->getChildren() as $child) {
+            if (!$child instanceof RoutablePageBehavior) {
+                continue;
+            }
+
+            $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($child));
+            $child->setRoutePath($route->getPath());
+
+            $node = $this->documentInspector->getNode($child);
+            $node->setProperty($propertyName, $route->getPath());
+        }
     }
 
     /**
@@ -305,17 +321,29 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private function reallocateExistingRoute(RoutablePageBehavior $document, $locale)
     {
-        $route = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
-        if (!$route) {
+        $newRoute = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
+        if (!$newRoute) {
             return;
         }
 
-        $route->setEntityClass(get_class($document));
-        $route->setEntityId($document->getId());
-        $route->setTarget(null);
-        $route->setHistory(false);
+        $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
+        $history = $this->routeRepository->findHistoryByEntity(get_class($document), $document->getUuid(), $locale);
+        foreach (array_merge($history, [$oldRoute]) as $historyRoute) {
+            if ($historyRoute->getId() === $newRoute->getId()) {
+                continue;
+            }
 
-        return $route;
+            $historyRoute->setTarget($newRoute);
+            $historyRoute->setHistory(true);
+            $newRoute->addHistory($historyRoute);
+        }
+
+        $newRoute->setEntityClass(get_class($document));
+        $newRoute->setEntityId($document->getId());
+        $newRoute->setTarget(null);
+        $newRoute->setHistory(false);
+
+        return $newRoute;
     }
 
     /**

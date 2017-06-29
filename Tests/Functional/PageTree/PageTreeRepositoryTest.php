@@ -120,6 +120,37 @@ class PageTreeRepositoryTest extends SuluTestCase
         $this->assertEquals('/test-2/article-3', $result[2]->getRoutePath());
     }
 
+    public function testMoveArticlePage()
+    {
+        $pages = [
+            $this->createPage('Test 1', '/test-1'),
+            $this->createPage('Test 2', '/test-2'),
+        ];
+
+        $article = $this->createArticle($this->getPathData($pages[0], 'article-1'));
+        $articlePages = [
+            $this->createArticlePage($article, 'Test page 1'),
+            $this->createArticlePage($article, 'Test page 2'),
+            $this->createArticlePage($article, 'Test page 3'),
+        ];
+
+        $this->documentManager->flush();
+        $this->documentManager->clear();
+
+        $this->pageTreeRepository->move('/test-1', $pages[1]);
+        $this->documentManager->flush();
+        $this->documentManager->clear();
+
+        $result = $this->documentManager->find($article['id'], $this->locale);
+        $this->assertEquals('/test-2/article-1', $result->getRoutePath());
+
+        $children = array_values(iterator_to_array($result->getChildren()));
+
+        $this->assertEquals('/test-2/article-1/page-2', $children[0]->getRoutePath());
+        $this->assertEquals('/test-2/article-1/page-3', $children[1]->getRoutePath());
+        $this->assertEquals('/test-2/article-1/page-4', $children[2]->getRoutePath());
+    }
+
     /**
      * Returns property value for given page.
      *
@@ -161,6 +192,36 @@ class PageTreeRepositoryTest extends SuluTestCase
                 'authored' => '2016-01-01',
             ]
         );
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    /**
+     * Create article page.
+     *
+     * @param array $article
+     * @param string $pageTitle
+     * @param string $template
+     * @param string $locale
+     *
+     * @return array
+     */
+    private function createArticlePage(
+        array $article,
+        $pageTitle = 'Test-Page',
+        $template = 'default_pages',
+        $locale = 'de'
+    ) {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles/' . $article['id'] . '/pages?locale=' . $locale,
+            [
+                'pageTitle' => $pageTitle,
+                'template' => $template,
+            ]
+        );
+        $this->assertHttpStatusCode(200, $client->getResponse());
 
         return json_decode($client->getResponse()->getContent(), true);
     }

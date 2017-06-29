@@ -159,7 +159,10 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
             $article->setRoutePath($path);
         }
 
-        if (WorkflowStage::PUBLISHED === $article->getWorkflowStage()) {
+        $workflowStage = $article->getWorkflowStage();
+
+        $this->documentManager->persist($article, $locale);
+        if (WorkflowStage::PUBLISHED === $workflowStage) {
             $this->documentManager->publish($article, $locale);
         }
     }
