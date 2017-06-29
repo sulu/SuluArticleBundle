@@ -124,6 +124,31 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ]
             );
         }
+
+        if ($container->hasExtension('massive_build')) {
+            $container->prependExtensionConfig(
+                'massive_build',
+                [
+                    'targets' => [
+                        'prod' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
+                        'dev' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
+                        'maintain' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
     }
 
     /**
