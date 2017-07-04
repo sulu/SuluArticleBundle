@@ -164,6 +164,7 @@
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="sulu_content.extension.manager"/>
 
             <tag name="jms_serializer.event_subscriber"/>
         </service>

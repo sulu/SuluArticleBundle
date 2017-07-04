@@ -23,6 +23,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
+use Sulu\Component\Content\Extension\ExtensionManagerInterface;
 use Sulu\Component\Util\SortUtils;
 
 /**
@@ -46,18 +47,26 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
     private $proxyFactory;
 
     /**
+     * @var ExtensionManagerInterface
+     */
+    private $extensionManager;
+
+    /**
      * @param StructureManagerInterface $structureManager
      * @param ContentTypeManagerInterface $contentTypeManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @param ExtensionManagerInterface $extensionManager
      */
     public function __construct(
         StructureManagerInterface $structureManager,
         ContentTypeManagerInterface $contentTypeManager,
-        LazyLoadingValueHolderFactory $proxyFactory
+        LazyLoadingValueHolderFactory $proxyFactory,
+        ExtensionManagerInterface $extensionManager
     ) {
         $this->structureManager = $structureManager;
         $this->contentTypeManager = $contentTypeManager;
         $this->proxyFactory = $proxyFactory;
+        $this->extensionManager = $extensionManager;
     }
 
     /**
@@ -106,7 +115,14 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
         $visitor->addData('uuid', $context->accept($article->getArticleUuid()));
         $visitor->addData('pageUuid', $context->accept($article->getPageUuid()));
-        $visitor->addData('extension', $context->accept($article->getExtensionsData()->toArray()));
+
+        $extensionData = $article->getExtensionsData()->toArray();
+        $extension = [];
+        foreach ($extensionData as $name => $data) {
+            $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($data);
+        }
+
+        $visitor->addData('extension', $extension);
     }
 
     /**
