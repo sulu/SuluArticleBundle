@@ -14,7 +14,7 @@ bin/adminconsole ongr:es:index:create -m default
 bin/websiteconsole ongr:es:index:create -m live
 
 bin/adminconsole sulu:article:index-rebuild ###LOCALE###
-bin/websiteconsole sulu:article:index-rebuild ###LOCALE### -live
+bin/websiteconsole sulu:article:index-rebuild ###LOCALE### --live
 ```
 
 ### DocumentManager
