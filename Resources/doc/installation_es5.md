@@ -10,6 +10,13 @@ composer require ongr/elasticsearch-bundle:^5.0
 # app/config/config.yml
 
 ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
     managers:
         default:
             index: 

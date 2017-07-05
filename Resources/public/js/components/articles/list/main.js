@@ -196,7 +196,7 @@ define([
                     url: urlArticleApi,
                     storageName: this.options.storageName,
                     searchInstanceName: 'articles',
-                    searchFields: ['title'],
+                    searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'pages.title'],
                     resultKey: 'articles',
                     instanceName: 'articles',
                     actionCallback: function(id, article) {
