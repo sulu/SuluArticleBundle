@@ -1,7 +1,7 @@
 ## Installation using ElasticSearch ^2.2
 
 ```bash
-composer require ongr/elasticsearch-bundle:^5.0
+composer require ongr/elasticsearch-bundle:^1.2
 ```
 
 ## Configure the bundles:
