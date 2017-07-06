@@ -28,6 +28,7 @@ use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Bundle\TagBundle\Entity\Tag;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManager;
 
@@ -928,6 +929,38 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
     }
 
+    public function testCgetFilterByTag()
+    {
+        $title = 'Test-Article';
+        $template = 'default';
+        $tag = $this->createTag();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'ext' => ['excerpt' => ['tags' => [$tag->getName()]]],
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $article1 = json_decode($client->getResponse()->getContent(), true);
+        // create second article which should not appear in response
+        $article2 = $this->post();
+
+        $client->request('GET', '/api/articles?locale=de&tagId=' . $tag->getId());
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $result = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $result['_embedded']['articles']);
+        $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
+    }
+
     public function testPostPageTreeRoute()
     {
         $page = $this->createPage('Test Page', '/test-page');
@@ -1177,6 +1210,23 @@ class ArticleControllerTest extends SuluTestCase
         $entityManager->flush();
 
         return $category;
+    }
+
+    /**
+     * Create a tag.
+     *
+     * @return Tag
+     */
+    private function createTag()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $tag = new Tag();
+        $tag->setName('Test');
+        $entityManager->persist($tag);
+        $entityManager->flush();
+
+        return $tag;
     }
 
     /**
