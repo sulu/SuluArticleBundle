@@ -479,6 +479,31 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
     }
 
+    public function testCGetSearchRoutePath()
+    {
+        $this->purgeIndex();
+
+        $articles = [
+            $this->testPost('Sulu'),
+            $this->testPost('Sulu is awesome'),
+        ];
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&searchFields=route_path&search=/articles&type=blog');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+        $this->assertEquals($articles[0]['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($articles[0]['title'], $response['_embedded']['articles'][0]['title']);
+        $this->assertEquals($articles[1]['id'], $response['_embedded']['articles'][1]['id']);
+        $this->assertEquals($articles[1]['title'], $response['_embedded']['articles'][1]['title']);
+    }
+
     public function testCGetSearchCaseInsensitive()
     {
         $this->purgeIndex();
