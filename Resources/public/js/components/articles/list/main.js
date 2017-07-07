@@ -174,7 +174,7 @@ define([
             this.$el.html(this.templates.list());
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
-            var filter = this.getFilterFromStorage();
+            var filter = this.loadFilterFromStorage();
 
             if (!!filter.contact) {
                 urlArticleApi += '&contactId=' + filter.contact.id;
@@ -189,7 +189,7 @@ define([
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.retrieveListToolbarTemplate(this.getFilterTitle(filter))
+                    template: this.retrieveListToolbarTemplate(filter)
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
@@ -339,16 +339,16 @@ define([
             }.bind(this));
 
             this.sandbox.on('husky.toolbar.articles.initialized', function() {
-                this.sandbox.emit('husky.toolbar.articles.item.mark', this.getFilterFromStorage().filterKey);
+                this.sandbox.emit('husky.toolbar.articles.item.mark', this.loadFilterFromStorage().filterKey);
             }.bind(this));
         },
 
         /**
          * Generates list toolbar buttons.
          *
-         * @param {String} title
+         * @param {Object} filter
          */
-        retrieveListToolbarTemplate: function(title) {
+        retrieveListToolbarTemplate: function(filter) {
             return this.sandbox.sulu.buttons.get({
                 settings: {
                     options: {
@@ -359,11 +359,19 @@ define([
                         ]
                     }
                 },
+                authoredDate: {
+                    options: {
+                        icon: 'calendar',
+                        group: 2,
+                        title: '',
+                        callback: this.openAuthoredSelectionOverlay.bind(this)
+                    }
+                },
                 filter: {
                     options: {
                         icon: 'filter',
                         group: 2,
-                        title: title,
+                        title: this.getFilterTitle(filter),
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
@@ -375,21 +383,14 @@ define([
                                 id: 'all',
                                 title: this.translations.filterAll,
                                 callback: function() {
-                                    this.applyFilterToList.call(
-                                        this,
-                                        'all'
-                                    );
+                                    this.replaceFilter('app');
                                 }.bind(this)
                             },
                             {
                                 id: 'me',
                                 title: this.translations.filterMe,
                                 callback: function() {
-                                    this.applyFilterToList.call(
-                                        this,
-                                        'me',
-                                        this.sandbox.sulu.user.contact
-                                    );
+                                    this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
                                 }.bind(this)
                             },
                             {
@@ -430,14 +431,10 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        contact: this.getFilterFromStorage().contact
+                        contact: this.loadFilterFromStorage().contact
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'filterByAuthor',
-                            data.contactItem
-                        );
+                        this.replaceFilter('contact', data.contactItem, 'filterByAuthor');
                     }.bind(this)
                 }
             }]);
@@ -457,15 +454,10 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        category: this.getFilterFromStorage().category
+                        category: this.loadFilterFromStorage().category
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'category',
-                            null,
-                            data.categoryItem
-                        );
+                        this.replaceFilter('category', data.categoryItem, 'filterByAuthor');
                     }.bind(this)
                 }
             }]);
@@ -485,56 +477,114 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        tag: this.getFilterFromStorage().tag
+                        tag: this.loadFilterFromStorage().tag
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'tag',
-                            null,
-                            null,
-                            data.tagItem
-                        );
+                        this.replaceFilter('tag', data.tagItem, 'filterByAuthor');
                     }.bind(this)
                 }
             }]);
         },
 
         /**
-         * Emits the url update event for the list, changes the title of the filter button
-         * and saves the selected contact id in the storage.
-         *
-         * @param {string} filterKey
-         * @param {Object} contact
-         * @param {Object} category
-         * @param {Object} tag
+         * Opens authored selection overlay.
          */
-        applyFilterToList: function(filterKey, contact, category, tag) {
-            var filter = {
-                    contact: contact,
-                    category: category,
-                    tag: tag,
-                    filterKey: filterKey
-                },
-                update = {
-                    contactId: contact ? contact.id : null,
-                    categoryId: category ? category.id : null,
-                    tagId: tag ? tag.id : null
-                };
+        openAuthoredSelectionOverlay: function() {
+            var $container = $('<div/>');
 
-            this.storage.set('filter', filter);
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'articles/list/authored-selection@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: this.loadFilterFromStorage().authored,
+                    selectCallback: function(data) {
+                        this.appendFilter('authored', data);
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        /**
+         * Replace given filter.
+         *
+         * @param {String} key
+         * @param {Object|String} value
+         * @param {String} filterKey
+         */
+        replaceFilter: function(key, value, filterKey) {
+            var filter = this.loadFilterFromStorage();
+
+            filter.category = null;
+            filter.contact = null;
+            filter.tag = null;
+            filter.filterKey = filterKey || key;
+
+            if (value) {
+                filter[key] = value;
+            }
+
+            this.applyFilterToList(filter);
+        },
+
+        /**
+         * Append given filter.
+         *
+         * @param {String} key
+         * @param {Object|String} value
+         */
+        appendFilter: function(key, value) {
+            var filter = this.loadFilterFromStorage();
+            filter[key] = value;
+
+            this.applyFilterToList(filter);
+        },
+
+        /**
+         * Emits the url update event for the list, changes the title of the filter button
+         * and saves the selected filters in the storage.
+         *
+         * @param {Object} filter
+         */
+        applyFilterToList: function(filter) {
+            var update = {
+                contactId: filter.contact ? filter.contact.id : null,
+                categoryId: filter.category ? filter.category.id : null,
+                tagId: filter.tag ? filter.tag.id : null,
+                authoredFrom: filter.authored ? filter.authored.from : null,
+                authoredTo: filter.authored ? filter.authored.to : null
+            };
+
+            this.saveFilterToStorage(filter);
 
             this.sandbox.emit('husky.datagrid.articles.url.update', update);
             this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: this.getFilterTitle(filter)});
         },
 
         /**
-         * Retrieves the contact filter from the storage.
+         * Retrieves the filter from the storage.
          *
          * @returns {Object}
          */
-        getFilterFromStorage: function() {
-            return this.storage.getWithDefault('filter', {filterKey: 'all', contact: null, category: null, tag: null});
+        loadFilterFromStorage: function() {
+            return this.storage.getWithDefault('filter', {
+                filterKey: 'all',
+                contact: null,
+                category: null,
+                tag: null,
+                authored: {from: null, to: null}
+            });
+        },
+
+        /**
+         * Save the filter in the storage.
+         *
+         * @param {Object} filter
+         */
+        saveFilterToStorage: function(filter) {
+            this.storage.set('filter', filter);
         },
 
         /**
