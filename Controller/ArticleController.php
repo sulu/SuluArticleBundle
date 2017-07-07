@@ -128,7 +128,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('type', $type));
         }
 
-        if (null !== ($contactId = $request->get('contactId'))) {
+        if ($contactId = $request->get('contactId')) {
             $boolQuery = new BoolQuery();
             $boolQuery->add(new MatchQuery('changer_contact_id', $contactId), BoolQuery::SHOULD);
             $boolQuery->add(new MatchQuery('creator_contact_id', $contactId), BoolQuery::SHOULD);
@@ -136,11 +136,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery($boolQuery);
         }
 
-        if (null !== ($categoryId = $request->get('categoryId'))) {
+        if ($categoryId = $request->get('categoryId')) {
             $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
         }
 
-        if (null !== ($tagId = $request->get('tagId'))) {
+        if ($tagId = $request->get('tagId')) {
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
