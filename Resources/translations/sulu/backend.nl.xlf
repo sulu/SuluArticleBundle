@@ -134,9 +134,17 @@
                 <source>sulu_article.list.filter.by-category</source>
                 <target>Alleen categorie</target>
             </trans-unit>
+            <trans-unit id="list-filter-05" resname="sulu_article.list.filter.by-tag">
+                <source>sulu_article.list.filter.by-tag</source>
+                <target>Alleen tag</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filter artikel voor contact</target>
+            </trans-unit>
+            <trans-unit id="tag-selection-overlay-01" resname="sulu_article.tag-selection-overlay.title">
+                <source>sulu_article.tag-selection-overlay.title</source>
+                <target>Filter artikel op tag</target>
             </trans-unit>
             <trans-unit id="copy-01">
                 <source>sulu_article.edit.copy</source>
