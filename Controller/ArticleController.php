@@ -20,6 +20,7 @@ use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
@@ -144,6 +145,12 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
+        $authoredFrom = $request->get('authoredFrom');
+        $authoredTo = $request->get('authoredTo');
+        if ($authoredFrom || $authoredTo) {
+            $search->addQuery($this->getRangeQuery('authored', $authoredFrom, $authoredTo), BoolQuery::MUST);
+        }
+
         if (null === $search->getQueries()) {
             $search->addQuery(new MatchAllQuery());
         }
@@ -186,6 +193,11 @@ class ArticleController extends RestController implements ClassResourceInterface
                 )
             )
         );
+    }
+
+    private function getRangeQuery($field, $from, $to)
+    {
+        return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
 
     /**

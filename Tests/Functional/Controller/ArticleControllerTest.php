@@ -57,7 +57,7 @@ class ArticleControllerTest extends SuluTestCase
         $mediaTypes->load($this->getEntityManager());
     }
 
-    protected function post($title = 'Test-Article', $template = 'default')
+    protected function post($title = 'Test-Article', $template = 'default', $authored = '2016-01-01')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -66,7 +66,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => $authored,
             ]
         );
 
@@ -456,6 +456,29 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertContains($article2['id'], $response['_embedded']['articles'][0]['id']);
         $this->assertContains($article1['id'], $response['_embedded']['articles'][1]['id']);
+    }
+
+    public function testCGetAuthoredRange()
+    {
+        $this->purgeIndex();
+
+        $this->post('Sulu');
+        $this->flush();
+        $article = $this->post('Sulu is awesome', 'default', '2016-01-10');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&type=blog&authoredFrom=2016-01-09&authoredTo=2016-01-11');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
+        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
     }
 
     public function testCGetSearch()
