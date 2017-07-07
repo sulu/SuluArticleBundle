@@ -59,7 +59,7 @@ configuration to `app/config/admin/config.yml`:
 sulu_article:
     content_types:
         page_tree_route:
-            update: task # "request" or "off" 
+            page_route_cascade: task # "request" or "off" 
 ```
 
 **Route move**
