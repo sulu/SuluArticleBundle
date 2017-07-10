@@ -1008,6 +1008,34 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
     }
 
+    public function testCgetFilterByPage()
+    {
+        $page = $this->createPage('Test Page', '/test-page');
+
+        $routePathData = [
+            'page' => [
+                'uuid' => $page->getUuid(),
+                'path' => $page->getResourceSegment(),
+                'webspace' => 'sulu_io',
+            ],
+            'suffix' => 'test-article',
+            'path' => '/test-page/test-article',
+        ];
+
+        $article1 = $this->postPageTreeRoute($routePathData);
+
+        // create second article which should not appear in response
+        $this->post();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&pageId=' . $page->getUuid());
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $result = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(1, $result['_embedded']['articles']);
+        $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
+    }
+
     public function testPostPageTreeRoute()
     {
         $page = $this->createPage('Test Page', '/test-page');

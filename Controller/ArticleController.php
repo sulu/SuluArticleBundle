@@ -145,6 +145,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
+        if ($pageId = $request->get('pageId')) {
+            $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
+        }
+
         if ($workflowStage = $request->get('workflowStage')) {
             $search->addQuery(new TermQuery('published_state', $workflowStage === 'published'), BoolQuery::MUST);
         }

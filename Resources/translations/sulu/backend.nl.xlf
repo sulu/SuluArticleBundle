@@ -138,6 +138,10 @@
                 <source>sulu_article.list.filter.by-tag</source>
                 <target>Alleen tag</target>
             </trans-unit>
+            <trans-unit id="list-filter-06" resname="sulu_article.list.filter.by-page">
+                <source>sulu_article.list.filter.by-page</source>
+                <target>Alleen pagina</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filter artikelen voor contact</target>
@@ -157,6 +161,10 @@
             <trans-unit id="authored-selection-overlay-02" resname="sulu_article.authored-selection-overlay.to">
                 <source>sulu_article.authored-selection-overlay.to</source>
                 <target>Tot</target>
+            </trans-unit>
+            <trans-unit id="page-selection-overlay-01" resname="sulu_article.page-selection-overlay.title">
+                <source>sulu_article.page-selection-overlay.title</source>
+                <target>Filter artikelen op pagina</target>
             </trans-unit>
             <trans-unit id="copy-01">
                 <source>sulu_article.edit.copy</source>

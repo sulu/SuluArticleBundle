@@ -138,6 +138,10 @@
                 <source>sulu_article.list.filter.by-tag</source>
                 <target>Nur Tag</target>
             </trans-unit>
+            <trans-unit id="list-filter-06" resname="sulu_article.list.filter.by-page">
+                <source>sulu_article.list.filter.by-page</source>
+                <target>Nur Seite</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Artikel nach Kontakt filtern</target>
@@ -157,6 +161,10 @@
             <trans-unit id="authored-selection-overlay-02" resname="sulu_article.authored-selection-overlay.to">
                 <source>sulu_article.authored-selection-overlay.to</source>
                 <target>Bis</target>
+            </trans-unit>
+            <trans-unit id="page-selection-overlay-01" resname="sulu_article.page-selection-overlay.title">
+                <source>sulu_article.page-selection-overlay.title</source>
+                <target>Artikel nach Seite filtern</target>
             </trans-unit>
             <trans-unit id="copy-01">
                 <source>sulu_article.edit.copy</source>

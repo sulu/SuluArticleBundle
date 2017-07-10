@@ -50,6 +50,7 @@ define([
             filterByAuthor: 'sulu_article.list.filter.by-author',
             filterByCategory: 'sulu_article.list.filter.by-category',
             filterByTag: 'sulu_article.list.filter.by-tag',
+            filterByPage: 'sulu_article.list.filter.by-page',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -448,6 +449,12 @@ define([
                                 title: this.translations.filterByTag,
                                 marked: filter.filterKey === 'filterByTag',
                                 callback: this.openTagSelectionOverlay.bind(this)
+                            },
+                            {
+                                id: 'filterByPage',
+                                title: this.translations.filterByPage,
+                                marked: filter.filterKey === 'filterByPage',
+                                callback: this.openPageSelectionOverlay.bind(this)
                             }
                         ]
                     }
@@ -525,6 +532,30 @@ define([
         },
 
         /**
+         * Opens page selection overlay.
+         */
+        openPageSelectionOverlay: function() {
+            var $container = $('<div/>');
+
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'page-tree-route/page-select@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: this.loadFilterFromStorage().page,
+                    translations: {
+                        overlayTitle: 'sulu_article.page-selection-overlay.title'
+                    },
+                    selectCallback: function(data) {
+                        this.replaceFilter('page', data, 'filterByPage');
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        /**
          * Opens authored selection overlay.
          */
         openAuthoredSelectionOverlay: function() {
@@ -591,6 +622,7 @@ define([
                 contactId: filter.contact ? filter.contact.id : null,
                 categoryId: filter.category ? filter.category.id : null,
                 tagId: filter.tag ? filter.tag.id : null,
+                pageId: filter.page ? filter.page.id : null,
                 authoredFrom: filter.authored ? filter.authored.from : null,
                 authoredTo: filter.authored ? filter.authored.to : null,
                 workflowStage: filter.workflowStage ? filter.workflowStage : null
@@ -630,36 +662,31 @@ define([
          * Returns the title for the filter button.
          *
          * @param {Object} filter
+         *
          * @return {String}
          */
         getFilterTitle: function(filter) {
-            var title = '';
-
             switch (filter.filterKey) {
-                case 'all':
-                    title = this.translations.filterAll;
-                    break;
                 case 'filterByAuthor':
-                    title = this.translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;
-                    break;
+                    return this.translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;
                 case 'me':
-                    title = this.translations.filterMe;
-                    break;
+                    return this.translations.filterMe;
                 case 'filterByCategory':
-                    title = this.translations.filterByCategory + ' ' + filter.category.name;
-                    break;
+                    return this.translations.filterByCategory + ' ' + filter.category.name;
                 case 'filterByTag':
-                    title = this.translations.filterByTag + ' ' + filter.tag.name;
-                    break;
+                    return this.translations.filterByTag + ' ' + filter.tag.name;
+                case 'filterByPage':
+                    return this.translations.filterByPage + ' ' + filter.page.title;
             }
 
-            return title;
+            return this.translations.filterAll;
         },
 
         /**
          * Returns the title for the published button.
          *
          * @param {Object} filter
+         *
          * @return {String}
          */
         getPublishedTitle: function(filter) {
