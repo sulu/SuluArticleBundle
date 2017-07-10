@@ -140,11 +140,15 @@
             </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
-                <target>Filter article by contact</target>
+                <target>Filter articles by contact</target>
+            </trans-unit>
+            <trans-unit id="category-selection-overlay-01" resname="sulu_article.category-selection-overlay.title">
+                <source>sulu_article.category-selection-overlay.title</source>
+                <target>Filter articles by category</target>
             </trans-unit>
             <trans-unit id="tag-selection-overlay-01" resname="sulu_article.tag-selection-overlay.title">
                 <source>sulu_article.tag-selection-overlay.title</source>
-                <target>Filter article by tag</target>
+                <target>Filter articles by tag</target>
             </trans-unit>
             <trans-unit id="copy-01">
                 <source>sulu_article.edit.copy</source>
