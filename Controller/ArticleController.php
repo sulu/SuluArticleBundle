@@ -145,6 +145,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
+        if ($workflowStage = $request->get('workflowStage')) {
+            $search->addQuery(new TermQuery('published_state', $workflowStage === 'published'), BoolQuery::MUST);
+        }
+
         $authoredFrom = $request->get('authoredFrom');
         $authoredTo = $request->get('authoredTo');
         if ($authoredFrom || $authoredTo) {
@@ -195,6 +199,15 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
     }
 
+    /**
+     * Returns query to filter by given range.
+     *
+     * @param string $field
+     * @param string $from
+     * @param string $to
+     *
+     * @return RangeQuery
+     */
     private function getRangeQuery($field, $from, $to)
     {
         return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));

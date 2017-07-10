@@ -57,7 +57,7 @@ class ArticleControllerTest extends SuluTestCase
         $mediaTypes->load($this->getEntityManager());
     }
 
-    protected function post($title = 'Test-Article', $template = 'default', $authored = '2016-01-01')
+    protected function post($title = 'Test-Article', $template = 'default', $authored = '2016-01-01', $action = null)
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -67,6 +67,7 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => $template,
                 'authored' => $authored,
+                'action' => $action,
             ]
         );
 
@@ -469,6 +470,29 @@ class ArticleControllerTest extends SuluTestCase
 
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/api/articles?locale=de&type=blog&authoredFrom=2016-01-09&authoredTo=2016-01-11');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+
+        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
+        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
+    }
+
+    public function testCGetWorkflowStage()
+    {
+        $this->purgeIndex();
+
+        $this->post('Sulu');
+        $this->flush();
+        $article = $this->post('Sulu is awesome', 'default', '2016-01-10', 'publish');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&type=blog&workflowStage=published');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 

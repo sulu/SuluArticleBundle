@@ -42,6 +42,7 @@ define([
 
         translations: {
             headline: 'sulu_article.list.title',
+            published: 'public.published',
             unpublished: 'public.unpublished',
             publishedWithDraft: 'public.published-with-draft',
             filterMe: 'sulu_article.list.filter.me',
@@ -174,14 +175,7 @@ define([
             this.$el.html(this.templates.list());
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
-            var filter = this.loadFilterFromStorage();
-
-            if (!!filter.contact) {
-                urlArticleApi += '&contactId=' + filter.contact.id;
-            }
-            if (!!filter.category) {
-                urlArticleApi += '&categoryId=' + filter.category.id;
-            }
+            var toolbar = this.retrieveListToolbarTemplate(this.loadFilterFromStorage());
 
             this.sandbox.sulu.initListToolbarAndList.call(this,
                 'article',
@@ -189,7 +183,7 @@ define([
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.retrieveListToolbarTemplate(filter)
+                    template: toolbar
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
@@ -367,6 +361,44 @@ define([
                         callback: this.openAuthoredSelectionOverlay.bind(this)
                     }
                 },
+                workflowStage: {
+                    options: {
+                        icon: 'globe',
+                        group: 2,
+                        title: this.getPublishedTitle(filter),
+                        showTitle: true,
+                        dropdownOptions: {
+                            idAttribute: 'id',
+                            markSelected: true,
+                            changeButton: true
+                        },
+                        dropdownItems: [
+                            {
+                                title: this.translations.filterAll,
+                                marked: !filter.workflowStage,
+                                callback: function() {
+                                    this.appendFilter('workflowStage', null);
+                                }.bind(this)
+                            },
+                            {
+                                id: 'published',
+                                title: this.translations.published,
+                                marked: filter.workflowStage === 'published',
+                                callback: function() {
+                                    this.appendFilter('workflowStage', 'published');
+                                }.bind(this)
+                            },
+                            {
+                                id: 'test',
+                                title: this.translations.unpublished,
+                                marked: filter.workflowStage === 'test',
+                                callback: function() {
+                                    this.appendFilter('workflowStage', 'test');
+                                }.bind(this)
+                            }
+                        ]
+                    }
+                },
                 filter: {
                     options: {
                         icon: 'filter',
@@ -376,19 +408,22 @@ define([
                         dropdownOptions: {
                             idAttribute: 'id',
                             markSelected: true,
-                            changeButton: false
+                            changeButton: false,
+                            preSelected: filter.filterKey
                         },
                         dropdownItems: [
                             {
                                 id: 'all',
                                 title: this.translations.filterAll,
+                                marked: filter.filterKey === 'all',
                                 callback: function() {
-                                    this.replaceFilter('app');
+                                    this.replaceFilter('all');
                                 }.bind(this)
                             },
                             {
                                 id: 'me',
                                 title: this.translations.filterMe,
+                                marked: filter.filterKey === 'me',
                                 callback: function() {
                                     this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
                                 }.bind(this)
@@ -396,6 +431,7 @@ define([
                             {
                                 id: 'filterByAuthor',
                                 title: this.translations.filterByAuthor + '...',
+                                marked: filter.filterKey === 'filterByAuthor',
                                 callback: this.openContactSelectionOverlay.bind(this)
                             },
                             {
@@ -404,11 +440,13 @@ define([
                             {
                                 id: 'filterByCategory',
                                 title: this.translations.filterByCategory,
+                                marked: filter.filterKey === 'filterByCategory',
                                 callback: this.openCategorySelectionOverlay.bind(this)
                             },
                             {
                                 id: 'filterByTag',
                                 title: this.translations.filterByTag,
+                                marked: filter.filterKey === 'filterByTag',
                                 callback: this.openTagSelectionOverlay.bind(this)
                             }
                         ]
@@ -554,7 +592,8 @@ define([
                 categoryId: filter.category ? filter.category.id : null,
                 tagId: filter.tag ? filter.tag.id : null,
                 authoredFrom: filter.authored ? filter.authored.from : null,
-                authoredTo: filter.authored ? filter.authored.to : null
+                authoredTo: filter.authored ? filter.authored.to : null,
+                workflowStage: filter.workflowStage ? filter.workflowStage : null
             };
 
             this.saveFilterToStorage(filter);
@@ -615,6 +654,24 @@ define([
             }
 
             return title;
+        },
+
+        /**
+         * Returns the title for the published button.
+         *
+         * @param {Object} filter
+         * @return {String}
+         */
+        getPublishedTitle: function(filter) {
+            if (!filter.workflowStage) {
+                return this.translations.filterAll;
+            }
+
+            if (filter.workflowStage === 'published') {
+                return this.translations.published;
+            }
+
+            return this.translations.unpublished;
         }
     };
 });

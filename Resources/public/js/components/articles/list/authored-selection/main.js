@@ -18,7 +18,7 @@ define(['jquery'], function($) {
             }
         },
         translations: {
-            title: 'sulu_article.authored-selection-overlay.title',
+            title: 'sulu_article.authored',
             from: 'sulu_article.authored-selection-overlay.from',
             to: 'sulu_article.authored-selection-overlay.to'
         },
