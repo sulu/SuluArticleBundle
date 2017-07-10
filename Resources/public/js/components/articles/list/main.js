@@ -472,7 +472,7 @@ define([
                         contact: this.loadFilterFromStorage().contact
                     },
                     selectCallback: function(data) {
-                        this.replaceFilter('contact', data.contactItem, 'filterByAuthor');
+                        this.replaceFilter('contact', data.contactItem, 'filterByContact');
                     }.bind(this)
                 }
             }]);
@@ -495,7 +495,7 @@ define([
                         category: this.loadFilterFromStorage().category
                     },
                     selectCallback: function(data) {
-                        this.replaceFilter('category', data.categoryItem, 'filterByAuthor');
+                        this.replaceFilter('category', data.categoryItem, 'filterByCategory');
                     }.bind(this)
                 }
             }]);
@@ -518,7 +518,7 @@ define([
                         tag: this.loadFilterFromStorage().tag
                     },
                     selectCallback: function(data) {
-                        this.replaceFilter('tag', data.tagItem, 'filterByAuthor');
+                        this.replaceFilter('tag', data.tagItem, 'filterByTag');
                     }.bind(this)
                 }
             }]);
@@ -645,10 +645,10 @@ define([
                 case 'me':
                     title = this.translations.filterMe;
                     break;
-                case 'category':
+                case 'filterByCategory':
                     title = this.translations.filterByCategory + ' ' + filter.category.name;
                     break;
-                case 'tag':
+                case 'filterByTag':
                     title = this.translations.filterByTag + ' ' + filter.tag.name;
                     break;
             }
