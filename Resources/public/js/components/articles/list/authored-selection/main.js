@@ -20,7 +20,8 @@ define(['jquery'], function($) {
         translations: {
             title: 'sulu_article.authored',
             from: 'sulu_article.authored-selection-overlay.from',
-            to: 'sulu_article.authored-selection-overlay.to'
+            to: 'sulu_article.authored-selection-overlay.to',
+            reset: 'smart-content.choose-data-source.reset'
         },
         templates: {
             skeleton: [
@@ -77,7 +78,26 @@ define(['jquery'], function($) {
                         {
                             title: this.translations.title,
                             data: $(this.templates.skeleton({translations: this.translations})),
-                            okCallback: this.okCallbackOverlay.bind(this)
+                            okCallback: this.okCallbackOverlay.bind(this),
+                            buttons: [
+                                {
+                                    type: 'cancel',
+                                    align: 'left'
+                                },
+                                {
+                                    classes: 'just-text',
+                                    text: this.translations.reset,
+                                    align: 'center',
+                                    callback: function() {
+                                        this.options.selectCallback({from: null, to: null});
+                                        this.sandbox.stop();
+                                    }.bind(this)
+                                },
+                                {
+                                    type: 'ok',
+                                    align: 'right'
+                                }
+                            ]
                         }
                     ]
                 }

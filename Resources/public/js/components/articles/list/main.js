@@ -51,6 +51,8 @@ define([
             filterByCategory: 'sulu_article.list.filter.by-category',
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
+            from: 'sulu_article.authored-selection-overlay.from',
+            to: 'sulu_article.authored-selection-overlay.to',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -358,7 +360,7 @@ define([
                     options: {
                         icon: 'calendar',
                         group: 2,
-                        title: '',
+                        title: this.getAuthoredTitle(filter),
                         callback: this.openAuthoredSelectionOverlay.bind(this)
                     }
                 },
@@ -479,7 +481,7 @@ define([
                         contact: this.loadFilterFromStorage().contact
                     },
                     selectCallback: function(data) {
-                        this.replaceFilter('contact', data.contactItem, 'filterByContact');
+                        this.replaceFilter('contact', data.contactItem, 'filterByAuthor');
                     }.bind(this)
                 }
             }]);
@@ -570,7 +572,12 @@ define([
                     locale: this.options.locale,
                     data: this.loadFilterFromStorage().authored,
                     selectCallback: function(data) {
-                        this.appendFilter('authored', data);
+                        var filter = this.appendFilter('authored', data);
+                        this.sandbox.emit(
+                            'husky.toolbar.articles.button.set',
+                            'authoredDate',
+                            {title: this.getAuthoredTitle(filter)}
+                        );
                     }.bind(this)
                 }
             }]);
@@ -582,6 +589,8 @@ define([
          * @param {String} key
          * @param {Object|String} value
          * @param {String} filterKey
+         *
+         * @return {Object}
          */
         replaceFilter: function(key, value, filterKey) {
             var filter = this.loadFilterFromStorage();
@@ -589,13 +598,14 @@ define([
             filter.category = null;
             filter.contact = null;
             filter.tag = null;
+            filter.page = null;
             filter.filterKey = filterKey || key;
 
             if (value) {
                 filter[key] = value;
             }
 
-            this.applyFilterToList(filter);
+            return this.applyFilterToList(filter);
         },
 
         /**
@@ -603,12 +613,14 @@ define([
          *
          * @param {String} key
          * @param {Object|String} value
+         *
+         * @return {Object}
          */
         appendFilter: function(key, value) {
             var filter = this.loadFilterFromStorage();
             filter[key] = value;
 
-            this.applyFilterToList(filter);
+            return this.applyFilterToList(filter);
         },
 
         /**
@@ -616,6 +628,8 @@ define([
          * and saves the selected filters in the storage.
          *
          * @param {Object} filter
+         *
+         * @return {Object}
          */
         applyFilterToList: function(filter) {
             var update = {
@@ -632,6 +646,8 @@ define([
 
             this.sandbox.emit('husky.datagrid.articles.url.update', update);
             this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: this.getFilterTitle(filter)});
+
+            return filter;
         },
 
         /**
@@ -699,6 +715,35 @@ define([
             }
 
             return this.translations.unpublished;
+        },
+
+        /**
+         * Returns the title for the authored button.
+         *
+         * @param {Object} filter
+         *
+         * @return {String}
+         */
+        getAuthoredTitle: function(filter) {
+            if (!filter.authored) {
+                return '';
+            }
+
+            var parts = [];
+            if (filter.authored.from) {
+                parts.push(this.translations.from);
+                parts.push(this.sandbox.date.format(filter.authored.from + 'T00:00'));
+            }
+            if (filter.authored.to) {
+                parts.push(parts.length > 0 ? this.translations.to.toLowerCase() : this.translations.to);
+                parts.push(this.sandbox.date.format(filter.authored.to + 'T00:00'));
+            }
+
+            if (parts.length === 0) {
+                return ' ';
+            }
+
+            return parts.join(' ');
         }
     };
 });
