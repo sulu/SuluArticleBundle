@@ -116,9 +116,14 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor->addData('uuid', $context->accept($article->getArticleUuid()));
         $visitor->addData('pageUuid', $context->accept($article->getPageUuid()));
 
-        $extensionData = $article->getExtensionsData()->toArray();
+        $extensionData = $article->getExtensionsData();
+
+        if (!$extensionData) {
+            return;
+        }
+
         $extension = [];
-        foreach ($extensionData as $name => $data) {
+        foreach ($extensionData->toArray() as $name => $data) {
             $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($data);
         }
 

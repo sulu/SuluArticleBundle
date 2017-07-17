@@ -334,6 +334,10 @@ class ArticlePageDocument implements
      */
     public function getArticleUuid()
     {
+        if (!$this->parent) {
+            return;
+        }
+
         return $this->getParent()->getUuid();
     }
 
@@ -350,6 +354,10 @@ class ArticlePageDocument implements
      */
     public function getWorkflowStage()
     {
+        if (!$this->parent) {
+            return;
+        }
+
         return $this->getParent()->getWorkflowStage();
     }
 
@@ -358,6 +366,10 @@ class ArticlePageDocument implements
      */
     public function getExtensionsData()
     {
+        if (!$this->parent) {
+            return;
+        }
+
         return $this->getParent()->getExtensionsData();
     }
 }

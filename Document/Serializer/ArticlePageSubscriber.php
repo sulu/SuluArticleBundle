@@ -50,6 +50,12 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $visitor->addData('title', $context->accept($articlePage->getParent()->getTitle()));
+        $parent = $articlePage->getParent();
+
+        if (!$parent) {
+            return;
+        }
+
+        $visitor->addData('title', $context->accept($parent->getTitle()));
     }
 }
