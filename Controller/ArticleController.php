@@ -16,6 +16,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MatchPhraseQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -122,7 +123,11 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (!empty($searchPattern = $restHelper->getSearchPattern())
             && 0 < count($searchFields = $restHelper->getSearchFields())
         ) {
-            $search->addQuery(new MultiMatchQuery($searchFields, $searchPattern));
+            $boolQuery = new BoolQuery();
+            foreach ($searchFields as $searchField) {
+                $boolQuery->add(new MatchPhraseQuery($searchField, $searchPattern), BoolQuery::SHOULD);
+            }
+            $search->addQuery($boolQuery);
         }
 
         if (null !== ($type = $request->get('type'))) {
@@ -163,8 +168,6 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new MatchAllQuery());
         }
 
-        $count = $repository->count($search);
-
         if (null !== $restHelper->getSortColumn()) {
             $search->addSort(
                 new FieldSort($this->uncamelize($restHelper->getSortColumn()), $restHelper->getSortOrder())
@@ -175,7 +178,8 @@ class ArticleController extends RestController implements ClassResourceInterface
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
-        foreach ($repository->findDocuments($search) as $document) {
+        $searchResult = $repository->findDocuments($search);
+        foreach ($searchResult as $document) {
             if (false !== ($index = array_search($document->getUuid(), $ids))) {
                 $result[$index] = $document;
             } else {
@@ -197,7 +201,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $request->query->all(),
                     $page,
                     $limit,
-                    $count
+                    $searchResult->count()
                 )
             )
         );
