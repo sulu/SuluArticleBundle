@@ -26,6 +26,9 @@ define([
 
         templates: {
             list: [
+                '<div class="content-title">',
+                '    <h2><%= translations.headline %> <span class="type"><%= type %></span></h2>',
+                '</div>',
                 '<div class="list-toolbar-container"></div>',
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
@@ -174,7 +177,12 @@ define([
         },
 
         render: function() {
-            this.$el.html(this.templates.list());
+            var type = this.options.config.types[this.options.type];
+
+            this.$el.html(this.templates.list({
+                translations: this.translations,
+                type: type ? this.sandbox.translate(type.title) : ''
+            }));
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
             var toolbar = this.retrieveListToolbarTemplate(this.loadFilterFromStorage());
@@ -300,6 +308,8 @@ define([
             this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: this.options.type});
             ArticleRouter.toList(this.options.locale, this.options.type, false, false);
             this.storage.set('type', this.options.type);
+
+            this.setTypeName(item.key ? item.name : '');
         },
 
         /**
@@ -765,6 +775,10 @@ define([
             }
 
             return parts.join(' ');
+        },
+
+        setTypeName: function(name) {
+            this.$el.find('.type').text(this.sandbox.translate(name));
         }
     };
 });
