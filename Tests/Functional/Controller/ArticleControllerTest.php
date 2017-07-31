@@ -134,16 +134,21 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
+    protected function get($id, $locale = 'de')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $id . '?locale=' . $locale);
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
     public function testGet()
     {
         $article = $this->testPost();
 
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles/' . $article['id'] . '?locale=de');
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $response = json_decode($client->getResponse()->getContent(), true);
+        $response = $this->get($article['id']);
         foreach ($article as $name => $value) {
             $this->assertEquals($value, $response[$name]);
         }
@@ -1078,10 +1083,18 @@ class ArticleControllerTest extends SuluTestCase
             $this->postPage($article, 'Page 1'),
             $this->postPage($article, 'Page 2'),
             $this->postPage($article, 'Page 3'),
+            $this->postPage($article, 'Page 4'),
         ];
-        $expectedPages = [$pages[1]['id'], $pages[2]['id'], $pages[0]['id']];
+        $expectedPages = [$pages[3]['id'], $pages[0]['id'], $pages[1]['id'], $pages[2]['id']];
 
         $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?action=publish&locale=de',
+            $this->get($article['id'])
+        );
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
         $client->request(
             'POST',
             '/api/articles/' . $article['id'] . '?action=order&locale=de',
@@ -1095,6 +1108,10 @@ class ArticleControllerTest extends SuluTestCase
         for ($i = 0; $i < count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);
+            $this->assertEquals(
+                $article['route'] . '/page-' . $responsePages[$i]['pageNumber'],
+                $responsePages[$i]['route']
+            );
         }
     }
 

@@ -198,7 +198,7 @@ class RoutableSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($child));
+            $route = $this->chainRouteGenerator->generate($child);
             $child->setRoutePath($route->getPath());
 
             $node = $this->documentInspector->getNode($child);
@@ -328,7 +328,7 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
         $history = $this->routeRepository->findHistoryByEntity(get_class($document), $document->getUuid(), $locale);
-        foreach (array_merge($history, [$oldRoute]) as $historyRoute) {
+        foreach (array_filter(array_merge($history, [$oldRoute])) as $historyRoute) {
             if ($historyRoute->getId() === $newRoute->getId()) {
                 continue;
             }
