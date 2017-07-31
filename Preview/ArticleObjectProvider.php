@@ -149,6 +149,10 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
                 ->setGroups(['preview'])
         );
 
+        foreach ($article->getChildren() as $child) {
+            $child->setParent($article);
+        }
+
         if ($result['pageNumber'] === 1) {
             return $article;
         }
@@ -156,7 +160,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
         $children = array_values($article->getChildren());
 
         $object = $children[$result['pageNumber'] - 2];
-        $object->setParent($article);
 
         return $object;
     }
