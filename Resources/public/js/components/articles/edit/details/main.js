@@ -75,7 +75,13 @@ define([
                 return;
             }
 
+            var routePathProperty = this.getRoutePathProperty();
             var data = this.sandbox.form.getData(this.formId);
+
+            if (data[routePathProperty.name] && data[routePathProperty.name] === '/') {
+                delete data[routePathProperty.name];
+            }
+
             this.options.adapter.save(this, data, action).done(function(response) {
                 this.data = response;
 
