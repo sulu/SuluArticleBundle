@@ -149,6 +149,8 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
             )
         )->shouldBeCalled()->willReturn($object->reveal());
 
+        $object->getChildren()->willReturn([]);
+
         $this->assertEquals(
             $object->reveal(),
             $this->provider->deserialize(
@@ -163,6 +165,7 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
         $article = $this->prophesize(ArticleDocument::class);
 
         $object = $this->prophesize(ArticlePageDocument::class);
+        $page2 = $this->prophesize(ArticlePageDocument::class);
 
         $this->serializer->deserialize(
             '{"title": "test"}',
@@ -176,8 +179,9 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
             )
         )->shouldBeCalled()->willReturn($article->reveal());
 
-        $article->getChildren()->willReturn(['page-1' => $object->reveal()]);
+        $article->getChildren()->willReturn(['page-1' => $object->reveal(), 'page-2' => $page2->reveal()]);
         $object->setParent($article->reveal())->shouldBeCalled();
+        $page2->setParent($article->reveal())->shouldBeCalled();
 
         $this->assertEquals(
             $object->reveal(),
