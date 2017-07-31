@@ -34,9 +34,7 @@ define([
             draftIcon: '<span class="draft-icon" title="<%= title %>"/>',
             publishedIcon: '<span class="published-icon" title="<%= title %>"/>',
             route: [
-                'articles',
-                '<% if (!!type) { %>:<%=type%><% } %>',
-                '/<%=locale%>'
+                'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
             ].join('')
         },
 
@@ -51,6 +49,7 @@ define([
             filterByCategory: 'sulu_article.list.filter.by-category',
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
+            filterByTimescale: 'sulu_article.list.filter.by-timescale',
             from: 'sulu_article.authored-selection-overlay.from',
             to: 'sulu_article.authored-selection-overlay.to',
             openGhostOverlay: {
@@ -361,12 +360,34 @@ define([
                         icon: 'calendar',
                         group: 2,
                         title: this.getAuthoredTitle(filter),
-                        callback: this.openAuthoredSelectionOverlay.bind(this)
+                        showTitle: true,
+                        dropdownOptions: {
+                            idAttribute: 'id',
+                            markSelected: false
+                        },
+                        dropdownItems: [
+                            {
+                                title: this.translations.filterAll,
+                                callback: function() {
+                                    var filter = this.appendFilter('authored', {from: null, to: null});
+                                    this.sandbox.emit(
+                                        'husky.toolbar.articles.button.set',
+                                        'authoredDate',
+                                        {title: this.getAuthoredTitle(filter)}
+                                    );
+                                }.bind(this)
+                            },
+                            {
+                                id: 'timescale',
+                                title: this.translations.filterByTimescale,
+                                callback: this.openAuthoredSelectionOverlay.bind(this)
+                            }
+                        ]
                     }
                 },
                 workflowStage: {
                     options: {
-                        icon: 'globe',
+                        icon: 'circle-o',
                         group: 2,
                         title: this.getPublishedTitle(filter),
                         showTitle: true,
@@ -433,7 +454,7 @@ define([
                             },
                             {
                                 id: 'filterByAuthor',
-                                title: this.translations.filterByAuthor + '...',
+                                title: this.translations.filterByAuthor + ' ...',
                                 marked: filter.filterKey === 'filterByAuthor',
                                 callback: this.openContactSelectionOverlay.bind(this)
                             },
@@ -442,19 +463,19 @@ define([
                             },
                             {
                                 id: 'filterByCategory',
-                                title: this.translations.filterByCategory,
+                                title: this.translations.filterByCategory + ' ...',
                                 marked: filter.filterKey === 'filterByCategory',
                                 callback: this.openCategorySelectionOverlay.bind(this)
                             },
                             {
                                 id: 'filterByTag',
-                                title: this.translations.filterByTag,
+                                title: this.translations.filterByTag + ' ...',
                                 marked: filter.filterKey === 'filterByTag',
                                 callback: this.openTagSelectionOverlay.bind(this)
                             },
                             {
                                 id: 'filterByPage',
-                                title: this.translations.filterByPage,
+                                title: this.translations.filterByPage + ' ...',
                                 marked: filter.filterKey === 'filterByPage',
                                 callback: this.openPageSelectionOverlay.bind(this)
                             }
@@ -726,7 +747,7 @@ define([
          */
         getAuthoredTitle: function(filter) {
             if (!filter.authored) {
-                return '';
+                return this.translation.filterAll;
             }
 
             var parts = [];
@@ -740,7 +761,7 @@ define([
             }
 
             if (parts.length === 0) {
-                return ' ';
+                return this.translations.filterAll;
             }
 
             return parts.join(' ');

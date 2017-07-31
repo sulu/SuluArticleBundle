@@ -142,6 +142,10 @@
                 <source>sulu_article.list.filter.by-page</source>
                 <target>Uniquement par page</target>
             </trans-unit>
+            <trans-unit id="list-filter-07" resname="sulu_article.list.filter.by-timescale">
+                <source>sulu_article.list.filter.by-timescale</source>
+                <target>Période</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filtrer les articles par contact</target>
