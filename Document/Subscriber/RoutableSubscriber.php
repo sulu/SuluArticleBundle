@@ -328,8 +328,14 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
         $history = $this->routeRepository->findHistoryByEntity(get_class($document), $document->getUuid(), $locale);
+
+        /** @var RouteInterface $historyRoute */
         foreach (array_filter(array_merge($history, [$oldRoute])) as $historyRoute) {
-            if ($historyRoute->getId() === $newRoute->getId()) {
+            if ($historyRoute->getId() === $newRoute->getId() || $document->getId() !== $historyRoute->getEntityId()) {
+                // Mismatch of entity-id's happens because doctrine don't check entities which has been changed in the
+                // current session. If the old-route was already reused by a page before it will be returned in the
+                // query of line 329.
+
                 continue;
             }
 
