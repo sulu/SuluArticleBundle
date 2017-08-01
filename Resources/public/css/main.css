@@ -71,3 +71,13 @@
 .page-tree-route .history {
   display: inline-block;
 }
+
+/* line 2, ../../scss/modules/teaser-selection.scss */
+.article-teaser-selection .teaser-selection-tabs {
+  padding-left: 20px;
+  background-color: white;
+}
+/* line 7, ../../scss/modules/teaser-selection.scss */
+.article-teaser-selection .grid {
+  padding: 20px;
+}
