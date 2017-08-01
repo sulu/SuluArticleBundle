@@ -1096,9 +1096,11 @@ class ArticleControllerTest extends SuluTestCase
             $this->postPage($article, 'Page 3'),
             $this->postPage($article, 'Page 4'),
         ];
-        $expectedPages = [$pages[3]['id'], $pages[2]['id'], $pages[1]['id'], $pages[0]['id']];
-
         $this->publish($article['id']);
+
+        $pages[] = $this->postPage($article, 'Page 5');
+
+        $expectedPages = [$pages[4]['id'], $pages[3]['id'], $pages[2]['id'], $pages[1]['id'], $pages[0]['id']];
 
         $client = $this->createAuthenticatedClient();
         $client->request(
