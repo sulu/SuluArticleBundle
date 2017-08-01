@@ -15,6 +15,7 @@ use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
@@ -27,6 +28,7 @@ use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManager;
@@ -134,16 +136,21 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
+    protected function get($id, $locale = 'de')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $id . '?locale=' . $locale);
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
     public function testGet()
     {
         $article = $this->testPost();
 
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles/' . $article['id'] . '?locale=de');
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $response = json_decode($client->getResponse()->getContent(), true);
+        $response = $this->get($article['id']);
         foreach ($article as $name => $value) {
             $this->assertEquals($value, $response[$name]);
         }
@@ -1071,6 +1078,15 @@ class ArticleControllerTest extends SuluTestCase
         );
     }
 
+    protected function publish($id)
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request('PUT', '/api/articles/' . $id . '?action=publish&locale=de', $this->get($id));
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
     public function testOrderPages()
     {
         $article = $this->post();
@@ -1078,8 +1094,13 @@ class ArticleControllerTest extends SuluTestCase
             $this->postPage($article, 'Page 1'),
             $this->postPage($article, 'Page 2'),
             $this->postPage($article, 'Page 3'),
+            $this->postPage($article, 'Page 4'),
         ];
-        $expectedPages = [$pages[1]['id'], $pages[2]['id'], $pages[0]['id']];
+        $this->publish($article['id']);
+
+        $pages[] = $this->postPage($article, 'Page 5');
+
+        $expectedPages = [$pages[4]['id'], $pages[3]['id'], $pages[2]['id'], $pages[1]['id'], $pages[0]['id']];
 
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -1089,12 +1110,24 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
-        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $response = $this->publish($article['id']);
 
         $responsePages = $response['_embedded']['pages'];
         for ($i = 0; $i < count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);
+            $this->assertEquals(
+                $article['route'] . '/page-' . $responsePages[$i]['pageNumber'],
+                $responsePages[$i]['route']
+            );
+
+            $route = $this->findRoute($responsePages[$i]['route'], 'de');
+            $this->assertEquals(ArticlePageDocument::class, $route->getEntityClass());
+            $this->assertEquals($responsePages[$i]['id'], $route->getEntityId());
+            $this->assertEquals('de', $route->getLocale());
+            $this->assertFalse($route->isHistory());
+            $this->assertNull($route->getTarget());
         }
     }
 
@@ -1224,6 +1257,17 @@ class ArticleControllerTest extends SuluTestCase
         $manager = $this->getContainer()->get('es.manager.default');
 
         return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+    }
+
+    /**
+     * @param string $path
+     * @param string $locale
+     *
+     * @return RouteInterface
+     */
+    private function findRoute($path, $locale)
+    {
+        return $this->getContainer()->get('sulu.repository.route')->findByPath($path, $locale);
     }
 
     private function getRoute($title)
