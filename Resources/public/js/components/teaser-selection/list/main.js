@@ -107,7 +107,7 @@ define(['underscore', 'config'], function(_, Config) {
                         sortable: false,
                         columnOptionsInstanceName: '',
                         clickCallback: function(item) {
-                            this.sandbox.emit('husky.datagrid.teaser-selection.toggle.item', item);
+                            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
                         }.bind(this),
                         selectedCounter: true,
                         searchInstanceName: this.options.instanceName + '-teaser-search',
@@ -134,10 +134,10 @@ define(['underscore', 'config'], function(_, Config) {
         },
 
         bindCustomEvents: function() {
-            this.sandbox.on('husky.datagrid.teaser-selection.item.select', function(id) {
+            this.sandbox.on('husky.datagrid.' + this.options.instanceName + '.item.select', function(id) {
                 this.options.selectCallback({type: this.options.type, id: id});
             }.bind(this));
-            this.sandbox.on('husky.datagrid.teaser-selection.item.deselect', function(id) {
+            this.sandbox.on('husky.datagrid.' + this.options.instanceName + '.item.deselect', function(id) {
                 this.options.deselectCallback({type: this.options.type, id: id});
             }.bind(this));
         },
