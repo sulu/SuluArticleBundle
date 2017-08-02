@@ -177,6 +177,14 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                         data: this.options.data,
                         selectCallback: this.closeCategorySelection.bind(this)
                     }
+                },
+                {
+                    name: 'articles/list/tag-selection/form@suluarticle',
+                    options: {
+                        el: '.slide.tag-slide .overlay-content',
+                        data: this.options.data,
+                        selectCallback: this.closeTagSelection.bind(this)
+                    }
                 }
             ]);
 
@@ -306,6 +314,11 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                                 id: 'filterByCategory',
                                 title: this.translations.filterByCategory + ' ...',
                                 callback: this.openCategorySelection.bind(this)
+                            },
+                            {
+                                id: 'filterByTag',
+                                title: this.translations.filterByTag + ' ...',
+                                callback: this.openTagSelection.bind(this)
                             }
                         ]
                     }
@@ -351,7 +364,6 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             var filter = {filterKey: filterKey || 'filterByAuthor', contact: data.contactItem};
 
             this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
-
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
 
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
@@ -372,7 +384,23 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             var filter = {filterKey: 'filterByCategory', category: data.categoryItem};
 
             this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
 
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+        },
+
+        openTagSelection: function() {
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 4);
+
+            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
+                this.sandbox.emit('sulu_article.tag-selection.form.get');
+            }.bind(this));
+        },
+
+        closeTagSelection: function(data) {
+            var filter = {filterKey: 'filterByTag', tag: data.tagItem};
+
+            this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
 
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
@@ -394,6 +422,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             return {
                 contactId: filter.contact ? filter.contact.id : null,
                 categoryId: filter.category ? filter.category.id : null,
+                tagId: filter.tag ? filter.tag.id : null,
             };
         }
     };
