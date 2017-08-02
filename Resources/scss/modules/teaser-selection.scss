@@ -7,4 +7,14 @@
     .grid {
         padding: 20px;
     }
+
+    .search-row,
+    .list-toolbar {
+        margin-bottom: 0;
+    }
+
+    &.limited {
+        height: 200px;
+        overflow: hidden;
+    }
 }
