@@ -112,6 +112,17 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                         ],
                     ],
                 ],
+                [
+                    'title' => $this->translator->trans('public.choose', [], 'backend'),
+                    'cssClass' => 'page-slide data-source-slide',
+                    'contentSpacing' => false,
+                    'buttons' => [
+                        [
+                            'type' => 'ok',
+                            'align' => 'right',
+                        ],
+                    ],
+                ],
             ]
         );
     }

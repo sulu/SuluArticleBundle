@@ -185,6 +185,15 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                         data: this.options.data,
                         selectCallback: this.closeTagSelection.bind(this)
                     }
+                },
+                {
+                    name: 'articles/list/page-selection/form@suluarticle',
+                    options: {
+                        el: '.slide.page-slide .overlay-content',
+                        locale: this.options.locale,
+                        data: this.options.data,
+                        selectCallback: this.closePageSelection.bind(this)
+                    }
                 }
             ]);
 
@@ -319,6 +328,11 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                                 id: 'filterByTag',
                                 title: this.translations.filterByTag + ' ...',
                                 callback: this.openTagSelection.bind(this)
+                            },
+                            {
+                                id: 'filterByPage',
+                                title: this.translations.filterByPage + ' ...',
+                                callback: this.openPageSelection.bind(this)
                             }
                         ]
                     }
@@ -406,6 +420,23 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
         },
 
+        openPageSelection: function() {
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 5);
+
+            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
+                this.sandbox.emit('sulu_article.page-selection.form.get');
+            }.bind(this));
+        },
+
+        closePageSelection: function(data) {
+            var filter = {filterKey: 'filterByPage', page: data.pageItem};
+
+            this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
+
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+        },
+
         removeFilter: function() {
             this.setButtonTitle('filter', listHelper.getFilterTitle());
 
@@ -423,6 +454,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                 contactId: filter.contact ? filter.contact.id : null,
                 categoryId: filter.category ? filter.category.id : null,
                 tagId: filter.tag ? filter.tag.id : null,
+                pageId: filter.page ? filter.page.id : null,
             };
         }
     };
