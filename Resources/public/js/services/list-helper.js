@@ -42,6 +42,7 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
 
         templates = {
             draftIcon: _.template('<span class="draft-icon" title="<%= title %>"/>'),
+            publishedIcon: _.template('<span class="published-icon" title="<%= title %>"/>'),
         };
 
     return {
@@ -60,11 +61,11 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
             var parts = [];
             if (authored.from) {
                 parts.push(translations.from);
-                parts.push(this.sandbox.date.format(authored.from + 'T00:00'));
+                parts.push(App.date.format(authored.from + 'T00:00'));
             }
             if (authored.to) {
                 parts.push(parts.length > 0 ? translations.to.toLowerCase() : translations.to);
-                parts.push(this.sandbox.date.format(authored.to + 'T00:00'));
+                parts.push(App.date.format(authored.to + 'T00:00'));
             }
 
             if (parts.length === 0) {

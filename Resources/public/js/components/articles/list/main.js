@@ -35,8 +35,7 @@ define([
                 '<div class="datagrid-container"></div>',
                 '<div class="dialog"></div>'
             ].join(''),
-            draftIcon: '<span class="draft-icon" title="<%= title %>"/>',
-            publishedIcon: '<span class="published-icon" title="<%= title %>"/>',
+
             route: [
                 'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
             ].join('')

@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
 use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\ContentBundle\Teaser\Teaser;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Enables selection of articles in teaser content-type.
@@ -32,17 +33,24 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     private $searchManager;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var string
      */
     private $articleDocumentClass;
 
     /**
      * @param Manager $searchManager
+     * @param TranslatorInterface $translator
      * @param $articleDocumentClass
      */
-    public function __construct(Manager $searchManager, $articleDocumentClass)
+    public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
     {
         $this->searchManager = $searchManager;
+        $this->translator = $translator;
         $this->articleDocumentClass = $articleDocumentClass;
     }
 
@@ -61,7 +69,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             ],
             [
                 [
-                    'title' => 'Test 1',
+                    'title' => $this->translator->trans('sulu_article.authored', [], 'backend'),
                     'cssClass' => 'authored-slide',
                     'contentSpacing' => true,
                     'buttons' => [
