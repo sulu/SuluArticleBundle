@@ -103,7 +103,7 @@ define([
                         }.bind(this),
                         selectedCounter: true,
                         searchInstanceName: this.options.instanceName + '-article-search',
-                        searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'pages.title'],
+                        searchFields: ['id', 'title'],
                         paginationOptions: {
                             dropdown: {
                                 limit: 20

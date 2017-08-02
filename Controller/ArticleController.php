@@ -16,11 +16,10 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MatchPhraseQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
@@ -122,11 +121,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (!empty($searchPattern = $restHelper->getSearchPattern())
             && 0 < count($searchFields = $restHelper->getSearchFields())
         ) {
-            $boolQuery = new BoolQuery();
-            foreach ($searchFields as $searchField) {
-                $boolQuery->add(new MatchPhraseQuery($searchField, $searchPattern), BoolQuery::SHOULD);
-            }
-            $search->addQuery($boolQuery);
+            $search->addQuery(new MultiMatchQuery($searchFields, $searchPattern));
         }
 
         if (null !== ($type = $request->get('type'))) {
@@ -149,23 +144,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
-        if ($pageId = $request->get('pageId')) {
-            $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
-        }
-
-        if ($workflowStage = $request->get('workflowStage')) {
-            $search->addQuery(new TermQuery('published_state', $workflowStage === 'published'), BoolQuery::MUST);
-        }
-
-        $authoredFrom = $request->get('authoredFrom');
-        $authoredTo = $request->get('authoredTo');
-        if ($authoredFrom || $authoredTo) {
-            $search->addQuery($this->getRangeQuery('authored', $authoredFrom, $authoredTo), BoolQuery::MUST);
-        }
-
         if (null === $search->getQueries()) {
             $search->addQuery(new MatchAllQuery());
         }
+
+        $count = $repository->count($search);
 
         if (null !== $restHelper->getSortColumn()) {
             $search->addSort(
@@ -177,8 +160,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
-        $searchResult = $repository->findDocuments($search);
-        foreach ($searchResult as $document) {
+        foreach ($repository->findDocuments($search) as $document) {
             if (false !== ($index = array_search($document->getUuid(), $ids))) {
                 $result[$index] = $document;
             } else {
@@ -200,24 +182,10 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $request->query->all(),
                     $page,
                     $limit,
-                    $searchResult->count()
+                    $count
                 )
             )
         );
-    }
-
-    /**
-     * Returns query to filter by given range.
-     *
-     * @param string $field
-     * @param string $from
-     * @param string $to
-     *
-     * @return RangeQuery
-     */
-    private function getRangeQuery($field, $from, $to)
-    {
-        return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
 
     /**

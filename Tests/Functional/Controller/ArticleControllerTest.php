@@ -57,7 +57,7 @@ class ArticleControllerTest extends SuluTestCase
         $mediaTypes->load($this->getEntityManager());
     }
 
-    protected function post($title = 'Test-Article', $template = 'default', $authored = '2016-01-01', $action = null)
+    protected function post($title = 'Test-Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -66,8 +66,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => $authored,
-                'action' => $action,
+                'authored' => '2016-01-01',
             ]
         );
 
@@ -457,52 +456,6 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertContains($article2['id'], $response['_embedded']['articles'][0]['id']);
         $this->assertContains($article1['id'], $response['_embedded']['articles'][1]['id']);
-    }
-
-    public function testCGetAuthoredRange()
-    {
-        $this->purgeIndex();
-
-        $this->post('Sulu');
-        $this->flush();
-        $article = $this->post('Sulu is awesome', 'default', '2016-01-10');
-        $this->flush();
-
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&authoredFrom=2016-01-09&authoredTo=2016-01-11');
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertEquals(1, $response['total']);
-        $this->assertCount(1, $response['_embedded']['articles']);
-
-        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
-        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
-    }
-
-    public function testCGetWorkflowStage()
-    {
-        $this->purgeIndex();
-
-        $this->post('Sulu');
-        $this->flush();
-        $article = $this->post('Sulu is awesome', 'default', '2016-01-10', 'publish');
-        $this->flush();
-
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&workflowStage=published');
-
-        $this->assertHttpStatusCode(200, $client->getResponse());
-
-        $response = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertEquals(1, $response['total']);
-        $this->assertCount(1, $response['_embedded']['articles']);
-
-        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
-        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
     }
 
     public function testCGetSearch()
@@ -1001,34 +954,6 @@ class ArticleControllerTest extends SuluTestCase
         $article2 = $this->post();
 
         $client->request('GET', '/api/articles?locale=de&tagId=' . $tag->getId());
-        $this->assertHttpStatusCode(200, $client->getResponse());
-        $result = json_decode($client->getResponse()->getContent(), true);
-
-        $this->assertCount(1, $result['_embedded']['articles']);
-        $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
-    }
-
-    public function testCgetFilterByPage()
-    {
-        $page = $this->createPage('Test Page', '/test-page');
-
-        $routePathData = [
-            'page' => [
-                'uuid' => $page->getUuid(),
-                'path' => $page->getResourceSegment(),
-                'webspace' => 'sulu_io',
-            ],
-            'suffix' => 'test-article',
-            'path' => '/test-page/test-article',
-        ];
-
-        $article1 = $this->postPageTreeRoute($routePathData);
-
-        // create second article which should not appear in response
-        $this->post();
-
-        $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&pageId=' . $page->getUuid());
         $this->assertHttpStatusCode(200, $client->getResponse());
         $result = json_decode($client->getResponse()->getContent(), true);
 
