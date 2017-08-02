@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'text!./form.html', function($, formTemplate) {
+define(['jquery', 'text!./form.html'], function($, formTemplate) {
 
     'use strict';
 
