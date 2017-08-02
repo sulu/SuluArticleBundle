@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery'], function($) {
+define(['jquery', 'text!./form.html', function($, formTemplate) {
 
     'use strict';
 
@@ -24,34 +24,7 @@ define(['jquery'], function($) {
             reset: 'smart-content.choose-data-source.reset'
         },
         templates: {
-            skeleton: [
-                '<div class="grid">',
-                '   <div class="grid-row">',
-                '       <div class="grid-col-6 form-group">',
-                '            <label for="authored-from"><%= translations.from %></label>',
-                '           <div class="form-element"',
-                '                data-aura-component="input@husky"',
-                '                data-aura-skin="date"',
-                '                data-aura-instance-name="from"',
-                '                data-aura-inpu-id="authored-from"',
-                '                data-type="husky-input"',
-                '                data-form="true"',
-                '                data-mapper-property="from"/>',
-                '       </div>',
-                '       <div class="grid-col-6 form-group">',
-                '            <label for="authored-to"><%= translations.to %></label>',
-                '           <div class="form-element"',
-                '                data-aura-component="input@husky"',
-                '                data-aura-skin="date"',
-                '                data-aura-instance-name="to"',
-                '                data-aura-inpu-id="authored-to"',
-                '                data-type="husky-input"',
-                '                data-form="true"',
-                '                data-mapper-property="to"/>',
-                '       </div>',
-                '   </div>',
-                '</div>'
-            ].join('')
+            skeleton: formTemplate
         }
     };
 
