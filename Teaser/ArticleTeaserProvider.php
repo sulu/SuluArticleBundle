@@ -90,6 +90,17 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                         ],
                     ],
                 ],
+                [
+                    'title' => $this->translator->trans('sulu_article.category-selection-overlay.title', [], 'backend'),
+                    'cssClass' => 'category-slide',
+                    'contentSpacing' => true,
+                    'buttons' => [
+                        [
+                            'type' => 'ok',
+                            'align' => 'right',
+                        ],
+                    ],
+                ],
             ]
         );
     }

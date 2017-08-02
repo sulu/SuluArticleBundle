@@ -168,6 +168,15 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                         data: this.options.data,
                         selectCallback: this.closeContactSelection.bind(this)
                     }
+                },
+                {
+                    name: 'articles/list/category-selection/form@suluarticle',
+                    options: {
+                        el: '.slide.category-slide .overlay-content',
+                        locale: this.options.locale,
+                        data: this.options.data,
+                        selectCallback: this.closeCategorySelection.bind(this)
+                    }
                 }
             ]);
 
@@ -289,6 +298,14 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                                 id: 'filterByAuthor',
                                 title: this.translations.filterByAuthor + ' ...',
                                 callback: this.openContactSelection.bind(this)
+                            },
+                            {
+                                divider: true
+                            },
+                            {
+                                id: 'filterByCategory',
+                                title: this.translations.filterByCategory + ' ...',
+                                callback: this.openCategorySelection.bind(this)
                             }
                         ]
                     }
@@ -322,12 +339,6 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
         },
 
-        setWorkflowStage: function(workflowStage) {
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                workflowStage: workflowStage,
-            });
-        },
-
         openContactSelection: function() {
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 2);
 
@@ -341,9 +352,28 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
 
             this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
 
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                contactId: filter.contact ? filter.contact.id : null,
-            });
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
+
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+        },
+
+        openCategorySelection: function() {
+            this.$el.parent().addClass('limited');
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 3);
+
+            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
+                this.sandbox.emit('sulu_article.category-selection.form.get');
+            }.bind(this));
+        },
+
+        closeCategorySelection: function(data) {
+            this.$el.parent().removeClass('limited');
+
+            var filter = {filterKey: 'filterByCategory', category: data.categoryItem};
+
+            this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
+
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter(filter));
 
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
         },
@@ -351,9 +381,20 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
         removeFilter: function() {
             this.setButtonTitle('filter', listHelper.getFilterTitle());
 
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update',this.getUrlParameter({}));
+        },
+
+        setWorkflowStage: function(workflowStage) {
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                contactId: null,
+                workflowStage: workflowStage,
             });
+        },
+
+        getUrlParameter: function(filter) {
+            return {
+                contactId: filter.contact ? filter.contact.id : null,
+                categoryId: filter.category ? filter.category.id : null,
+            };
         }
     };
 });
