@@ -13,7 +13,7 @@
  * @class ListArticleTeaser
  * @constructor
  */
-define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_, Config, listHelper) {
+define(['underscore', 'config'], function(_, Config) {
 
     'use strict';
 
@@ -23,6 +23,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                 url: '',
                 resultKey: null,
                 searchFields: [],
+                matchings: [],
                 instanceName: 'teaser-selection',
                 selectCallback: function(item) {
                 }
@@ -32,19 +33,14 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                     '<div class="teaser-selection-tabs"></div>',
                     '<div class="grid">',
                     '   <div class="grid-row search-row">',
-                    '       <div class="grid-col-12 teaser-selection-search"/>',
+                    '       <div class="grid-col-8"/>',
+                    '       <div class="grid-col-4 teaser-selection-search"/>',
                     '   </div>',
                     '   <div class="grid-row">',
                     '       <div class="grid-col-12 teaser-selection-list"/>',
                     '   </div>',
                     '</div>'
-                ].join(''),
-            },
-            translations: {
-                filterAll: 'sulu_article.list.filter.all',
-                filterByTimescale: 'sulu_article.list.filter.by-timescale',
-                published: 'public.published',
-                unpublished: 'public.unpublished',
+                ].join('')
             }
         },
 
@@ -89,68 +85,47 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             var $container = $(this.templates.skeleton());
             this.$el.append($container);
 
-            var toolbar = this.retrieveListToolbarTemplate();
-            this.sandbox.sulu.initListToolbarAndList.call(this,
-                'article',
-                '/admin/api/articles/fields',
+            this.sandbox.start([
                 {
-                    el: '.teaser-selection-search',
-                    instanceName: this.options.instanceName,
-                    template: toolbar
+                    name: 'search@husky',
+                    options: {
+                        el: '.teaser-selection-search',
+                        appearance: 'white small',
+                        instanceName: this.options.instanceName + '-teaser-search'
+                    }
                 },
                 {
-                    el: '.teaser-selection-list',
-                    instanceName: this.options.instanceName,
-                    url: this.getUrl(),
-                    preselected: _.map(this.options.data, function(item) {
-                        return item.id;
-                    }),
-                    resultKey: this.options.resultKey,
-                    clickCallback: function(item) {
-                        this.sandbox.emit('husky.datagrid.teaser-selection.toggle.item', item);
-                    }.bind(this),
-                    searchInstanceName: this.options.instanceName,
-                    searchFields: this.options.searchFields,
-                    paginationOptions: {
-                        dropdown: {
-                            limit: 20
-                        }
-                    },
-                    viewOptions: {
-                        table: {
-                            actionIconColumn: 'title',
-                            badges: [
-                                {
-                                    column: 'title',
-                                    callback: function(item, badge) {
-                                        return listHelper.generateLocalizationBadge(item, badge, this.options.locale);
-                                    }.bind(this)
-                                },
-                                {
-                                    column: 'title',
-                                    callback: listHelper.generateWorkflowBadge
-                                }
-                            ]
-                        }
-                    },
-                }
-            );
-
-            this.sandbox.start([
+                    name: 'datagrid@husky',
+                    options: {
+                        el: '.teaser-selection-list',
+                        instanceName: this.options.instanceName,
+                        url: this.getUrl(),
+                        preselected: _.map(this.options.data, function(item) {
+                            return item.id;
+                        }),
+                        resultKey: this.options.resultKey,
+                        sortable: false,
+                        columnOptionsInstanceName: '',
+                        clickCallback: function(item) {
+                            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
+                        }.bind(this),
+                        selectedCounter: true,
+                        searchInstanceName: this.options.instanceName + '-teaser-search',
+                        searchFields: this.options.searchFields,
+                        paginationOptions: {
+                            dropdown: {
+                                limit: 20
+                            }
+                        },
+                        matchings: this.options.matchings,
+                    }
+                },
                 {
                     name: 'tabs@husky',
                     options: {
                         el: '.teaser-selection-tabs',
                         data: getTabsData(),
                         callback: this.changeType.bind(this)
-                    }
-                },
-                {
-                    name: 'articles/list/authored-selection/form@suluarticle',
-                    options: {
-                        el: '.slide.authored-slide .overlay-content',
-                        data: this.options.data,
-                        selectCallback: this.closeAuthoredSelection.bind(this)
                     }
                 }
             ]);
@@ -178,105 +153,6 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             }
 
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: type});
-        },
-
-        /**
-         * Generates list toolbar buttons.
-         */
-        retrieveListToolbarTemplate: function() {
-            return this.sandbox.sulu.buttons.get({
-                authoredDate: {
-                    options: {
-                        icon: 'calendar',
-                        group: 2,
-                        title: this.translations.filterAll,
-                        showTitle: true,
-                        dropdownOptions: {
-                            idAttribute: 'id',
-                            markSelected: false
-                        },
-                        dropdownItems: [
-                            {
-                                title: this.translations.filterAll,
-                                callback: this.closeAuthoredSelection.bind(this)
-                            },
-                            {
-                                id: 'timescale',
-                                title: this.translations.filterByTimescale,
-                                callback: this.openAuthoredSelection.bind(this)
-                            }
-                        ]
-                    }
-                },
-                workflowStage: {
-                    options: {
-                        icon: 'circle-o',
-                        group: 2,
-                        title: listHelper.getPublishedTitle(),
-                        showTitle: true,
-                        dropdownOptions: {
-                            idAttribute: 'id',
-                            markSelected: true,
-                            changeButton: true
-                        },
-                        dropdownItems: [
-                            {
-                                title: this.translations.filterAll,
-                                marked: true,
-                                callback: function() {
-                                    this.setWorkflowStage(null);
-                                }.bind(this)
-                            },
-                            {
-                                id: 'published',
-                                title: this.translations.published,
-                                callback: function() {
-                                    this.setWorkflowStage('published');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'test',
-                                title: this.translations.unpublished,
-                                callback: function() {
-                                    this.setWorkflowStage('test');
-                                }.bind(this)
-                            }
-                        ]
-                    }
-                }
-            });
-        },
-
-        openAuthoredSelection: function() {
-            this.$el.parent().addClass('limited');
-            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 1);
-
-            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
-                this.sandbox.emit('sulu_article.authored-selection.form.get');
-            }.bind(this));
-        },
-
-        closeAuthoredSelection: function(data) {
-            this.$el.parent().removeClass('limited');
-
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                authoredFrom: data ? data.from : null,
-                authoredTo: data ? data.to : null,
-            });
-
-            this.sandbox.emit(
-                'husky.toolbar.' + this.options.instanceName + '.button.set',
-                'authoredDate',
-                {title: listHelper.getAuthoredTitle(data)}
-            );
-
-            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
-        },
-
-        setWorkflowStage: function(workflowStage) {
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                workflowStage: workflowStage,
-            });
         }
     };
 });

@@ -58,17 +58,15 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
                 'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'pages.title'],
-            ],
-            [
-                [
-                    'title' => 'Test 1',
-                    'cssClass' => 'authored-slide',
-                    'contentSpacing' => true,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
+                'matchings' => [
+                    [
+                        'content' => 'public.title',
+                        'name' => 'title',
+                    ],
+                    [
+                        'content' => 'public.type',
+                        'name' => 'typeTranslation',
+                        'type' => 'translation',
                     ],
                 ],
             ]
