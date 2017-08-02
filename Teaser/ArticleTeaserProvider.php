@@ -65,7 +65,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             [
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
-                'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'pages.title'],
+                'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
             ],
             [
                 [
