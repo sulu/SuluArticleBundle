@@ -241,6 +241,7 @@
         </service>
         <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
             <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="translator"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.teaser.provider" alias="article"/>
