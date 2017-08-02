@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="list-filter-01" resname="sulu_article.list.filter.me">
                 <source>sulu_article.list.filter.me</source>
-                <target>Only mine</target>
+                <target>My articles</target>
             </trans-unit>
             <trans-unit id="list-filter-02" resname="sulu_article.list.filter.all">
                 <source>sulu_article.list.filter.all</source>
@@ -128,15 +128,23 @@
             </trans-unit>
             <trans-unit id="list-filter-03" resname="sulu_article.list.filter.by-author">
                 <source>sulu_article.list.filter.by-author</source>
-                <target>Only from</target>
+                <target>From</target>
             </trans-unit>
             <trans-unit id="list-filter-04" resname="sulu_article.list.filter.by-category">
                 <source>sulu_article.list.filter.by-category</source>
-                <target>Only Category</target>
+                <target>Category</target>
             </trans-unit>
             <trans-unit id="list-filter-05" resname="sulu_article.list.filter.by-tag">
                 <source>sulu_article.list.filter.by-tag</source>
-                <target>Only Tag</target>
+                <target>Tag</target>
+            </trans-unit>
+            <trans-unit id="list-filter-06" resname="sulu_article.list.filter.by-page">
+                <source>sulu_article.list.filter.by-page</source>
+                <target>Page</target>
+            </trans-unit>
+            <trans-unit id="list-filter-07" resname="sulu_article.list.filter.by-timescale">
+                <source>sulu_article.list.filter.by-timescale</source>
+                <target>Timescale</target>
             </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
@@ -149,6 +157,18 @@
             <trans-unit id="tag-selection-overlay-01" resname="sulu_article.tag-selection-overlay.title">
                 <source>sulu_article.tag-selection-overlay.title</source>
                 <target>Filter articles by tag</target>
+            </trans-unit>
+            <trans-unit id="authored-selection-overlay-01" resname="sulu_article.authored-selection-overlay.from">
+                <source>sulu_article.authored-selection-overlay.from</source>
+                <target>From</target>
+            </trans-unit>
+            <trans-unit id="authored-selection-overlay-02" resname="sulu_article.authored-selection-overlay.to">
+                <source>sulu_article.authored-selection-overlay.to</source>
+                <target>To</target>
+            </trans-unit>
+            <trans-unit id="page-selection-overlay-01" resname="sulu_article.page-selection-overlay.title">
+                <source>sulu_article.page-selection-overlay.title</source>
+                <target>Filter articles by page</target>
             </trans-unit>
             <trans-unit id="copy-01">
                 <source>sulu_article.edit.copy</source>

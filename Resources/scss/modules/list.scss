@@ -1,0 +1,11 @@
+.content-title .type {
+    &:empty {
+        &:before, &:after {
+            content: "";
+        }
+    }
+
+    &:before, &:after {
+        content: "\"";
+    }
+}

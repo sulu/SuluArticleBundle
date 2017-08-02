@@ -26,6 +26,9 @@ define([
 
         templates: {
             list: [
+                '<div class="content-title">',
+                '    <h2><%= translations.headline %> <span class="type"><%= type %></span></h2>',
+                '</div>',
                 '<div class="list-toolbar-container"></div>',
                 '<div class="list-info"></div>',
                 '<div class="datagrid-container"></div>',
@@ -34,14 +37,13 @@ define([
             draftIcon: '<span class="draft-icon" title="<%= title %>"/>',
             publishedIcon: '<span class="published-icon" title="<%= title %>"/>',
             route: [
-                'articles',
-                '<% if (!!type) { %>:<%=type%><% } %>',
-                '/<%=locale%>'
+                'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
             ].join('')
         },
 
         translations: {
             headline: 'sulu_article.list.title',
+            published: 'public.published',
             unpublished: 'public.unpublished',
             publishedWithDraft: 'public.published-with-draft',
             filterMe: 'sulu_article.list.filter.me',
@@ -49,6 +51,10 @@ define([
             filterByAuthor: 'sulu_article.list.filter.by-author',
             filterByCategory: 'sulu_article.list.filter.by-category',
             filterByTag: 'sulu_article.list.filter.by-tag',
+            filterByPage: 'sulu_article.list.filter.by-page',
+            filterByTimescale: 'sulu_article.list.filter.by-timescale',
+            from: 'sulu_article.authored-selection-overlay.from',
+            to: 'sulu_article.authored-selection-overlay.to',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -171,17 +177,15 @@ define([
         },
 
         render: function() {
-            this.$el.html(this.templates.list());
+            var type = this.options.config.types[this.options.type];
+
+            this.$el.html(this.templates.list({
+                translations: this.translations,
+                type: type ? this.sandbox.translate(type.title) : ''
+            }));
 
             var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
-            var filter = this.getFilterFromStorage();
-
-            if (!!filter.contact) {
-                urlArticleApi += '&contactId=' + filter.contact.id;
-            }
-            if (!!filter.category) {
-                urlArticleApi += '&categoryId=' + filter.category.id;
-            }
+            var toolbar = this.retrieveListToolbarTemplate(this.loadFilterFromStorage());
 
             this.sandbox.sulu.initListToolbarAndList.call(this,
                 'article',
@@ -189,7 +193,7 @@ define([
                 {
                     el: this.$find('.list-toolbar-container'),
                     instanceName: 'articles',
-                    template: this.retrieveListToolbarTemplate(this.getFilterTitle(filter))
+                    template: toolbar
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
@@ -304,6 +308,8 @@ define([
             this.sandbox.emit('husky.datagrid.articles.url.update', {page: 1, type: this.options.type});
             ArticleRouter.toList(this.options.locale, this.options.type, false, false);
             this.storage.set('type', this.options.type);
+
+            this.setTypeName(item.key ? item.name : '');
         },
 
         /**
@@ -339,16 +345,16 @@ define([
             }.bind(this));
 
             this.sandbox.on('husky.toolbar.articles.initialized', function() {
-                this.sandbox.emit('husky.toolbar.articles.item.mark', this.getFilterFromStorage().filterKey);
+                this.sandbox.emit('husky.toolbar.articles.item.mark', this.loadFilterFromStorage().filterKey);
             }.bind(this));
         },
 
         /**
          * Generates list toolbar buttons.
          *
-         * @param {String} title
+         * @param {Object} filter
          */
-        retrieveListToolbarTemplate: function(title) {
+        retrieveListToolbarTemplate: function(filter) {
             return this.sandbox.sulu.buttons.get({
                 settings: {
                     options: {
@@ -359,42 +365,107 @@ define([
                         ]
                     }
                 },
-                filter: {
+                authoredDate: {
                     options: {
-                        icon: 'filter',
+                        icon: 'calendar',
                         group: 2,
-                        title: title,
+                        title: this.getAuthoredTitle(filter),
+                        showTitle: true,
+                        dropdownOptions: {
+                            idAttribute: 'id',
+                            markSelected: false
+                        },
+                        dropdownItems: [
+                            {
+                                title: this.translations.filterAll,
+                                callback: function() {
+                                    var filter = this.appendFilter('authored', {from: null, to: null});
+                                    this.sandbox.emit(
+                                        'husky.toolbar.articles.button.set',
+                                        'authoredDate',
+                                        {title: this.getAuthoredTitle(filter)}
+                                    );
+                                }.bind(this)
+                            },
+                            {
+                                id: 'timescale',
+                                title: this.translations.filterByTimescale,
+                                callback: this.openAuthoredSelectionOverlay.bind(this)
+                            }
+                        ]
+                    }
+                },
+                workflowStage: {
+                    options: {
+                        icon: 'circle-o',
+                        group: 2,
+                        title: this.getPublishedTitle(filter),
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
                             markSelected: true,
-                            changeButton: false
+                            changeButton: true
+                        },
+                        dropdownItems: [
+                            {
+                                title: this.translations.filterAll,
+                                marked: !filter.workflowStage,
+                                callback: function() {
+                                    this.appendFilter('workflowStage', null);
+                                }.bind(this)
+                            },
+                            {
+                                id: 'published',
+                                title: this.translations.published,
+                                marked: filter.workflowStage === 'published',
+                                callback: function() {
+                                    this.appendFilter('workflowStage', 'published');
+                                }.bind(this)
+                            },
+                            {
+                                id: 'test',
+                                title: this.translations.unpublished,
+                                marked: filter.workflowStage === 'test',
+                                callback: function() {
+                                    this.appendFilter('workflowStage', 'test');
+                                }.bind(this)
+                            }
+                        ]
+                    }
+                },
+                filter: {
+                    options: {
+                        icon: 'filter',
+                        group: 2,
+                        title: this.getFilterTitle(filter),
+                        showTitle: true,
+                        dropdownOptions: {
+                            idAttribute: 'id',
+                            markSelected: true,
+                            changeButton: false,
+                            preSelected: filter.filterKey
                         },
                         dropdownItems: [
                             {
                                 id: 'all',
                                 title: this.translations.filterAll,
+                                marked: filter.filterKey === 'all',
                                 callback: function() {
-                                    this.applyFilterToList.call(
-                                        this,
-                                        'all'
-                                    );
+                                    this.replaceFilter('all');
                                 }.bind(this)
                             },
                             {
                                 id: 'me',
                                 title: this.translations.filterMe,
+                                marked: filter.filterKey === 'me',
                                 callback: function() {
-                                    this.applyFilterToList.call(
-                                        this,
-                                        'me',
-                                        this.sandbox.sulu.user.contact
-                                    );
+                                    this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
                                 }.bind(this)
                             },
                             {
                                 id: 'filterByAuthor',
-                                title: this.translations.filterByAuthor + '...',
+                                title: this.translations.filterByAuthor + ' ...',
+                                marked: filter.filterKey === 'filterByAuthor',
                                 callback: this.openContactSelectionOverlay.bind(this)
                             },
                             {
@@ -402,13 +473,21 @@ define([
                             },
                             {
                                 id: 'filterByCategory',
-                                title: this.translations.filterByCategory,
+                                title: this.translations.filterByCategory + ' ...',
+                                marked: filter.filterKey === 'filterByCategory',
                                 callback: this.openCategorySelectionOverlay.bind(this)
                             },
                             {
                                 id: 'filterByTag',
-                                title: this.translations.filterByTag,
+                                title: this.translations.filterByTag + ' ...',
+                                marked: filter.filterKey === 'filterByTag',
                                 callback: this.openTagSelectionOverlay.bind(this)
+                            },
+                            {
+                                id: 'filterByPage',
+                                title: this.translations.filterByPage + ' ...',
+                                marked: filter.filterKey === 'filterByPage',
+                                callback: this.openPageSelectionOverlay.bind(this)
                             }
                         ]
                     }
@@ -430,14 +509,10 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        contact: this.getFilterFromStorage().contact
+                        contact: this.loadFilterFromStorage().contact
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'filterByAuthor',
-                            data.contactItem
-                        );
+                        this.replaceFilter('contact', data.contactItem, 'filterByAuthor');
                     }.bind(this)
                 }
             }]);
@@ -457,15 +532,10 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        category: this.getFilterFromStorage().category
+                        category: this.loadFilterFromStorage().category
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'category',
-                            null,
-                            data.categoryItem
-                        );
+                        this.replaceFilter('category', data.categoryItem, 'filterByCategory');
                     }.bind(this)
                 }
             }]);
@@ -485,15 +555,59 @@ define([
                     el: $container,
                     locale: this.options.locale,
                     data: {
-                        tag: this.getFilterFromStorage().tag
+                        tag: this.loadFilterFromStorage().tag
                     },
                     selectCallback: function(data) {
-                        this.applyFilterToList.call(
-                            this,
-                            'tag',
-                            null,
-                            null,
-                            data.tagItem
+                        this.replaceFilter('tag', data.tagItem, 'filterByTag');
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        /**
+         * Opens page selection overlay.
+         */
+        openPageSelectionOverlay: function() {
+            var $container = $('<div/>');
+
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'page-tree-route/page-select@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: this.loadFilterFromStorage().page,
+                    translations: {
+                        overlayTitle: 'sulu_article.page-selection-overlay.title'
+                    },
+                    selectCallback: function(data) {
+                        this.replaceFilter('page', data, 'filterByPage');
+                    }.bind(this)
+                }
+            }]);
+        },
+
+        /**
+         * Opens authored selection overlay.
+         */
+        openAuthoredSelectionOverlay: function() {
+            var $container = $('<div/>');
+
+            this.$el.append($container);
+
+            this.sandbox.start([{
+                name: 'articles/list/authored-selection@suluarticle',
+                options: {
+                    el: $container,
+                    locale: this.options.locale,
+                    data: this.loadFilterFromStorage().authored,
+                    selectCallback: function(data) {
+                        var filter = this.appendFilter('authored', data);
+                        this.sandbox.emit(
+                            'husky.toolbar.articles.button.set',
+                            'authoredDate',
+                            {title: this.getAuthoredTitle(filter)}
                         );
                     }.bind(this)
                 }
@@ -501,70 +615,170 @@ define([
         },
 
         /**
-         * Emits the url update event for the list, changes the title of the filter button
-         * and saves the selected contact id in the storage.
+         * Replace given filter.
          *
-         * @param {string} filterKey
-         * @param {Object} contact
-         * @param {Object} category
-         * @param {Object} tag
+         * @param {String} key
+         * @param {Object|String} value
+         * @param {String} filterKey
+         *
+         * @return {Object}
          */
-        applyFilterToList: function(filterKey, contact, category, tag) {
-            var filter = {
-                    contact: contact,
-                    category: category,
-                    tag: tag,
-                    filterKey: filterKey
-                },
-                update = {
-                    contactId: contact ? contact.id : null,
-                    categoryId: category ? category.id : null,
-                    tagId: tag ? tag.id : null
-                };
+        replaceFilter: function(key, value, filterKey) {
+            var filter = this.loadFilterFromStorage();
 
-            this.storage.set('filter', filter);
+            filter.category = null;
+            filter.contact = null;
+            filter.tag = null;
+            filter.page = null;
+            filter.filterKey = filterKey || key;
 
-            this.sandbox.emit('husky.datagrid.articles.url.update', update);
-            this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: this.getFilterTitle(filter)});
+            if (value) {
+                filter[key] = value;
+            }
+
+            return this.applyFilterToList(filter);
         },
 
         /**
-         * Retrieves the contact filter from the storage.
+         * Append given filter.
+         *
+         * @param {String} key
+         * @param {Object|String} value
+         *
+         * @return {Object}
+         */
+        appendFilter: function(key, value) {
+            var filter = this.loadFilterFromStorage();
+            filter[key] = value;
+
+            return this.applyFilterToList(filter);
+        },
+
+        /**
+         * Emits the url update event for the list, changes the title of the filter button
+         * and saves the selected filters in the storage.
+         *
+         * @param {Object} filter
+         *
+         * @return {Object}
+         */
+        applyFilterToList: function(filter) {
+            var update = {
+                contactId: filter.contact ? filter.contact.id : null,
+                categoryId: filter.category ? filter.category.id : null,
+                tagId: filter.tag ? filter.tag.id : null,
+                pageId: filter.page ? filter.page.id : null,
+                authoredFrom: filter.authored ? filter.authored.from : null,
+                authoredTo: filter.authored ? filter.authored.to : null,
+                workflowStage: filter.workflowStage ? filter.workflowStage : null
+            };
+
+            this.saveFilterToStorage(filter);
+
+            this.sandbox.emit('husky.datagrid.articles.url.update', update);
+            this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: this.getFilterTitle(filter)});
+
+            return filter;
+        },
+
+        /**
+         * Retrieves the filter from the storage.
          *
          * @returns {Object}
          */
-        getFilterFromStorage: function() {
-            return this.storage.getWithDefault('filter', {filterKey: 'all', contact: null, category: null, tag: null});
+        loadFilterFromStorage: function() {
+            return this.storage.getWithDefault('filter', {
+                filterKey: 'all',
+                contact: null,
+                category: null,
+                tag: null,
+                authored: {from: null, to: null}
+            });
+        },
+
+        /**
+         * Save the filter in the storage.
+         *
+         * @param {Object} filter
+         */
+        saveFilterToStorage: function(filter) {
+            this.storage.set('filter', filter);
         },
 
         /**
          * Returns the title for the filter button.
          *
          * @param {Object} filter
+         *
          * @return {String}
          */
         getFilterTitle: function(filter) {
-            var title = '';
-
             switch (filter.filterKey) {
-                case 'all':
-                    title = this.translations.filterAll;
-                    break;
                 case 'filterByAuthor':
-                    title = this.translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;
-                    break;
+                    return this.translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;
                 case 'me':
-                    title = this.translations.filterMe;
-                    break;
-                case 'category':
-                    title = this.translations.filterByCategory + ' ' + filter.category.name;
-                    break;
-                case 'tag':
-                    title = this.translations.filterByTag + ' ' + filter.tag.name;
-                    break;
+                    return this.translations.filterMe;
+                case 'filterByCategory':
+                    return this.translations.filterByCategory + ' ' + filter.category.name;
+                case 'filterByTag':
+                    return this.translations.filterByTag + ' ' + filter.tag.name;
+                case 'filterByPage':
+                    return this.translations.filterByPage + ' ' + filter.page.title;
             }
 
-            return title;
+            return this.translations.filterAll;
+        },
+
+        /**
+         * Returns the title for the published button.
+         *
+         * @param {Object} filter
+         *
+         * @return {String}
+         */
+        getPublishedTitle: function(filter) {
+            if (!filter.workflowStage) {
+                return this.translations.filterAll;
+            }
+
+            if (filter.workflowStage === 'published') {
+                return this.translations.published;
+            }
+
+            return this.translations.unpublished;
+        },
+
+        /**
+         * Returns the title for the authored button.
+         *
+         * @param {Object} filter
+         *
+         * @return {String}
+         */
+        getAuthoredTitle: function(filter) {
+            if (!filter.authored) {
+                return this.translation.filterAll;
+            }
+
+            var parts = [];
+            if (filter.authored.from) {
+                parts.push(this.translations.from);
+                parts.push(this.sandbox.date.format(filter.authored.from + 'T00:00'));
+            }
+            if (filter.authored.to) {
+                parts.push(parts.length > 0 ? this.translations.to.toLowerCase() : this.translations.to);
+                parts.push(this.sandbox.date.format(filter.authored.to + 'T00:00'));
+            }
+
+            if (parts.length === 0) {
+                return this.translations.filterAll;
+            }
+
+            return parts.join(' ');
+        },
+
+        setTypeName: function(name) {
+            this.$el.find('.type').text(this.sandbox.translate(name));
         }
     };
 });
