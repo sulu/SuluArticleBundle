@@ -17,15 +17,12 @@ require.config({
 
         'services/suluarticle/article-manager': '../../suluarticle/js/services/manager',
         'services/suluarticle/article-router': '../../suluarticle/js/services/router',
-        'services/suluarticle/property-configuration': '../../suluarticle/js/services/property-configuration'
+        'services/suluarticle/property-configuration': '../../suluarticle/js/services/property-configuration',
+        'services/suluarticle/list-helper': '../../suluarticle/js/services/list-helper'
     }
 });
 
-define([
-    'underscore',
-    'config',
-    'css!suluarticlecss/main'
-], function(_, Config) {
+define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) {
 
     'use strict';
 

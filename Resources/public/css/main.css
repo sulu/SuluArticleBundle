@@ -90,3 +90,13 @@
 .article-teaser-selection .grid {
   padding: 20px;
 }
+/* line 11, ../../scss/modules/teaser-selection.scss */
+.article-teaser-selection .search-row,
+.article-teaser-selection .list-toolbar {
+  margin-bottom: 0;
+}
+/* line 16, ../../scss/modules/teaser-selection.scss */
+.article-teaser-selection.limited {
+  height: 200px;
+  overflow: hidden;
+}
