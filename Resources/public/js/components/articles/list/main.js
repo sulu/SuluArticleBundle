@@ -13,8 +13,9 @@ define([
     'sulucontent/components/copy-locale-overlay/main',
     'sulucontent/components/open-ghost-overlay/main',
     'services/suluarticle/article-manager',
-    'services/suluarticle/article-router'
-], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter) {
+    'services/suluarticle/article-router',
+    'services/suluarticle/list-helper'
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper) {
 
     'use strict';
 
@@ -53,8 +54,6 @@ define([
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
             filterByTimescale: 'sulu_article.list.filter.by-timescale',
-            from: 'sulu_article.authored-selection-overlay.from',
-            to: 'sulu_article.authored-selection-overlay.to',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -63,7 +62,6 @@ define([
             }
         }
     };
-
 
     return {
 
@@ -241,37 +239,12 @@ define([
                                 {
                                     column: 'title',
                                     callback: function(item, badge) {
-                                        if (!!item.localizationState &&
-                                            item.localizationState.state === 'ghost' &&
-                                            item.localizationState.locale !== this.options.locale
-                                        ) {
-                                            badge.title = item.localizationState.locale;
-
-                                            return badge;
-                                        }
-
-                                        return false;
+                                        return listHelper.generateLocalizationBadge(item, badge, this.options.locale);
                                     }.bind(this)
                                 },
                                 {
                                     column: 'title',
-                                    callback: function(item, badge) {
-                                        var icons = '',
-                                            tooltip = this.translations.unpublished;
-
-                                        if (!!item.published && !item.publishedState) {
-                                            tooltip = this.translations.publishedWithDraft;
-                                            icons += this.templates.publishedIcon({title: tooltip});
-                                        }
-                                        if (!item.publishedState) {
-                                            icons += this.templates.draftIcon({title: tooltip});
-                                        }
-
-                                        badge.title = icons;
-                                        badge.cssClass = 'badge-none';
-
-                                        return badge;
-                                    }.bind(this)
+                                    callback: listHelper.generateWorkflowBadge
                                 }
                             ]
                         }
@@ -369,7 +342,7 @@ define([
                     options: {
                         icon: 'calendar',
                         group: 2,
-                        title: this.getAuthoredTitle(filter),
+                        title: listHelper.getAuthoredTitle(filter.authored),
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
@@ -383,7 +356,7 @@ define([
                                     this.sandbox.emit(
                                         'husky.toolbar.articles.button.set',
                                         'authoredDate',
-                                        {title: this.getAuthoredTitle(filter)}
+                                        {title: listHelper.getAuthoredTitle(filter.authored)}
                                     );
                                 }.bind(this)
                             },
@@ -399,7 +372,7 @@ define([
                     options: {
                         icon: 'circle-o',
                         group: 2,
-                        title: this.getPublishedTitle(filter),
+                        title: listHelper.getPublishedTitle(filter.workflowStage),
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
@@ -437,7 +410,7 @@ define([
                     options: {
                         icon: 'filter',
                         group: 2,
-                        title: this.getFilterTitle(filter),
+                        title: listHelper.getFilterTitle(filter),
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
@@ -607,7 +580,7 @@ define([
                         this.sandbox.emit(
                             'husky.toolbar.articles.button.set',
                             'authoredDate',
-                            {title: this.getAuthoredTitle(filter)}
+                            {title: listHelper.getAuthoredTitle(filter.authored)}
                         );
                     }.bind(this)
                 }
@@ -676,7 +649,7 @@ define([
             this.saveFilterToStorage(filter);
 
             this.sandbox.emit('husky.datagrid.articles.url.update', update);
-            this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: this.getFilterTitle(filter)});
+            this.sandbox.emit('husky.toolbar.articles.button.set', 'filter', {title: listHelper.getFilterTitle(filter)});
 
             return filter;
         },
@@ -703,78 +676,6 @@ define([
          */
         saveFilterToStorage: function(filter) {
             this.storage.set('filter', filter);
-        },
-
-        /**
-         * Returns the title for the filter button.
-         *
-         * @param {Object} filter
-         *
-         * @return {String}
-         */
-        getFilterTitle: function(filter) {
-            switch (filter.filterKey) {
-                case 'filterByAuthor':
-                    return this.translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;
-                case 'me':
-                    return this.translations.filterMe;
-                case 'filterByCategory':
-                    return this.translations.filterByCategory + ' ' + filter.category.name;
-                case 'filterByTag':
-                    return this.translations.filterByTag + ' ' + filter.tag.name;
-                case 'filterByPage':
-                    return this.translations.filterByPage + ' ' + filter.page.title;
-            }
-
-            return this.translations.filterAll;
-        },
-
-        /**
-         * Returns the title for the published button.
-         *
-         * @param {Object} filter
-         *
-         * @return {String}
-         */
-        getPublishedTitle: function(filter) {
-            if (!filter.workflowStage) {
-                return this.translations.filterAll;
-            }
-
-            if (filter.workflowStage === 'published') {
-                return this.translations.published;
-            }
-
-            return this.translations.unpublished;
-        },
-
-        /**
-         * Returns the title for the authored button.
-         *
-         * @param {Object} filter
-         *
-         * @return {String}
-         */
-        getAuthoredTitle: function(filter) {
-            if (!filter.authored) {
-                return this.translation.filterAll;
-            }
-
-            var parts = [];
-            if (filter.authored.from) {
-                parts.push(this.translations.from);
-                parts.push(this.sandbox.date.format(filter.authored.from + 'T00:00'));
-            }
-            if (filter.authored.to) {
-                parts.push(parts.length > 0 ? this.translations.to.toLowerCase() : this.translations.to);
-                parts.push(this.sandbox.date.format(filter.authored.to + 'T00:00'));
-            }
-
-            if (parts.length === 0) {
-                return this.translations.filterAll;
-            }
-
-            return parts.join(' ');
         },
 
         setTypeName: function(name) {

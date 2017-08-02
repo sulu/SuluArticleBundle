@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'text!./form.html'], function($, formTemplate) {
+define(['jquery'], function($) {
 
     'use strict';
 
@@ -19,13 +19,8 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
         },
         translations: {
             title: 'sulu_article.authored',
-            from: 'sulu_article.authored-selection-overlay.from',
-            to: 'sulu_article.authored-selection-overlay.to',
             reset: 'smart-content.choose-data-source.reset'
         },
-        templates: {
-            skeleton: formTemplate
-        }
     };
 
     return {
@@ -34,9 +29,8 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
 
         initialize: function() {
             this.$overlayContainer = $('<div/>');
+            this.$componentContainer = $('<div/>');
             this.$el.append(this.$overlayContainer);
-
-            this.data = this.options.data;
 
             // start overlay
             this.sandbox.start([{
@@ -50,7 +44,7 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
                     slides: [
                         {
                             title: this.translations.title,
-                            data: $(this.templates.skeleton({translations: this.translations})),
+                            data: this.$componentContainer,
                             okCallback: this.okCallbackOverlay.bind(this),
                             buttons: [
                                 {
@@ -78,11 +72,17 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
 
             // start search and datagrid
             this.sandbox.once('husky.overlay.authored-selection.opened', function() {
-                this.sandbox.form.create(this.$overlayContainer).initialized.then(function() {
-                    this.sandbox.form.setData(this.$overlayContainer, this.options.data).then(function() {
-                        this.sandbox.start(this.$overlayContainer);
-                    }.bind(this));
-                }.bind(this));
+                this.sandbox.start([{
+                    name: 'articles/list/authored-selection/form@suluarticle',
+                    options: {
+                        el: this.$componentContainer,
+                        data: this.options.data,
+                        selectCallback: function(data) {
+                            this.options.selectCallback(data);
+                            this.sandbox.stop();
+                        }.bind(this)
+                    }
+                }]);
             }.bind(this));
         },
 
@@ -90,12 +90,7 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
          * OK callback of the overlay.
          */
         okCallbackOverlay: function() {
-            if (!this.sandbox.form.validate(this.$overlayContainer)) {
-                return;
-            }
-
-            this.options.selectCallback(this.sandbox.form.getData(this.$overlayContainer));
-            this.sandbox.stop();
+            this.sandbox.emit('sulu_article.authored-selection.form.get');
         }
     };
 });
