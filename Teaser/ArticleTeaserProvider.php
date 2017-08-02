@@ -79,6 +79,17 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                         ],
                     ],
                 ],
+                [
+                    'title' => $this->translator->trans('sulu_article.contact-selection-overlay.title', [], 'backend'),
+                    'cssClass' => 'contact-slide',
+                    'contentSpacing' => true,
+                    'buttons' => [
+                        [
+                            'type' => 'ok',
+                            'align' => 'right',
+                        ],
+                    ],
+                ],
             ]
         );
     }

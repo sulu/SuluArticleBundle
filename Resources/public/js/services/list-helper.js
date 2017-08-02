@@ -102,6 +102,10 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
          * @return {String}
          */
         getFilterTitle: function(filter) {
+            if (!filter) {
+                return translations.filterAll;
+            }
+
             switch (filter.filterKey) {
                 case 'filterByAuthor':
                     return translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;

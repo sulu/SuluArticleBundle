@@ -45,6 +45,11 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                 filterByTimescale: 'sulu_article.list.filter.by-timescale',
                 published: 'public.published',
                 unpublished: 'public.unpublished',
+                filterMe: 'sulu_article.list.filter.me',
+                filterByAuthor: 'sulu_article.list.filter.by-author',
+                filterByCategory: 'sulu_article.list.filter.by-category',
+                filterByTag: 'sulu_article.list.filter.by-tag',
+                filterByPage: 'sulu_article.list.filter.by-page',
             }
         },
 
@@ -80,7 +85,10 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
         };
 
     return {
+
         defaults: defaults,
+
+        filter: {},
 
         initialize: function() {
             this.$el.parent().removeClass('content-spacing');
@@ -151,6 +159,14 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                         el: '.slide.authored-slide .overlay-content',
                         data: this.options.data,
                         selectCallback: this.closeAuthoredSelection.bind(this)
+                    }
+                },
+                {
+                    name: 'articles/list/contact-selection/form@suluarticle',
+                    options: {
+                        el: '.slide.contact-slide .overlay-content',
+                        data: this.options.data,
+                        selectCallback: this.closeContactSelection.bind(this)
                     }
                 }
             ]);
@@ -243,8 +259,45 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                             }
                         ]
                     }
+                },
+                filter: {
+                    options: {
+                        icon: 'filter',
+                        group: 2,
+                        title: listHelper.getFilterTitle(),
+                        showTitle: true,
+                        dropdownOptions: {
+                            idAttribute: 'id',
+                            markSelected: true,
+                            changeButton: false
+                        },
+                        dropdownItems: [
+                            {
+                                id: 'all',
+                                title: this.translations.filterAll,
+                                marked: true,
+                                callback: this.removeFilter.bind(this)
+                            },
+                            {
+                                id: 'me',
+                                title: this.translations.filterMe,
+                                callback: function() {
+                                    this.closeContactSelection({contactItem: this.sandbox.sulu.user.contact}, 'me');
+                                }.bind(this)
+                            },
+                            {
+                                id: 'filterByAuthor',
+                                title: this.translations.filterByAuthor + ' ...',
+                                callback: this.openContactSelection.bind(this)
+                            }
+                        ]
+                    }
                 }
             });
+        },
+
+        setButtonTitle: function(button, title) {
+            this.sandbox.emit('husky.toolbar.' + this.options.instanceName + '.button.set', button, {title: title});
         },
 
         openAuthoredSelection: function() {
@@ -264,11 +317,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                 authoredTo: data ? data.to : null,
             });
 
-            this.sandbox.emit(
-                'husky.toolbar.' + this.options.instanceName + '.button.set',
-                'authoredDate',
-                {title: listHelper.getAuthoredTitle(data)}
-            );
+            this.setButtonTitle('authoredDate', listHelper.getAuthoredTitle(data));
 
             this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
         },
@@ -276,6 +325,34 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
         setWorkflowStage: function(workflowStage) {
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
                 workflowStage: workflowStage,
+            });
+        },
+
+        openContactSelection: function() {
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 2);
+
+            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
+                this.sandbox.emit('sulu_article.contact-selection.form.get');
+            }.bind(this));
+        },
+
+        closeContactSelection: function(data, filterKey) {
+            var filter = {filterKey: filterKey || 'filterByAuthor', contact: data.contactItem};
+
+            this.setButtonTitle('filter', listHelper.getFilterTitle(filter));
+
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
+                contactId: filter.contact ? filter.contact.id : null,
+            });
+
+            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+        },
+
+        removeFilter: function() {
+            this.setButtonTitle('filter', listHelper.getFilterTitle());
+
+            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
+                contactId: null,
             });
         }
     };
