@@ -100,3 +100,9 @@
   height: 200px;
   overflow: hidden;
 }
+
+/* line 23, ../../scss/modules/teaser-selection.scss */
+.husky-overlay-container .type-article .overlay-content {
+  max-height: 500px;
+  overflow: scroll;
+}

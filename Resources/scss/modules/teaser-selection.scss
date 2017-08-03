@@ -18,3 +18,10 @@
         overflow: hidden;
     }
 }
+
+.husky-overlay-container .type-article {
+    .overlay-content {
+        max-height: 500px;
+        overflow: scroll;
+    }
+}

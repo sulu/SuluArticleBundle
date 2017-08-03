@@ -207,7 +207,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             this.sandbox.on('husky.datagrid.' + this.options.instanceName + '.item.deselect', function(id) {
                 this.options.deselectCallback({type: this.options.type, id: id});
             }.bind(this));
-            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.cancel-button.clicked', function() {
+            this.sandbox.on('sulu_content.teaser-selection.' + this.options.instanceName + '.cancel-button.clicked', function() {
                 this.$el.parent().removeClass('limited');
                 this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
             }.bind(this));
