@@ -23,6 +23,7 @@
                  class="Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler">
             <argument type="service" id="sulu_article.page_tree_route.updater.request"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="doctrine.orm.entity_manager"/>
 
             <tag name="task.handler"/>
         </service>
