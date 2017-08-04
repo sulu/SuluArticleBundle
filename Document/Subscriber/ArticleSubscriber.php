@@ -117,7 +117,6 @@ class ArticleSubscriber implements EventSubscriberInterface
                 ['handleRemove', -500],
                 ['handleRemoveLive', -500],
                 ['handleRemovePage', -500],
-                ['handleRemovePageLive', -500],
             ],
             Events::PUBLISH => [
                 ['handleScheduleIndexLive', 0],
@@ -441,25 +440,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $document = $document->getParent();
         $this->documents[$document->getUuid()] = [
-            'uuid' => $document->getUuid(),
-            'locale' => $document->getLocale(),
-        ];
-    }
-
-    /**
-     * Reindex article live if a page was removed.
-     *
-     * @param RemoveEvent $event
-     */
-    public function handleRemovePageLive(RemoveEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticlePageDocument) {
-            return;
-        }
-
-        $document = $document->getParent();
-        $this->liveDocuments[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
