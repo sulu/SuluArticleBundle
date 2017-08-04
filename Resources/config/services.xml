@@ -260,8 +260,8 @@
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="serializer"/>
 
-            <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticleDocument"/>
-            <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument"/>
+            <tag name="sulu_preview.object_provider" class="%sulu_article.article_document.class%"/>
+            <tag name="sulu_preview.object_provider" class="%sulu_article.article_page_document.class%"/>
         </service>
 
         <!-- link -->
