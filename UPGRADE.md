@@ -20,6 +20,29 @@ bin/adminconsole sulu:article:index-rebuild ###LOCALE###
 bin/websiteconsole sulu:article:index-rebuild ###LOCALE### -live
 ```
 
+## 0.6.1
+
+### Resolve of excerpt data
+
+Excerpt data is now resolved in the article template instead of an array of categories and images you
+get directly the data.
+
+__before__:
+
+```twig
+{{ extension.excerpt.categories[0] }}
+{{ extension.excerpt.images.ids[0] }}
+{{ extension.excerpt.icon.ids[0] }}
+```
+
+__after__:
+
+```twig
+{{ extension.excerpt.categories[0].id }}
+{{ extension.excerpt.images[0].id }}
+{{ extension.excerpt.icon[0].id }}
+```
+
 ## 0.6.0
 
 ### Index mapping has changed

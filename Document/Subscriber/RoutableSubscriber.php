@@ -198,7 +198,7 @@ class RoutableSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($child));
+            $route = $this->chainRouteGenerator->generate($child);
             $child->setRoutePath($route->getPath());
 
             $node = $this->documentInspector->getNode($child);
@@ -302,6 +302,14 @@ class RoutableSubscriber implements EventSubscriberInterface
             $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
         }
 
+        if ($route && $route->getEntityId() !== $document->getId()) {
+            // Mismatch of entity-id's happens because doctrine don't check entities which has been changed in the
+            // current session.
+
+            $document->removeRoute();
+            $route = null;
+        }
+
         if ($route) {
             $document->setRoute($route);
 
@@ -328,8 +336,14 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
         $history = $this->routeRepository->findHistoryByEntity(get_class($document), $document->getUuid(), $locale);
-        foreach (array_merge($history, [$oldRoute]) as $historyRoute) {
-            if ($historyRoute->getId() === $newRoute->getId()) {
+
+        /** @var RouteInterface $historyRoute */
+        foreach (array_filter(array_merge($history, [$oldRoute])) as $historyRoute) {
+            if ($historyRoute->getId() === $newRoute->getId() || $document->getId() !== $historyRoute->getEntityId()) {
+                // Mismatch of entity-id's happens because doctrine don't check entities which has been changed in the
+                // current session. If the old-route was already reused by a page before it will be returned in the
+                // query of line 329.
+
                 continue;
             }
 
