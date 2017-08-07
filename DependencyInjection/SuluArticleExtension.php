@@ -195,6 +195,22 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
         $this->appendDefaultAuthor($config, $container);
         $this->appendArticlePageConfig($container);
+
+        $articleDocument = ArticleDocument::class;
+        $articlePageDocument = ArticlePageDocument::class;
+
+        foreach ($container->getParameter('sulu_document_manager.mapping') as $mapping) {
+            if ($mapping['alias'] == 'article') {
+                $articleDocument = $mapping['class'];
+            }
+
+            if ($mapping['alias'] == 'article_page') {
+                $articlePageDocument = $mapping['class'];
+            }
+        }
+
+        $container->setParameter('sulu_article.article_document.class', $articleDocument);
+        $container->setParameter('sulu_article.article_page_document.class', $articlePageDocument);
     }
 
     /**

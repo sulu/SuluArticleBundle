@@ -42,7 +42,7 @@ class ArticlePageDocument implements
     /**
      * @var string
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
@@ -62,7 +62,7 @@ class ArticlePageDocument implements
     /**
      * @var string
      */
-    private $path;
+    protected $path;
 
     /**
      * @var string
@@ -82,7 +82,7 @@ class ArticlePageDocument implements
     /**
      * @var StructureInterface
      */
-    private $structure;
+    protected $structure;
 
     /**
      * @var RouteInterface

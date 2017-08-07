@@ -117,7 +117,10 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     public function supports($entityClass)
     {
-        return $entityClass === ArticleDocument::class || $entityClass === ArticlePageDocument::class;
+        return $entityClass === ArticleDocument::class
+            || $entityClass === ArticlePageDocument::class
+            || is_subclass_of($entityClass, ArticleDocument::class)
+            || is_subclass_of($entityClass, ArticlePageDocument::class);
     }
 
     /**
