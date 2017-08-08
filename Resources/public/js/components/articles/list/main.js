@@ -345,11 +345,12 @@ define([
                         showTitle: true,
                         dropdownOptions: {
                             idAttribute: 'id',
-                            markSelected: false
+                            markSelected: true
                         },
                         dropdownItems: [
                             {
                                 title: this.translations.filterAll,
+                                marked: true,
                                 callback: function() {
                                     var filter = this.appendFilter('authored', {from: null, to: null});
                                     this.sandbox.emit(

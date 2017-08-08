@@ -217,11 +217,12 @@ define([
                     showTitle: true,
                     dropdownOptions: {
                         idAttribute: 'id',
-                        markSelected: false
+                        markSelected: true
                     },
                     dropdownItems: [
                         {
                             title: listHelper.translations.filterAll,
+                            marked: true,
                             callback: closeAuthoredSelection.bind(this)
                         },
                         {
