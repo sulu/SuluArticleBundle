@@ -14,10 +14,23 @@ define([
 
     'use strict';
 
-    var setButtonTitle = function(button, title) {
+    var
+        /**
+         * Set button-title.
+         *
+         * @param {String} button
+         * @param {String} title
+         */
+        setButtonTitle = function(button, title) {
             mediator.emit('husky.toolbar.' + this.instanceName + '.button.set', button, {title: title});
         },
 
+        /**
+         * Goto given slide and wait for ok-button identified thru given alias.
+         *
+         * @param {Number} slide
+         * @param {String} alias
+         */
         gotoSlide = function(slide, alias) {
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', slide);
 
@@ -26,6 +39,11 @@ define([
             }.bind(this));
         },
 
+        /**
+         * Close the authored selection and goto first-slide.
+         *
+         * @param {Object} data
+         */
         closeAuthoredSelection = function(data) {
             mediator.emit('husky.datagrid.' + this.instanceName + '.url.update', {
                 authoredFrom: data ? data.from : null,
@@ -37,6 +55,12 @@ define([
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', 0);
         },
 
+        /**
+         * Close the contact selection and goto first-slide.
+         *
+         * @param {Object} data
+         * @param {String} filterKey
+         */
         closeContactSelection = function(data, filterKey) {
             var filter = {filterKey: filterKey || 'filterByAuthor', contact: data.contactItem};
 
@@ -46,6 +70,11 @@ define([
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', 0);
         },
 
+        /**
+         * Close the category selection and goto first-slide.
+         *
+         * @param {Object} data
+         */
         closeCategorySelection = function(data) {
             var filter = {filterKey: 'filterByCategory', category: data.categoryItem};
 
@@ -55,6 +84,11 @@ define([
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', 0);
         },
 
+        /**
+         * Close the tag selection and goto first-slide.
+         *
+         * @param {Object} data
+         */
         closeTagSelection = function(data) {
             var filter = {filterKey: 'filterByTag', tag: data.tagItem};
 
@@ -64,6 +98,11 @@ define([
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', 0);
         },
 
+        /**
+         * Close the page selection and goto first-slide.
+         *
+         * @param {Object} data
+         */
         closePageSelection = function(data) {
             var filter = {filterKey: 'filterByPage', page: data.pageItem};
 
@@ -73,18 +112,33 @@ define([
             mediator.emit('husky.overlay.' + this.instanceName + '.slide-to', 0);
         },
 
+        /**
+         * Remove all filter from datagrid.
+         */
         removeFilter = function() {
             setButtonTitle.call(this, 'filter', listHelper.getFilterTitle());
 
             mediator.emit('husky.datagrid.' + this.instanceName + '.url.update', getUrlParameter({}));
         },
 
+        /**
+         * Set workflow-stage.
+         *
+         * @param {String} workflowStage
+         */
         setWorkflowStage = function(workflowStage) {
             mediator.emit('husky.datagrid.' + this.instanceName + '.url.update', {
                 workflowStage: workflowStage,
             });
         },
 
+        /**
+         * Create url-parameter from given filter.
+         *
+         * @param {Object} filter
+         *
+         * @returns {{contactId: null, categoryId: null, tagId: null, pageId: null}}
+         */
         getUrlParameter = function(filter) {
             return {
                 contactId: filter.contact ? filter.contact.id : null,
@@ -101,6 +155,11 @@ define([
         this.okClickNamespace = okClickNamespace;
     }
 
+    /**
+     * Start filter components.
+     *
+     * @param {{start}} sandbox
+     */
     FilterState.prototype.startFilterComponents = function(sandbox) {
         sandbox.start([
             {
@@ -143,6 +202,11 @@ define([
         ]);
     };
 
+    /**
+     * Create toolbar-template.
+     *
+     * @param {{sulu}} sandbox
+     */
     FilterState.prototype.createToolbarTemplate = function(sandbox) {
         return sandbox.sulu.buttons.get({
             authoredDate: {
@@ -259,6 +323,15 @@ define([
     };
 
     return {
+        /**
+         * Create new filter-state instance.
+         *
+         * @param {Node} $el
+         * @param {String} instanceName
+         * @param {String} locale
+         * @param {String} okClickNamespace
+         * @returns {FilterState}
+         */
         create: function($el, instanceName, locale, okClickNamespace) {
             return new FilterState($el, instanceName, locale, okClickNamespace);
         }
