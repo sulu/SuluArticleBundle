@@ -37,6 +37,10 @@ define([
             mediator.once(this.okClickNamespace + '.' + this.instanceName + '.ok-button.clicked', function() {
                 mediator.emit('sulu_article.' + alias + '-selection.form.get');
             }.bind(this));
+
+            mediator.once(this.okClickNamespace + '.' + this.instanceName + '.cancel-button.clicked', function() {
+                mediator.off(this.okClickNamespace + '.' + this.instanceName + '.ok-button.clicked');
+            }.bind(this));
         },
 
         /**
