@@ -59,6 +59,8 @@ class ArticleTeaserProvider implements TeaserProviderInterface
      */
     public function getConfiguration()
     {
+        $okDefaultText = $this->translator->trans('sulu-content.teaser.apply', [], 'backend');
+
         return new TeaserConfiguration(
             'sulu_article.teaser',
             'teaser-selection/list@suluarticle',
@@ -72,7 +74,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                     'title' => $this->translator->trans('sulu_article.authored', [], 'backend'),
                     'cssClass' => 'authored-slide',
                     'contentSpacing' => true,
-                    'okDefaultText' => $this->translator->trans('sulu-content.teaser.apply', [], 'backend'),
+                    'okDefaultText' => $okDefaultText,
                     'buttons' => [
                         [
                             'type' => 'ok',
@@ -88,7 +90,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                     'title' => $this->translator->trans('sulu_article.contact-selection-overlay.title', [], 'backend'),
                     'cssClass' => 'contact-slide',
                     'contentSpacing' => true,
-                    'okDefaultText' => $this->translator->trans('sulu-content.teaser.apply', [], 'backend'),
+                    'okDefaultText' => $okDefaultText,
                     'buttons' => [
                         [
                             'type' => 'ok',
@@ -104,7 +106,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                     'title' => $this->translator->trans('sulu_article.category-selection-overlay.title', [], 'backend'),
                     'cssClass' => 'category-slide',
                     'contentSpacing' => true,
-                    'okDefaultText' => $this->translator->trans('sulu-content.teaser.apply', [], 'backend'),
+                    'okDefaultText' => $okDefaultText,
                     'buttons' => [
                         [
                             'type' => 'ok',
@@ -120,7 +122,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                     'title' => $this->translator->trans('sulu_article.tag-selection-overlay.title', [], 'backend'),
                     'cssClass' => 'tag-slide',
                     'contentSpacing' => true,
-                    'okDefaultText' => $this->translator->trans('sulu-content.teaser.apply', [], 'backend'),
+                    'okDefaultText' => $okDefaultText,
                     'buttons' => [
                         [
                             'type' => 'ok',
@@ -136,7 +138,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                     'title' => $this->translator->trans('public.choose', [], 'backend'),
                     'cssClass' => 'page-slide data-source-slide',
                     'contentSpacing' => false,
-                    'okDefaultText' => $this->translator->trans('sulu-content.teaser.apply', [], 'backend'),
+                    'okDefaultText' => $okDefaultText,
                     'buttons' => [
                         [
                             'type' => 'ok',

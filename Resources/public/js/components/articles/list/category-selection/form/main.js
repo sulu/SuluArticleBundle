@@ -28,6 +28,9 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
         },
         templates: {
             skeleton: formTemplate
+        },
+        translations: {
+            noItems: 'sulu.category.no-categories-available'
         }
     };
 
@@ -61,7 +64,7 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
                         viewOptions: {
                             table: {
                                 cropContents: false,
-                                noItemsText: 'sulu.category.no-categories-available',
+                                noItemsText: this.translations.noItems,
                                 showHead: false,
                                 cssClass: 'white-box',
                                 selectItem: {

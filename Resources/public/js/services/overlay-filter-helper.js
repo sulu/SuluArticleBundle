@@ -148,6 +148,16 @@ define([
             };
         };
 
+    /**
+     * Handles the state of the filter drop-down.
+     *
+     * @param {Node} $el
+     * @param {String} instanceName
+     * @param {String} locale
+     * @param {String} okClickNamespace
+     *
+     * @constructor
+     */
     function FilterState($el, instanceName, locale, okClickNamespace) {
         this.$el = $el;
         this.instanceName = instanceName;
@@ -331,6 +341,7 @@ define([
          * @param {String} instanceName
          * @param {String} locale
          * @param {String} okClickNamespace
+         *
          * @returns {FilterState}
          */
         create: function($el, instanceName, locale, okClickNamespace) {
