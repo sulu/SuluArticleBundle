@@ -290,7 +290,7 @@ define([
                             id: 'me',
                             title: listHelper.translations.filterMe,
                             callback: function() {
-                                closeContactSelection.call(this, {contactItem: this.sandbox.sulu.user.contact}, 'me');
+                                closeContactSelection.call(this, {contactItem: sandbox.sulu.user.contact}, 'me');
                             }.bind(this)
                         },
                         {
