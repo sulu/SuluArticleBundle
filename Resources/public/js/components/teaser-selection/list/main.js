@@ -13,7 +13,12 @@
  * @class ListArticleTeaser
  * @constructor
  */
-define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_, Config, listHelper) {
+define([
+    'underscore',
+    'config',
+    'services/suluarticle/list-helper',
+    'services/suluarticle/overlay-filter-helper'
+], function(_, Config, listHelper, overlayFilterHelper) {
 
     'use strict';
 
@@ -45,6 +50,11 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                 filterByTimescale: 'sulu_article.list.filter.by-timescale',
                 published: 'public.published',
                 unpublished: 'public.unpublished',
+                filterMe: 'sulu_article.list.filter.me',
+                filterByAuthor: 'sulu_article.list.filter.by-author',
+                filterByCategory: 'sulu_article.list.filter.by-category',
+                filterByTag: 'sulu_article.list.filter.by-tag',
+                filterByPage: 'sulu_article.list.filter.by-page',
             }
         },
 
@@ -80,16 +90,21 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
         };
 
     return {
+
         defaults: defaults,
+
+        filter: {},
 
         initialize: function() {
             this.$el.parent().removeClass('content-spacing');
             this.$el.parent().addClass('article-teaser-selection');
 
+            this.filterHelper = overlayFilterHelper.create(this.$el, this.options.instanceName, this.options.locale, 'sulu_content.teaser-selection');
+
             var $container = $(this.templates.skeleton());
             this.$el.append($container);
 
-            var toolbar = this.retrieveListToolbarTemplate();
+            var toolbar = this.filterHelper.createToolbarTemplate(this.sandbox);
             this.sandbox.sulu.initListToolbarAndList.call(this,
                 'article',
                 '/admin/api/articles/fields',
@@ -107,7 +122,7 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                     }),
                     resultKey: this.options.resultKey,
                     clickCallback: function(item) {
-                        this.sandbox.emit('husky.datagrid.teaser-selection.toggle.item', item);
+                        this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
                     }.bind(this),
                     searchInstanceName: this.options.instanceName,
                     searchFields: this.options.searchFields,
@@ -144,16 +159,10 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
                         data: getTabsData(),
                         callback: this.changeType.bind(this)
                     }
-                },
-                {
-                    name: 'articles/list/authored-selection/form@suluarticle',
-                    options: {
-                        el: '.slide.authored-slide .overlay-content',
-                        data: this.options.data,
-                        selectCallback: this.closeAuthoredSelection.bind(this)
-                    }
                 }
             ]);
+
+            this.filterHelper.startFilterComponents(this.sandbox);
 
             this.bindCustomEvents();
         },
@@ -164,6 +173,10 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             }.bind(this));
             this.sandbox.on('husky.datagrid.' + this.options.instanceName + '.item.deselect', function(id) {
                 this.options.deselectCallback({type: this.options.type, id: id});
+            }.bind(this));
+            this.sandbox.on('sulu_content.teaser-selection.' + this.options.instanceName + '.cancel-button.clicked', function() {
+                this.$el.parent().removeClass('limited');
+                this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
             }.bind(this));
         },
 
@@ -178,105 +191,6 @@ define(['underscore', 'config', 'services/suluarticle/list-helper'], function(_,
             }
 
             this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {type: type});
-        },
-
-        /**
-         * Generates list toolbar buttons.
-         */
-        retrieveListToolbarTemplate: function() {
-            return this.sandbox.sulu.buttons.get({
-                authoredDate: {
-                    options: {
-                        icon: 'calendar',
-                        group: 2,
-                        title: this.translations.filterAll,
-                        showTitle: true,
-                        dropdownOptions: {
-                            idAttribute: 'id',
-                            markSelected: false
-                        },
-                        dropdownItems: [
-                            {
-                                title: this.translations.filterAll,
-                                callback: this.closeAuthoredSelection.bind(this)
-                            },
-                            {
-                                id: 'timescale',
-                                title: this.translations.filterByTimescale,
-                                callback: this.openAuthoredSelection.bind(this)
-                            }
-                        ]
-                    }
-                },
-                workflowStage: {
-                    options: {
-                        icon: 'circle-o',
-                        group: 2,
-                        title: listHelper.getPublishedTitle(),
-                        showTitle: true,
-                        dropdownOptions: {
-                            idAttribute: 'id',
-                            markSelected: true,
-                            changeButton: true
-                        },
-                        dropdownItems: [
-                            {
-                                title: this.translations.filterAll,
-                                marked: true,
-                                callback: function() {
-                                    this.setWorkflowStage(null);
-                                }.bind(this)
-                            },
-                            {
-                                id: 'published',
-                                title: this.translations.published,
-                                callback: function() {
-                                    this.setWorkflowStage('published');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'test',
-                                title: this.translations.unpublished,
-                                callback: function() {
-                                    this.setWorkflowStage('test');
-                                }.bind(this)
-                            }
-                        ]
-                    }
-                }
-            });
-        },
-
-        openAuthoredSelection: function() {
-            this.$el.parent().addClass('limited');
-            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 1);
-
-            this.sandbox.once('sulu_content.teaser-selection.' + this.options.instanceName + '.ok-button.clicked', function() {
-                this.sandbox.emit('sulu_article.authored-selection.form.get');
-            }.bind(this));
-        },
-
-        closeAuthoredSelection: function(data) {
-            this.$el.parent().removeClass('limited');
-
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                authoredFrom: data ? data.from : null,
-                authoredTo: data ? data.to : null,
-            });
-
-            this.sandbox.emit(
-                'husky.toolbar.' + this.options.instanceName + '.button.set',
-                'authoredDate',
-                {title: listHelper.getAuthoredTitle(data)}
-            );
-
-            this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
-        },
-
-        setWorkflowStage: function(workflowStage) {
-            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.url.update', {
-                workflowStage: workflowStage,
-            });
         }
     };
 });

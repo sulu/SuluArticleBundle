@@ -43,7 +43,7 @@ define(['jquery', 'text!./form.html'], function($, formTemplate) {
         },
 
         /**
-         * OK callback of the overlay.
+         * Callback for get-event.
          */
         getEvent: function() {
             if (!this.sandbox.form.validate(this.$container)) {

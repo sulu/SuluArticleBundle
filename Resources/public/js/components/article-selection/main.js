@@ -18,8 +18,10 @@ define([
     'services/suluwebsite/reference-store',
     'text!./overlay.html',
     'text!./contentItem.html',
-    'text!/admin/api/articles/fields'
-], function(_, Config, referenceStore, overlayTemplate, contentItemTemplate, fieldsResponse) {
+    'text!/admin/api/articles/fields',
+    'services/suluarticle/list-helper',
+    'services/suluarticle/overlay-filter-helper'
+], function(_, Config, referenceStore, overlayTemplate, contentItemTemplate, fieldsResponse, listHelper, overlayFilterHelper) {
 
     'use strict';
 
@@ -49,7 +51,13 @@ define([
 
             translations: {
                 title: 'public.title',
-                overlayTitle: 'sulu_article.title'
+                overlayTitle: 'sulu_article.title',
+                authoredTitle: 'sulu_article.authored',
+                contactTitle: 'sulu_article.contact-selection-overlay.title',
+                categoryTitle: 'sulu_article.category-selection-overlay.title',
+                tagTitle: 'sulu_article.tag-selection-overlay.title',
+                pageTitle: 'public.choose',
+                apply: 'sulu-content.teaser.apply'
             }
         },
 
@@ -58,61 +66,73 @@ define([
          */
         bindCustomEvents = function() {
             this.sandbox.on(
-                'husky.overlay.article-selection.' + this.options.instanceName + '.add.initialized',
+                'husky.overlay.' + this.options.instanceName + '.initialized',
                 initializeList.bind(this)
             );
 
             this.sandbox.on(
-                'husky.overlay.article-selection.' + this.options.instanceName + '.add.opened',
+                'husky.overlay.' + this.options.instanceName + '.opened',
                 updateList.bind(this)
             );
 
             // adjust position of overlay after column-navigation has initialized
-            this.sandbox.on('husky.datagrid.article.view.rendered', function() {
-                this.sandbox.emit('husky.overlay.article-selection.' + this.options.instanceName + '.add.set-position');
+            this.sandbox.on('husky.datagrid.' + this.options.instanceName + '.view.rendered', function() {
+                this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.set-position');
             }.bind(this));
 
-            this.sandbox.on('husky.tabs.overlayarticle-selection.' + this.options.instanceName + '.add.item.select', typeChange.bind(this));
+            this.sandbox.on('husky.tabs.overlay' + this.options.instanceName + '.item.select', typeChange.bind(this));
         },
 
         /**
          * Initializes list in the overlay
          */
         initializeList = function() {
-            this.sandbox.start([
+            this.sandbox.sulu.initListToolbarAndList.call(this,
+                'article',
+                '/admin/api/articles/fields',
                 {
-                    name: 'search@husky',
-                    options: {
-                        appearance: 'white small',
-                        instanceName: this.options.instanceName + '-article-search',
-                        el: '#article-selection-' + this.options.instanceName + '-search'
-                    }
+                    el: '#article-selection-' + this.options.instanceName + '-search',
+                    instanceName: this.options.instanceName,
+                    template: this.filterHelper.createToolbarTemplate(this.sandbox)
                 },
                 {
-                    name: 'datagrid@husky',
-                    options: {
-                        el: '#article-selection-' + this.options.instanceName + '-list',
-                        instanceName: this.options.instanceName,
-                        url: this.url,
-                        preselected: this.getData() || [],
-                        resultKey: this.options.resultKey,
-                        sortable: false,
-                        columnOptionsInstanceName: '',
-                        clickCallback: function(item) {
-                            this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
-                        }.bind(this),
-                        selectedCounter: true,
-                        searchInstanceName: this.options.instanceName + '-article-search',
-                        searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
-                        paginationOptions: {
-                            dropdown: {
-                                limit: 20
-                            }
-                        },
-                        matchings: fields
-                    }
+                    el: '#article-selection-' + this.options.instanceName + '-list',
+                    instanceName: this.options.instanceName,
+                    url: this.url,
+                    preselected: this.getData() || [],
+                    resultKey: this.options.resultKey,
+                    clickCallback: function(item) {
+                        this.sandbox.emit('husky.datagrid.' + this.options.instanceName + '.toggle.item', item);
+                    }.bind(this),
+                    selectedCounter: true,
+                    searchInstanceName: this.options.instanceName,
+                    searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
+                    paginationOptions: {
+                        dropdown: {
+                            limit: 20
+                        }
+                    },
+                    viewOptions: {
+                        table: {
+                            actionIconColumn: 'title',
+                            badges: [
+                                {
+                                    column: 'title',
+                                    callback: function(item, badge) {
+                                        return listHelper.generateLocalizationBadge(item, badge, this.options.locale);
+                                    }.bind(this)
+                                },
+                                {
+                                    column: 'title',
+                                    callback: listHelper.generateWorkflowBadge
+                                }
+                            ]
+                        }
+                    },
                 }
-            ]);
+            );
+
+            this.filterHelper.startFilterComponents(this.sandbox);
         },
 
         /**
@@ -194,12 +214,96 @@ define([
                         el: $element,
                         removeOnClose: false,
                         container: this.$el,
-                        instanceName: 'article-selection.' + this.options.instanceName + '.add',
+                        instanceName: this.options.instanceName,
                         skin: 'large',
-                        okCallback: getAddOverlayData.bind(this),
-                        title: this.translations.overlayTitle,
-                        tabs: tabs,
-                        data: $data
+                        slides: [
+                            {
+                                title: this.translations.overlayTitle,
+                                okCallback: getAddOverlayData.bind(this),
+                                tabs: tabs,
+                                data: $data
+                            },
+                            {
+                                title: this.translations.authoredTitle,
+                                cssClass: 'authored-slide',
+                                contentSpacing: true,
+                                okDefaultText: this.translations.apply,
+                                okCallback: function() {
+                                    this.sandbox.emit('sulu_article.article-selection.' + this.options.instanceName + '.ok-button.clicked');
+
+                                    return false;
+                                }.bind(this),
+                                cancelCallback: function() {
+                                    this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+
+                                    return false;
+                                }.bind(this)
+                            },
+                            {
+                                title: this.translations.contactTitle,
+                                cssClass: 'contact-slide',
+                                contentSpacing: true,
+                                okDefaultText: this.translations.apply,
+                                okCallback: function() {
+                                    this.sandbox.emit('sulu_article.article-selection.' + this.options.instanceName + '.ok-button.clicked');
+
+                                    return false;
+                                }.bind(this),
+                                cancelCallback: function() {
+                                    this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+
+                                    return false;
+                                }.bind(this)
+                            },
+                            {
+                                title: this.translations.categoryTitle,
+                                cssClass: 'category-slide',
+                                contentSpacing: true,
+                                okDefaultText: this.translations.apply,
+                                okCallback: function() {
+                                    this.sandbox.emit('sulu_article.article-selection.' + this.options.instanceName + '.ok-button.clicked');
+
+                                    return false;
+                                }.bind(this),
+                                cancelCallback: function() {
+                                    this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+
+                                    return false;
+                                }.bind(this)
+                            },
+                            {
+                                title: this.translations.tagTitle,
+                                cssClass: 'tag-slide',
+                                contentSpacing: true,
+                                okDefaultText: this.translations.apply,
+                                okCallback: function() {
+                                    this.sandbox.emit('sulu_article.article-selection.' + this.options.instanceName + '.ok-button.clicked');
+
+                                    return false;
+                                }.bind(this),
+                                cancelCallback: function() {
+                                    this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+
+                                    return false;
+                                }.bind(this)
+                            },
+                            {
+                                title: this.translations.pageTitle,
+                                cssClass: 'page-slide data-source-slide',
+                                contentSpacing: true,
+                                okDefaultText: this.translations.apply,
+                                okCallback: function() {
+                                    this.sandbox.emit('sulu_article.article-selection.' + this.options.instanceName + '.ok-button.clicked');
+
+                                    return false;
+                                }.bind(this),
+                                cancelCallback: function() {
+                                    this.sandbox.emit('husky.overlay.' + this.options.instanceName + '.slide-to', 0);
+
+                                    return false;
+                                }.bind(this)
+                            }
+                        ]
                     }
                 }
             ]);
@@ -260,6 +364,7 @@ define([
         initialize: function() {
             // sandbox event handling
             bindCustomEvents.call(this);
+            this.filterHelper = overlayFilterHelper.create(this.$el, this.options.instanceName, this.options.locale, 'sulu_article.article-selection');
             this.prefillReferenceStore();
 
             this.render();

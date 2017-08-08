@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse) {
+define(['jquery'], function($) {
 
     'use strict';
 
@@ -17,24 +17,10 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
                 contact: null
             },
             selectCallback: function(data) {
-            },
-            matchings: JSON.parse(fieldsResponse)
+            }
         },
         translations: {
             title: 'sulu_article.contact-selection-overlay.title'
-        },
-        templates: {
-            skeleton: [
-                '<div class="grid">',
-                '   <div class="grid-row search-row">',
-                '       <div class="grid-col-8"/>',
-                '       <div class="grid-col-4 contact-selection-search"/>',
-                '   </div>',
-                '   <div class="grid-row">',
-                '       <div class="grid-col-12 contact-selection-list"/>',
-                '   </div>',
-                '</div>'
-            ].join('')
         }
     };
 
@@ -44,9 +30,8 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
 
         initialize: function() {
             var $overlayContainer = $('<div/>');
+            var $componentContainer = $('<div/>');
             this.$el.append($overlayContainer);
-
-            this.data = this.options.data;
 
             // start overlay
             this.sandbox.start([{
@@ -60,9 +45,7 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
                     slides: [
                         {
                             title: this.translations.title,
-                            data: $(this.templates.skeleton({
-                                translations: this.translations
-                            })),
+                            data: $componentContainer,
                             okCallback: this.okCallbackOverlay.bind(this)
                         }
                     ]
@@ -71,43 +54,17 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
 
             // start search and datagrid
             this.sandbox.once('husky.overlay.contact-selection.opened', function() {
-                this.sandbox.start([
-                    {
-                        name: 'search@husky',
-                        options: {
-                            el: $overlayContainer.find('.contact-selection-search'),
-                            appearance: 'white small',
-                            instanceName: 'contact-selection-search'
-                        }
-                    },
-                    {
-                        name: 'datagrid@husky',
-                        options: {
-                            el: $overlayContainer.find('.contact-selection-list'),
-                            instanceName: 'contact-selection',
-                            url: '/admin/api/contacts?flat=true',
-                            resultKey: 'contacts',
-                            sortable: false,
-                            selectedCounter: false,
-                            searchInstanceName: 'contact-selection-search',
-                            searchFields: ['fullName', 'mainEmail'],
-                            preselected: !!this.options.data.contact ? [this.options.data.contact.id] : [],
-                            paginationOptions: {
-                                dropdown: {
-                                    limit: 20
-                                }
-                            },
-                            viewOptions: {
-                                table: {
-                                    selectItem: {
-                                        type: 'radio'
-                                    }
-                                }
-                            },
-                            matchings: this.options.matchings
-                        }
+                this.sandbox.start([{
+                    name: 'articles/list/contact-selection/form@suluarticle',
+                    options: {
+                        el: $componentContainer,
+                        data: this.options.data,
+                        selectCallback: function(data) {
+                            this.options.selectCallback(data);
+                            this.sandbox.stop();
+                        }.bind(this)
                     }
-                ]);
+                }]);
             }.bind(this));
         },
 
@@ -115,15 +72,7 @@ define(['jquery', 'text!/admin/api/contacts/fields'], function($, fieldsResponse
          * OK callback of the overlay.
          */
         okCallbackOverlay: function() {
-            this.sandbox.emit('husky.datagrid.contact-selection.items.get-selected', function(ids, items) {
-                if (items.length > 0) {
-                    this.data.contactId = ids[0];
-                    this.data.contactItem = items[0];
-                }
-
-                this.options.selectCallback(this.data);
-                this.sandbox.stop();
-            }.bind(this), true);
+            this.sandbox.emit('sulu_article.contact-selection.form.get');
         }
     };
 });

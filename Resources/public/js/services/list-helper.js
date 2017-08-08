@@ -37,6 +37,7 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
                 filterByCategory: 'sulu_article.list.filter.by-category',
                 filterByTag: 'sulu_article.list.filter.by-tag',
                 filterByPage: 'sulu_article.list.filter.by-page',
+                filterByTimescale: 'sulu_article.list.filter.by-timescale',
             }
         ),
 
@@ -46,6 +47,9 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
         };
 
     return {
+
+        translations: translations,
+
         /**
          * Returns the title for the authored button.
          *
@@ -102,6 +106,10 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
          * @return {String}
          */
         getFilterTitle: function(filter) {
+            if (!filter) {
+                return translations.filterAll;
+            }
+
             switch (filter.filterKey) {
                 case 'filterByAuthor':
                     return translations.filterByAuthor + ' ' + filter.contact.firstName + ' ' + filter.contact.lastName;

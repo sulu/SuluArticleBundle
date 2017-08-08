@@ -13,29 +13,15 @@ define(['jquery'], function($) {
 
     var defaults = {
         options: {
+            locale: null,
             data: {
-                contact: null
+                category: null
             },
             selectCallback: function(data) {
-            },
-            matchings: [
-                {'name': 'name', 'content': 'Name'},
-                {'name': 'id', 'disabled': true},
-                {'name': 'children', 'disabled': true},
-                {'name': 'parent', 'disabled': true}
-            ]
+            }
         },
         translations: {
             title: 'sulu_article.category-selection-overlay.title'
-        },
-        templates: {
-            skeleton: [
-                '<div class="grid">',
-                '   <div class="grid-row">',
-                '       <div class="grid-col-12 category-selection-list"/>',
-                '   </div>',
-                '</div>'
-            ].join('')
         }
     };
 
@@ -45,6 +31,7 @@ define(['jquery'], function($) {
 
         initialize: function() {
             var $overlayContainer = $('<div/>');
+            var $componentContainer = $('<div/>');
             this.$el.append($overlayContainer);
 
             this.data = this.options.data;
@@ -61,9 +48,7 @@ define(['jquery'], function($) {
                     slides: [
                         {
                             title: this.translations.title,
-                            data: $(this.templates.skeleton({
-                                translations: this.translations
-                            })),
+                            data: $componentContainer,
                             okCallback: this.okCallbackOverlay.bind(this)
                         }
                     ]
@@ -71,39 +56,18 @@ define(['jquery'], function($) {
             }]);
 
             this.sandbox.once('husky.overlay.category-selection.opened', function() {
-                this.sandbox.start([
-                    {
-                        name: 'datagrid@husky',
-                        options: {
-                            el: $overlayContainer.find('.category-selection-list'),
-                            instanceName: 'category-selection',
-                            url: '/admin/api/categories?locale=' + this.options.locale + '&flat=true&sortBy=name&sortOrder=asc',
-                            resultKey: 'categories',
-                            sortable: false,
-                            selectedCounter: false,
-                            preselected: !!this.options.data.category ? [this.options.data.category.id] : [],
-                            paginationOptions: {
-                                dropdown: {
-                                    limit: 20
-                                }
-                            },
-                            childrenPropertyName: 'hasChildren',
-                            viewOptions: {
-                                table: {
-                                    cropContents: false,
-                                    noItemsText: 'sulu.category.no-categories-available',
-                                    showHead: false,
-                                    cssClass: 'white-box',
-                                    selectItem: {
-                                        type: 'radio',
-                                        inFirstCell: true
-                                    }
-                                }
-                            },
-                            matchings: this.options.matchings
-                        }
+                this.sandbox.start([{
+                    name: 'articles/list/category-selection/form@suluarticle',
+                    options: {
+                        el: $componentContainer,
+                        locale: this.options.locale,
+                        data: this.options.data,
+                        selectCallback: function(data) {
+                            this.options.selectCallback(data);
+                            this.sandbox.stop();
+                        }.bind(this)
                     }
-                ]);
+                }]);
             }.bind(this));
         },
 
@@ -111,15 +75,7 @@ define(['jquery'], function($) {
          * OK callback of the overlay.
          */
         okCallbackOverlay: function() {
-            this.sandbox.emit('husky.datagrid.category-selection.items.get-selected', function(ids, items) {
-                if (items.length > 0) {
-                    this.data.categoryId = ids[0];
-                    this.data.categoryItem = items[0];
-                }
-
-                this.options.selectCallback(this.data);
-                this.sandbox.stop();
-            }.bind(this), true);
+            this.sandbox.emit('sulu_article.category-selection.form.get');
         }
     };
 });
