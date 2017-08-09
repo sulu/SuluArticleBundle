@@ -13,10 +13,9 @@ namespace Sulu\Bundle\ArticleBundle\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
-use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
-use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory;
+use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkItem;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
@@ -26,15 +25,17 @@ use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
  */
 class ArticleLinkProvider implements LinkProviderInterface
 {
+    use ArticleViewDocumentIdTrait;
+
     /**
      * @var Manager
      */
-    private $manager;
+    private $liveManager;
 
     /**
-     * @var DocumentFactory
+     * @var Manager
      */
-    private $documentFactory;
+    private $defaultManager;
 
     /**
      * @var array
@@ -42,15 +43,26 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $types;
 
     /**
-     * @param Manager         $manager
-     * @param DocumentFactory $documentFactory
-     * @param array           $types
+     * @var string
      */
-    public function __construct(Manager $manager, DocumentFactory $documentFactory, array $types)
-    {
-        $this->manager = $manager;
-        $this->documentFactory = $documentFactory;
+    private $articleViewClass;
+
+    /**
+     * @param Manager $liveManager
+     * @param Manager $defaultManager
+     * @param array $types
+     * @param string $articleViewClass
+     */
+    public function __construct(
+        Manager $liveManager,
+        Manager $defaultManager,
+        array $types,
+        $articleViewClass
+    ) {
+        $this->liveManager = $liveManager;
+        $this->defaultManager = $defaultManager;
         $this->types = $types;
+        $this->articleViewClass = $articleViewClass;
     }
 
     /**
@@ -82,12 +94,13 @@ class ArticleLinkProvider implements LinkProviderInterface
     public function preload(array $hrefs, $locale, $published = true)
     {
         $search = new Search();
-        $search->addQuery(new IdsQuery($hrefs));
-        if ($published) {
-            $search->addQuery(new RangeQuery('authored', ['lte' => 'now']));
+        $search->addQuery(new IdsQuery($this->getViewDocumentIds($hrefs, $locale)));
+
+        $repository = $this->liveManager->getRepository($this->articleViewClass);
+        if (!$published) {
+            $repository = $this->defaultManager->getRepository($this->articleViewClass);
         }
 
-        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $documents = $repository->findDocuments($search);
 
         $result = [];
@@ -97,7 +110,7 @@ class ArticleLinkProvider implements LinkProviderInterface
                 $document->getUuid(),
                 $document->getTitle(),
                 $document->getRoutePath(),
-                $document->getAuthored() <= new \DateTime()
+                $document->getPublishedState()
             );
         }
 
