@@ -15,12 +15,12 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
-use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
@@ -195,8 +195,10 @@ class ArticlePageController extends RestController implements ClassResourceInter
             $data['template'] = $article->getStructureType();
         }
 
+        $formType = $this->getMetadataFactory()->getMetadataForAlias('article_page')->getFormType();
+
         $form = $this->createForm(
-            ArticlePageDocumentType::class,
+            $formType,
             $document,
             [
                 // disable csrf protection, since we can't produce a token, because the form is cached on the client
@@ -239,6 +241,14 @@ class ArticlePageController extends RestController implements ClassResourceInter
     protected function getMapper()
     {
         return $this->get('sulu.content.mapper');
+    }
+
+    /**
+     * @return BaseMetadataFactory
+     */
+    protected function getMetadataFactory()
+    {
+        return $this->get('sulu_document_manager.metadata_factory.base');
     }
 
     /**

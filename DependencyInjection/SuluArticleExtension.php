@@ -13,6 +13,8 @@ namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
@@ -84,8 +86,16 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 'sulu_document_manager',
                 [
                     'mapping' => [
-                        'article' => ['class' => ArticleDocument::class, 'phpcr_type' => 'sulu:article'],
-                        'article_page' => ['class' => ArticlePageDocument::class, 'phpcr_type' => 'sulu:articlepage'],
+                        'article' => [
+                            'class' => ArticleDocument::class,
+                            'phpcr_type' => 'sulu:article',
+                            'form_type' => ArticleDocumentType::class,
+                        ],
+                        'article_page' => [
+                            'class' => ArticlePageDocument::class,
+                            'phpcr_type' => 'sulu:articlepage',
+                            'form_type' => ArticlePageDocumentType::class,
+                        ],
                     ],
                     'path_segments' => [
                         'articles' => 'articles',

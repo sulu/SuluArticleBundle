@@ -57,17 +57,17 @@ class ArticleDocument implements
     /**
      * @var string
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
      */
-    private $nodeName;
+    protected $nodeName;
 
     /**
      * @var string
      */
-    private $path;
+    protected $path;
 
     /**
      * @var object
@@ -117,27 +117,27 @@ class ArticleDocument implements
     /**
      * @var StructureInterface
      */
-    private $structure;
+    protected $structure;
 
     /**
      * @var int
      */
-    private $creator;
+    protected $creator;
 
     /**
      * @var int
      */
-    private $changer;
+    protected $changer;
 
     /**
      * @var \DateTime
      */
-    private $created;
+    protected $created;
 
     /**
      * @var \DateTime
      */
-    private $changed;
+    protected $changed;
 
     /**
      * @var int

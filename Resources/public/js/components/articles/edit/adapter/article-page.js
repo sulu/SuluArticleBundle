@@ -17,12 +17,13 @@ define([
     'use strict';
 
     var getPage = function(page, data) {
-        if (!page || !data._embedded || data._embedded.pages.length <= page - 2) {
-            return {};
-        }
+            if (!page || !data._embedded || data._embedded.pages.length <= page - 2) {
+                return {};
+            }
 
-        return data._embedded.pages[page - 2];
-    };
+            return data._embedded.pages[page - 2];
+        },
+        config = Config.get('sulu_article');
 
     return {
         startPreview: function(component, data) {
@@ -37,7 +38,7 @@ define([
 
             var preview = Preview.initialize(Config.get('sulu_security.contexts')['sulu.modules.articles']);
             preview.start(
-                'Sulu\\Bundle\\ArticleBundle\\Document\\ArticlePageDocument',
+                config.classes.articlePage,
                 pageData.id,
                 component.options.locale,
                 pageData
