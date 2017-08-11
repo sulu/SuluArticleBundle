@@ -16,6 +16,8 @@ define([
 
     'use strict';
 
+    var config = Config.get('sulu_article');
+
     return {
         startPreview: function(component, data) {
             var pageData = data;
@@ -25,7 +27,7 @@ define([
 
             var preview = Preview.initialize(Config.get('sulu_security.contexts')['sulu.modules.articles']);
             preview.start(
-                'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
+                config.classes.article,
                 pageData.id,
                 component.options.locale,
                 pageData

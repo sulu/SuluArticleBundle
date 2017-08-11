@@ -49,6 +49,7 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
 
             // set config for this bundle
             var locales = getContentLocales(),
+                articleConfig = Config.get('sulu_article'),
                 config = {
                     defaultLocale: locales[0],
                     locales: locales,
@@ -56,12 +57,14 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                         return {id: locale, title: locale};
                     }),
                     settingsKey: 'articleLanguage',
-                    typeNames: Object.keys(Config.get('sulu_article').types),
-                    types: Config.get('sulu_article').types,
-                    templates: Config.get('sulu_article').templates,
-                    displayTabAll: Config.get('sulu_article').displayTabAll,
-                    defaultAuthor: Config.get('sulu_article').defaultAuthor
+                    typeNames: Object.keys(articleConfig.types),
+                    types: articleConfig.types,
+                    templates: articleConfig.templates,
+                    displayTabAll: articleConfig.displayTabAll,
+                    defaultAuthor: articleConfig.defaultAuthor,
+                    classes: articleConfig.classes,
                 };
+
             Config.set('sulu_article', config);
 
             /**

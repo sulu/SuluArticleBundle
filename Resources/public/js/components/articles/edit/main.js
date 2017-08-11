@@ -534,14 +534,11 @@ define([
                 return {_embedded: {pages: []}};
             }
 
-            var promise = $.Deferred();
-            this.sandbox.util.load(this.getUrl()).done(function(data) {
+            return this.sandbox.util.load(this.getUrl()).done(function(data) {
                 this.preview = this.getAdapter().startPreview(this, data);
 
-                promise.resolve(data);
+                return data;
             }.bind(this));
-
-            return promise;
         },
 
         getAdapter: function() {

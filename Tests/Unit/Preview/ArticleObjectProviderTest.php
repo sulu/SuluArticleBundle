@@ -45,7 +45,11 @@ class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->serializer = $this->prophesize(SerializerInterface::class);
 
-        $this->provider = new ArticleObjectProvider($this->documentManager->reveal(), $this->serializer->reveal());
+        $this->provider = new ArticleObjectProvider(
+            $this->documentManager->reveal(),
+            $this->serializer->reveal(),
+            ArticleDocument::class
+        );
     }
 
     public function testGetObject($id = '123-123-123', $locale = 'de')

@@ -19,8 +19,14 @@
         <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%sulu_article.types%</argument>
-            <argument>%sulu_article.display_tab_all%</argument>
-            <argument>%sulu_article.default_author%</argument>
+            <argument type="collection">
+                <argument key="displayTabAll">%sulu_article.display_tab_all%</argument>
+                <argument key="defaultAuthor">%sulu_article.default_author%</argument>
+                <argument key="classes" type="collection">
+                    <argument key="article">%sulu_article.article_document.class%</argument>
+                    <argument key="articlePage">%sulu_article.article_page_document.class%</argument>
+                </argument>
+            </argument>
 
             <tag name="sulu.js_config"/>
             <tag name="sulu.context" context="admin"/>
@@ -260,6 +266,7 @@
                  class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="serializer"/>
+            <argument type="string">%sulu_article.article_document.class%</argument>
 
             <tag name="sulu_preview.object_provider" class="%sulu_article.article_document.class%"/>
             <tag name="sulu_preview.object_provider" class="%sulu_article.article_page_document.class%"/>

@@ -33,31 +33,20 @@ class ArticleJsConfig implements JsConfigInterface
     private $typeConfiguration;
 
     /**
-     * @var bool
+     * @var array
      */
-    private $displayTabAll;
-
-    /**
-     * @var bool
-     */
-    private $defaultAuthor;
+    private $parameter;
 
     /**
      * @param StructureManagerInterface $structureManager
      * @param array $typeConfiguration
-     * @param bool $displayTabAll
-     * @param bool $defaultAuthor
+     * @param array $parameter
      */
-    public function __construct(
-        StructureManagerInterface $structureManager,
-        array $typeConfiguration,
-        $displayTabAll,
-        $defaultAuthor
-    ) {
+    public function __construct(StructureManagerInterface $structureManager, array $typeConfiguration, array $parameter)
+    {
         $this->structureManager = $structureManager;
         $this->typeConfiguration = $typeConfiguration;
-        $this->displayTabAll = $displayTabAll;
-        $this->defaultAuthor = $defaultAuthor;
+        $this->parameter = $parameter;
     }
 
     /**
@@ -65,12 +54,13 @@ class ArticleJsConfig implements JsConfigInterface
      */
     public function getParameters()
     {
-        $config = [
-            'types' => [],
-            'templates' => [],
-            'displayTabAll' => $this->displayTabAll,
-            'defaultAuthor' => $this->defaultAuthor,
-        ];
+        $config = array_merge(
+            $this->parameter,
+            [
+                'types' => [],
+                'templates' => [],
+            ]
+        );
 
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());

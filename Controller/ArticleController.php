@@ -25,11 +25,11 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
@@ -472,8 +472,9 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function persistDocument($data, $document, $locale)
     {
+        $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
         $form = $this->createForm(
-            ArticleDocumentType::class,
+            $formType,
             $document,
             [
                 // disable csrf protection, since we can't produce a token, because the form is cached on the client
@@ -550,5 +551,13 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
 
         return strtolower($camel);
+    }
+
+    /**
+     * @return BaseMetadataFactory
+     */
+    protected function getMetadataFactory()
+    {
+        return $this->get('sulu_document_manager.metadata_factory.base');
     }
 }

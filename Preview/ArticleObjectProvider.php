@@ -36,13 +36,23 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     private $serializer;
 
     /**
+     * @var string
+     */
+    private $articleDocumentClass;
+
+    /**
      * @param DocumentManagerInterface $documentManager
      * @param SerializerInterface $serializer
+     * @param $articleDocumentClass
      */
-    public function __construct(DocumentManagerInterface $documentManager, SerializerInterface $serializer)
-    {
+    public function __construct(
+        DocumentManagerInterface $documentManager,
+        SerializerInterface $serializer,
+        $articleDocumentClass
+    ) {
         $this->documentManager = $documentManager;
         $this->serializer = $serializer;
+        $this->articleDocumentClass = $articleDocumentClass;
     }
 
     /**
@@ -142,7 +152,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
 
         $article = $this->serializer->deserialize(
             $result['object'],
-            ArticleDocument::class,
+            $this->articleDocumentClass,
             'json',
             DeserializationContext::create()
                 ->setSerializeNull(true)
