@@ -25,6 +25,7 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\FieldDescriptor\ESFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
@@ -54,25 +55,44 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Create field-descriptor array.
      *
-     * @return FieldDescriptor[]
+     * @return ESFieldDescriptor[]
      */
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
-            'typeTranslation' => new FieldDescriptor(
+            'uuid' => new ESFieldDescriptor('id', '', 'public.id', false, false, 'string', '', '', false),
+            'typeTranslation' => new ESFieldDescriptor(
                 'typeTranslation',
+                'typeTranslation.raw',
                 'sulu_article.list.type',
                 !$this->getParameter('sulu_article.display_tab_all'),
                 false
             ),
-            'title' => new FieldDescriptor('title', 'public.title', false, true),
-            'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
-            'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
-            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.author', false, false),
-            'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
-            'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
-            'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
+            'title' => new ESFieldDescriptor('title', 'title.raw', 'public.title', false, true),
+            'creatorFullName' => new ESFieldDescriptor(
+                'creatorFullName',
+                'creatorFullName.raw',
+                'sulu_article.list.creator',
+                true,
+                false
+            ),
+            'changerFullName' => new ESFieldDescriptor(
+                'changerFullName',
+                'changerFullName.raw',
+                'sulu_article.list.changer',
+                false,
+                false
+            ),
+            'authorFullName' => new ESFieldDescriptor(
+                'authorFullName',
+                'authorFullName.raw',
+                'sulu_article.author',
+                false,
+                false
+            ),
+            'created' => new ESFieldDescriptor('created', 'public.created', true, false, 'datetime'),
+            'changed' => new ESFieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
+            'authored' => new ESFieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
         ];
     }
 
@@ -146,9 +166,11 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         $count = $repository->count($search);
 
-        if (null !== $restHelper->getSortColumn()) {
+        if (null !== $restHelper->getSortColumn() &&
+            $sortField = $this->getSortFieldName($restHelper->getSortColumn())
+        ) {
             $search->addSort(
-                new FieldSort($this->uncamelize($restHelper->getSortColumn()), $restHelper->getSortOrder())
+                new FieldSort($sortField, $restHelper->getSortOrder())
             );
         }
 
@@ -496,6 +518,23 @@ class ArticleController extends RestController implements ClassResourceInterface
                 $this->getDocumentManager()->publish($document, $locale);
                 break;
         }
+    }
+
+    /**
+     * @param string $sortBy
+     *
+     * @return null|string
+     */
+    private function getSortFieldName($sortBy)
+    {
+        $sortBy = $this->uncamelize($sortBy);
+        $fieldDescriptors = $this->getFieldDescriptors();
+
+        if (array_key_exists($sortBy, $fieldDescriptors)) {
+            return $fieldDescriptors[$sortBy]->getSortField();
+        }
+
+        return null;
     }
 
     /**
