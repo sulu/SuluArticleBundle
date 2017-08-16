@@ -366,11 +366,13 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'remove-draft':
                     $data = $this->getDocumentManager()->find($uuid, $locale);
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
+
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
@@ -387,6 +389,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
@@ -395,6 +398,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($copiedPath, $locale);
+
                     break;
                 case 'order':
                     $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
@@ -402,6 +406,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->clear();
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
@@ -515,6 +520,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         switch ($actionParameter) {
             case 'publish':
                 $this->getDocumentManager()->publish($document, $locale);
+
                 break;
         }
     }
