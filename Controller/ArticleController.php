@@ -25,7 +25,7 @@ use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
-use Sulu\Bundle\ArticleBundle\FieldDescriptor\ESFieldDescriptor;
+use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
@@ -54,44 +54,44 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Create field-descriptor array.
      *
-     * @return ESFieldDescriptor[]
+     * @return ElasticSearchFieldDescriptor[]
      */
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => new ESFieldDescriptor('id', '', 'public.id', false, false, 'string', '', '', false),
-            'typeTranslation' => new ESFieldDescriptor(
+            'uuid' => new ElasticSearchFieldDescriptor('id', null, 'public.id', false, false, 'string', '', '', false),
+            'typeTranslation' => new ElasticSearchFieldDescriptor(
                 'typeTranslation',
                 'typeTranslation.raw',
                 'sulu_article.list.type',
                 !$this->getParameter('sulu_article.display_tab_all'),
                 false
             ),
-            'title' => new ESFieldDescriptor('title', 'title.raw', 'public.title', false, true),
-            'creatorFullName' => new ESFieldDescriptor(
+            'title' => new ElasticSearchFieldDescriptor('title', 'title.raw', 'public.title', false, true),
+            'creatorFullName' => new ElasticSearchFieldDescriptor(
                 'creatorFullName',
                 'creatorFullName.raw',
                 'sulu_article.list.creator',
                 true,
                 false
             ),
-            'changerFullName' => new ESFieldDescriptor(
+            'changerFullName' => new ElasticSearchFieldDescriptor(
                 'changerFullName',
                 'changerFullName.raw',
                 'sulu_article.list.changer',
                 false,
                 false
             ),
-            'authorFullName' => new ESFieldDescriptor(
+            'authorFullName' => new ElasticSearchFieldDescriptor(
                 'authorFullName',
                 'authorFullName.raw',
                 'sulu_article.author',
                 false,
                 false
             ),
-            'created' => new ESFieldDescriptor('created', '', 'public.created', true, false, 'datetime'),
-            'changed' => new ESFieldDescriptor('changed', '', 'public.changed', false, false, 'datetime'),
-            'authored' => new ESFieldDescriptor('authored', '', 'sulu_article.authored', false, false, 'date'),
+            'created' => new ElasticSearchFieldDescriptor('created', null, 'public.created', true, false, 'datetime'),
+            'changed' => new ElasticSearchFieldDescriptor('changed', null, 'public.changed', false, false, 'datetime'),
+            'authored' => new ElasticSearchFieldDescriptor('authored', null, 'sulu_article.authored', false, false, 'date'),
         ];
     }
 

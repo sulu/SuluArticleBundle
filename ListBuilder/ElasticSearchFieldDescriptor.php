@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\FieldDescriptor;
+namespace Sulu\Bundle\ArticleBundle\ListBuilder;
 
 use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 
@@ -17,7 +17,7 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
  * Extends the default FieldDescriptor with the property sort field to configure it.
  * Default is the name.
  */
-class ESFieldDescriptor extends FieldDescriptor
+class ElasticSearchFieldDescriptor extends FieldDescriptor
 {
     /**
      * @var string
@@ -26,7 +26,7 @@ class ESFieldDescriptor extends FieldDescriptor
 
     public function __construct(
         $name,
-        $sortField = '',
+        $sortField = null,
         $translation = null,
         $disabled = false,
         $default = false,
@@ -37,11 +37,7 @@ class ESFieldDescriptor extends FieldDescriptor
         $editable = false,
         $cssClass = ''
     ) {
-        if ('' !== $sortField) {
-            $this->sortField = $sortField;
-        } else {
-            $this->sortField = $name;
-        }
+        $this->sortField = $sortField ? $sortField : $name;
 
         parent::__construct(
             $name,
