@@ -89,9 +89,9 @@ class ArticleController extends RestController implements ClassResourceInterface
                 false,
                 false
             ),
-            'created' => new ESFieldDescriptor('created', 'public.created', true, false, 'datetime'),
-            'changed' => new ESFieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
-            'authored' => new ESFieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
+            'created' => new ESFieldDescriptor('created', '', 'public.created', true, false, 'datetime'),
+            'changed' => new ESFieldDescriptor('changed', '', 'public.changed', false, false, 'datetime'),
+            'authored' => new ESFieldDescriptor('authored', '', 'sulu_article.authored', false, false, 'date'),
         ];
     }
 
