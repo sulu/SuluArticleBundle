@@ -18,7 +18,6 @@ use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Task\Lock\LockingTaskHandlerInterface;
-use Task\Runner\RetryException;
 
 /**
  * Task-Handler to update page-tree-routes.
@@ -96,7 +95,7 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
         } catch (\Exception $exception) {
             $this->entityManager->rollback();
 
-            throw new RetryException($exception);
+            throw $exception;
         }
     }
 
