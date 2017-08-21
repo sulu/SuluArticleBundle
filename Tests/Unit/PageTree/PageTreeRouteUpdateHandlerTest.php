@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\PageTree;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
 use Sulu\Bundle\ContentBundle\Document\HomeDocument;
@@ -31,6 +32,11 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
     private $documentManager;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @var PageTreeRouteUpdateHandler
      */
     private $handler;
@@ -39,10 +45,12 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->routeUpdater = $this->prophesize(PageTreeUpdaterInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
+        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
 
         $this->handler = new PageTreeRouteUpdateHandler(
             $this->routeUpdater->reveal(),
-            $this->documentManager->reveal()
+            $this->documentManager->reveal(),
+            $this->entityManager->reveal()
         );
     }
 
@@ -74,6 +82,46 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->documentManager->find('123-123-123', 'de')->willReturn($document->reveal());
         $this->documentManager->flush()->shouldBeCalled();
+
+        $this->entityManager->beginTransaction()->shouldBeCalled();
+        $this->entityManager->commit()->shouldBeCalled();
+        $this->entityManager->rollback()->shouldNotBeCalled();
+
+        $this->routeUpdater->update($document->reveal())->shouldBeCalled();
+
+        $this->handler->handle(['id' => '123-123-123', 'locale' => 'de']);
+    }
+
+    public function testHandleUpdateException()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+
+        $document = $this->prophesize(PageDocument::class);
+
+        $this->documentManager->find('123-123-123', 'de')->willReturn($document->reveal());
+        $this->documentManager->flush()->shouldNotBeCalled();
+
+        $this->entityManager->beginTransaction()->shouldBeCalled();
+        $this->entityManager->commit()->shouldNotBeCalled();
+        $this->entityManager->rollback()->shouldBeCalled();
+
+        $this->routeUpdater->update($document->reveal())->willThrow(new \InvalidArgumentException());
+
+        $this->handler->handle(['id' => '123-123-123', 'locale' => 'de']);
+    }
+
+    public function testHandleDocumentExceptionException()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+
+        $document = $this->prophesize(PageDocument::class);
+
+        $this->documentManager->find('123-123-123', 'de')->willReturn($document->reveal());
+        $this->documentManager->flush()->willThrow(new \InvalidArgumentException());
+
+        $this->entityManager->beginTransaction()->shouldBeCalled();
+        $this->entityManager->commit()->shouldNotBeCalled();
+        $this->entityManager->rollback()->shouldBeCalled();
 
         $this->routeUpdater->update($document->reveal())->shouldBeCalled();
 
