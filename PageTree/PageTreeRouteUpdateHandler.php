@@ -17,12 +17,13 @@ use Sulu\Bundle\AutomationBundle\TaskHandler\TaskHandlerConfiguration;
 use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Task\Executor\RetryTaskHandlerInterface;
 use Task\Lock\LockingTaskHandlerInterface;
 
 /**
  * Task-Handler to update page-tree-routes.
  */
-class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, LockingTaskHandlerInterface
+class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, LockingTaskHandlerInterface, RetryTaskHandlerInterface
 {
     /**
      * @var PageTreeUpdaterInterface
@@ -105,5 +106,13 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     public function getLockKey($workload)
     {
         return self::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaximumAttempts()
+    {
+        return 3;
     }
 }

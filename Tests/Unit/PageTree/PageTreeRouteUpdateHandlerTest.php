@@ -18,6 +18,7 @@ use Sulu\Bundle\ContentBundle\Document\HomeDocument;
 use Sulu\Bundle\ContentBundle\Document\PageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Task\Executor\RetryTaskHandlerInterface;
 
 class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -126,5 +127,11 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->routeUpdater->update($document->reveal())->shouldBeCalled();
 
         $this->handler->handle(['id' => '123-123-123', 'locale' => 'de']);
+    }
+
+    public function testGetMaximumAttempts()
+    {
+        $this->assertInstanceOf(RetryTaskHandlerInterface::class, $this->handler);
+        $this->assertEquals(3, $this->handler->getMaximumAttempts());
     }
 }
