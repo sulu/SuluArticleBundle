@@ -11,17 +11,19 @@
 
 namespace Sulu\Bundle\ArticleBundle\PageTree;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\AutomationBundle\TaskHandler\AutomationTaskHandlerInterface;
 use Sulu\Bundle\AutomationBundle\TaskHandler\TaskHandlerConfiguration;
 use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Task\Executor\RetryTaskHandlerInterface;
 use Task\Lock\LockingTaskHandlerInterface;
 
 /**
  * Task-Handler to update page-tree-routes.
  */
-class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, LockingTaskHandlerInterface
+class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, LockingTaskHandlerInterface, RetryTaskHandlerInterface
 {
     /**
      * @var PageTreeUpdaterInterface
@@ -34,15 +36,23 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     private $documentManager;
 
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
      * @param PageTreeUpdaterInterface $routeUpdater
      * @param DocumentManagerInterface $documentManager
+     * @param EntityManagerInterface $entityManager
      */
     public function __construct(
         PageTreeUpdaterInterface $routeUpdater,
-        DocumentManagerInterface $documentManager
+        DocumentManagerInterface $documentManager,
+        EntityManagerInterface $entityManager
     ) {
         $this->routeUpdater = $routeUpdater;
         $this->documentManager = $documentManager;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -76,9 +86,18 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
      */
     public function handle($workload)
     {
-        $this->routeUpdater->update($this->documentManager->find($workload['id'], $workload['locale']));
+        $this->entityManager->beginTransaction();
 
-        $this->documentManager->flush();
+        try {
+            $this->routeUpdater->update($this->documentManager->find($workload['id'], $workload['locale']));
+
+            $this->documentManager->flush();
+            $this->entityManager->commit();
+        } catch (\Exception $exception) {
+            $this->entityManager->rollback();
+
+            throw $exception;
+        }
     }
 
     /**
@@ -87,5 +106,13 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     public function getLockKey($workload)
     {
         return self::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaximumAttempts()
+    {
+        return 3;
     }
 }
