@@ -1017,7 +1017,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
         $article2 = json_decode($client->getResponse()->getContent(), true);
 
-        $client->request('GET', '/api/articles?locale=de&categoriesIds=' . $category1->getId() . ','. $category2->getId());
+        $client->request('GET', '/api/articles?locale=de&categoriesIds=' . $category1->getId() . ',' . $category2->getId());
         $this->assertHttpStatusCode(200, $client->getResponse());
         $result = json_decode($client->getResponse()->getContent(), true);
 
