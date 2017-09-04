@@ -404,10 +404,10 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function setUnpublished($uuid)
+    public function setUnpublished($uuid, $locale)
     {
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $uuid);
-
+        $articleId = $this->getViewDocumentId($uuid, $locale);
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
         if (!$article) {
             return;
         }
@@ -416,6 +416,8 @@ class ArticleIndexer implements IndexerInterface
         $article->setPublishedState(false);
 
         $this->manager->persist($article);
+
+        return $article;
     }
 
     /**
