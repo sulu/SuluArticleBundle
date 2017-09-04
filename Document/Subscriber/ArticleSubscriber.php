@@ -423,7 +423,8 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->liveIndexer->remove($document);
         $this->liveIndexer->flush();
 
-        $this->indexer->setUnpublished($document->getUuid());
+        $this->indexer->setUnpublished($document->getUuid(), $event->getLocale());
+        $this->indexer->flush();
     }
 
     /**

@@ -28,10 +28,11 @@ interface IndexerInterface
      * Clear published and sets published state to false.
      *
      * @param string $uuid
+     * @param string $locale
      *
      * @return ArticleDocument $document
      */
-    public function setUnpublished($uuid);
+    public function setUnpublished($uuid, $locale);
 
     /**
      * Indexes given document.

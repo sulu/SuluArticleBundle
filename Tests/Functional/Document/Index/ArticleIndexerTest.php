@@ -71,13 +71,20 @@ class ArticleIndexerTest extends SuluTestCase
             'page_tree_route'
         );
 
-        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $document = $documentManager->find($article['id'], $this->locale);
+        $document = $this->documentManager->find($article['id'], $this->locale);
         $this->indexer->index($document);
 
-        $viewDocument = $this->manager->find(ArticleViewDocument::class, $article['id'] . '-' . $this->locale);
-
+        $viewDocument = $this->findViewDocument($article['id']);
         $this->assertEquals($page->getUuid(), $viewDocument->getParentPageUuid());
+    }
+
+    public function testSetUnpublished()
+    {
+        $article = $this->createArticle();
+
+        $viewDocument = $this->indexer->setUnpublished($article['id'], $this->locale);
+        $this->assertNull($viewDocument->getPublished());
+        $this->assertFalse($viewDocument->getPublishedState());
     }
 
     /**
@@ -89,7 +96,7 @@ class ArticleIndexerTest extends SuluTestCase
      *
      * @return mixed
      */
-    private function createArticle(array $data, $title = 'Test Article', $template = 'default')
+    private function createArticle(array $data = [], $title = 'Test Article', $template = 'default')
     {
         $client = $this->createAuthenticatedClient();
         $client->request(
@@ -129,5 +136,17 @@ class ArticleIndexerTest extends SuluTestCase
         $this->documentManager->flush();
 
         return $page;
+    }
+
+    /**
+     * Find view-document.
+     *
+     * @param string $uuid
+     *
+     * @return ArticleViewDocument
+     */
+    private function findViewDocument($uuid)
+    {
+        return $this->manager->find(ArticleViewDocument::class, $uuid . '-' . $this->locale);
     }
 }
