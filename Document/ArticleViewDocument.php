@@ -66,6 +66,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @Property(
      *     type="string",
      *     options={
+     *         "analyzer": "pathAnalyzer",
      *         "fields":{
      *            "raw":{"type":"string", "index":"not_analyzed"},
      *            "value":{"type":"string"}

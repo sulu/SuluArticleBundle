@@ -1,5 +1,25 @@
 # Upgrade
 
+## 0.7.0
+
+### Index mapping has changed
+
+Update configuration for Elasticsearch [^2.2](Resources/doc/installation_es2.md) or 
+[^5.0](Resources/doc/installation_es5.md) and add the new analyzer `pathAnalyzer`.
+
+After that recreate the index and reindex your articles:
+
+```bash
+bin/adminconsole ongr:es:index:drop -m default --force
+bin/websiteconsole ongr:es:index:drop -m live --force
+
+bin/adminconsole ongr:es:index:create -m default
+bin/websiteconsole ongr:es:index:create -m live
+
+bin/adminconsole sulu:article:index-rebuild ###LOCALE###
+bin/websiteconsole sulu:article:index-rebuild ###LOCALE### -live
+```
+
 ## 0.6.1
 
 ### Resolve of excerpt data
@@ -37,7 +57,7 @@ bin/adminconsole ongr:es:index:create -m default
 bin/websiteconsole ongr:es:index:create -m live
 
 bin/adminconsole sulu:article:index-rebuild ###LOCALE###
-bin/websiteconsole sulu:article:index-rebuild ###LOCALE### -live
+bin/websiteconsole sulu:article:index-rebuild ###LOCALE### --live
 ```
 
 ### DocumentManager

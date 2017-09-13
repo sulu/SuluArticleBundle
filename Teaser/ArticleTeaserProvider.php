@@ -53,11 +53,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     {
         return new TeaserConfiguration(
             'sulu_article.teaser',
-            'teaser-selection/list@sulucontent',
+            'teaser-selection/list@suluarticle',
             [
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
-                'searchFields' => ['title', 'type'],
+                'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'pages.title'],
                 'matchings' => [
                     [
                         'content' => 'public.title',
