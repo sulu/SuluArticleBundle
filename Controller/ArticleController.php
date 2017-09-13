@@ -25,6 +25,8 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
@@ -32,7 +34,6 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
-use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
@@ -55,25 +56,44 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Create field-descriptor array.
      *
-     * @return FieldDescriptor[]
+     * @return ElasticSearchFieldDescriptor[]
      */
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
-            'typeTranslation' => new FieldDescriptor(
+            'uuid' => new ElasticSearchFieldDescriptor('id', null, 'public.id', false, false, 'string', '', '', false),
+            'typeTranslation' => new ElasticSearchFieldDescriptor(
                 'typeTranslation',
+                'typeTranslation.raw',
                 'sulu_article.list.type',
                 !$this->getParameter('sulu_article.display_tab_all'),
                 false
             ),
-            'title' => new FieldDescriptor('title', 'public.title', false, true),
-            'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
-            'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
-            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.author', false, false),
-            'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
-            'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
-            'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
+            'title' => new ElasticSearchFieldDescriptor('title', 'title.raw', 'public.title', false, true),
+            'creatorFullName' => new ElasticSearchFieldDescriptor(
+                'creatorFullName',
+                'creatorFullName.raw',
+                'sulu_article.list.creator',
+                true,
+                false
+            ),
+            'changerFullName' => new ElasticSearchFieldDescriptor(
+                'changerFullName',
+                'changerFullName.raw',
+                'sulu_article.list.changer',
+                false,
+                false
+            ),
+            'authorFullName' => new ElasticSearchFieldDescriptor(
+                'authorFullName',
+                'authorFullName.raw',
+                'sulu_article.author',
+                false,
+                false
+            ),
+            'created' => new ElasticSearchFieldDescriptor('created', null, 'public.created', true, false, 'datetime'),
+            'changed' => new ElasticSearchFieldDescriptor('changed', null, 'public.changed', false, false, 'datetime'),
+            'authored' => new ElasticSearchFieldDescriptor('authored', null, 'sulu_article.authored', false, false, 'date'),
         ];
     }
 
@@ -167,9 +187,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new MatchAllQuery());
         }
 
-        if (null !== $restHelper->getSortColumn()) {
+        if (null !== $restHelper->getSortColumn() &&
+            $sortField = $this->getSortFieldName($restHelper->getSortColumn())
+        ) {
             $search->addSort(
-                new FieldSort($this->uncamelize($restHelper->getSortColumn()), $restHelper->getSortOrder())
+                new FieldSort($sortField, $restHelper->getSortOrder())
             );
         }
 
@@ -381,11 +403,13 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'remove-draft':
                     $data = $this->getDocumentManager()->find($uuid, $locale);
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
+
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
@@ -402,6 +426,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
@@ -410,6 +435,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($copiedPath, $locale);
+
                     break;
                 case 'order':
                     $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
@@ -417,6 +443,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->clear();
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
@@ -531,8 +558,26 @@ class ArticleController extends RestController implements ClassResourceInterface
         switch ($actionParameter) {
             case 'publish':
                 $this->getDocumentManager()->publish($document, $locale);
+
                 break;
         }
+    }
+
+    /**
+     * @param string $sortBy
+     *
+     * @return null|string
+     */
+    private function getSortFieldName($sortBy)
+    {
+        $sortBy = $this->uncamelize($sortBy);
+        $fieldDescriptors = $this->getFieldDescriptors();
+
+        if (array_key_exists($sortBy, $fieldDescriptors)) {
+            return $fieldDescriptors[$sortBy]->getSortField();
+        }
+
+        return null;
     }
 
     /**
