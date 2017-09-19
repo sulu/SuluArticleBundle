@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\AutomationBundle\Entity\Task;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
 use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Schedules the route-update task.
@@ -32,13 +33,18 @@ class AutomationPageTreeUpdater implements PageTreeUpdaterInterface
     private $entityManager;
 
     /**
-     * @param TaskManagerInterface $taskManager
-     * @param EntityManagerInterface $entityManager
+     * @var RequestStack
      */
-    public function __construct(TaskManagerInterface $taskManager, EntityManagerInterface $entityManager)
-    {
+    private $requestStack;
+
+    public function __construct(
+        TaskManagerInterface $taskManager,
+        EntityManagerInterface $entityManager,
+        RequestStack $requestStack
+    ) {
         $this->taskManager = $taskManager;
         $this->entityManager = $entityManager;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -46,12 +52,19 @@ class AutomationPageTreeUpdater implements PageTreeUpdaterInterface
      */
     public function update(BasePageDocument $document)
     {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return;
+        }
+
         $task = new Task();
         $task->setEntityClass(BasePageDocument::class)
             ->setEntityId($document->getUuid())
             ->setLocale($document->getLocale())
             ->setHandlerClass(PageTreeRouteUpdateHandler::class)
-            ->setSchedule(new \DateTime());
+            ->setSchedule(new \DateTime())
+            ->setHost($request->getHost())
+            ->setScheme($request->getScheme());
 
         $this->taskManager->create($task);
         $this->entityManager->flush();
