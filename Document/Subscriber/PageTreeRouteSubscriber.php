@@ -150,8 +150,9 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
         );
 
         $liveNode = $this->getLiveNode($document);
+        $url = $liveNode->getPropertyValueWithDefault($urlPropertyName, null);
 
-        return $liveNode->getPropertyValueWithDefault($urlPropertyName, null) !== $document->getResourceSegment();
+        return $url && $url !== $document->getResourceSegment();
     }
 
     /**

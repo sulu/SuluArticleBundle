@@ -17,6 +17,7 @@
                  class="Sulu\Bundle\ArticleBundle\PageTree\AutomationPageTreeUpdater">
             <argument type="service" id="sulu_automation.tasks.manager"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="request_stack"/>
         </service>
 
         <service id="sulu_article.automation.route_update_handler"

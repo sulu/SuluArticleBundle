@@ -19,6 +19,8 @@ use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Model\TaskInterface;
 use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,16 +35,33 @@ class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * @var PageTreeUpdaterInterface
      */
     private $updater;
+
+    /**
+     * @var Request
+     */
+    private $request;
 
     protected function setUp()
     {
         $this->taskManager = $this->prophesize(TaskManagerInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->requestStack = $this->prophesize(RequestStack::class);
 
-        $this->updater = new AutomationPageTreeUpdater($this->taskManager->reveal(), $this->entityManager->reveal());
+        $this->updater = new AutomationPageTreeUpdater($this->taskManager->reveal(), $this->entityManager->reveal(), $this->requestStack->reveal());
+
+        $this->request = $this->prophesize(Request::class);
+        $this->request->getScheme()->willReturn('http');
+        $this->request->getHost()->willReturn('sulu.io');
+
+        $this->requestStack->getCurrentRequest()->willReturn($this->request->reveal());
     }
 
     public function testUpdate()
@@ -60,7 +79,9 @@ class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
                         && $task->getEntityId() === '123-123-123'
                         && $task->getLocale() === 'de'
                         && $task->getHandlerClass() === PageTreeRouteUpdateHandler::class
-                        && $task->getSchedule() <= new \DateTime();
+                        && $task->getSchedule() <= new \DateTime()
+                        && $task->getHost() === 'sulu.io'
+                        && $task->getScheme() === 'http';
                 }
             )
         )->shouldBeCalled();
