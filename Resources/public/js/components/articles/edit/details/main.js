@@ -202,6 +202,7 @@ define([
                 translate: this.sandbox.translate,
                 content: this.data,
                 options: this.options,
+                categoryLocale: this.options.locale,
                 entityClass: 'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
                 entityId: this.options.id
             }));
