@@ -230,6 +230,8 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
+        $article->setContentData(json_encode($document->getStructure()->toArray()));
+
         $this->mapPages($document, $article);
 
         return $article;

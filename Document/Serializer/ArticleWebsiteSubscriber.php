@@ -14,15 +14,11 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use ProxyManager\Proxy\LazyLoadingInterface;
-use ProxyManager\Proxy\VirtualProxyInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
-use Sulu\Component\Content\Compat\StructureInterface;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
-use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
 use Sulu\Component\Util\SortUtils;
 
@@ -37,36 +33,23 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
     private $structureManager;
 
     /**
-     * @var ContentTypeManagerInterface
-     */
-    private $contentTypeManager;
-
-    /**
-     * @var LazyLoadingValueHolderFactory
-     */
-    private $proxyFactory;
-
-    /**
      * @var ExtensionManagerInterface
      */
     private $extensionManager;
 
     /**
-     * @param StructureManagerInterface $structureManager
-     * @param ContentTypeManagerInterface $contentTypeManager
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @param ExtensionManagerInterface $extensionManager
+     * @var ContentProxyFactory
      */
+    private $contentProxyFactory;
+
     public function __construct(
         StructureManagerInterface $structureManager,
-        ContentTypeManagerInterface $contentTypeManager,
-        LazyLoadingValueHolderFactory $proxyFactory,
-        ExtensionManagerInterface $extensionManager
+        ExtensionManagerInterface $extensionManager,
+        ContentProxyFactory $contentProxyFactory
     ) {
         $this->structureManager = $structureManager;
-        $this->contentTypeManager = $contentTypeManager;
-        $this->proxyFactory = $proxyFactory;
         $this->extensionManager = $extensionManager;
+        $this->contentProxyFactory = $contentProxyFactory;
     }
 
     /**
@@ -222,82 +205,8 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $data = $article->getStructure()->toArray();
 
         return [
-            'content' => $this->createContentProxy($structure, $data),
-            'view' => $this->createViewProxy($structure, $data),
+            'content' => $this->contentProxyFactory->createContentProxy($structure, $data),
+            'view' => $this->contentProxyFactory->createViewProxy($structure, $data),
         ];
-    }
-
-    /**
-     * Create content-proxy for given structure.
-     *
-     * @param StructureInterface $structure
-     * @param array $data
-     *
-     * @return VirtualProxyInterface
-     */
-    private function createContentProxy($structure, $data)
-    {
-        return $this->proxyFactory->createProxy(
-            \ArrayObject::class,
-            function (
-                &$wrappedObject,
-                LazyLoadingInterface $proxy,
-                $method,
-                array $parameters,
-                &$initializer
-            ) use ($structure, $data) {
-                $content = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $content[$child->getName()] = $contentType->getContentData($child);
-                }
-
-                $initializer = null;
-                $wrappedObject = new \ArrayObject($content);
-
-                return true;
-            }
-        );
-    }
-
-    /**
-     * Create view-proxy for given structure.
-     *
-     * @param StructureInterface $structure
-     * @param array $data
-     *
-     * @return VirtualProxyInterface
-     */
-    private function createViewProxy($structure, array $data)
-    {
-        return $this->proxyFactory->createProxy(
-            \ArrayObject::class,
-            function (
-                &$wrappedObject,
-                LazyLoadingInterface $proxy,
-                $method,
-                array $parameters,
-                &$initializer
-            ) use ($structure, $data) {
-                $view = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $view[$child->getName()] = $contentType->getViewData($child);
-                }
-
-                $initializer = null;
-                $wrappedObject = new \ArrayObject($view);
-
-                return true;
-            }
-        );
     }
 }

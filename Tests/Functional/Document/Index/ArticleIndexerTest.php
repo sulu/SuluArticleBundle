@@ -87,6 +87,29 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertFalse($viewDocument->getPublishedState());
     }
 
+    public function testIndexContentData()
+    {
+        $data = ['title' => 'Test Article', 'description' => 'Test Description'];
+        $article = $this->createArticle(['description' => $data['description']], $data['title'], 'simple');
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
+        $this->assertEquals($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertInstanceOf(\ArrayObject::class, $viewDocument->getContent());
+        $this->assertInstanceOf(\ArrayObject::class, $viewDocument->getView());
+
+        $content = iterator_to_array($viewDocument->getContent());
+        $view = iterator_to_array($viewDocument->getView());
+
+        $this->assertEquals($data, $content);
+        $this->assertArrayHasKey('title', $view);
+        $this->assertArrayHasKey('description', $view);
+    }
+
     /**
      * Create a new article.
      *
