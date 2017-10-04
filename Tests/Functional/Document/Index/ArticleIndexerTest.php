@@ -53,7 +53,7 @@ class ArticleIndexerTest extends SuluTestCase
 
         $this->manager = $this->getContainer()->get('es.manager.live');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
+        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
         $this->indexer->clear();
     }
 
@@ -89,25 +89,56 @@ class ArticleIndexerTest extends SuluTestCase
 
     public function testIndexContentData()
     {
-        $data = ['title' => 'Test Article', 'description' => 'Test Description'];
-        $article = $this->createArticle(['description' => $data['description']], $data['title'], 'simple');
+        $data = [
+            'title' => 'Test Article',
+            'pageTitle' => 'Test Page Title',
+            'article' => 'Test Article',
+            'routePath' => '/test-article',
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_pages');
+        $this->documentManager->clear();
+
+        $this->createArticlePage($article);
+        $this->documentManager->clear();
 
         $document = $this->documentManager->find($article['id'], $this->locale);
         $this->indexer->index($document);
+        $this->indexer->flush();
 
         $viewDocument = $this->findViewDocument($article['id']);
         $this->assertEquals($article['id'], $viewDocument->getUuid());
         $this->assertEquals($data, json_decode($viewDocument->getContentData(), true));
 
-        $this->assertInstanceOf(\ArrayObject::class, $viewDocument->getContent());
-        $this->assertInstanceOf(\ArrayObject::class, $viewDocument->getView());
+        $this->assertProxies($data, $viewDocument->getContent(), $viewDocument->getView());
 
-        $content = iterator_to_array($viewDocument->getContent());
-        $view = iterator_to_array($viewDocument->getView());
+        $this->assertCount(1, $viewDocument->getPages());
+        foreach ($viewDocument->getPages() as $page) {
+            $this->assertProxies(
+                [
+                    'title' => 'Test Article',
+                    'pageTitle' => 'Test-Page',
+                    'article' => '',
+                    'routePath' => '/test-article/page-2',
+                ],
+                $page->content,
+                $page->view
+            );
+        }
+    }
+
+    private function assertProxies(array $data, $contentProxy, $viewProxy)
+    {
+        $this->assertInstanceOf(\ArrayObject::class, $contentProxy);
+        $this->assertInstanceOf(\ArrayObject::class, $viewProxy);
+
+        $content = iterator_to_array($contentProxy);
+        $view = iterator_to_array($viewProxy);
 
         $this->assertEquals($data, $content);
-        $this->assertArrayHasKey('title', $view);
-        $this->assertArrayHasKey('description', $view);
+        foreach ($data as $key => $value) {
+            $this->assertArrayHasKey($key, $view);
+        }
     }
 
     /**
@@ -127,6 +158,33 @@ class ArticleIndexerTest extends SuluTestCase
             '/api/articles?locale=' . $this->locale . '&action=publish',
             array_merge(['title' => $title, 'template' => $template], $data)
         );
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    /**
+     * Create article page.
+     *
+     * @param array $article
+     * @param array $data
+     * @param string $pageTitle
+     * @param string $template
+     *
+     * @return array
+     */
+    private function createArticlePage(
+        array $article,
+        array $data = [],
+        $pageTitle = 'Test-Page',
+        $template = 'default_pages'
+    ) {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles/' . $article['id'] . '/pages?locale=' . $this->locale . '&action=publish',
+            array_merge(['pageTitle' => $pageTitle, 'template' => $template], $data)
+        );
+        $this->assertHttpStatusCode(200, $client->getResponse());
 
         return json_decode($client->getResponse()->getContent(), true);
     }

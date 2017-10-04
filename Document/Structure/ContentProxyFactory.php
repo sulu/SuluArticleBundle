@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Sulu.
+ *
+ * (c) MASSIVE ART WebServices GmbH
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Sulu\Bundle\ArticleBundle\Document\Structure;
 
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
@@ -8,7 +17,7 @@ use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 
 /**
- * TODO add description here
+ * Factory for content-proxies.
  */
 class ContentProxyFactory
 {
@@ -53,22 +62,35 @@ class ContentProxyFactory
                 array $parameters,
                 &$initializer
             ) use ($structure, $data) {
-                $content = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $content[$child->getName()] = $contentType->getContentData($child);
-                }
-
                 $initializer = null;
-                $wrappedObject = new \ArrayObject($content);
+                $wrappedObject = new \ArrayObject($this->resolveContent($structure, $data));
 
                 return true;
             }
         );
+    }
+
+    /**
+     * Resolve content from given data with the structure.
+     *
+     * @param StructureInterface $structure
+     * @param array $data
+     *
+     * @return array
+     */
+    private function resolveContent(StructureInterface $structure, array $data)
+    {
+        $content = [];
+        foreach ($structure->getProperties(true) as $child) {
+            if (array_key_exists($child->getName(), $data)) {
+                $child->setValue($data[$child->getName()]);
+            }
+
+            $contentType = $this->contentTypeManager->get($child->getContentTypeName());
+            $content[$child->getName()] = $contentType->getContentData($child);
+        }
+
+        return $content;
     }
 
     /**
@@ -90,21 +112,34 @@ class ContentProxyFactory
                 array $parameters,
                 &$initializer
             ) use ($structure, $data) {
-                $view = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $view[$child->getName()] = $contentType->getViewData($child);
-                }
-
                 $initializer = null;
-                $wrappedObject = new \ArrayObject($view);
+                $wrappedObject = new \ArrayObject($this->resolveView($structure, $data));
 
                 return true;
             }
         );
+    }
+
+    /**
+     * Resolve view from given data with the structure.
+     *
+     * @param StructureInterface $structure
+     * @param array $data
+     *
+     * @return array
+     */
+    private function resolveView(StructureInterface $structure, array $data)
+    {
+        $view = [];
+        foreach ($structure->getProperties(true) as $child) {
+            if (array_key_exists($child->getName(), $data)) {
+                $child->setValue($data[$child->getName()]);
+            }
+
+            $contentType = $this->contentTypeManager->get($child->getContentTypeName());
+            $view[$child->getName()] = $contentType->getViewData($child);
+        }
+
+        return $view;
     }
 }

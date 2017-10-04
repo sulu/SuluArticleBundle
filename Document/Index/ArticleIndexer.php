@@ -17,6 +17,8 @@ use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -280,12 +282,15 @@ class ArticleIndexer implements IndexerInterface
     private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
         $pages = [];
+        /** @var ArticlePageDocument $child */
         foreach ($document->getChildren() as $child) {
+            /** @var ArticlePageViewObject $page */
             $pages[] = $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();
             $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
+            $page->contentData = json_encode($child->getStructure()->toArray());
         }
 
         $article->setPages(new Collection($pages));

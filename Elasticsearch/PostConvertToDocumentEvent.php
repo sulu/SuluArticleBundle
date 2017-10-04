@@ -1,12 +1,21 @@
 <?php
 
+/*
+ * This file is part of Sulu.
+ *
+ * (c) MASSIVE ART WebServices GmbH
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace Sulu\Bundle\ArticleBundle\Elasticsearch;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * TODO add description here
+ * Event args for "es.post_convert_to_document".
  */
 class PostConvertToDocumentEvent extends Event
 {
