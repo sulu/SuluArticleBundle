@@ -16,7 +16,7 @@ No parameters.
 
 ### Returns
 
-The content-type returns a list of `ArticleViewDocumentInterface` instances.
+The content-type returns a list of [ArticleViewDocumentInterface](article-view-document.md) instances.
 
 ### Example
 
@@ -49,7 +49,8 @@ the articles.
 
 ### Returns
 
-The content-type returns a list of `ArticleResourceItem` instances.
+The content-type returns a list of `ArticleResourceItem` (get the underlying
+[ArticleViewDocumentInterface](article-view-document.md) with `ArticleResourceItem::getContent()`) instances.
 
 ## Teaser-Selection
 
