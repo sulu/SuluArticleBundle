@@ -349,8 +349,12 @@ define([
                     return;
                 }
 
+                this.sandbox.emit('sulu.header.toolbar.item.loading', 'edit');
                 ArticleManager.remove(this.options.id, this.options.locale).then(function() {
                     this.toList();
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit', false);
+                }.bind(this)).fail(function() {
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit', false);
                 }.bind(this));
             }.bind(this));
         },
