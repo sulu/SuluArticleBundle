@@ -265,9 +265,19 @@ define([
         },
 
         deleteItems: function(ids) {
-            ArticleManager.remove(ids, this.options.locale).then(function() {
-                _.each(ids, function(id) {
-                    this.sandbox.emit('husky.datagrid.articles.record.remove', id);
+            this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
+                if (!wasConfirmed) {
+                    return;
+                }
+
+                this.sandbox.emit('sulu.header.toolbar.item.loading', 'deleteSelected');
+                ArticleManager.remove(ids, this.options.locale).then(function() {
+                    _.each(ids, function(id) {
+                        this.sandbox.emit('husky.datagrid.articles.record.remove', id);
+                    }.bind(this));
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'deleteSelected', false);
+                }.bind(this)).fail(function() {
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'deleteSelected', false);
                 }.bind(this));
             }.bind(this));
         },
