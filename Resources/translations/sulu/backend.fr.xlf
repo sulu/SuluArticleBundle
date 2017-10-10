@@ -194,6 +194,10 @@
                 <source>sulu_article.edit.page</source>
                 <target>Page</target>
             </trans-unit>
+            <trans-unit id="broken-template-01" resname="sulu_content.broken-template.title">
+                <source>sulu_content.broken-template.title</source>
+                <target>Le modèle de article est cassé</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

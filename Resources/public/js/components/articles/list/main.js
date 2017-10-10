@@ -38,6 +38,14 @@ define([
 
             route: [
                 'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
+            ].join(''),
+
+            brokenTemplate: [
+                '<p><%= translations.brokenTemplateMessage %></p>',
+                '<p>',
+                '    <%= translations.brokenTemplateName %>: <%= item.originalStructureType %><br/>',
+                '    <%= translations.brokenTemplateUuid %>: <%= item.id %>',
+                '</p>'
             ].join('')
         },
 
@@ -53,6 +61,10 @@ define([
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
             filterByTimescale: 'sulu_article.list.filter.by-timescale',
+            brokenTemplateTitle: 'sulu_content.broken-template.title',
+            brokenTemplateMessage: 'sulu_article.broken-template.message',
+            brokenTemplateName: 'sulu_content.broken-template.message.template-name',
+            brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -200,40 +212,27 @@ define([
                     searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
                     resultKey: 'articles',
                     instanceName: 'articles',
-                    actionCallback: function(id, article) {
-                        if ('ghost' === article.localizationState.state) {
-                            ArticleManager.load(id, this.options.locale).then(function(response) {
-                                OpenGhost.openGhost.call(
-                                    this,
-                                    response,
-                                    this.translations.openGhostOverlay
-                                ).then(
-                                    function(copy, src) {
-                                        if (!!copy) {
-                                            CopyLocale.copyLocale.call(
-                                                this,
-                                                id,
-                                                src,
-                                                [this.options.locale],
-                                                function() {
-                                                    this.toEdit(id);
-                                                }.bind(this)
-                                            );
-                                        } else {
-                                            this.toEdit(id);
-                                        }
-                                    }.bind(this)
-                                );
-                            }.bind(this)).fail(function(xhr) {
-                                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
-                            }.bind(this));
-                        } else {
-                            this.toEdit(id);
-                        }
-                    }.bind(this),
+                    actionCallback: this.actionCallback.bind(this),
                     viewOptions: {
                         table: {
                             actionIconColumn: 'title',
+                            actionIcon: function(item) {
+                                if (item.broken) {
+                                    return 'info';
+                                }
+
+                                return 'pencil';
+                            },
+                            cssClasses: [
+                                {
+                                    column: 'title',
+                                    callback: function(item) {
+                                        if (item.broken) {
+                                            return 'article-broken';
+                                        }
+                                    }.bind(this)
+                                }
+                            ],
                             badges: [
                                 {
                                     column: 'title',
@@ -250,6 +249,42 @@ define([
                     }
                 }
             );
+        },
+
+        actionCallback: function(id, article) {
+            if (article.broken) {
+                return this.showBrokenInfo(article);
+            }
+
+            if ('ghost' !== article.localizationState.state) {
+                return this.toEdit(id);
+            }
+
+            ArticleManager.load(id, this.options.locale).then(function(response) {
+                OpenGhost.openGhost.call(
+                    this,
+                    response,
+                    this.translations.openGhostOverlay
+                ).then(
+                    function(copy, src) {
+                        if (!!copy) {
+                            CopyLocale.copyLocale.call(
+                                this,
+                                id,
+                                src,
+                                [this.options.locale],
+                                function() {
+                                    this.toEdit(id);
+                                }.bind(this)
+                            );
+                        } else {
+                            this.toEdit(id);
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)).fail(function(xhr) {
+                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
+            }.bind(this));
         },
 
         toEdit: function(id, locale) {
@@ -690,6 +725,38 @@ define([
 
         setTypeName: function(name) {
             this.$el.find('.type').text(this.sandbox.translate(name));
+        },
+
+        showBrokenInfo: function(item) {
+            var $element = this.sandbox.dom.createElement('<div/>');
+            this.sandbox.dom.append(this.$el, $element);
+
+            this.sandbox.start([
+                {
+                    name: 'overlay@husky',
+                    options: {
+                        el: $element,
+                        type: 'alert',
+                        slides: [
+                            {
+                                title: this.translations.brokenTemplateTitle,
+                                message: this.templates.brokenTemplate({
+                                    translations: this.translations,
+                                    item: item
+                                }),
+                                contentSpacing: false,
+                                type: 'alert',
+                                buttons: [
+                                    {
+                                        type: 'ok',
+                                        align: 'center'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]);
         }
     };
 });
