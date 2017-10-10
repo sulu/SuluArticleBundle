@@ -196,7 +196,7 @@
             </trans-unit>
             <trans-unit id="broken-template-01" resname="sulu_content.broken-template.title">
                 <source>sulu_content.broken-template.title</source>
-                <target>Le gabarit de artikel est cassé</target>
+                <target>Artikel template is beschadigd</target>
             </trans-unit>
         </body>
     </file>
