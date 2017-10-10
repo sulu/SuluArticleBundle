@@ -1,6 +1,6 @@
 # Upgrade
 
-## 0.8.0
+## 0.8.0 (unreleased)
 
 ### NewIndex mapping has changed
 
