@@ -165,12 +165,25 @@
             <tag name="jms_serializer.event_subscriber" />
         </service>
 
+        <service id="sulu_article.content_proxy_factory"
+                 class="Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory">
+            <argument type="service" id="sulu.content.type_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+        </service>
+
+        <service id="sulu_article.content_proxy_listener"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\ContentProxyListener">
+            <argument type="service" id="sulu_article.content_proxy_factory"/>
+            <argument type="service" id="sulu.content.structure_manager"/>
+
+            <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
+        </service>
+
         <service id="sulu_article.serializer.website_article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
-            <argument type="service" id="sulu.content.type_manager"/>
-            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
             <argument type="service" id="sulu_content.extension.manager"/>
+            <argument type="service" id="sulu_article.content_proxy_factory"/>
 
             <tag name="jms_serializer.event_subscriber"/>
         </service>

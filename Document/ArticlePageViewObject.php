@@ -64,4 +64,21 @@ class ArticlePageViewObject
      * @Property(type="integer", options={"index"="not_analyzed"})
      */
     public $pageNumber;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string", options={"index":"not_analyzed"})
+     */
+    public $contentData;
+
+    /**
+     * @var \ArrayObject
+     */
+    public $content;
+
+    /**
+     * @var \ArrayObject
+     */
+    public $view;
 }

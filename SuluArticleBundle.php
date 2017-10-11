@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle;
 
+use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -18,4 +20,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SuluArticleBundle extends Bundle
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new ConverterCompilerPass());
+    }
 }
