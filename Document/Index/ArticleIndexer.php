@@ -436,4 +436,24 @@ class ArticleIndexer implements IndexerInterface
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropIndex()
+    {
+        $this->manager->dropIndex();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createIndex()
+    {
+        if ($this->manager->indexExists()) {
+            return;
+        }
+
+        $this->manager->createIndex();
+    }
 }
