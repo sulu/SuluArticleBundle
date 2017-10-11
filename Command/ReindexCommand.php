@@ -98,7 +98,7 @@ class ReindexCommand extends ContainerAwareCommand
     protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('drop')) {
-            return;
+            return true;
         }
 
         if (!$input->getOption('no-interaction')) {
