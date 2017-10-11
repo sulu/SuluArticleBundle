@@ -194,8 +194,8 @@
                 <source>sulu_article.edit.page</source>
                 <target>Seite</target>
             </trans-unit>
-            <trans-unit id="broken-template-01" resname="sulu_content.broken-template.title">
-                <source>sulu_content.broken-template.title</source>
+            <trans-unit id="broken-template-01">
+                <source>sulu_article.broken-template.title</source>
                 <target>Artikel-Template ist beschädigt</target>
             </trans-unit>
         </body>

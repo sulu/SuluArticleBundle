@@ -61,8 +61,8 @@ define([
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
             filterByTimescale: 'sulu_article.list.filter.by-timescale',
-            brokenTemplateTitle: 'sulu_content.broken-template.title',
-            brokenTemplateMessage: 'sulu_article.broken-template.message',
+            brokenTemplateTitle: 'sulu_article.broken-template.title',
+            brokenTemplateMessage: 'sulu_content.broken-template.message',
             brokenTemplateName: 'sulu_content.broken-template.message.template-name',
             brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
             openGhostOverlay: {
