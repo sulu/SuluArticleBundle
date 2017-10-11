@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle;
 
 use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
+use Sulu\Bundle\ArticleBundle\DependencyInjection\PageTreeCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -25,6 +26,7 @@ class SuluArticleBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
+        $container->addCompilerPass(new PageTreeCompilerPass());
         $container->addCompilerPass(new ConverterCompilerPass());
     }
 }
