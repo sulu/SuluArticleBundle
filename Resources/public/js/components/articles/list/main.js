@@ -251,6 +251,18 @@ define([
             );
         },
 
+        /**
+         * Handles click for datagrid.
+         *
+         * For broken article: Show brocken info
+         * For ghost articles: Open ghost overlay
+         * Else: Goto edit
+         *
+         * @param {String} id
+         * @param {Object} article
+         *
+         * @returns {*}
+         */
         actionCallback: function(id, article) {
             if (article.broken) {
                 return this.showBrokenInfo(article);
