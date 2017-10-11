@@ -67,6 +67,12 @@
   content: "\"";
 }
 
+/* line 13, ../../scss/modules/list.scss */
+.husky-table tbody td .article-broken .cell-content {
+  color: #666 !important;
+  text-decoration: line-through;
+}
+
 /* line 2, ../../scss/modules/page-tree-route.scss */
 .page-tree-route .single-internal-link {
   display: inline-block;
