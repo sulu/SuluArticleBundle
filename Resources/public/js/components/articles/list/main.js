@@ -384,6 +384,55 @@ define([
          * @param {Object} filter
          */
         retrieveListToolbarTemplate: function(filter) {
+            var filterDropdownItems = [
+                {
+                    id: 'all',
+                    title: this.translations.filterAll,
+                    marked: filter.filterKey === 'all',
+                    callback: function() {
+                        this.replaceFilter('all');
+                    }.bind(this)
+                },
+                {
+                    id: 'me',
+                    title: this.translations.filterMe,
+                    marked: filter.filterKey === 'me',
+                    callback: function() {
+                        this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
+                    }.bind(this)
+                },
+                {
+                    id: 'filterByAuthor',
+                    title: this.translations.filterByAuthor + ' ...',
+                    marked: filter.filterKey === 'filterByAuthor',
+                    callback: this.openContactSelectionOverlay.bind(this)
+                },
+                {
+                    divider: true
+                },
+                {
+                    id: 'filterByCategory',
+                    title: this.translations.filterByCategory + ' ...',
+                    marked: filter.filterKey === 'filterByCategory',
+                    callback: this.openCategorySelectionOverlay.bind(this)
+                },
+                {
+                    id: 'filterByTag',
+                    title: this.translations.filterByTag + ' ...',
+                    marked: filter.filterKey === 'filterByTag',
+                    callback: this.openTagSelectionOverlay.bind(this)
+                },
+            ];
+
+            if (this.options.config.pageTreeEnabled) {
+                filterDropdownItems.push({
+                    id: 'filterByPage',
+                    title: this.translations.filterByPage + ' ...',
+                    marked: filter.filterKey === 'filterByPage',
+                    callback: this.openPageSelectionOverlay.bind(this)
+                });
+            }
+
             return this.sandbox.sulu.buttons.get({
                 settings: {
                     options: {
@@ -475,51 +524,7 @@ define([
                             changeButton: false,
                             preSelected: filter.filterKey
                         },
-                        dropdownItems: [
-                            {
-                                id: 'all',
-                                title: this.translations.filterAll,
-                                marked: filter.filterKey === 'all',
-                                callback: function() {
-                                    this.replaceFilter('all');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'me',
-                                title: this.translations.filterMe,
-                                marked: filter.filterKey === 'me',
-                                callback: function() {
-                                    this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'filterByAuthor',
-                                title: this.translations.filterByAuthor + ' ...',
-                                marked: filter.filterKey === 'filterByAuthor',
-                                callback: this.openContactSelectionOverlay.bind(this)
-                            },
-                            {
-                                divider: true
-                            },
-                            {
-                                id: 'filterByCategory',
-                                title: this.translations.filterByCategory + ' ...',
-                                marked: filter.filterKey === 'filterByCategory',
-                                callback: this.openCategorySelectionOverlay.bind(this)
-                            },
-                            {
-                                id: 'filterByTag',
-                                title: this.translations.filterByTag + ' ...',
-                                marked: filter.filterKey === 'filterByTag',
-                                callback: this.openTagSelectionOverlay.bind(this)
-                            },
-                            {
-                                id: 'filterByPage',
-                                title: this.translations.filterByPage + ' ...',
-                                marked: filter.filterKey === 'filterByPage',
-                                callback: this.openPageSelectionOverlay.bind(this)
-                            }
-                        ]
+                        dropdownItems: filterDropdownItems
                     }
                 }
             });
