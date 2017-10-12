@@ -36,7 +36,7 @@ class ReindexCommand extends ContainerAwareCommand
         $this->setDescription('Rebuild elastic-search index for articles');
         $this->setHelp('This command will load all articles and index them to elastic-search indexes.');
         $this->addOption('drop', null, InputOption::VALUE_NONE, 'Drop and recreate index before reindex');
-        $this->addOption('clear', null, InputOption::VALUE_NONE, 'Clear content of index before reindex');
+        $this->addOption('clear', null, InputOption::VALUE_NONE, 'Clear all articles of index before reindex');
     }
 
     /**

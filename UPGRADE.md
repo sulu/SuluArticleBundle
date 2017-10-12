@@ -5,7 +5,7 @@
 ### Reindex command
 
 The `sulu:article:index-rebuild` command was refactored and renamed to `sulu:article:reindex`. 
-See [Commands in documentation](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/commands.md).
+See [Commands in documentation](Resources/doc/commands.md).
 
 ### NewIndex mapping has changed
 
