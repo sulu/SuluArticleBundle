@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -19,6 +21,7 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -71,6 +74,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     protected $defaultLimit;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Manager $searchManager
      * @param DocumentManagerInterface $documentManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
@@ -78,6 +86,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param ArticleResourceItemFactory $articleResourceItemFactory
      * @param string $articleDocumentClass
      * @param int $defaultLimit
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Manager $searchManager,
@@ -86,7 +95,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ReferenceStoreInterface $referenceStore,
         ArticleResourceItemFactory $articleResourceItemFactory,
         $articleDocumentClass,
-        $defaultLimit
+        $defaultLimit,
+        LoggerInterface $logger = null
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
@@ -95,6 +105,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
+        $this->logger = $logger;
     }
 
     /**
@@ -162,7 +173,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**
@@ -191,7 +202,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $result[] = $this->articleResourceItemFactory->createResourceItem($document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**
@@ -239,7 +250,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
         if (!$search) {
-            return new \ArrayIterator([]);
+            return new DocumentIterator([], $this->searchManager);
         }
 
         $this->addPagination($search, $pageSize, $page, $limit);
@@ -249,7 +260,15 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
         }
 
-        return $repository->findDocuments($search);
+        try {
+            return $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return new DocumentIterator([], $this->searchManager);
+        }
     }
 
     /**

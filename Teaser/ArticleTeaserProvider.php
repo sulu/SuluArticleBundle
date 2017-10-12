@@ -11,8 +11,10 @@
 
 namespace Sulu\Bundle\ArticleBundle\Teaser;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
@@ -43,15 +45,26 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     private $articleDocumentClass;
 
     /**
+     * @var null|LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Manager $searchManager
      * @param TranslatorInterface $translator
      * @param $articleDocumentClass
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
-    {
+    public function __construct(
+        Manager $searchManager,
+        TranslatorInterface $translator,
+        $articleDocumentClass,
+        LoggerInterface $logger = null
+    ) {
         $this->searchManager = $searchManager;
         $this->translator = $translator;
         $this->articleDocumentClass = $articleDocumentClass;
+        $this->logger = $logger;
     }
 
     /**
@@ -62,14 +75,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $okDefaultText = $this->translator->trans('sulu-content.teaser.apply', [], 'backend');
 
         return new TeaserConfiguration(
-            'sulu_article.teaser',
-            'teaser-selection/list@suluarticle',
-            [
+            'sulu_article.teaser', 'teaser-selection/list@suluarticle', [
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
                 'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
-            ],
-            [
+            ], [
                 [
                     'title' => $this->translator->trans('sulu_article.authored', [], 'backend'),
                     'cssClass' => 'authored-slide',
@@ -169,19 +179,29 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($articleIds));
 
+        try {
+            $documents = $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return [];
+        }
+
         $result = [];
-        foreach ($repository->findDocuments($search) as $item) {
-            $excerpt = $item->getExcerpt();
+        foreach ($documents as $document) {
+            $excerpt = $document->getExcerpt();
             $result[] = new Teaser(
-                $item->getUuid(),
+                $document->getUuid(),
                 'article',
-                $item->getLocale(),
-                ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
-                ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
+                $document->getLocale(),
+                ('' !== $excerpt->title ? $excerpt->title : $document->getTitle()),
+                ('' !== $excerpt->description ? $excerpt->description : $document->getTeaserDescription()),
                 $excerpt->more,
-                $item->getRoutePath(),
-                count($excerpt->images) ? $excerpt->images[0]->id : $item->getTeaserMediaId(),
-                $this->getAttributes($item)
+                $document->getRoutePath(),
+                count($excerpt->images) ? $excerpt->images[0]->id : $document->getTeaserMediaId(),
+                $this->getAttributes($document)
             );
         }
 

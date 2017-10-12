@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Repository;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
@@ -19,6 +20,7 @@ use ONGR\ElasticsearchDSL\Query\Specialized\MoreLikeThisQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
@@ -57,19 +59,28 @@ class ArticleViewDocumentRepository
     protected $searchFields;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Manager $searchManager
      * @param string $articleDocumentClass
      * @param array $searchFields
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         Manager $searchManager,
         $articleDocumentClass,
-        array $searchFields
+        array $searchFields,
+        LoggerInterface $logger = null
     ) {
         $this->searchManager = $searchManager;
         $this->articleDocumentClass = $articleDocumentClass;
-        $this->repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $this->searchFields = $searchFields;
+        $this->logger = $logger;
+
+        $this->repository = $this->searchManager->getRepository($this->articleDocumentClass);
     }
 
     /**
@@ -92,7 +103,15 @@ class ArticleViewDocumentRepository
 
         $search->addSort(new FieldSort('authored', FieldSort::DESC));
 
-        return $this->repository->findDocuments($search);
+        try {
+            return $this->repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return new DocumentIterator([], $this->searchManager);
+        }
     }
 
     /**
@@ -121,7 +140,15 @@ class ArticleViewDocumentRepository
             )
         );
 
-        return $this->repository->findDocuments($search);
+        try {
+            return $this->repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return new DocumentIterator([], $this->searchManager);
+        }
     }
 
     /**

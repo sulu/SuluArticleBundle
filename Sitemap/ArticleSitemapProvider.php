@@ -11,9 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Sitemap;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\Sitemap;
@@ -37,13 +40,23 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     private $documentFactory;
 
     /**
+     * @var null|LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Manager $manager
      * @param DocumentFactoryInterface $documentFactory
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(Manager $manager, DocumentFactoryInterface $documentFactory)
-    {
+    public function __construct(
+        Manager $manager,
+        DocumentFactoryInterface $documentFactory,
+        LoggerInterface $logger = null
+    ) {
         $this->manager = $manager;
         $this->documentFactory = $documentFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -117,7 +130,15 @@ class ArticleSitemapProvider implements SitemapProviderInterface
             ->setFrom($from)
             ->setSize($size);
 
-        return $repository->findDocuments($search);
+        try {
+            return $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return new DocumentIterator([], $repository->getManager());
+        }
     }
 
     /**

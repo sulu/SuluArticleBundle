@@ -11,9 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Markup;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
@@ -48,21 +50,29 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $articleViewClass;
 
     /**
+     * @var null|LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Manager $liveManager
      * @param Manager $defaultManager
      * @param array $types
      * @param string $articleViewClass
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         Manager $liveManager,
         Manager $defaultManager,
         array $types,
-        $articleViewClass
+        $articleViewClass,
+        LoggerInterface $logger = null
     ) {
         $this->liveManager = $liveManager;
         $this->defaultManager = $defaultManager;
         $this->types = $types;
         $this->articleViewClass = $articleViewClass;
+        $this->logger = $logger;
     }
 
     /**
@@ -101,7 +111,15 @@ class ArticleLinkProvider implements LinkProviderInterface
             $repository = $this->defaultManager->getRepository($this->articleViewClass);
         }
 
-        $documents = $repository->findDocuments($search);
+        try {
+            $documents = $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            if ($this->logger) {
+                $this->logger->error($exception->getMessage());
+            }
+
+            return [];
+        }
 
         $result = [];
         /** @var ArticleViewDocumentInterface $document */

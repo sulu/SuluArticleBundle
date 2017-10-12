@@ -11,12 +11,15 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Repository;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
+use ONGR\ElasticsearchBundle\Result\Converter;
 use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Prophecy\Argument;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
 
@@ -31,6 +34,16 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @var Repository
      */
     private $repository;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var Converter
+     */
+    private $converter;
 
     /**
      * @var Search
@@ -49,13 +62,20 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository = $this->prophesize(Repository::class);
         $this->repository->createSearch()->willReturn(new Search());
 
+        $this->converter = $this->prophesize(Converter::class);
+
         $this->searchManager = $this->prophesize(Manager::class);
         $this->searchManager->getRepository(ArticleViewDocument::class)->willReturn($this->repository->reveal());
+        $this->searchManager->getConverter()->willReturn($this->converter->reveal());
+        $this->searchManager->getConfig()->willReturn([]);
+
+        $this->logger = $this->prophesize(LoggerInterface::class);
 
         $this->articleViewDocumentRepository = new ArticleViewDocumentRepository(
             $this->searchManager->reveal(),
             ArticleViewDocument::class,
-            ['title', 'teaser_description']
+            ['title', 'teaser_description'],
+            $this->logger->reveal()
         );
     }
 
@@ -127,6 +147,17 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFindSimilarNoNodesAvailable()
+    {
+        $this->repository->findDocuments(Argument::any())->willThrow(new NoNodesAvailableException('No nodes alive'));
+
+        $this->logger->error('No nodes alive')->shouldBeCalled();
+
+        $result = $this->articleViewDocumentRepository->findSimilar('123-123-123');
+        $this->assertInstanceOf(DocumentIterator::class, $result);
+        $this->assertCount(0, $result);
+    }
+
     /**
      * @dataProvider dataProvider
      *
@@ -187,5 +218,16 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
             $documentIterator->reveal(),
             $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale)
         );
+    }
+
+    public function testFindRecentNoNodesAvailable()
+    {
+        $this->repository->findDocuments(Argument::any())->willThrow(new NoNodesAvailableException('No nodes alive'));
+
+        $this->logger->error('No nodes alive')->shouldBeCalled();
+
+        $result = $this->articleViewDocumentRepository->findRecent('123-123-123');
+        $this->assertInstanceOf(DocumentIterator::class, $result);
+        $this->assertCount(0, $result);
     }
 }
