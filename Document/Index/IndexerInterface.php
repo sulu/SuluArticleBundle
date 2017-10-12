@@ -52,4 +52,14 @@ interface IndexerInterface
      * Flushes index.
      */
     public function flush();
+
+    /**
+     * Drop and recreate elastic-search index.
+     */
+    public function dropIndex();
+
+    /**
+     * Drop and create elastic-search index.
+     */
+    public function createIndex();
 }

@@ -2,19 +2,18 @@
 
 ## 0.8.0 (unreleased)
 
+### Reindex command
+
+The `sulu:article:index-rebuild` command was refactored and renamed to `sulu:article:reindex`. 
+See [Commands in documentation](Resources/doc/commands.md).
+
 ### NewIndex mapping has changed
 
 Recreate the index to update mapping (new `content_data` field) and reindex your articles:
 
 ```bash
-bin/adminconsole ongr:es:index:drop -m default --force
-bin/websiteconsole ongr:es:index:drop -m live --force
-
-bin/adminconsole ongr:es:index:create -m default
-bin/websiteconsole ongr:es:index:create -m live
-
-bin/adminconsole sulu:article:index-rebuild ###LOCALE###
-bin/websiteconsole sulu:article:index-rebuild ###LOCALE### --live
+bin/adminconsole sulu:article:reindex --drop --no-interactive
+bin/websiteconsole sulu:article:reindex --drop --no-interactive
 ```
 
 ## 0.7.0
