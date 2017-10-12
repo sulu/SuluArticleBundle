@@ -11,3 +11,4 @@ This documentation covers basic-topics to install and use this bundle.
 * [Twig-Extensions](twig-extensions.md)
 * [Author](author.md)
 * [Multi-Page](multi-page.md)
+* [Exception-Handling](exception-handling.md)
