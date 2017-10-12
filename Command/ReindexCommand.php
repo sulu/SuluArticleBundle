@@ -105,8 +105,9 @@ class ReindexCommand extends ContainerAwareCommand
             $output->writeln(
                 '<comment>ATTENTION</comment>: This operation drops and recreates the whole index and deletes the complete data.'
             );
+            $output->writeln('');
 
-            $question = new ConfirmationQuestion('           Are you sure you want to drop the index? ');
+            $question = new ConfirmationQuestion('Are you sure you want to drop the index? [Y/n] ');
 
             /** @var QuestionHelper $questionHelper */
             $questionHelper = $this->getHelper('question');
