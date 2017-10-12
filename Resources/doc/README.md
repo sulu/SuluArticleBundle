@@ -12,3 +12,4 @@ This documentation covers basic-topics to install and use this bundle.
 * [Commands](commands.md)
 * [Author](author.md)
 * [Multi-Page](multi-page.md)
+* [Article Types](article-types.md)
