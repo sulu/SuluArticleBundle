@@ -74,9 +74,10 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->articleViewDocumentRepository = new ArticleViewDocumentRepository(
             $this->searchManager->reveal(),
             ArticleViewDocument::class,
-            ['title', 'teaser_description'],
-            $this->logger->reveal()
+            ['title', 'teaser_description']
         );
+
+        $this->articleViewDocumentRepository->setLogger($this->logger->reveal());
     }
 
     public function dataProvider()

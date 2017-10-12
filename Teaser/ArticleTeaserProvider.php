@@ -14,7 +14,9 @@ namespace Sulu\Bundle\ArticleBundle\Teaser;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
@@ -25,9 +27,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Enables selection of articles in teaser content-type.
  */
-class ArticleTeaserProvider implements TeaserProviderInterface
+class ArticleTeaserProvider implements TeaserProviderInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -45,26 +48,16 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     private $articleDocumentClass;
 
     /**
-     * @var null|LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param Manager $searchManager
      * @param TranslatorInterface $translator
      * @param $articleDocumentClass
-     * @param LoggerInterface|null $logger
      */
-    public function __construct(
-        Manager $searchManager,
-        TranslatorInterface $translator,
-        $articleDocumentClass,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
+    {
         $this->searchManager = $searchManager;
         $this->translator = $translator;
         $this->articleDocumentClass = $articleDocumentClass;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -75,11 +68,13 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $okDefaultText = $this->translator->trans('sulu-content.teaser.apply', [], 'backend');
 
         return new TeaserConfiguration(
-            'sulu_article.teaser', 'teaser-selection/list@suluarticle', [
+            'sulu_article.teaser', 'teaser-selection/list@suluarticle',
+            [
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
                 'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
-            ], [
+            ],
+            [
                 [
                     'title' => $this->translator->trans('sulu_article.authored', [], 'backend'),
                     'cssClass' => 'authored-slide',
@@ -182,9 +177,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         try {
             $documents = $repository->findDocuments($search);
         } catch (NoNodesAvailableException $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage());
-            }
+            $this->logger->error($exception->getMessage());
 
             return [];
         }

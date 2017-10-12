@@ -243,7 +243,10 @@
             <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
@@ -263,7 +266,10 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="translator"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
 
             <tag name="sulu.teaser.provider" alias="article"/>
         </service>
@@ -272,7 +278,10 @@
         <service id="sulu_article.sitemap.articles" class="Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider">
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
 
             <tag name="sulu.sitemap.provider" alias="articles"/>
         </service>
@@ -294,7 +303,10 @@
             <argument type="service" id="es.manager.default"/>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_article.view_document.article.class%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
 
             <tag name="sulu.link.provider" alias="article"/>
         </service>
@@ -312,7 +324,10 @@
             <argument type="service" id="sulu_article.reference_store.article"/>
             <argument>%sulu_article.view_document.article.class%</argument>
             <argument>%sulu_article.content-type.article.template%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
 
             <tag name="sulu.content.type" alias="article_selection"/>
         </service>
@@ -342,7 +357,10 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument>%sulu_article.search_fields%</argument>
-            <argument type="service" id="logger" on-invalid="null" />
+
+            <call method="setLogger">
+                <argument type="service" id="logger"/>
+            </call>
         </service>
 
         <!-- twig extension -->

@@ -15,7 +15,9 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
@@ -25,9 +27,10 @@ use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
 /**
  * Integrates articles into link-system.
  */
-class ArticleLinkProvider implements LinkProviderInterface
+class ArticleLinkProvider implements LinkProviderInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -50,29 +53,18 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $articleViewClass;
 
     /**
-     * @var null|LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param Manager $liveManager
      * @param Manager $defaultManager
      * @param array $types
      * @param string $articleViewClass
-     * @param LoggerInterface|null $logger
      */
-    public function __construct(
-        Manager $liveManager,
-        Manager $defaultManager,
-        array $types,
-        $articleViewClass,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(Manager $liveManager, Manager $defaultManager, array $types, $articleViewClass)
+    {
         $this->liveManager = $liveManager;
         $this->defaultManager = $defaultManager;
         $this->types = $types;
         $this->articleViewClass = $articleViewClass;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -114,9 +106,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         try {
             $documents = $repository->findDocuments($search);
         } catch (NoNodesAvailableException $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage());
-            }
+            $this->logger->error($exception->getMessage());
 
             return [];
         }

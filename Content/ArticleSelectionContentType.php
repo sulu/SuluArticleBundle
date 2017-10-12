@@ -14,7 +14,9 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -25,9 +27,10 @@ use Sulu\Component\Content\SimpleContentType;
 /**
  * Provides article_selection content-type.
  */
-class ArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface
+class ArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -50,23 +53,16 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
     private $template;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param Manager $searchManager
      * @param ReferenceStoreInterface $referenceStore
      * @param string $articleDocumentClass
      * @param string $template
-     * @param LoggerInterface|null $logger
      */
     public function __construct(
         Manager $searchManager,
         ReferenceStoreInterface $referenceStore,
         $articleDocumentClass,
-        $template,
-        LoggerInterface $logger = null
+        $template
     ) {
         parent::__construct('Article', []);
 
@@ -74,7 +70,7 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $this->referenceStore = $referenceStore;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->template = $template;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -96,9 +92,7 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         try {
             $documents = $repository->findDocuments($search);
         } catch (NoNodesAvailableException $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage());
-            }
+            $this->logger->error($exception->getMessage());
 
             return [];
         }

@@ -21,7 +21,9 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -36,8 +38,10 @@ use Sulu\Component\SmartContent\DataProviderResult;
 /**
  * Introduces articles in smart-content.
  */
-class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInterface
+class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var Manager
      */
@@ -74,11 +78,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     protected $defaultLimit;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param Manager $searchManager
      * @param DocumentManagerInterface $documentManager
      * @param LazyLoadingValueHolderFactory $proxyFactory
@@ -86,7 +85,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param ArticleResourceItemFactory $articleResourceItemFactory
      * @param string $articleDocumentClass
      * @param int $defaultLimit
-     * @param LoggerInterface $logger
      */
     public function __construct(
         Manager $searchManager,
@@ -95,8 +93,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ReferenceStoreInterface $referenceStore,
         ArticleResourceItemFactory $articleResourceItemFactory,
         $articleDocumentClass,
-        $defaultLimit,
-        LoggerInterface $logger = null
+        $defaultLimit
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
@@ -105,7 +102,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -263,9 +260,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         try {
             return $repository->findDocuments($search);
         } catch (NoNodesAvailableException $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage());
-            }
+            $this->logger->error($exception->getMessage());
 
             return new DocumentIterator([], $this->searchManager);
         }

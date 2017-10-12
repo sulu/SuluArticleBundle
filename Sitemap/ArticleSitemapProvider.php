@@ -16,7 +16,9 @@ use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\Sitemap;
@@ -27,8 +29,10 @@ use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
 /**
  * Integrates articles into sitemap.
  */
-class ArticleSitemapProvider implements SitemapProviderInterface
+class ArticleSitemapProvider implements SitemapProviderInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var Manager
      */
@@ -40,23 +44,14 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     private $documentFactory;
 
     /**
-     * @var null|LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @param Manager $manager
      * @param DocumentFactoryInterface $documentFactory
-     * @param LoggerInterface|null $logger
      */
-    public function __construct(
-        Manager $manager,
-        DocumentFactoryInterface $documentFactory,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(Manager $manager, DocumentFactoryInterface $documentFactory)
+    {
         $this->manager = $manager;
         $this->documentFactory = $documentFactory;
-        $this->logger = $logger;
+        $this->logger = $logger = new NullLogger();
     }
 
     /**
@@ -133,9 +128,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         try {
             return $repository->findDocuments($search);
         } catch (NoNodesAvailableException $exception) {
-            if ($this->logger) {
-                $this->logger->error($exception->getMessage());
-            }
+            $this->logger->error($exception->getMessage());
 
             return new DocumentIterator([], $repository->getManager());
         }
