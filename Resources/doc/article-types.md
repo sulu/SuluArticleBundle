@@ -41,3 +41,19 @@ The type can also be used to predefine a filter for the smart-content provider f
 ```
 
 This will filter the smart-content for the given two types of articles.
+
+## Route Schema
+
+The bundle provides also a way to define a `route_schema` foreach article-type.
+
+```yml
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: type
+            options:
+                my_custom_type: "/custom/{object.getTitle()}"
+                my_second_custom_type: "/custom2/{object.getTitle()}"
+```
+
+See more information in [Routing](routing.md#route-schema).
