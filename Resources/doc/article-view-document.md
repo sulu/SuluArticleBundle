@@ -27,3 +27,98 @@ is requested (content-types, smart-content, ...).
 | view | array | Resolved view from raw-data |
 
 The `content` and `view` property is represented by a proxy to avoid resolving data where it is not needed.
+
+## How to extend?
+
+To extend the indexed data you can extend the `ArticleViewDocument`. This can be achieved by performing the following
+steps. The same steps can also be used to extend the `ArticlePageViewObject`.
+
+#### 1. Create custom class
+
+```php
+<?php
+
+namespace AppBundle\Document;
+
+use ONGR\ElasticsearchBundle\Annotation\Document;
+use ONGR\ElasticsearchBundle\Annotation\Property;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument as SuluArticleViewDocument;
+
+/**
+ * @Document(type="app_article")
+ */
+class ArticleViewDocument extends SuluArticleViewDocument
+{
+    /**
+     * @var string
+     *
+     * @Property(
+     *     type="string",
+     *     options={
+     *        "fields"={
+     *            "raw"={"type"="string", "index"="not_analyzed"}
+     *        }
+     *    }
+     * )
+     */
+    public $article;
+}
+```
+
+See [here](http://docs.ongr.io/ElasticsearchBundle/mapping) for more information about the mapping of 
+ongr_elasticsearch. 
+
+#### 2. Configure view-class and ongr_elasticsearch
+
+```yml
+ongr_elasticsearch:
+    ...
+    managers:
+        default:
+            ...
+            mappings:
+                - AppBundle
+                ...
+        live:
+            ...
+            mappings:
+                - AppBundle
+                ...
+
+sulu_article:
+    documents:
+        article:
+            view: AppBundle\Document\ArticleViewDocument
+```
+
+#### 3. Add listener to set custom value
+
+```php
+<?php
+
+namespace AppBundle\EventListener;
+
+use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
+
+class ArticleIndexListener
+{
+    public function onIndex(IndexEvent $event)
+    {
+        $document = $event->getDocument();
+        $viewDocument = $event->getViewDocument();
+        $data = $document->getStructure()->toArray();
+
+        if (!array_key_exists('article', $data)) {
+            return;
+        }
+
+        $viewDocument->article = $data['article'];
+    }
+}
+```
+
+```xml
+<service id="app.sulu_article.index_listener" class="AppBundle\EventListener\ArticleIndexListener">
+    <tag name="kernel.event_listener" event="sulu_article.index" method="onIndex"/>
+</service>
+```
