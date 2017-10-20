@@ -73,7 +73,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'search' => [
                         'mapping' => [
-                            ArticleDocument::class => ['index' => 'article'],
+                            ArticleDocument::class => ['index' => 'article', 'decorate_index' => true],
                             ArticlePageDocument::class => ['index' => 'article_page'],
                         ],
                     ],
