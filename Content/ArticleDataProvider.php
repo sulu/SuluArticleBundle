@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -19,6 +21,9 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -33,8 +38,10 @@ use Sulu\Component\SmartContent\DataProviderResult;
 /**
  * Introduces articles in smart-content.
  */
-class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInterface
+class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var Manager
      */
@@ -95,6 +102,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -162,7 +170,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**
@@ -191,7 +199,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $result[] = $this->articleResourceItemFactory->createResourceItem($document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**
@@ -239,7 +247,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
         if (!$search) {
-            return new \ArrayIterator([]);
+            return new DocumentIterator([], $this->searchManager);
         }
 
         $this->addPagination($search, $pageSize, $page, $limit);
@@ -249,7 +257,13 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
         }
 
-        return $repository->findDocuments($search);
+        try {
+            return $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return new DocumentIterator([], $this->searchManager);
+        }
     }
 
     /**

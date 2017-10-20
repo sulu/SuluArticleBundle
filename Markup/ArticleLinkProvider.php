@@ -11,9 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Markup;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
@@ -23,9 +27,10 @@ use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
 /**
  * Integrates articles into link-system.
  */
-class ArticleLinkProvider implements LinkProviderInterface
+class ArticleLinkProvider implements LinkProviderInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -53,16 +58,13 @@ class ArticleLinkProvider implements LinkProviderInterface
      * @param array $types
      * @param string $articleViewClass
      */
-    public function __construct(
-        Manager $liveManager,
-        Manager $defaultManager,
-        array $types,
-        $articleViewClass
-    ) {
+    public function __construct(Manager $liveManager, Manager $defaultManager, array $types, $articleViewClass)
+    {
         $this->liveManager = $liveManager;
         $this->defaultManager = $defaultManager;
         $this->types = $types;
         $this->articleViewClass = $articleViewClass;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -101,7 +103,13 @@ class ArticleLinkProvider implements LinkProviderInterface
             $repository = $this->defaultManager->getRepository($this->articleViewClass);
         }
 
-        $documents = $repository->findDocuments($search);
+        try {
+            $documents = $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return [];
+        }
 
         $result = [];
         /** @var ArticleViewDocumentInterface $document */

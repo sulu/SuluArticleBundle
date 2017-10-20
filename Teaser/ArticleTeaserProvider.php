@@ -11,8 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Teaser;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
@@ -23,9 +27,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Enables selection of articles in teaser content-type.
  */
-class ArticleTeaserProvider implements TeaserProviderInterface
+class ArticleTeaserProvider implements TeaserProviderInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -52,6 +57,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $this->searchManager = $searchManager;
         $this->translator = $translator;
         $this->articleDocumentClass = $articleDocumentClass;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -62,8 +68,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $okDefaultText = $this->translator->trans('sulu-content.teaser.apply', [], 'backend');
 
         return new TeaserConfiguration(
-            'sulu_article.teaser',
-            'teaser-selection/list@suluarticle',
+            'sulu_article.teaser', 'teaser-selection/list@suluarticle',
             [
                 'url' => '/admin/api/articles?locale={locale}',
                 'resultKey' => 'articles',
@@ -169,19 +174,27 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($articleIds));
 
+        try {
+            $documents = $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return [];
+        }
+
         $result = [];
-        foreach ($repository->findDocuments($search) as $item) {
-            $excerpt = $item->getExcerpt();
+        foreach ($documents as $document) {
+            $excerpt = $document->getExcerpt();
             $result[] = new Teaser(
-                $item->getUuid(),
+                $document->getUuid(),
                 'article',
-                $item->getLocale(),
-                ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
-                ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
+                $document->getLocale(),
+                ('' !== $excerpt->title ? $excerpt->title : $document->getTitle()),
+                ('' !== $excerpt->description ? $excerpt->description : $document->getTeaserDescription()),
                 $excerpt->more,
-                $item->getRoutePath(),
-                count($excerpt->images) ? $excerpt->images[0]->id : $item->getTeaserMediaId(),
-                $this->getAttributes($item)
+                $document->getRoutePath(),
+                count($excerpt->images) ? $excerpt->images[0]->id : $document->getTeaserMediaId(),
+                $this->getAttributes($document)
             );
         }
 

@@ -11,8 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -23,9 +27,10 @@ use Sulu\Component\Content\SimpleContentType;
 /**
  * Provides article_selection content-type.
  */
-class ArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface
+class ArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface, LoggerAwareInterface
 {
     use ArticleViewDocumentIdTrait;
+    use LoggerAwareTrait;
 
     /**
      * @var Manager
@@ -65,6 +70,7 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $this->referenceStore = $referenceStore;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->template = $template;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -83,9 +89,17 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($value, $locale)));
 
+        try {
+            $documents = $repository->findDocuments($search);
+        } catch (NoNodesAvailableException $exception) {
+            $this->logger->error($exception->getMessage());
+
+            return [];
+        }
+
         $result = [];
         /** @var ArticleViewDocumentInterface $articleDocument */
-        foreach ($repository->findDocuments($search) as $articleDocument) {
+        foreach ($documents as $articleDocument) {
             $result[array_search($articleDocument->getUuid(), $value, false)] = $articleDocument;
         }
 
