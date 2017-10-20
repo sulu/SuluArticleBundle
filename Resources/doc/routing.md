@@ -19,6 +19,36 @@ The arguments for the controller are:
 
 Additionally the `Request $request` can also be used in the controller.
 
+## Route Schema
+
+The `route_schema` which will be used to generate a route for a newly created article can be
+defined in the configuration.
+
+```yml
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: schema
+            options:
+                route_schema: /articles/{object.getTitle()}
+```
+
+This schema will be used for all articles which will be created in the future. Older articles
+will not be touched.
+
+If you want to define the schema based on the template or type you can use the related generator
+(`type` or `template`).
+
+```yml
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: <template|type>
+            options:
+                custom_template_or_type1: /test1/{object.getTitle()}
+                custom_template_or_type2: /test2/{object.getTitle()}
+```
+
 ## Route Generation
 
 For the route generation this bundle provides two different ways and two different approaches.

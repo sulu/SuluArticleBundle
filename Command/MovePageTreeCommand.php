@@ -55,4 +55,12 @@ class MovePageTreeCommand extends ContainerAwareCommand
 
         $documentManager->flush();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEnabled()
+    {
+        return $this->getContainer()->getParameter('sulu_article.page_tree_enabled');
+    }
 }

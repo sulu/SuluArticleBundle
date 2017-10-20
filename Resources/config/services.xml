@@ -22,6 +22,7 @@
             <argument type="collection">
                 <argument key="displayTabAll">%sulu_article.display_tab_all%</argument>
                 <argument key="defaultAuthor">%sulu_article.default_author%</argument>
+                <argument key="pageTreeEnabled">%sulu_article.page_tree_enabled%</argument>
                 <argument key="classes" type="collection">
                     <argument key="article">%sulu_article.article_document.class%</argument>
                     <argument key="articlePage">%sulu_article.article_page_document.class%</argument>
