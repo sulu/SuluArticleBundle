@@ -62,6 +62,7 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                     templates: articleConfig.templates,
                     displayTabAll: articleConfig.displayTabAll,
                     defaultAuthor: articleConfig.defaultAuthor,
+                    pageTreeEnabled: articleConfig.pageTreeEnabled,
                     classes: articleConfig.classes,
                 };
 
