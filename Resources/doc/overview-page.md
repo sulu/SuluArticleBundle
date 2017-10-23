@@ -4,7 +4,7 @@ This bundle provides multiple ways to create a overview page.
 
 ## Content Types
 
-Another way to create a overview page is to use the build in functionality of Sulu.
+The first possibility to create a overview page is to use the build in functionality of Sulu.
 
 * Manually: Article-Selection (see [Content-Types](content-types.md#article-selection))
 * Automatic: Smart-Content with article provider (see [Content-Types](content-types.md#smart-content))
@@ -13,7 +13,7 @@ Both can be influenced by the content-manager (selection of articles or configur
 
 ## Custom Controller
 
-The first possibility is to create custom controllers.
+Another way is to create a custom controller.
 
 ```xml
 <?xml version="1.0" ?>
