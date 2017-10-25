@@ -24,7 +24,6 @@ use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
-use Sulu\Component\Util\SortUtils;
 
 /**
  * Extends serializer with additional functionality to prepare article(-page) data.
@@ -168,22 +167,38 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $children = $article->getChildren();
-
-        if (null !== $children && $context->attributes->containsKey('pageNumber')) {
-            $pages = array_values(is_array($children) ? $children : iterator_to_array($children));
-            $pages = SortUtils::multisort($pages, 'pageNumber');
-
-            $pageNumber = $context->attributes->get('pageNumber')->get();
-            if ($pageNumber !== 1) {
-                $article = $pages[$pageNumber - 2];
-            }
+        if ($context->attributes->containsKey('pageNumber')) {
+            $article = $this->getArticleForPage($article, $context->attributes->get('pageNumber')->get());
         }
 
         $content = $this->resolve($article);
         foreach ($content as $name => $value) {
             $visitor->addData($name, $value);
         }
+    }
+
+    /**
+     * Returns article page by page-number.
+     *
+     * @param ArticleDocument $article
+     * @param int $pageNumber
+     *
+     * @return ArticleDocument
+     */
+    private function getArticleForPage(ArticleDocument $article, $pageNumber)
+    {
+        $children = $article->getChildren();
+        if ($children === null || $pageNumber === 1) {
+            return $article;
+        }
+
+        foreach ($children as $child) {
+            if ($child instanceof ArticlePageDocument && $child->getPageNumber() === $pageNumber) {
+                return $child;
+            }
+        }
+
+        return $article;
     }
 
     /**
