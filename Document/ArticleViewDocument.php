@@ -265,7 +265,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="binary")
+     * @Property(type="binary", options={"index":false})
      */
     protected $contentData;
 
