@@ -75,13 +75,13 @@ class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
         $this->taskManager->create(
             Argument::that(
                 function (TaskInterface $task) {
-                    return $task->getEntityClass() === BasePageDocument::class
-                        && $task->getEntityId() === '123-123-123'
-                        && $task->getLocale() === 'de'
-                        && $task->getHandlerClass() === PageTreeRouteUpdateHandler::class
+                    return BasePageDocument::class === $task->getEntityClass()
+                        && '123-123-123' === $task->getEntityId()
+                        && 'de' === $task->getLocale()
+                        && PageTreeRouteUpdateHandler::class === $task->getHandlerClass()
                         && $task->getSchedule() <= new \DateTime()
-                        && $task->getHost() === 'sulu.io'
-                        && $task->getScheme() === 'http';
+                        && 'sulu.io' === $task->getHost()
+                        && 'http' === $task->getScheme();
                 }
             )
         )->shouldBeCalled();

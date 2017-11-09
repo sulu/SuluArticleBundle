@@ -48,7 +48,7 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="translator.default"/>
+            <argument type="service" id="translator"/>
             <argument>%sulu_article.types%</argument>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
@@ -63,7 +63,7 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="translator.default"/>
+            <argument type="service" id="translator"/>
             <argument>%sulu_article.types%</argument>
         </service>
 

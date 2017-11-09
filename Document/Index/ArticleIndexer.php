@@ -202,7 +202,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
-        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
+        $article->setPublishedState(WorkflowStage::PUBLISHED === $document->getWorkflowStage());
         $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
         $article->setLocalizationState(
             new LocalizationStateViewObject(
@@ -314,7 +314,7 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $property = $document->getStructure()->getProperty($propertyMetadata->getName());
-        if (!$property || $propertyMetadata->getType() !== PageTreeRouteContentType::NAME || !$property->getValue()) {
+        if (!$property || PageTreeRouteContentType::NAME !== $propertyMetadata->getType() || !$property->getValue()) {
             return;
         }
 
@@ -402,7 +402,7 @@ class ArticleIndexer implements IndexerInterface
             }
 
             $this->manager->commit();
-        } while ($result->count() !== 0);
+        } while (0 !== $result->count());
 
         $this->manager->clearCache();
         $this->manager->flush();

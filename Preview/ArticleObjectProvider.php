@@ -163,7 +163,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             $child->setParent($article);
         }
 
-        if ($result['pageNumber'] === 1) {
+        if (1 === $result['pageNumber']) {
             return $article;
         }
 
