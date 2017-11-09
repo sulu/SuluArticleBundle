@@ -158,7 +158,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             $pages = SortUtils::multisort($pages, 'pageNumber');
 
             $pageNumber = $context->attributes->get('pageNumber')->get();
-            if ($pageNumber !== 1) {
+            if (1 !== $pageNumber) {
                 $article = $pages[$pageNumber - 2];
             }
         }

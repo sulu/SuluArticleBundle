@@ -233,7 +233,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $children = iterator_to_array($document->getChildren());
         foreach ($children as $child) {
-            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST) {
+            if (LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)) {
                 $this->documentManager->publish($child, $event->getLocale());
             }
         }
@@ -300,7 +300,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         foreach ($document->getChildren() as $child) {
             if ($child instanceof ArticlePageDocument
-                && $this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST
+                && LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)
             ) {
                 $pages[] = [
                     'uuid' => $child->getUuid(),
@@ -352,7 +352,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         foreach ($document->getChildren() as $child) {
-            if ($this->documentInspector->getLocalizationState($child) === LocalizationState::GHOST) {
+            if (LocalizationState::GHOST === $this->documentInspector->getLocalizationState($child)) {
                 continue;
             }
 
@@ -510,7 +510,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         foreach ($document->getChildren() as $child) {
-            if ($this->documentInspector->getLocalizationState($child) !== LocalizationState::GHOST
+            if (LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)
                 && $document->getStructureType() !== $child->getStructureType()
             ) {
                 $child->setStructureType($document->getStructureType());
@@ -526,7 +526,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {
-        if ($event->getMetadata()->getClass() !== ArticleDocument::class) {
+        if (ArticleDocument::class !== $event->getMetadata()->getClass()) {
             return;
         }
 

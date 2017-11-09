@@ -43,7 +43,7 @@ class PageTreeCompilerPass implements CompilerPassInterface
     protected function hasPageTree(array $properties)
     {
         foreach ($properties as $property) {
-            if ($property->getType() === PageTreeRouteContentType::NAME) {
+            if (PageTreeRouteContentType::NAME === $property->getType()) {
                 return true;
             } elseif ($property instanceof BlockMetadata && $this->hasPageTree($property->getChildren())) {
                 return true;

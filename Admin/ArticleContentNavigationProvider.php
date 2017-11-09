@@ -27,7 +27,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
     {
         $action = 'details';
         $page = 1;
-        if (array_key_exists('page', $options) && (int) $options['page'] !== 1) {
+        if (array_key_exists('page', $options) && 1 !== (int) $options['page']) {
             $action = 'page:' . $options['page'] . '/' . $action;
             $page = (int) $options['page'];
         }

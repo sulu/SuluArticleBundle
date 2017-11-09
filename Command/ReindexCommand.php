@@ -48,7 +48,7 @@ class ReindexCommand extends ContainerAwareCommand
         $startTime = microtime(true);
 
         $id = 'sulu_article.elastic_search.article_indexer';
-        if ($context === SuluKernel::CONTEXT_WEBSITE) {
+        if (SuluKernel::CONTEXT_WEBSITE === $context) {
             $id = 'sulu_article.elastic_search.article_live_indexer';
         }
 

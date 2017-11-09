@@ -34,7 +34,7 @@ class AppKernel extends SuluTestKernel
     {
         parent::registerContainerConfiguration($loader);
 
-        if (getenv('SYMFONY__PHPCR__TRANSPORT') === 'jackrabbit') {
+        if ('jackrabbit' === getenv('SYMFONY__PHPCR__TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
         $loader->load(__DIR__ . '/config/config.yml');
