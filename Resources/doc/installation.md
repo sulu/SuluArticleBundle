@@ -6,8 +6,8 @@ The SuluArticleBundle requires a running elasticsearch `^2.2` or `^5.0`.
 
 There is an different installation and configuration depending on which version of ElasticSearch you are using.
 
-If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation_es2.md)
-else read: [Installation for ElasticSearch 5.0](installation_es5.md) 
+If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation-es2.md)
+else read: [Installation for ElasticSearch 5.0](installation-es5.md) 
 
 ## Install the bundle
  

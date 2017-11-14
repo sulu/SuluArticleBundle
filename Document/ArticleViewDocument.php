@@ -263,6 +263,23 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $pages = [];
 
     /**
+     * @var string
+     *
+     * @Property(type="binary")
+     */
+    protected $contentData;
+
+    /**
+     * @var \ArrayObject
+     */
+    protected $content;
+
+    /**
+     * @var \ArrayObject
+     */
+    protected $view;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -730,6 +747,60 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setPages(Collection $pages)
     {
         $this->pages = $pages;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentData()
+    {
+        return $this->contentData;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContentData($contentData)
+    {
+        $this->contentData = $contentData;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContent(\ArrayObject $content)
+    {
+        $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getView()
+    {
+        return $this->view;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setView(\ArrayObject $view)
+    {
+        $this->view = $view;
 
         return $this;
     }

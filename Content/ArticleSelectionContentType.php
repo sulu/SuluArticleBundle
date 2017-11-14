@@ -73,7 +73,7 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
     public function getContentData(PropertyInterface $property)
     {
         $value = $property->getValue();
-        if ($value === null || !is_array($value) || count($value) === 0) {
+        if (null === $value || !is_array($value) || 0 === count($value)) {
             return [];
         }
 

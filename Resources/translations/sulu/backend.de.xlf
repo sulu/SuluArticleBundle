@@ -194,6 +194,10 @@
                 <source>sulu_article.edit.page</source>
                 <target>Seite</target>
             </trans-unit>
+            <trans-unit id="broken-template-01">
+                <source>sulu_article.broken-template.title</source>
+                <target>Artikel-Template ist beschädigt</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -16,6 +16,7 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -67,6 +68,11 @@ class ArticleSubscriber implements EventSubscriberInterface
             [
                 'event' => Events::POST_SERIALIZE,
                 'format' => 'json',
+                'method' => 'addBrokenIndicatorOnPostSerialize',
+            ],
+            [
+                'event' => Events::POST_SERIALIZE,
+                'format' => 'json',
                 'method' => 'addPageTitlePropertyNameOnPostSerialize',
             ],
         ];
@@ -89,6 +95,25 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $visitor->addData('articleType', $context->accept($this->getType($structure->getStructure())));
+    }
+
+    /**
+     * Append broken-indicator to result.
+     *
+     * @param ObjectEvent $event
+     */
+    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
+    {
+        $article = $event->getObject();
+        $visitor = $event->getVisitor();
+
+        if (!($article instanceof ArticleViewDocumentInterface)) {
+            return;
+        }
+
+        $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
+        $visitor->addData('broken', !$structure || $structure->getKey() !== $article->getStructureType());
+        $visitor->addData('originalStructureType', $article->getStructureType());
     }
 
     /**

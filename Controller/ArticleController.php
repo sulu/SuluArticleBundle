@@ -173,7 +173,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         if ($workflowStage = $request->get('workflowStage')) {
-            $search->addQuery(new TermQuery('published_state', $workflowStage === 'published'), BoolQuery::MUST);
+            $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
         }
 
         $authoredFrom = $request->get('authoredFrom');

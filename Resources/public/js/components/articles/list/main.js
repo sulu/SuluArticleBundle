@@ -38,6 +38,14 @@ define([
 
             route: [
                 'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
+            ].join(''),
+
+            brokenTemplate: [
+                '<p><%= translations.brokenTemplateMessage %></p>',
+                '<p>',
+                '    <%= translations.brokenTemplateName %>: <%= item.originalStructureType %><br/>',
+                '    <%= translations.brokenTemplateUuid %>: <%= item.id %>',
+                '</p>'
             ].join('')
         },
 
@@ -53,6 +61,10 @@ define([
             filterByTag: 'sulu_article.list.filter.by-tag',
             filterByPage: 'sulu_article.list.filter.by-page',
             filterByTimescale: 'sulu_article.list.filter.by-timescale',
+            brokenTemplateTitle: 'sulu_article.broken-template.title',
+            brokenTemplateMessage: 'sulu_content.broken-template.message',
+            brokenTemplateName: 'sulu_content.broken-template.message.template-name',
+            brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
             openGhostOverlay: {
                 info: 'sulu_article.settings.open-ghost-overlay.info',
                 new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -200,40 +212,27 @@ define([
                     searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
                     resultKey: 'articles',
                     instanceName: 'articles',
-                    actionCallback: function(id, article) {
-                        if ('ghost' === article.localizationState.state) {
-                            ArticleManager.load(id, this.options.locale).then(function(response) {
-                                OpenGhost.openGhost.call(
-                                    this,
-                                    response,
-                                    this.translations.openGhostOverlay
-                                ).then(
-                                    function(copy, src) {
-                                        if (!!copy) {
-                                            CopyLocale.copyLocale.call(
-                                                this,
-                                                id,
-                                                src,
-                                                [this.options.locale],
-                                                function() {
-                                                    this.toEdit(id);
-                                                }.bind(this)
-                                            );
-                                        } else {
-                                            this.toEdit(id);
-                                        }
-                                    }.bind(this)
-                                );
-                            }.bind(this)).fail(function(xhr) {
-                                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
-                            }.bind(this));
-                        } else {
-                            this.toEdit(id);
-                        }
-                    }.bind(this),
+                    actionCallback: this.actionCallback.bind(this),
                     viewOptions: {
                         table: {
                             actionIconColumn: 'title',
+                            actionIcon: function(item) {
+                                if (item.broken) {
+                                    return 'info';
+                                }
+
+                                return 'pencil';
+                            },
+                            cssClasses: [
+                                {
+                                    column: 'title',
+                                    callback: function(item) {
+                                        if (item.broken) {
+                                            return 'article-broken';
+                                        }
+                                    }.bind(this)
+                                }
+                            ],
                             badges: [
                                 {
                                     column: 'title',
@@ -250,6 +249,54 @@ define([
                     }
                 }
             );
+        },
+
+        /**
+         * Handles click for datagrid.
+         *
+         * For broken article: Show brocken info
+         * For ghost articles: Open ghost overlay
+         * Else: Goto edit
+         *
+         * @param {String} id
+         * @param {Object} article
+         *
+         * @returns {*}
+         */
+        actionCallback: function(id, article) {
+            if (article.broken) {
+                return this.showBrokenInfo(article);
+            }
+
+            if ('ghost' !== article.localizationState.state) {
+                return this.toEdit(id);
+            }
+
+            ArticleManager.load(id, this.options.locale).then(function(response) {
+                OpenGhost.openGhost.call(
+                    this,
+                    response,
+                    this.translations.openGhostOverlay
+                ).then(
+                    function(copy, src) {
+                        if (!!copy) {
+                            CopyLocale.copyLocale.call(
+                                this,
+                                id,
+                                src,
+                                [this.options.locale],
+                                function() {
+                                    this.toEdit(id);
+                                }.bind(this)
+                            );
+                        } else {
+                            this.toEdit(id);
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)).fail(function(xhr) {
+                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
+            }.bind(this));
         },
 
         toEdit: function(id, locale) {
@@ -337,6 +384,55 @@ define([
          * @param {Object} filter
          */
         retrieveListToolbarTemplate: function(filter) {
+            var filterDropdownItems = [
+                {
+                    id: 'all',
+                    title: this.translations.filterAll,
+                    marked: filter.filterKey === 'all',
+                    callback: function() {
+                        this.replaceFilter('all');
+                    }.bind(this)
+                },
+                {
+                    id: 'me',
+                    title: this.translations.filterMe,
+                    marked: filter.filterKey === 'me',
+                    callback: function() {
+                        this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
+                    }.bind(this)
+                },
+                {
+                    id: 'filterByAuthor',
+                    title: this.translations.filterByAuthor + ' ...',
+                    marked: filter.filterKey === 'filterByAuthor',
+                    callback: this.openContactSelectionOverlay.bind(this)
+                },
+                {
+                    divider: true
+                },
+                {
+                    id: 'filterByCategory',
+                    title: this.translations.filterByCategory + ' ...',
+                    marked: filter.filterKey === 'filterByCategory',
+                    callback: this.openCategorySelectionOverlay.bind(this)
+                },
+                {
+                    id: 'filterByTag',
+                    title: this.translations.filterByTag + ' ...',
+                    marked: filter.filterKey === 'filterByTag',
+                    callback: this.openTagSelectionOverlay.bind(this)
+                },
+            ];
+
+            if (this.options.config.pageTreeEnabled) {
+                filterDropdownItems.push({
+                    id: 'filterByPage',
+                    title: this.translations.filterByPage + ' ...',
+                    marked: filter.filterKey === 'filterByPage',
+                    callback: this.openPageSelectionOverlay.bind(this)
+                });
+            }
+
             return this.sandbox.sulu.buttons.get({
                 settings: {
                     options: {
@@ -428,51 +524,7 @@ define([
                             changeButton: false,
                             preSelected: filter.filterKey
                         },
-                        dropdownItems: [
-                            {
-                                id: 'all',
-                                title: this.translations.filterAll,
-                                marked: filter.filterKey === 'all',
-                                callback: function() {
-                                    this.replaceFilter('all');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'me',
-                                title: this.translations.filterMe,
-                                marked: filter.filterKey === 'me',
-                                callback: function() {
-                                    this.replaceFilter('contact', this.sandbox.sulu.user.contact, 'me');
-                                }.bind(this)
-                            },
-                            {
-                                id: 'filterByAuthor',
-                                title: this.translations.filterByAuthor + ' ...',
-                                marked: filter.filterKey === 'filterByAuthor',
-                                callback: this.openContactSelectionOverlay.bind(this)
-                            },
-                            {
-                                divider: true
-                            },
-                            {
-                                id: 'filterByCategory',
-                                title: this.translations.filterByCategory + ' ...',
-                                marked: filter.filterKey === 'filterByCategory',
-                                callback: this.openCategorySelectionOverlay.bind(this)
-                            },
-                            {
-                                id: 'filterByTag',
-                                title: this.translations.filterByTag + ' ...',
-                                marked: filter.filterKey === 'filterByTag',
-                                callback: this.openTagSelectionOverlay.bind(this)
-                            },
-                            {
-                                id: 'filterByPage',
-                                title: this.translations.filterByPage + ' ...',
-                                marked: filter.filterKey === 'filterByPage',
-                                callback: this.openPageSelectionOverlay.bind(this)
-                            }
-                        ]
+                        dropdownItems: filterDropdownItems
                     }
                 }
             });
@@ -690,6 +742,38 @@ define([
 
         setTypeName: function(name) {
             this.$el.find('.type').text(this.sandbox.translate(name));
+        },
+
+        showBrokenInfo: function(item) {
+            var $element = this.sandbox.dom.createElement('<div/>');
+            this.sandbox.dom.append(this.$el, $element);
+
+            this.sandbox.start([
+                {
+                    name: 'overlay@husky',
+                    options: {
+                        el: $element,
+                        type: 'alert',
+                        slides: [
+                            {
+                                title: this.translations.brokenTemplateTitle,
+                                message: this.templates.brokenTemplate({
+                                    translations: this.translations,
+                                    item: item
+                                }),
+                                contentSpacing: false,
+                                type: 'alert',
+                                buttons: [
+                                    {
+                                        type: 'ok',
+                                        align: 'center'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ]);
         }
     };
 });

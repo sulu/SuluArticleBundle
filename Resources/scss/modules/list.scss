@@ -9,3 +9,8 @@
         content: "\"";
     }
 }
+
+.husky-table tbody td .article-broken .cell-content {
+    color: $gray !important;
+    text-decoration: line-through;
+}

@@ -377,11 +377,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $offset = ($page - 1) * $pageSize;
         }
 
-        if ($limit === null) {
+        if (null === $limit) {
             $limit = $this->defaultLimit;
         }
 
-        if ($pageSize === null || $offset + $pageSize > $limit) {
+        if (null === $pageSize || $offset + $pageSize > $limit) {
             $pageSize = $limit - $offset;
 
             if ($pageSize < 0) {

@@ -73,7 +73,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'search' => [
                         'mapping' => [
-                            ArticleDocument::class => ['index' => 'article'],
+                            ArticleDocument::class => ['index' => 'article', 'decorate_index' => true],
                             ArticlePageDocument::class => ['index' => 'article_page'],
                         ],
                     ],
@@ -210,11 +210,11 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $articlePageDocument = ArticlePageDocument::class;
 
         foreach ($container->getParameter('sulu_document_manager.mapping') as $mapping) {
-            if ($mapping['alias'] == 'article') {
+            if ('article' == $mapping['alias']) {
                 $articleDocument = $mapping['class'];
             }
 
-            if ($mapping['alias'] == 'article_page') {
+            if ('article_page' == $mapping['alias']) {
                 $articlePageDocument = $mapping['class'];
             }
         }
@@ -233,7 +233,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     {
         $mapping = $container->getParameter('sulu_document_manager.mapping');
         foreach ($mapping as $key => $item) {
-            if ($item['alias'] === 'article') {
+            if ('article' === $item['alias']) {
                 $mapping[$key]['set_default_author'] = $config['default_author'];
             }
         }

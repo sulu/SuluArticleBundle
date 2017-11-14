@@ -17,6 +17,8 @@ use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -200,7 +202,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
-        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
+        $article->setPublishedState(WorkflowStage::PUBLISHED === $document->getWorkflowStage());
         $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
         $article->setLocalizationState(
             new LocalizationStateViewObject(
@@ -229,6 +231,8 @@ class ArticleIndexer implements IndexerInterface
                 $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
             }
         }
+
+        $article->setContentData(json_encode($document->getStructure()->toArray()));
 
         $this->mapPages($document, $article);
 
@@ -278,12 +282,15 @@ class ArticleIndexer implements IndexerInterface
     private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
         $pages = [];
+        /** @var ArticlePageDocument $child */
         foreach ($document->getChildren() as $child) {
+            /** @var ArticlePageViewObject $page */
             $pages[] = $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();
             $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
+            $page->contentData = json_encode($child->getStructure()->toArray());
         }
 
         $article->setPages(new Collection($pages));
@@ -307,7 +314,7 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $property = $document->getStructure()->getProperty($propertyMetadata->getName());
-        if (!$property || $propertyMetadata->getType() !== PageTreeRouteContentType::NAME || !$property->getValue()) {
+        if (!$property || PageTreeRouteContentType::NAME !== $propertyMetadata->getType() || !$property->getValue()) {
             return;
         }
 
@@ -395,7 +402,7 @@ class ArticleIndexer implements IndexerInterface
             }
 
             $this->manager->commit();
-        } while ($result->count() !== 0);
+        } while (0 !== $result->count());
 
         $this->manager->clearCache();
         $this->manager->flush();
@@ -428,5 +435,25 @@ class ArticleIndexer implements IndexerInterface
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropIndex()
+    {
+        $this->manager->dropIndex();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createIndex()
+    {
+        if ($this->manager->indexExists()) {
+            return;
+        }
+
+        $this->manager->createIndex();
     }
 }

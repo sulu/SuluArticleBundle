@@ -123,7 +123,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument
-            || $this->documentInspector->getLocalizationState($document->getParent()) === LocalizationState::GHOST
+            || LocalizationState::GHOST === $this->documentInspector->getLocalizationState($document->getParent())
         ) {
             return;
         }
@@ -233,7 +233,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument
-            || $this->documentInspector->getLocalizationState($document->getParent()) === LocalizationState::GHOST
+            || LocalizationState::GHOST === $this->documentInspector->getLocalizationState($document->getParent())
             || $document->getStructureType() === $document->getParent()->getStructureType()
         ) {
             return;
@@ -250,7 +250,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {
-        if ($event->getMetadata()->getClass() !== ArticlePageDocument::class) {
+        if (ArticlePageDocument::class !== $event->getMetadata()->getClass()) {
             return;
         }
 
