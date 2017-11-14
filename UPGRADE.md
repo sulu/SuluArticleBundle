@@ -1,6 +1,6 @@
 # Upgrade
 
-## 0.8.0 (unreleased)
+## 1.0.0-RC1
 
 ### Reindex command
 
