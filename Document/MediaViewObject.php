@@ -44,7 +44,7 @@ class MediaViewObject
     public $copyright;
 
     /**
-     * @var string[]
+     * @var string
      *
      * @Property(type="string", options={"index"="not_analyzed"})
      */
@@ -88,7 +88,7 @@ class MediaViewObject
     /**
      * Set formats.
      *
-     * @param \string[] $formats
+     * @param string[] $formats
      *
      * @return $this
      */
