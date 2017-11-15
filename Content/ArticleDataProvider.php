@@ -155,14 +155,12 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
-        $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
         foreach ($queryResult as $document) {
-            $uuids[] = $document->getUuid();
             $result[] = new ArticleDataItem($document->getUuid(), $document->getTitle(), $document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**
@@ -182,16 +180,13 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
 
         $result = [];
-        $uuids = [];
         /** @var ArticleViewDocumentInterface $document */
         foreach ($queryResult as $document) {
             $this->referenceStore->add($document->getUuid());
-
-            $uuids[] = $document->getUuid();
             $result[] = $this->articleResourceItemFactory->createResourceItem($document);
         }
 
-        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize), $uuids);
+        return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
     /**

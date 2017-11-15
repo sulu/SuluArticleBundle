@@ -11,7 +11,7 @@ env:
 cache:
   directories:
     - "downloads"
-    - "$HOME/.composer/cache"
+    - "$HOME/.composer/cache/files"
 
 matrix:
   include:
@@ -24,6 +24,7 @@ matrix:
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
+        - PHPSTAN=true
 
 addons:
   apt:
@@ -51,7 +52,7 @@ before_install:
   - ./elasticsearch-*/bin/elasticsearch -d
 
 install:
-  - travis_retry composer update $COMPOSER_FLAGS
+  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan $COMPOSER_FLAGS ; else travis_retry composer update $COMPOSER_FLAGS ; fi
   - composer info -i
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
@@ -61,6 +62,7 @@ install:
 
 script:
   - ./vendor/bin/phpunit $CODE_COVERAGE
+  - if [[ $PHPSTAN == 'true' ]]; then ./vendor/bin/phpstan analyse ./ --level 1 -c phpstan.neon ; fi
 
 after_script:
   - if [[ -n $CODE_COVERAGE ]]; then wget https://scrutinizer-ci.com/ocular.phar ; fi
