@@ -150,21 +150,8 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             return;
         }
 
-<<<<<<< HEAD
         if ($context->attributes->containsKey('pageNumber')) {
             $article = $this->getArticleForPage($article, $context->attributes->get('pageNumber')->get());
-=======
-        $children = $article->getChildren();
-
-        if (null !== $children && $context->attributes->containsKey('pageNumber')) {
-            $pages = array_values(is_array($children) ? $children : iterator_to_array($children));
-            $pages = SortUtils::multisort($pages, 'pageNumber');
-
-            $pageNumber = $context->attributes->get('pageNumber')->get();
-            if (1 !== $pageNumber) {
-                $article = $pages[$pageNumber - 2];
-            }
->>>>>>> 00f868a1795bb563ddb67cbba8e460cab1590225
         }
 
         $content = $this->resolve($article);
@@ -184,7 +171,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
     private function getArticleForPage(ArticleDocument $article, $pageNumber)
     {
         $children = $article->getChildren();
-        if ($children === null || $pageNumber === 1) {
+        if (null === $children || 1 === $pageNumber) {
             return $article;
         }
 
