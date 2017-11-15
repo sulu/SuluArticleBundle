@@ -21,6 +21,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Content\Document\Structure\Structure;
@@ -45,6 +46,11 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
     private $proxyFactory;
 
     /**
+     * @var ContentProxyFactory
+     */
+    private $contentProxyFactory;
+
+    /**
      * @var ExtensionManagerInterface
      */
     private $extensionManager;
@@ -64,13 +70,16 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->structureManager = $this->prophesize(StructureManagerInterface::class);
         $this->contentTypeManager = $this->prophesize(ContentTypeManagerInterface::class);
         $this->proxyFactory = new LazyLoadingValueHolderFactory();
+        $this->contentProxyFactory = new ContentProxyFactory(
+            $this->contentTypeManager->reveal(),
+            $this->proxyFactory
+        );
         $this->extensionManager = $this->prophesize(ExtensionManagerInterface::class);
 
         $this->subscriber = new ArticleWebsiteSubscriber(
             $this->structureManager->reveal(),
-            $this->contentTypeManager->reveal(),
-            $this->proxyFactory,
-            $this->extensionManager->reveal()
+            $this->extensionManager->reveal(),
+            $this->contentProxyFactory
         );
 
         $this->structure = $this->prophesize(ArticleBridge::class);
