@@ -983,6 +983,49 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
     }
 
+    public function testCgetFilterByCategories()
+    {
+        $title = 'Test-Article';
+        $template = 'default';
+        $category1 = $this->createCategory();
+        $category2 = $this->createCategory();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-01',
+                'ext' => ['excerpt' => ['categories' => [$category1->getId()]]],
+            ]
+        );
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $article1 = json_decode($client->getResponse()->getContent(), true);
+
+        $client->request(
+            'POST',
+            '/api/articles?locale=de',
+            [
+                'title' => $title,
+                'template' => $template,
+                'authored' => '2016-01-02',
+                'ext' => ['excerpt' => ['categories' => [$category2->getId()]]],
+            ]
+        );
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $article2 = json_decode($client->getResponse()->getContent(), true);
+
+        $client->request('GET', '/api/articles?locale=de&categoriesIds=' . $category1->getId() . ',' . $category2->getId());
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $result = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(2, $result['_embedded']['articles']);
+        $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['id'], $result['_embedded']['articles'][1]['id']);
+    }
+
     public function testCgetFilterByTag()
     {
         $title = 'Test-Article';
