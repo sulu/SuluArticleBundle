@@ -35,8 +35,7 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('author', TextType::class);
         $builder->add(
             'authored',
-            DateType::class,
-            ['widget' => 'single_text', 'model_timezone' => 'UTC', 'view_timezone' => 'UTC']
+            TextType::class
         );
     }
 
