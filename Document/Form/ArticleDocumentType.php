@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,7 +35,10 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('author', TextType::class);
         $builder->add(
             'authored',
-            TextType::class
+            DateTimeType::class,
+            [
+                'widget' => 'single_text',
+            ]
         );
     }
 
