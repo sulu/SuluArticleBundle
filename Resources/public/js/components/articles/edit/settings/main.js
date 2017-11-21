@@ -183,7 +183,7 @@ define([
          * @param {Boolean} remove
          */
         setAuthorChangelog: function(fullName, date, remove) {
-            var authoredText, formattedDate = this.sandbox.date.format(date);
+            var authoredText, formattedDate = this.sandbox.date.format(date, true);
 
             if (!fullName && !remove) {
                 fullName = this.authorFullname;
