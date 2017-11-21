@@ -95,6 +95,7 @@ class ArticleLinkProvider implements LinkProviderInterface
     {
         $search = new Search();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($hrefs, $locale)));
+        $search->setSize(count($hrefs));
 
         $repository = $this->liveManager->getRepository($this->articleViewClass);
         if (!$published) {

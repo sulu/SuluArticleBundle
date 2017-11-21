@@ -83,6 +83,34 @@ class ArticleLinkProviderTest extends SuluTestCase
         $this->assertEquals($articles[1]['id'], $result[0]->getId());
     }
 
+    public function testPreloadMoreThan10()
+    {
+        $articles = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        $uuids = array_map(
+            function (array $data) {
+                return $data['id'];
+            },
+            $articles
+        );
+
+        $result = $this->articleLinkProvider->preload($uuids, 'de', false);
+
+        $this->assertCount(11, $result);
+    }
+
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
         $client = $this->createAuthenticatedClient();
