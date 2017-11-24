@@ -32,7 +32,7 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
             locales = [];
 
         _.each(config, function(item) {
-            locales = locales.concat(Object.keys(item));
+            locales = _.union(locales, Object.keys(item));
         });
 
         return locales;
