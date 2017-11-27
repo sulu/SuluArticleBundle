@@ -19,6 +19,7 @@ use Sulu\Component\HttpCache\HttpCache;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Handles articles.
@@ -60,11 +61,16 @@ class WebsiteArticleController extends Controller
 
         $content = $this->serializeArticle($object, $pageNumber);
 
-        return $this->render(
-            $viewTemplate,
-            $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
-            $this->createResponse($request)
-        );
+        try {
+            return $this->render(
+                $viewTemplate,
+                $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
+                $this->createResponse($request)
+            );
+        } catch (\InvalidArgumentException $exception) {
+            // template not found
+            throw new HttpException(406, 'Error encountered when rendering content', $exception);
+        }
     }
 
     /**
