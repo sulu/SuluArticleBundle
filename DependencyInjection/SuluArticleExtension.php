@@ -57,8 +57,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'metadata' => [
                         'directories' => [
-                            [
-                                'name' => 'sulu_article',
+                            'sulu_article' => [
                                 'path' => __DIR__ . '/../Resources/config/serializer',
                                 'namespace_prefix' => 'Sulu\Bundle\ArticleBundle',
                             ],
