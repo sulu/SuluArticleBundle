@@ -279,7 +279,7 @@
         <service id="sulu_article.preview.object_provider"
                  class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
             <argument type="service" id="sulu_document_manager.document_manager"/>
-            <argument type="service" id="serializer"/>
+            <argument type="service" id="jms_serializer"/>
             <argument type="string">%sulu_article.article_document.class%</argument>
 
             <tag name="sulu_preview.object_provider" class="%sulu_article.article_document.class%"/>
