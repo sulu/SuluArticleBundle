@@ -8,7 +8,8 @@
         "sulu/sulu": "^1.6.8",
         "ongr/elasticsearch-bundle": "^1.2.9 || ~5.0",
         "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
-        "jackalope/jackalope": "^1.2.8 || >=1.3.3"
+        "jackalope/jackalope": "^1.2.8 || >=1.3.3",
+        "jms/serializer-bundle": "^1.1 || ^2.0"
     },
     "require-dev": {
         "massive/build-bundle": "~0.3.0",
