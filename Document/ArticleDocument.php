@@ -17,6 +17,7 @@ use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\AuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
+use Sulu\Component\Content\Document\Behavior\LocalizedAuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
@@ -50,7 +51,7 @@ class ArticleDocument implements
     ExtensionBehavior,
     WorkflowStageBehavior,
     VersionBehavior,
-    AuthorBehavior,
+    LocalizedAuthorBehavior,
     ChildrenBehavior,
     ArticleInterface
 {
