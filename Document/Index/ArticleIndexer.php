@@ -442,6 +442,10 @@ class ArticleIndexer implements IndexerInterface
      */
     public function dropIndex()
     {
+        if (!$this->manager->indexExists()) {
+            return;
+        }
+
         $this->manager->dropIndex();
     }
 
