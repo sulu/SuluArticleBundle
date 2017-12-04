@@ -73,7 +73,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
-                if (!$node->hasProperty(sprintf('i18n:%s-changed', $localization->getLocale()))) {
+                if (!$node->hasProperty(sprintf('i18n:%s-template', $localization->getLocale()))) {
                     continue;
                 }
 
