@@ -1,5 +1,16 @@
 # Upgrade
 
+## 1.0.0-RC5
+
+### Author and Authored
+
+The author and authored are now localized and has to be updated.
+
+```bash
+bin/adminconsole phpcr:migrations:migrate 
+bin/websiteconsole sulu:article:reindex --no-interaction
+``` 
+
 ## 1.0.0-RC1
 
 ### Reindex command
@@ -12,8 +23,8 @@ See [Commands in documentation](Resources/doc/commands.md).
 Recreate the index to update mapping (new `content_data` field) and reindex your articles:
 
 ```bash
-bin/adminconsole sulu:article:reindex --drop --no-interactive
-bin/websiteconsole sulu:article:reindex --drop --no-interactive
+bin/adminconsole sulu:article:reindex --drop --no-interaction
+bin/websiteconsole sulu:article:reindex --drop --no-interaction
 ```
 
 ## 0.7.0
