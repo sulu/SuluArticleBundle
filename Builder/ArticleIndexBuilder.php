@@ -32,7 +32,7 @@ class ArticleIndexBuilder extends SuluBuilder
      */
     public function getDependencies()
     {
-        return ['cache'];
+        return [];
     }
 
     /**
