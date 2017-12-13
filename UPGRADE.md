@@ -12,8 +12,8 @@ See [Commands in documentation](Resources/doc/commands.md).
 Recreate the index to update mapping (new `content_data` field) and reindex your articles:
 
 ```bash
-bin/adminconsole sulu:article:reindex --drop --no-interactive
-bin/websiteconsole sulu:article:reindex --drop --no-interactive
+bin/adminconsole sulu:article:reindex --drop --no-interaction
+bin/websiteconsole sulu:article:reindex --drop --no-interaction
 ```
 
 ## 0.7.0
