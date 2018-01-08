@@ -29,6 +29,7 @@ use Sulu\Component\DocumentManager\PropertyEncoder;
 class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInterface
 {
     const ROUTE_PROPERTY = 'routePath';
+
     const TAG_NAME = 'sulu_article.article_route';
 
     /**
