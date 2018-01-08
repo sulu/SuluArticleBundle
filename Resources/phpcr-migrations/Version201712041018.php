@@ -28,6 +28,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
     use ContainerAwareTrait;
 
     const AUTHOR_PROPERTY_NAME = 'sulu:author';
+
     const AUTHORED_PROPERTY_NAME = 'sulu:authored';
 
     /**

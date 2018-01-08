@@ -33,6 +33,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ArticlePageSubscriber implements EventSubscriberInterface
 {
     const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
+
     const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
 
     /**

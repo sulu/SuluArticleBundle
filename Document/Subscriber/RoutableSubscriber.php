@@ -43,7 +43,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class RoutableSubscriber implements EventSubscriberInterface
 {
     const ROUTE_FIELD = 'routePath';
+
     const ROUTES_PROPERTY = 'suluRoutes';
+
     const TAG_NAME = 'sulu_article.article_route';
 
     /**

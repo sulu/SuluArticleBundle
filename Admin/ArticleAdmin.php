@@ -23,7 +23,9 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 class ArticleAdmin extends Admin
 {
     const STRUCTURE_TAG_TYPE = 'sulu_article.type';
+
     const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
+
     const SECURITY_CONTEXT = 'sulu.modules.articles';
 
     /**
