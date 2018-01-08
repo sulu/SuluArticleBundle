@@ -120,7 +120,7 @@
             </trans-unit>
             <trans-unit id="list-filter-01" resname="sulu_article.list.filter.me">
                 <source>sulu_article.list.filter.me</source>
-                <target>Mij artikel</target>
+                <target>Mijn artikels</target>
             </trans-unit>
             <trans-unit id="list-filter-02" resname="sulu_article.list.filter.all">
                 <source>sulu_article.list.filter.all</source>
