@@ -15,11 +15,6 @@ Additional features included:
 * Segmentation of article-templates (called article-types)
 * Define URL schemas per type
 
-## Status
-
-This repository will become version 1.0 of SuluArticleBundle. It is under **heavy development** and currently its APIs
-and code are not stable yet (pre 1.0).
-
 ## Requirements
 
 * Composer
