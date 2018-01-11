@@ -14,19 +14,24 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
-use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
-use Sulu\Component\Content\ContentTypeManagerInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
 
 /**
  * Extends serialization for articles.
  */
 class ArticleSubscriber implements EventSubscriberInterface
 {
-    use ArticleTypeTrait;
+    const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
+
+    const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
+
+    use StructureTagTrait;
 
     /**
      * @var StructureManagerInterface
@@ -34,28 +39,20 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $structureManager;
 
     /**
-     * @var ContentTypeManagerInterface
+     * @var StructureMetadataFactoryInterface
      */
-    private $contentTypeManager;
-
-    /**
-     * @var LazyLoadingValueHolderFactory
-     */
-    private $proxyFactory;
+    private $structureMetadataFactory;
 
     /**
      * @param StructureManagerInterface $structureManager
-     * @param ContentTypeManagerInterface $contentTypeManager
-     * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @param StructureMetadataFactoryInterface $structureMetadataFactory
      */
     public function __construct(
         StructureManagerInterface $structureManager,
-        ContentTypeManagerInterface $contentTypeManager,
-        LazyLoadingValueHolderFactory $proxyFactory
+        StructureMetadataFactoryInterface $structureMetadataFactory
     ) {
         $this->structureManager = $structureManager;
-        $this->contentTypeManager = $contentTypeManager;
-        $this->proxyFactory = $proxyFactory;
+        $this->structureMetadataFactory = $structureMetadataFactory;
     }
 
     /**
@@ -71,8 +68,13 @@ class ArticleSubscriber implements EventSubscriberInterface
             ],
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
-                'method' => 'resolveContentOnPostSerialize',
+                'format' => 'json',
+                'method' => 'addBrokenIndicatorOnPostSerialize',
+            ],
+            [
+                'event' => Events::POST_SERIALIZE,
+                'format' => 'json',
+                'method' => 'addPageTitlePropertyNameOnPostSerialize',
             ],
         ];
     }
@@ -97,94 +99,67 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Resolve content on serialization.
+     * Append broken-indicator to result.
      *
      * @param ObjectEvent $event
      */
-    public function resolveContentOnPostSerialize(ObjectEvent $event)
+    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
+    {
+        $article = $event->getObject();
+        $visitor = $event->getVisitor();
+
+        if (!($article instanceof ArticleViewDocumentInterface)) {
+            return;
+        }
+
+        $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
+        $visitor->addData('broken', !$structure || $structure->getKey() !== $article->getStructureType());
+        $visitor->addData('originalStructureType', $article->getStructureType());
+    }
+
+    /**
+     * Append page-title-property to result.
+     *
+     * @param ObjectEvent $event
+     */
+    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event)
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticleInterface) {
             return;
         }
 
-        $visitor->addData('uuid', $context->accept($article->getUuid()));
-        $visitor->addData('extension', $context->accept($article->getExtensionsData()->toArray()));
-
-        $content = $this->resolve($article);
-        foreach ($content as $name => $value) {
-            $visitor->addData($name, $value);
+        $property = $this->getPageTitleProperty($article);
+        if ($property) {
+            $visitor->addData('_pageTitlePropertyName', $context->accept($property->getName()));
         }
     }
 
     /**
-     * Returns content and view of article.
+     * Find page-title property.
      *
-     * @param ArticleDocument $article
+     * @param ArticleInterface $document
      *
-     * @return array
+     * @return PropertyMetadata
      */
-    private function resolve(ArticleDocument $article)
+    private function getPageTitleProperty(ArticleInterface $document)
     {
-        $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $structure->setDocument($article);
-
-        $data = $article->getStructure()->toArray();
-
-        $content = $this->proxyFactory->createProxy(
-            \ArrayObject::class,
-            function (
-                &$wrappedObject,
-                LazyLoadingInterface $proxy,
-                $method,
-                array $parameters,
-                &$initializer
-            ) use ($structure, $data) {
-                $content = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $content[$child->getName()] = $contentType->getContentData($child);
-                }
-
-                $initializer = null;
-                $wrappedObject = new \ArrayObject($content);
-
-                return true;
-            }
-        );
-        $view = $this->proxyFactory->createProxy(
-            \ArrayObject::class,
-            function (
-                &$wrappedObject,
-                LazyLoadingInterface $proxy,
-                $method,
-                array $parameters,
-                &$initializer
-            ) use ($structure, $data) {
-                $view = [];
-                foreach ($structure->getProperties(true) as $child) {
-                    if (array_key_exists($child->getName(), $data)) {
-                        $child->setValue($data[$child->getName()]);
-                    }
-
-                    $contentType = $this->contentTypeManager->get($child->getContentTypeName());
-                    $view[$child->getName()] = $contentType->getViewData($child);
-                }
-
-                $initializer = null;
-                $wrappedObject = new \ArrayObject($view);
-
-                return true;
-            }
+        $metadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article',
+            $document->getStructureType()
         );
 
-        return ['content' => $content, 'view' => $view];
+        if ($metadata->hasPropertyWithTagName(self::PAGE_TITLE_TAG_NAME)) {
+            return $metadata->getPropertyByTagName(self::PAGE_TITLE_TAG_NAME);
+        }
+
+        if ($metadata->hasProperty(self::PAGE_TITLE_PROPERTY_NAME)) {
+            return $metadata->getProperty(self::PAGE_TITLE_PROPERTY_NAME);
+        }
+
+        return null;
     }
 }

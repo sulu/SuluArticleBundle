@@ -1,0 +1,6 @@
+parameters:
+    excludes_analyse:
+        - %currentWorkingDirectory%/vendor/*
+        - %currentWorkingDirectory%/Tests/*
+        - %currentWorkingDirectory%/Resources/phpcr-migrations/*
+

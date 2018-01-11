@@ -16,25 +16,28 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
+use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
-use ONGR\ElasticsearchDSL\Query\FullText\MultiMatchQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\RangeQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
-use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
+use Sulu\Component\Security\Authorization\PermissionTypes;
+use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,25 +55,44 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Create field-descriptor array.
      *
-     * @return FieldDescriptor[]
+     * @return ElasticSearchFieldDescriptor[]
      */
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => new FieldDescriptor('uuid', 'public.id', true),
-            'typeTranslation' => new FieldDescriptor(
+            'uuid' => new ElasticSearchFieldDescriptor('id', null, 'public.id', false, false, 'string', '', '', false),
+            'typeTranslation' => new ElasticSearchFieldDescriptor(
                 'typeTranslation',
+                'typeTranslation.raw',
                 'sulu_article.list.type',
                 !$this->getParameter('sulu_article.display_tab_all'),
                 false
             ),
-            'title' => new FieldDescriptor('title', 'public.title', false, true),
-            'creatorFullName' => new FieldDescriptor('creatorFullName', 'sulu_article.list.creator', true, false),
-            'changerFullName' => new FieldDescriptor('changerFullName', 'sulu_article.list.changer', false, false),
-            'authorFullName' => new FieldDescriptor('authorFullName', 'sulu_article.author', false, false),
-            'created' => new FieldDescriptor('created', 'public.created', true, false, 'datetime'),
-            'changed' => new FieldDescriptor('changed', 'public.changed', false, false, 'datetime'),
-            'authored' => new FieldDescriptor('authored', 'sulu_article.authored', false, false, 'date'),
+            'title' => new ElasticSearchFieldDescriptor('title', 'title.raw', 'public.title', false, true),
+            'creatorFullName' => new ElasticSearchFieldDescriptor(
+                'creatorFullName',
+                'creatorFullName.raw',
+                'sulu_article.list.creator',
+                true,
+                false
+            ),
+            'changerFullName' => new ElasticSearchFieldDescriptor(
+                'changerFullName',
+                'changerFullName.raw',
+                'sulu_article.list.changer',
+                false,
+                false
+            ),
+            'authorFullName' => new ElasticSearchFieldDescriptor(
+                'authorFullName',
+                'authorFullName.raw',
+                'sulu_article.author',
+                false,
+                false
+            ),
+            'created' => new ElasticSearchFieldDescriptor('created', null, 'public.created', true, false, 'datetime'),
+            'changed' => new ElasticSearchFieldDescriptor('changed', null, 'public.changed', false, false, 'datetime'),
+            'authored' => new ElasticSearchFieldDescriptor('authored', null, 'sulu_article.authored', false, false, 'date'),
         ];
     }
 
@@ -119,14 +141,18 @@ class ArticleController extends RestController implements ClassResourceInterface
         if (!empty($searchPattern = $restHelper->getSearchPattern())
             && 0 < count($searchFields = $restHelper->getSearchFields())
         ) {
-            $search->addQuery(new MultiMatchQuery($searchFields, $searchPattern));
+            $boolQuery = new BoolQuery();
+            foreach ($searchFields as $searchField) {
+                $boolQuery->add(new MatchPhrasePrefixQuery($searchField, $searchPattern), BoolQuery::SHOULD);
+            }
+            $search->addQuery($boolQuery);
         }
 
         if (null !== ($type = $request->get('type'))) {
             $search->addQuery(new TermQuery('type', $type));
         }
 
-        if (null !== ($contactId = $request->get('contactId'))) {
+        if ($contactId = $request->get('contactId')) {
             $boolQuery = new BoolQuery();
             $boolQuery->add(new MatchQuery('changer_contact_id', $contactId), BoolQuery::SHOULD);
             $boolQuery->add(new MatchQuery('creator_contact_id', $contactId), BoolQuery::SHOULD);
@@ -134,19 +160,37 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery($boolQuery);
         }
 
-        if (null !== ($categoryId = $request->get('categoryId'))) {
+        if ($categoryId = $request->get('categoryId')) {
             $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
+        }
+
+        if ($tagId = $request->get('tagId')) {
+            $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
+        }
+
+        if ($pageId = $request->get('pageId')) {
+            $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
+        }
+
+        if ($workflowStage = $request->get('workflowStage')) {
+            $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
+        }
+
+        $authoredFrom = $request->get('authoredFrom');
+        $authoredTo = $request->get('authoredTo');
+        if ($authoredFrom || $authoredTo) {
+            $search->addQuery($this->getRangeQuery('authored', $authoredFrom, $authoredTo), BoolQuery::MUST);
         }
 
         if (null === $search->getQueries()) {
             $search->addQuery(new MatchAllQuery());
         }
 
-        $count = $repository->count($search);
-
-        if (null !== $restHelper->getSortColumn()) {
+        if (null !== $restHelper->getSortColumn() &&
+            $sortField = $this->getSortFieldName($restHelper->getSortColumn())
+        ) {
             $search->addSort(
-                new FieldSort($this->uncamelize($restHelper->getSortColumn()), $restHelper->getSortOrder())
+                new FieldSort($sortField, $restHelper->getSortOrder())
             );
         }
 
@@ -154,7 +198,8 @@ class ArticleController extends RestController implements ClassResourceInterface
         $search->setFrom(($page - 1) * $limit);
 
         $result = [];
-        foreach ($repository->findDocuments($search) as $document) {
+        $searchResult = $repository->findDocuments($search);
+        foreach ($searchResult as $document) {
             if (false !== ($index = array_search($document->getUuid(), $ids))) {
                 $result[$index] = $document;
             } else {
@@ -176,10 +221,24 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $request->query->all(),
                     $page,
                     $limit,
-                    $count
+                    $searchResult->count()
                 )
             )
         );
+    }
+
+    /**
+     * Returns query to filter by given range.
+     *
+     * @param string $field
+     * @param string $from
+     * @param string $to
+     *
+     * @return RangeQuery
+     */
+    private function getRangeQuery($field, $from, $to)
+    {
+        return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
 
     /**
@@ -204,7 +263,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -229,7 +290,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -265,7 +328,9 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view($document)->setSerializationContext(
-                SerializationContext::create()->setSerializeNull(true)->setGroups(['defaultPage'])
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
             )
         );
     }
@@ -337,15 +402,30 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'remove-draft':
                     $data = $this->getDocumentManager()->find($uuid, $locale);
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
+
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
-                    $data = $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, explode(',', $destLocales));
+                    $destLocales = explode(',', $destLocales);
+
+                    $securityChecker = $this->get('sulu_security.security_checker');
+                    foreach ($destLocales as $destLocale) {
+                        $securityChecker->checkPermission(
+                            new SecurityCondition($this->getSecurityContext(), $destLocale),
+                            PermissionTypes::EDIT
+                        );
+                    }
+
+                    $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
@@ -354,19 +434,48 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
 
                     $data = $this->getDocumentManager()->find($copiedPath, $locale);
+
+                    break;
+                case 'order':
+                    $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
+                    $this->getDocumentManager()->flush();
+                    $this->getDocumentManager()->clear();
+
+                    $data = $this->getDocumentManager()->find($uuid, $locale);
+
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
             }
 
             // prepare view
-            $view = $this->view($data, $data !== null ? 200 : 204);
-            $view->setSerializationContext(SerializationContext::create()->setGroups(['defaultPage']));
+            $view = $this->view($data);
+            $view->setSerializationContext(
+                SerializationContext::create()
+                    ->setSerializeNull(true)
+                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
+            );
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
         }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Ordering given pages.
+     *
+     * @param array $pages
+     * @param string $locale
+     */
+    private function orderPages(array $pages, $locale)
+    {
+        $documentManager = $this->getDocumentManager();
+
+        for ($i = 0; $i < count($pages); ++$i) {
+            $document = $documentManager->find($pages[$i], $locale);
+            $documentManager->reorder($document, null);
+        }
     }
 
     /**
@@ -389,8 +498,9 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function persistDocument($data, $document, $locale)
     {
+        $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
         $form = $this->createForm(
-            ArticleDocumentType::class,
+            $formType,
             $document,
             [
                 // disable csrf protection, since we can't produce a token, because the form is cached on the client
@@ -403,13 +513,16 @@ class ArticleController extends RestController implements ClassResourceInterface
             throw new InvalidFormException($form);
         }
 
+        if (array_key_exists('author', $data) && null === $data['author']) {
+            $document->setAuthor(null);
+        }
+
         $this->getDocumentManager()->persist(
             $document,
             $locale,
             [
                 'user' => $this->getUser()->getId(),
                 'clear_missing_content' => false,
-                'route_path' => array_key_exists('routePath', $data) ? $data['routePath'] : null,
             ]
         );
     }
@@ -444,8 +557,26 @@ class ArticleController extends RestController implements ClassResourceInterface
         switch ($actionParameter) {
             case 'publish':
                 $this->getDocumentManager()->publish($document, $locale);
+
                 break;
         }
+    }
+
+    /**
+     * @param string $sortBy
+     *
+     * @return null|string
+     */
+    private function getSortFieldName($sortBy)
+    {
+        $sortBy = $this->uncamelize($sortBy);
+        $fieldDescriptors = $this->getFieldDescriptors();
+
+        if (array_key_exists($sortBy, $fieldDescriptors)) {
+            return $fieldDescriptors[$sortBy]->getSortField();
+        }
+
+        return null;
     }
 
     /**
@@ -464,5 +595,13 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
 
         return strtolower($camel);
+    }
+
+    /**
+     * @return BaseMetadataFactory
+     */
+    protected function getMetadataFactory()
+    {
+        return $this->get('sulu_document_manager.metadata_factory.base');
     }
 }

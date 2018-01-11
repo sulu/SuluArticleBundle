@@ -1,0 +1,16 @@
+.content-title .type {
+    &:empty {
+        &:before, &:after {
+            content: "";
+        }
+    }
+
+    &:before, &:after {
+        content: "\"";
+    }
+}
+
+.husky-table tbody td .article-broken .cell-content {
+    color: $gray !important;
+    text-decoration: line-through;
+}

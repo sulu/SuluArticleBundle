@@ -25,47 +25,58 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
      */
     public function getNavigationItems(array $options = [])
     {
-        $details = new ContentNavigationItem('sulu_article.edit.details');
-        $details->setAction('details');
-        $details->setPosition(10);
-        $details->setComponent('articles/edit/details@suluarticle');
+        $action = 'details';
+        $page = 1;
+        if (array_key_exists('page', $options) && 1 !== (int) $options['page']) {
+            $action = 'page:' . $options['page'] . '/' . $action;
+            $page = (int) $options['page'];
+        }
 
-        $seo = new ContentNavigationItem('content-navigation.contents.seo');
-        $seo->setId('seo');
-        $seo->setPosition(20);
-        $seo->setAction('seo');
-        $seo->setComponent('articles/edit/seo@suluarticle');
-        $seo->setDisplay(['edit']);
-        $seo->setDisplayConditions(
-            [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
-            ]
-        );
+        $tabs = [];
 
-        $excerpt = new ContentNavigationItem('content-navigation.contents.excerpt');
-        $excerpt->setId('excerpt');
-        $excerpt->setPosition(30);
-        $excerpt->setAction('excerpt');
-        $excerpt->setComponent('articles/edit/excerpt@suluarticle');
-        $excerpt->setDisplay(['edit']);
-        $excerpt->setDisplayConditions(
-            [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
-            ]
-        );
+        $tabs['details'] = new ContentNavigationItem('sulu_article.edit.details');
+        $tabs['details']->setAction($action);
+        $tabs['details']->setPosition(10);
+        $tabs['details']->setComponent('articles/edit/details@suluarticle');
 
-        $settings = new ContentNavigationItem('content-navigation.contents.settings');
-        $settings->setId('settings');
-        $settings->setPosition(40);
-        $settings->setAction('settings');
-        $settings->setComponent('articles/edit/settings@suluarticle');
-        $settings->setDisplay(['edit']);
-        $settings->setDisplayConditions(
-            [
-                new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
-            ]
-        );
+        if ($page < 2) {
+            $tabs['seo'] = new ContentNavigationItem('content-navigation.contents.seo');
+            $tabs['seo']->setId('seo');
+            $tabs['seo']->setPosition(20);
+            $tabs['seo']->setAction('seo');
+            $tabs['seo']->setComponent('articles/edit/seo@suluarticle');
+            $tabs['seo']->setDisplay(['edit']);
+            $tabs['seo']->setDisplayConditions(
+                [
+                    new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
+                ]
+            );
 
-        return [$details, $seo, $excerpt, $settings];
+            $tabs['excerpt'] = new ContentNavigationItem('content-navigation.contents.excerpt');
+            $tabs['excerpt']->setId('excerpt');
+            $tabs['excerpt']->setPosition(30);
+            $tabs['excerpt']->setAction('excerpt');
+            $tabs['excerpt']->setComponent('articles/edit/excerpt@suluarticle');
+            $tabs['excerpt']->setDisplay(['edit']);
+            $tabs['excerpt']->setDisplayConditions(
+                [
+                    new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
+                ]
+            );
+
+            $tabs['settings'] = new ContentNavigationItem('content-navigation.contents.settings');
+            $tabs['settings']->setId('settings');
+            $tabs['settings']->setPosition(40);
+            $tabs['settings']->setAction('settings');
+            $tabs['settings']->setComponent('articles/edit/settings@suluarticle');
+            $tabs['settings']->setDisplay(['edit']);
+            $tabs['settings']->setDisplayConditions(
+                [
+                    new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
+                ]
+            );
+        }
+
+        return $tabs;
     }
 }

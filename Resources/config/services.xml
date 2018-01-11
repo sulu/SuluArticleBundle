@@ -19,7 +19,15 @@
         <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%sulu_article.types%</argument>
-            <argument>%sulu_article.display_tab_all%</argument>
+            <argument type="collection">
+                <argument key="displayTabAll">%sulu_article.display_tab_all%</argument>
+                <argument key="defaultAuthor">%sulu_article.default_author%</argument>
+                <argument key="pageTreeEnabled">%sulu_article.page_tree_enabled%</argument>
+                <argument key="classes" type="collection">
+                    <argument key="article">%sulu_article.article_document.class%</argument>
+                    <argument key="articlePage">%sulu_article.article_page_document.class%</argument>
+                </argument>
+            </argument>
 
             <tag name="sulu.js_config"/>
             <tag name="sulu.context" context="admin"/>
@@ -40,7 +48,7 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="translator.default"/>
+            <argument type="service" id="translator"/>
             <argument>%sulu_article.types%</argument>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
@@ -55,7 +63,7 @@
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="translator.default"/>
+            <argument type="service" id="translator"/>
             <argument>%sulu_article.types%</argument>
         </service>
 
@@ -102,20 +110,44 @@
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
         <service id="sulu_article.subscriber.routable"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
+            <argument type="service" id="sulu_route.chain_generator"/>
             <argument type="service" id="sulu_route.manager.route_manager"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+        <service id="sulu_article.subscriber.page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber">
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.subscriber.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticlePageSubscriber">
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.node_name_slugifier"/>
+            <argument type="service" id="sulu_document_manager.name_resolver"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+
         <service id="sulu_article.initializer"
                  class="Sulu\Bundle\ArticleBundle\Document\Initializer\ArticleInitializer">
             <argument type="service" id="sulu_document_manager.node_manager"/>
@@ -125,12 +157,46 @@
             <!-- This needs to happen after the content repository has been initialized !-->
             <tag name="sulu_document_manager.initializer" priority="-127"/>
         </service>
-        <service id="sulu_article.serializer.type"
+
+        <service id="sulu_article.serializer.article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+
+            <tag name="jms_serializer.event_subscriber" />
+        </service>
+
+        <service id="sulu_article.content_proxy_factory"
+                 class="Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory">
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+        </service>
 
+        <service id="sulu_article.content_proxy_listener"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\ContentProxyListener">
+            <argument type="service" id="sulu_article.content_proxy_factory"/>
+            <argument type="service" id="sulu.content.structure_manager"/>
+
+            <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
+        </service>
+
+        <service id="sulu_article.serializer.website_article"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber">
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_content.extension.manager"/>
+            <argument type="service" id="sulu_article.content_proxy_factory"/>
+
+            <tag name="jms_serializer.event_subscriber"/>
+        </service>
+        <service id="sulu_article.serializer.urls"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber">
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="sulu.repository.route"/>
+
+            <tag name="jms_serializer.event_subscriber"/>
+        </service>
+        <service id="sulu_article.serializer.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticlePageSubscriber">
             <tag name="jms_serializer.event_subscriber" />
         </service>
         <service id="sulu_article.routing.default_provider"
@@ -157,28 +223,45 @@
 
             <tag name="sulu.route_generator" alias="template"/>
         </service>
+        <service id="sulu_article.route_generator.article_page"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticlePageRouteGenerator">
+            <argument type="service" id="sulu_route.generator.route_generator"/>
+            <argument type="service" id="sulu_route.generator.expression_token_provider"/>
+
+            <tag name="sulu.route_generator" alias="article_page"/>
+        </service>
 
         <!-- content -->
-        <service id="sulu_article.content.data_provider.proxy_factory.configuration" class="ProxyManager\Configuration"
-                 public="false">
-            <call method="setProxiesTargetDir">
-                <argument>%sulu.cache_dir%/documents</argument>
-            </call>
-        </service>
         <service id="sulu_article.content.data_provider.proxy_factory"
                  class="ProxyManager\Factory\LazyLoadingValueHolderFactory">
-            <argument type="service" id="sulu_article.content.data_provider.proxy_factory.configuration"/>
+            <argument type="service" id="sulu_core.proxy_manager.configuration"/>
         </service>
         <service id="sulu_article.content.data_provider" class="Sulu\Bundle\ArticleBundle\Content\ArticleDataProvider">
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.smart_content.default_limit%</argument>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
+        <service id="sulu_article.content.page_tree_data_provider"
+                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument type="string">%sulu_article.smart_content.default_limit%</argument>
+
+            <tag name="sulu.smart_content.data_provider" alias="articles_page_tree"/>
+        </service>
         <service id="sulu_article.teaser.provider" class="Sulu\Bundle\ArticleBundle\Teaser\ArticleTeaserProvider">
             <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="translator"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.teaser.provider" alias="article"/>
@@ -193,30 +276,84 @@
         </service>
 
         <!-- preview -->
-        <service id="sulu_article.preview.object_provider" class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
+        <service id="sulu_article.preview.object_provider"
+                 class="Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider">
             <argument type="service" id="sulu_document_manager.document_manager"/>
-            <argument type="service" id="serializer"/>
+            <argument type="service" id="jms_serializer"/>
+            <argument type="string">%sulu_article.article_document.class%</argument>
 
-            <tag name="sulu_preview.object_provider" class="Sulu\Bundle\ArticleBundle\Document\ArticleDocument"/>
+            <tag name="sulu_preview.object_provider" class="%sulu_article.article_document.class%"/>
+            <tag name="sulu_preview.object_provider" class="%sulu_article.article_page_document.class%"/>
         </service>
 
         <!-- link -->
         <service id="sulu_article.markup.link_provider" class="Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider">
             <argument type="service" id="es.manager.live"/>
-            <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument type="service" id="es.manager.default"/>
             <argument>%sulu_article.types%</argument>
+            <argument>%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.link.provider" alias="article"/>
+        </service>
+
+        <!-- reference-store -->
+        <service id="sulu_article.reference_store.article"
+                 class="Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStore">
+            <tag name="sulu_website.reference_store" alias="article"/>
         </service>
 
         <!-- content-type -->
         <service id="sulu_article.content_types.article_selection"
                  class="Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType">
             <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
             <argument>%sulu_article.view_document.article.class%</argument>
             <argument>%sulu_article.content-type.article.template%</argument>
 
             <tag name="sulu.content.type" alias="article_selection"/>
+        </service>
+
+        <service id="sulu_article.content_types.page_tree_route"
+                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType">
+            <argument>%sulu_article.content-type.page_tree_route.template%</argument>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.document_registry"/>
+            <argument type="service" id="sulu_route.chain_generator"/>
+            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
+
+            <tag name="sulu.content.type" alias="page_tree_route"/>
+        </service>
+
+        <!-- article resource item factory -->
+        <service id="sulu_article.factory.resource_item"
+                 class="Sulu\Bundle\ArticleBundle\Content\ArticleResourceItemFactory">
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+        </service>
+
+        <!-- article view document repository -->
+        <service id="sulu_article.repository.view_document"
+                 class="Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
+            <argument>%sulu_article.search_fields%</argument>
+        </service>
+
+        <!-- twig extension -->
+        <service id="sulu_article.twig.view_document_repository"
+                 class="Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension">
+            <argument type="service" id="sulu_article.repository.view_document"/>
+            <argument type="service" id="sulu_article.factory.resource_item"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="request_stack"/>
+
+            <tag name="twig.extension"/>
+        </service>
+
+        <service id="sulu_article.builder.index" class="Sulu\Bundle\ArticleBundle\Builder\ArticleIndexBuilder">
+            <tag name="massive_build.builder" />
         </service>
     </services>
 </container>

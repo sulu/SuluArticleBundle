@@ -24,7 +24,7 @@ class AppKernel extends SuluTestKernel
      */
     public function registerBundles()
     {
-        return array_merge([new SuluArticleBundle(), new ONGRElasticsearchBundle()], parent::registerBundles());
+        return array_merge(parent::registerBundles(), [new SuluArticleBundle(), new ONGRElasticsearchBundle()]);
     }
 
     /**
@@ -34,16 +34,16 @@ class AppKernel extends SuluTestKernel
     {
         parent::registerContainerConfiguration($loader);
 
-        if (getenv('SYMFONY__PHPCR__TRANSPORT') === 'jackrabbit') {
+        if ('jackrabbit' === getenv('SYMFONY__PHPCR__TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
+        $loader->load(__DIR__ . '/config/config.yml');
 
         $esVersion = getenv('ES_VERSION');
-        if (version_compare($esVersion, '2.2', '>=') &&
-            version_compare($esVersion, '5.0', '<')) {
+        if (version_compare($esVersion, '2.2', '>=') && version_compare($esVersion, '5.0', '<')) {
             $loader->load(__DIR__ . '/config/config_es2.yml');
         } else {
-            $loader->load(__DIR__ . '/config/config.yml');
+            $loader->load(__DIR__ . '/config/config_es5.yml');
         }
     }
 }

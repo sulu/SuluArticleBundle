@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use ONGR\ElasticsearchBundle\Collection\Collection;
+
 /**
  * Interface for indexable article-document.
  */
@@ -95,6 +97,22 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setRoutePath($routePath);
+
+    /**
+     * Returns parent-page-uuid.
+     *
+     * @return string
+     */
+    public function getParentPageUuid();
+
+    /**
+     * Set parent-page-uuid.
+     *
+     * @param string $parentPageUuid
+     *
+     * @return $this
+     */
+    public function setParentPageUuid($parentPageUuid);
 
     /**
      * Returns type.
@@ -399,4 +417,68 @@ interface ArticleViewDocumentInterface
      * @return string
      */
     public function getChangerContactId();
+
+    /**
+     * Returns pages.
+     *
+     * @return ArticlePageViewObject[]
+     */
+    public function getPages();
+
+    /**
+     * Set pages.
+     *
+     * @param Collection $pages
+     *
+     * @return $this
+     */
+    public function setPages(Collection $pages);
+
+    /**
+     * Returns contentData.
+     *
+     * @return string
+     */
+    public function getContentData();
+
+    /**
+     * Set contentData.
+     *
+     * @param string $contentData
+     *
+     * @return $this
+     */
+    public function setContentData($contentData);
+
+    /**
+     * Returns content.
+     *
+     * @return \ArrayObject
+     */
+    public function getContent();
+
+    /**
+     * Set content.
+     *
+     * @param \ArrayObject $content
+     *
+     * @return \ArrayObject
+     */
+    public function setContent(\ArrayObject $content);
+
+    /**
+     * Returns view.
+     *
+     * @return \ArrayObject
+     */
+    public function getView();
+
+    /**
+     * Set view.
+     *
+     * @param \ArrayObject $view
+     *
+     * @return $this
+     */
+    public function setView(\ArrayObject $view);
 }

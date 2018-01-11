@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,17 +32,14 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         // extensions
         $builder->add('extensions', TextType::class, ['property_path' => 'extensionsData']);
 
-        // TODO: Fix the admin interface to not send this junk (not required for articles)
-        $builder->add('redirectType', TextType::class, ['mapped' => false]);
-        $builder->add('resourceSegment', TextType::class, ['mapped' => false]);
-        $builder->add('navigationContexts', TextType::class, ['mapped' => false]);
-        $builder->add('shadowLocaleEnabled', TextType::class, ['mapped' => false]);
+        $builder->add('author', TextType::class);
         $builder->add(
             'authored',
-            DateType::class,
-            ['widget' => 'single_text', 'model_timezone' => 'UTC', 'view_timezone' => 'UTC']
+            DateTimeType::class,
+            [
+                'widget' => 'single_text',
+            ]
         );
-        $builder->add('author', TextType::class);
     }
 
     /**

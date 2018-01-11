@@ -15,16 +15,11 @@ Additional features included:
 * Segmentation of article-templates (called article-types)
 * Define URL schemas per type
 
-## Status
-
-This repository will become version 1.0 of SuluArticleBundle. It is under **heavy development** and currently its APIs
-and code are not stable yet (pre 1.0).
-
 ## Requirements
 
 * Composer
 * PHP `^5.5 || ^7.0`
-* Sulu `^1.5`
+* Sulu `^1.6`
 * Elasticsearch `^2.2 || ^5.0`
 
 For detailed requirements see [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/composer.json).

@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -110,6 +111,7 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
     {
         $article = $this->prophesize(ArticleDocument::class);
         $article->getStructureType()->willReturn('default');
+        $article->getPageNumber()->willReturn(1);
 
         $structureMetadata = new StructureMetadata('default');
         $structureMetadata->view = 'default.html.twig';
@@ -132,6 +134,46 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
                 'object' => $article->reveal(),
                 'structure' => $structure->reveal(),
                 'view' => 'default.html.twig',
+                'pageNumber' => 1,
+                '_controller' => 'SuluArticleBundle:Default:index',
+                '_cacheLifetime' => 3600,
+            ],
+            $result
+        );
+    }
+
+    public function testGetByEntityArticlePage()
+    {
+        $articlePage = $this->prophesize(ArticlePageDocument::class);
+        $articlePage->getPageNumber()->willReturn(2);
+
+        $article = $this->prophesize(ArticleDocument::class);
+        $article->getStructureType()->willReturn('default');
+        $article->getPageNumber()->willReturn(1);
+        $articlePage->getParent()->willReturn($article->reveal());
+
+        $structureMetadata = new StructureMetadata('default');
+        $structureMetadata->view = 'default.html.twig';
+        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
+        $structureMetadata->controller = 'SuluArticleBundle:Default:index';
+
+        $this->documentManager->find($this->entityId, $this->locale)->willReturn($articlePage->reveal());
+        $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);
+        $this->cacheLifetimeResolver->supports('seconds', 3600)->willReturn(true);
+        $this->cacheLifetimeResolver->resolve('seconds', 3600)->willReturn(3600);
+
+        $structure = $this->prophesize(ArticleBridge::class);
+        $structure->setDocument($article->reveal())->shouldBeCalled();
+        $this->structureManager->wrapStructure('article', $structureMetadata)->willReturn($structure->reveal());
+
+        $result = $this->provider->getByEntity($this->entityClass, $this->entityId, $this->locale);
+
+        $this->assertEquals(
+            [
+                'object' => $article->reveal(),
+                'structure' => $structure->reveal(),
+                'view' => 'default.html.twig',
+                'pageNumber' => 2,
                 '_controller' => 'SuluArticleBundle:Default:index',
                 '_cacheLifetime' => 3600,
             ],

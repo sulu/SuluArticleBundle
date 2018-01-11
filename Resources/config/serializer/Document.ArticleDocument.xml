@@ -6,28 +6,39 @@
                 <h:parameter name="uuid" value="expr(object.getUuid())"/>
                 <h:parameter name="locale" value="expr(object.getLocale())"/>
             </h:href>
-            <h:exclusion groups="defaultPage"/>
+            <h:exclusion groups="defaultArticle,smallArticle"/>
         </h:relation>
 
-        <property name="uuid" serialized-name="id" type="string" groups="defaultPage,smallPage,preview"/>
+        <h:relation rel="pages">
+            <h:embedded>
+                <h:content>expr(object.getChildren())</h:content>
+            </h:embedded>
+            <h:exclusion groups="defaultArticle"/>
+        </h:relation>
+
+        <property name="uuid" serialized-name="id" type="string" groups="defaultArticle,smallArticle,preview"/>
         <property name="nodeName" type="string"/>
         <property name="path" type="string"/>
-        <property name="routePath" serialized-name="route" type="string" groups="website,defaultPage,smallPage,preview"/>
+        <property name="routePath" serialized-name="route" type="string" groups="defaultArticle,smallArticle,preview"/>
 
         <property name="locale" type="string" groups="preview"/>
         <property name="originalLocale" type="string" groups="preview"/>
         <property name="structure" type="Sulu\Component\Content\Document\Structure\Structure" groups="preview"/>
         <property name="structureType" type="string" groups="preview"/>
 
-        <property name="title" type="string" groups="defaultPage,smallPage,preview"/>
-        <property name="creator" type="integer" groups="website,defaultPage,preview"/>
-        <property name="changer" type="integer" groups="website,defaultPage,preview"/>
-        <property name="created" type="DateTime" groups="website,defaultPage,preview"/>
-        <property name="changed" type="DateTime" groups="website,defaultPage,preview"/>
+        <property name="title" type="string" groups="website,defaultArticle,smallArticle,preview"/>
+        <property name="creator" type="integer" groups="website,defaultArticle,preview"/>
+        <property name="changer" type="integer" groups="website,defaultArticle,preview"/>
+        <property name="created" type="DateTime" groups="website,defaultArticle,preview"/>
+        <property name="changed" type="DateTime" groups="website,defaultArticle,preview"/>
+        <property name="pages" type="array" groups="preview"/>
+        <property name="children" groups="preview">
+            <type><![CDATA[array<string,Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument>]]></type>
+        </property>
 
-        <property name="published" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
-        <property name="author" type="integer" groups="website,defaultPage,preview"/>
-        <property name="authored" type="DateTime" groups="website,defaultPage,smallPage,preview"/>
-        <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultPage,preview"/>
+        <property name="published" type="DateTime" groups="website,defaultArticle,smallArticle,preview"/>
+        <property name="author" type="integer" groups="website,defaultArticle,preview"/>
+        <property name="authored" type="DateTime" groups="website,defaultArticle,smallArticle,preview"/>
+        <property name="extensions" type="Sulu\Component\Content\Document\Extension\ExtensionContainer" serialized-name="ext" groups="defaultArticle,preview"/>
     </class>
 </serializer>

@@ -22,7 +22,7 @@ define(['services/suluarticle/article-manager'], function(ArticleManager) {
         getUrl: function() {
             var content = this.options.data();
 
-            return this.options.excerptUrlPrefix + content.route;
+            return this.options.excerptUrlPrefix.replace('{locale}', this.options.locale)  + content.route;
         },
 
         save: function(data, action) {
@@ -32,7 +32,7 @@ define(['services/suluarticle/article-manager'], function(ArticleManager) {
             ArticleManager.save(content, content.id, this.options.locale, action).then(function(response) {
                 this.sandbox.emit('sulu.tab.saved', response.id, response);
             }.bind(this)).fail(function(xhr) {
-                this.sandbox.emit('sulu.article.error', xhr.status, data);
+                this.sandbox.emit('sulu.article.error', xhr.status, xhr.responseJSON.code || 0, data);
             }.bind(this));
         }
     };

@@ -14,21 +14,23 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
-use Sulu\Component\Content\Document\Behavior\AuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
+use Sulu\Component\Content\Document\Behavior\LocalizedAuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
+use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\LocalizedTitleBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\NodeNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
 use Sulu\Component\DocumentManager\Behavior\Path\AutoNameBehavior;
 use Sulu\Component\DocumentManager\Behavior\VersionBehavior;
+use Sulu\Component\DocumentManager\Collection\ChildrenCollection;
 use Sulu\Component\DocumentManager\Version;
 
 /**
@@ -48,22 +50,24 @@ class ArticleDocument implements
     ExtensionBehavior,
     WorkflowStageBehavior,
     VersionBehavior,
-    AuthorBehavior
+    LocalizedAuthorBehavior,
+    ChildrenBehavior,
+    ArticleInterface
 {
     /**
      * @var string
      */
-    private $uuid;
+    protected $uuid;
 
     /**
      * @var string
      */
-    private $nodeName;
+    protected $nodeName;
 
     /**
      * @var string
      */
-    private $path;
+    protected $path;
 
     /**
      * @var object
@@ -74,6 +78,16 @@ class ArticleDocument implements
      * @var string
      */
     private $title;
+
+    /**
+     * @var string
+     */
+    private $pageTitle;
+
+    /**
+     * @var array
+     */
+    private $pages;
 
     /**
      * @var RouteInterface
@@ -103,27 +117,27 @@ class ArticleDocument implements
     /**
      * @var StructureInterface
      */
-    private $structure;
+    protected $structure;
 
     /**
      * @var int
      */
-    private $creator;
+    protected $creator;
 
     /**
      * @var int
      */
-    private $changer;
+    protected $changer;
 
     /**
      * @var \DateTime
      */
-    private $created;
+    protected $created;
 
     /**
      * @var \DateTime
      */
-    private $changed;
+    protected $changed;
 
     /**
      * @var int
@@ -163,10 +177,16 @@ class ArticleDocument implements
      */
     protected $versions = [];
 
+    /**
+     * @var ChildrenCollection
+     */
+    protected $children;
+
     public function __construct()
     {
         $this->structure = new Structure();
         $this->extensions = new ExtensionContainer();
+        $this->children = new \ArrayIterator();
     }
 
     /**
@@ -249,7 +269,6 @@ class ArticleDocument implements
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
-        $this->routePath = $route->getPath();
     }
 
     /**
@@ -275,6 +294,14 @@ class ArticleDocument implements
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getClass()
+    {
+        return self::class;
     }
 
     /**
@@ -469,5 +496,83 @@ class ArticleDocument implements
     public function setVersions($versions)
     {
         $this->versions = $versions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getArticleUuid()
+    {
+        return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageUuid()
+    {
+        return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageNumber()
+    {
+        return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPageTitle()
+    {
+        return $this->pageTitle;
+    }
+
+    /**
+     * Set pageTitle.
+     *
+     * @param string $pageTitle
+     *
+     * @return $this
+     */
+    public function setPageTitle($pageTitle)
+    {
+        $this->pageTitle = $pageTitle;
+
+        return $this;
+    }
+
+    /**
+     * Returns pages.
+     *
+     * @return array
+     */
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    /**
+     * Set pages.
+     *
+     * @param array $pages
+     *
+     * @return $this
+     */
+    public function setPages($pages)
+    {
+        $this->pages = $pages;
+
+        return $this;
     }
 }

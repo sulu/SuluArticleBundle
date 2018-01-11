@@ -17,6 +17,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\Sitemap;
+use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapAlternateLink;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapProviderInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
 
@@ -48,7 +49,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function build($page, $portalKey, $locale)
+    public function build($page, $portalKey)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
 
@@ -58,15 +59,55 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         $size = 1000;
         do {
             $bulk = $this->getBulk($repository, $from, $size);
+            /** @var SitemapUrl[] $alternatives */
+            $sitemapUrlListByUuid = [];
 
             /** @var ArticleViewDocumentInterface $item */
             foreach ($bulk as $item) {
-                $result[] = new SitemapUrl($item->getRoutePath(), $item->getChanged());
+                $sitemapUrl = new SitemapUrl($item->getRoutePath(), $item->getLocale(), $item->getChanged());
+                $result[] = $sitemapUrl;
+
+                if (!isset($sitemapUrlListByUuid[$item->getUuid()])) {
+                    $sitemapUrlListByUuid[$item->getUuid()] = [];
+                }
+
+                $sitemapUrlListByUuid[$item->getUuid()] = $this->setAlternatives(
+                    $sitemapUrlListByUuid[$item->getUuid()],
+                    $sitemapUrl
+                );
             }
+
             $from += $size;
         } while ($bulk->count() > $from || $from > self::PAGE_SIZE);
 
         return $result;
+    }
+
+    /**
+     * Set alternatives to sitemap url.
+     *
+     * @param SitemapUrl[] $sitemapUrlList
+     * @param SitemapUrl $sitemapUrl
+     *
+     * @return SitemapUrl[]
+     */
+    private function setAlternatives(array $sitemapUrlList, SitemapUrl $sitemapUrl)
+    {
+        foreach ($sitemapUrlList as $sitemapUrlFromList) {
+            // Add current as alternative to exist.
+            $sitemapUrlFromList->addAlternateLink(
+                new SitemapAlternateLink($sitemapUrl->getLoc(), $sitemapUrl->getLocale())
+            );
+
+            // Add others as alternative to current.
+            $sitemapUrl->addAlternateLink(
+                new SitemapAlternateLink($sitemapUrlFromList->getLoc(), $sitemapUrlFromList->getLocale())
+            );
+        }
+
+        $sitemapUrlList[] = $sitemapUrl;
+
+        return $sitemapUrlList;
     }
 
     private function getBulk(Repository $repository, $from, $size)

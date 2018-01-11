@@ -11,24 +11,30 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
+use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
+use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -37,7 +43,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class ArticleIndexer implements IndexerInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
     use ArticleViewDocumentIdTrait;
 
     /**
@@ -141,18 +147,14 @@ class ArticleIndexer implements IndexerInterface
 
         $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
 
-        return $this->translator->trans(
-            $typeTranslationKey,
-            [],
-            'backend'
-        );
+        return $this->translator->trans($typeTranslationKey, [], 'backend');
     }
 
     /**
      * @param ArticleDocument $document
-     * @param ArticleViewDocument $article
+     * @param ArticleViewDocumentInterface $article
      */
-    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocument $article)
+    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
         $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
     }
@@ -169,22 +171,9 @@ class ArticleIndexer implements IndexerInterface
         $locale,
         $localizationState = LocalizationState::LOCALIZED
     ) {
-        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
-        /** @var ArticleViewDocument $article */
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
-
+        $article = $this->findOrCreateViewDocument($document, $locale, $localizationState);
         if (!$article) {
-            $article = $this->documentFactory->create('article');
-            $article->setId($articleId);
-            $article->setUuid($document->getUuid());
-            $article->setLocale($locale);
-        } else {
-            // Only index ghosts when the article isn't a ghost himself.
-            if (LocalizationState::GHOST === $localizationState
-                && LocalizationState::GHOST !== $article->getLocalizationState()->state
-            ) {
-                return null;
-            }
+            return;
         }
 
         $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
@@ -194,6 +183,7 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
+        $this->setParentPageUuid($structureMetadata, $document, $article);
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
@@ -212,7 +202,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
         $article->setPublished($document->getPublished());
-        $article->setPublishedState($document->getWorkflowStage() === WorkflowStage::PUBLISHED);
+        $article->setPublishedState(WorkflowStage::PUBLISHED === $document->getWorkflowStage());
         $article->setTypeTranslation($this->getTypeTranslation($this->getType($structureMetadata)));
         $article->setLocalizationState(
             new LocalizationStateViewObject(
@@ -242,7 +232,134 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
+        $article->setContentData(json_encode($document->getStructure()->toArray()));
+
+        $this->mapPages($document, $article);
+
         return $article;
+    }
+
+    /**
+     * Returns view-document from index or create a new one.
+     *
+     * @param ArticleDocument $document
+     * @param string $locale
+     * @param string $localizationState
+     *
+     * @return ArticleViewDocumentInterface
+     */
+    protected function findOrCreateViewDocument(ArticleDocument $document, $locale, $localizationState)
+    {
+        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
+        /** @var ArticleViewDocumentInterface $article */
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
+
+        if ($article) {
+            // Only index ghosts when the article isn't a ghost himself.
+            if (LocalizationState::GHOST === $localizationState
+                && LocalizationState::GHOST !== $article->getLocalizationState()->state
+            ) {
+                return null;
+            }
+
+            return $article;
+        }
+
+        $article = $this->documentFactory->create('article');
+        $article->setId($articleId);
+        $article->setUuid($document->getUuid());
+        $article->setLocale($locale);
+
+        return $article;
+    }
+
+    /**
+     * Maps pages from document to view-document.
+     *
+     * @param ArticleDocument $document
+     * @param ArticleViewDocumentInterface $article
+     */
+    private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
+    {
+        $pages = [];
+        /** @var ArticlePageDocument $child */
+        foreach ($document->getChildren() as $child) {
+            /** @var ArticlePageViewObject $page */
+            $pages[] = $page = $this->documentFactory->create('article_page');
+            $page->uuid = $child->getUuid();
+            $page->pageNumber = $child->getPageNumber();
+            $page->title = $child->getPageTitle();
+            $page->routePath = $child->getRoutePath();
+            $page->contentData = json_encode($child->getStructure()->toArray());
+        }
+
+        $article->setPages(new Collection($pages));
+    }
+
+    /**
+     * Set parent-page-uuid to view-document.
+     *
+     * @param StructureMetadata $metadata
+     * @param ArticleDocument $document
+     * @param ArticleViewDocumentInterface $article
+     */
+    private function setParentPageUuid(
+        StructureMetadata $metadata,
+        ArticleDocument $document,
+        ArticleViewDocumentInterface $article
+    ) {
+        $propertyMetadata = $this->getRoutePathProperty($metadata);
+        if (!$propertyMetadata) {
+            return;
+        }
+
+        $property = $document->getStructure()->getProperty($propertyMetadata->getName());
+        if (!$property || PageTreeRouteContentType::NAME !== $propertyMetadata->getType() || !$property->getValue()) {
+            return;
+        }
+
+        $value = $property->getValue();
+        if (!$value || !isset($value['page']) || !isset($value['page']['uuid'])) {
+            return;
+        }
+
+        $article->setParentPageUuid($value['page']['uuid']);
+    }
+
+    /**
+     * Returns property-metadata for route-path property.
+     *
+     * @param StructureMetadata $metadata
+     *
+     * @return PropertyMetadata
+     */
+    private function getRoutePathProperty(StructureMetadata $metadata)
+    {
+        if ($metadata->hasTag(RoutableSubscriber::TAG_NAME)) {
+            return $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME);
+        }
+
+        if (!$metadata->hasProperty(RoutableSubscriber::ROUTE_FIELD)) {
+            return;
+        }
+
+        return $metadata->getProperty(RoutableSubscriber::ROUTE_FIELD);
+    }
+
+    /**
+     * @param string $id
+     */
+    protected function removeArticle($id)
+    {
+        $article = $this->manager->find(
+            $this->documentFactory->getClass('article'),
+            $id
+        );
+        if (null === $article) {
+            return;
+        }
+
+        $this->manager->remove($article);
     }
 
     /**
@@ -285,7 +402,7 @@ class ArticleIndexer implements IndexerInterface
             }
 
             $this->manager->commit();
-        } while ($result->count() !== 0);
+        } while (0 !== $result->count());
 
         $this->manager->clearCache();
         $this->manager->flush();
@@ -294,10 +411,10 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function setUnpublished($uuid)
+    public function setUnpublished($uuid, $locale)
     {
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $uuid);
-
+        $articleId = $this->getViewDocumentId($uuid, $locale);
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
         if (!$article) {
             return;
         }
@@ -306,6 +423,8 @@ class ArticleIndexer implements IndexerInterface
         $article->setPublishedState(false);
 
         $this->manager->persist($article);
+
+        return $article;
     }
 
     /**
@@ -316,5 +435,29 @@ class ArticleIndexer implements IndexerInterface
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function dropIndex()
+    {
+        if (!$this->manager->indexExists()) {
+            return;
+        }
+
+        $this->manager->dropIndex();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createIndex()
+    {
+        if ($this->manager->indexExists()) {
+            return;
+        }
+
+        $this->manager->createIndex();
     }
 }

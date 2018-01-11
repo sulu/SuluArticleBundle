@@ -18,6 +18,7 @@ use ONGR\ElasticsearchDSL\Search;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\Compat\StructureInterface;
 
@@ -41,6 +42,7 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
         $structure = $this->prophesize(StructureInterface::class);
         $repository = $this->prophesize(Repository::class);
         $search = $this->prophesize(Search::class);
+        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
 
         $structure->getLanguageCode()->willReturn('de');
         $property->getStructure()->willReturn($structure->reveal());
@@ -68,6 +70,7 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
+            $referenceStore->reveal(),
             ArticleViewDocument::class,
             'test.html.twig'
         );
@@ -85,12 +88,14 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $manager = $this->prophesize(Manager::class);
         $property = $this->prophesize(PropertyInterface::class);
+        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
 
         $property->getValue()->willReturn($ids);
         $manager->getRepository(ArticleViewDocument::class)->shouldNotBeCalled();
 
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
+            $referenceStore->reveal(),
             ArticleViewDocument::class,
             'test.html.twig'
         );
@@ -106,12 +111,14 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
 
         $manager = $this->prophesize(Manager::class);
         $property = $this->prophesize(PropertyInterface::class);
+        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
 
         $property->getValue()->willReturn($ids);
         $manager->getRepository(ArticleViewDocument::class)->shouldNotBeCalled();
 
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
+            $referenceStore->reveal(),
             ArticleViewDocument::class,
             'test.html.twig'
         );
@@ -124,9 +131,11 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
     public function testGetTemplate()
     {
         $manager = $this->prophesize(Manager::class);
+        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
 
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
+            $referenceStore->reveal(),
             ArticleViewDocument::class,
             'test.html.twig'
         );

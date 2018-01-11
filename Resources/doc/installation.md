@@ -1,21 +1,60 @@
 # Installation
 
-## Install ElasticSearch
+### ElasticSearch
 
-The sulu article bundle requires a running elasticsearch `^2.2` or `^5.0`.
+The SuluArticleBundle requires a running elasticsearch `^2.2` or `^5.0`.
 
 There is an different installation and configuration depending on which version of ElasticSearch you are using.
 
-If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation_es2.md)
-else read: [Installation for ElasticSearch 5.0](installation_es5.md) 
+If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation-es2.md)
+else read: [Installation for ElasticSearch 5.0](installation-es5.md) 
 
+## Install the bundle
+ 
+```bash
+composer require sulu/article-bundle
+```
 
-## Configure the routing
+### Add bundles to AbstractKernel
+
+The bundle should be registered after the `SuluCoreBundle`.
+
+```php
+/* app/AbstractKernel.php */
+
+new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
+new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+```
+
+### Configure SuluArticleBundle and sulu core
+
+```yml
+# app/config/config.yml
+
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: schema
+            options:
+                route_schema: /articles/{object.getTitle()}
+
+sulu_core:
+    content:
+        structure:
+            default_type:
+                article: "article_default"
+            paths:
+                article:
+                    path: "%kernel.root_dir%/Resources/templates/articles"
+                    type: "article"
+```
+
+### Configure the routing
 
 ```yml
 # app/config/admin/routing.yml
 
-sulu_arictle_api:
+sulu_article_api:
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
     type: rest
     prefix: /admin/api
@@ -36,14 +75,14 @@ Add xml template for structure in configured folder:
 Example is located in Bundle
 [article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.xml).
 
-Add template for article type in configured folder: ``
+Add template for article type in configured folder:
 
 ```
 %kernel.root_dir%/Resources/views/articles/article_default.html.twig
 ```
 
 Example is located in Bundle
-[article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
+[article_default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
 
 ## Initialize bundle
 
@@ -69,6 +108,7 @@ Create elasticsearch index:
 
 ```bash
 php bin/console ongr:es:index:create
+php bin/console ongr:es:index:create --manager=live
 ```
 
 ## Possible bundle configurations:
@@ -77,9 +117,19 @@ php bin/console ongr:es:index:create
 # app/config/config.yml
 
 sulu_article:
+    smart_content:
+        default_limit:        100
+    content_types:
+        article:
+            template:             'SuluArticleBundle:Template:content-types/article-selection.html.twig'
+        page_tree_route:
+            template:             'SuluArticleBundle:Template:content-types/page-tree-route.html.twig'
+            page_route_cascade:   request # One of "request"; "task"; "off"
     documents:
         article:
-            view: Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
+            view:                 Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
+        article_page:
+            view:                 Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject
     types:
 
         # Prototype
@@ -88,6 +138,17 @@ sulu_article:
 
     # Display tab 'all' in list view
     display_tab_all:      true
+
+    # Set default author if none isset
+    default_author:       true
+    search_fields:
+
+        # Defaults:
+        - title
+        - excerpt.title
+        - excerpt.description
+        - excerpt.seo.title
+        - excerpt.seo.description
+        - excerpt.seo.keywords
+        - teaser_description
 ```
-
-

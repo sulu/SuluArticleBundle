@@ -12,7 +12,13 @@
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
+use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
+use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
+use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
+use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -37,6 +43,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         'structure' => [
                             'type_map' => [
                                 'article' => ArticleBridge::class,
+                                'article_page' => ArticlePageBridge::class,
                             ],
                         ],
                     ],
@@ -50,7 +57,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'metadata' => [
                         'directories' => [
-                            [
+                            'sulu_article' => [
                                 'path' => __DIR__ . '/../Resources/config/serializer',
                                 'namespace_prefix' => 'Sulu\Bundle\ArticleBundle',
                             ],
@@ -66,7 +73,8 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'search' => [
                         'mapping' => [
-                            ArticleDocument::class => ['index' => 'article'],
+                            ArticleDocument::class => ['index' => 'article', 'decorate_index' => true],
+                            ArticlePageDocument::class => ['index' => 'article_page'],
                         ],
                     ],
                 ]
@@ -78,10 +86,75 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 'sulu_document_manager',
                 [
                     'mapping' => [
-                        'article' => ['class' => ArticleDocument::class, 'phpcr_type' => 'sulu:article'],
+                        'article' => [
+                            'class' => ArticleDocument::class,
+                            'phpcr_type' => 'sulu:article',
+                            'form_type' => ArticleDocumentType::class,
+                        ],
+                        'article_page' => [
+                            'class' => ArticlePageDocument::class,
+                            'phpcr_type' => 'sulu:articlepage',
+                            'form_type' => ArticlePageDocumentType::class,
+                        ],
                     ],
                     'path_segments' => [
                         'articles' => 'articles',
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_route')) {
+            $container->prependExtensionConfig(
+                'sulu_route',
+                [
+                    'mappings' => [
+                        ArticlePageDocument::class => [
+                            'generator' => 'article_page',
+                            'options' => [
+                                'route_schema' => '/{translator.trans("page")}-{object.getPageNumber()}',
+                                'parent' => '{object.getParent().getRoutePath()}',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('fos_rest')) {
+            $container->prependExtensionConfig(
+                'fos_rest',
+                [
+                    'exception' => [
+                        'codes' => [
+                            ParameterNotAllowedException::class => 400,
+                            ArticlePageNotFoundException::class => 404,
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('massive_build')) {
+            $container->prependExtensionConfig(
+                'massive_build',
+                [
+                    'targets' => [
+                        'prod' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
+                        'dev' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
+                        'maintain' => [
+                            'dependencies' => [
+                                'article_index' => [],
+                            ],
+                        ],
                     ],
                 ]
             );
@@ -99,10 +172,17 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.documents', $config['documents']);
         $container->setParameter('sulu_article.view_document.article.class', $config['documents']['article']['view']);
         $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
+        $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
+        $container->setParameter('sulu_article.search_fields', $config['search_fields']);
 
         $container->setParameter(
             'sulu_article.content-type.article.template',
             $config['content_types']['article']['template']
+        );
+
+        $container->setParameter(
+            'sulu_article.content-type.page_tree_route.template',
+            $config['content_types']['page_tree_route']['template']
         );
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -112,5 +192,87 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         }
+
+        $container->setAlias(
+            'sulu_article.page_tree_route.updater',
+            'sulu_article.page_tree_route.updater.' . $config['content_types']['page_tree_route']['page_route_cascade']
+        );
+
+        $loader->load('page_tree_move.xml');
+        if ($config['content_types']['page_tree_route']['page_route_cascade'] !== 'off') {
+            $loader->load('page_tree_update.xml');
+        }
+
+        $this->appendDefaultAuthor($config, $container);
+        $this->appendArticlePageConfig($container);
+
+        $articleDocument = ArticleDocument::class;
+        $articlePageDocument = ArticlePageDocument::class;
+
+        foreach ($container->getParameter('sulu_document_manager.mapping') as $mapping) {
+            if ('article' == $mapping['alias']) {
+                $articleDocument = $mapping['class'];
+            }
+
+            if ('article_page' == $mapping['alias']) {
+                $articlePageDocument = $mapping['class'];
+            }
+        }
+
+        $container->setParameter('sulu_article.article_document.class', $articleDocument);
+        $container->setParameter('sulu_article.article_page_document.class', $articlePageDocument);
+    }
+
+    /**
+     * Append configuration for article "set_default_author".
+     *
+     * @param array $config
+     * @param ContainerBuilder $container
+     */
+    private function appendDefaultAuthor(array $config, ContainerBuilder $container)
+    {
+        $mapping = $container->getParameter('sulu_document_manager.mapping');
+        foreach ($mapping as $key => $item) {
+            if ('article' === $item['alias']) {
+                $mapping[$key]['set_default_author'] = $config['default_author'];
+            }
+        }
+
+        $container->setParameter('sulu_document_manager.mapping', $mapping);
+        $container->setParameter('sulu_article.default_author', $config['default_author']);
+    }
+
+    /**
+     * Append configuration for article-page (cloned from article).
+     *
+     * @param ContainerBuilder $container
+     */
+    private function appendArticlePageConfig(ContainerBuilder $container)
+    {
+        $paths = $container->getParameter('sulu.content.structure.paths');
+        $paths['article_page'] = $this->cloneArticleConfig($paths['article'], 'article_page');
+        $container->setParameter('sulu.content.structure.paths', $paths);
+
+        $defaultTypes = $container->getParameter('sulu.content.structure.default_types');
+        $defaultTypes['article_page'] = $defaultTypes['article'];
+        $container->setParameter('sulu.content.structure.default_types', $defaultTypes);
+    }
+
+    /**
+     * Clone given path configuration and use given type.
+     *
+     * @param array $config
+     * @param string $type
+     *
+     * @return array
+     */
+    private function cloneArticleConfig(array $config, $type)
+    {
+        $result = [];
+        foreach ($config as $item) {
+            $result[] = ['path' => $item['path'], 'type' => $type];
+        }
+
+        return $result;
     }
 }

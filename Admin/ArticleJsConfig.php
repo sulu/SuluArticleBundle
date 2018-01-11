@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\JsConfigInterface;
-use Sulu\Bundle\ArticleBundle\Metadata\ArticleTypeTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleJsConfig implements JsConfigInterface
 {
-    use ArticleTypeTrait;
+    use StructureTagTrait;
 
     /**
      * @var StructureManagerInterface
@@ -33,23 +33,20 @@ class ArticleJsConfig implements JsConfigInterface
     private $typeConfiguration;
 
     /**
-     * @var bool
+     * @var array
      */
-    private $displayTabAll;
+    private $parameter;
 
     /**
      * @param StructureManagerInterface $structureManager
      * @param array $typeConfiguration
-     * @param bool $displayTabAll
+     * @param array $parameter
      */
-    public function __construct(
-        StructureManagerInterface $structureManager,
-        array $typeConfiguration,
-        $displayTabAll
-    ) {
+    public function __construct(StructureManagerInterface $structureManager, array $typeConfiguration, array $parameter)
+    {
         $this->structureManager = $structureManager;
         $this->typeConfiguration = $typeConfiguration;
-        $this->displayTabAll = $displayTabAll;
+        $this->parameter = $parameter;
     }
 
     /**
@@ -57,10 +54,13 @@ class ArticleJsConfig implements JsConfigInterface
      */
     public function getParameters()
     {
-        $config = [
-            'types' => [],
-            'displayTabAll' => $this->displayTabAll,
-        ];
+        $config = array_merge(
+            $this->parameter,
+            [
+                'types' => [],
+                'templates' => [],
+            ]
+        );
 
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());
@@ -70,6 +70,10 @@ class ArticleJsConfig implements JsConfigInterface
                     'title' => $this->getTitle($type),
                 ];
             }
+
+            $config['templates'][$structure->getKey()] = [
+                'multipage' => ['enabled' => $this->getMultipage($structure->getStructure())],
+            ];
         }
 
         return $config;

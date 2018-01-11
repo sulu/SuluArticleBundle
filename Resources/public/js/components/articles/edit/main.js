@@ -11,25 +11,43 @@ define([
     'jquery',
     'underscore',
     'config',
+    'services/husky/util',
     'services/suluarticle/article-manager',
+    'services/suluarticle/article-router',
     'sulusecurity/services/user-manager',
-    'services/sulupreview/preview',
     'sulusecurity/services/security-checker',
     'sulucontent/components/copy-locale-overlay/main',
-    'sulucontent/components/open-ghost-overlay/main'
-], function($, _, config, ArticleManager, UserManager, Preview, SecurityChecker, CopyLocale, OpenGhost) {
+    'sulucontent/components/open-ghost-overlay/main',
+    'services/sulucontent/smart-content-manager',
+    './adapter/article',
+    './adapter/article-page'
+], function($, _, config, Util, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, SmartContentManager, Article, ArticlePage) {
 
     'use strict';
+
+    var constants = {
+            headerRightSelector: '.right-container'
+        },
+        errorCodes = {
+            resourceLocatorAlreadyExists: 1103
+        };
 
     return {
 
         defaults: {
             options: {
+                page: 1,
                 config: {}
             },
 
             templates: {
-                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>'
+                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
+                pageSwitcher: [
+                    '<div class="page-changer">',
+                    '   <span class="title"><%= label %></span>',
+                    '   <span class="dropdown-toggle"></span>',
+                    '</div>'
+                ].join('')
             },
 
             translations: {
@@ -43,6 +61,11 @@ define([
                 deleteDraftConfirmTitle: 'sulu-content.delete-draft-confirm-title',
                 deleteDraftConfirmText: 'sulu-content.delete-draft-confirm-text',
                 copy: 'sulu_article.edit.copy',
+                deletePage: 'sulu_article.edit.delete_page',
+                pageOf: 'sulu_article.edit.page-of',
+                newPage: 'sulu_article.edit.new-page',
+                orderPage: 'sulu_article.edit.order-page',
+                page: 'sulu_article.edit.page',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -108,10 +131,11 @@ define([
                             callback: function(item) {
                                 this.template = item.template;
                                 this.sandbox.emit('sulu.tab.template-change', item);
+                                this.setHeaderBar();
                             }.bind(this)
                         }
                     }
-                }
+                };
             }
 
             if (SecurityChecker.hasPermission(this.data, 'live')) {
@@ -135,6 +159,14 @@ define([
                     options: {
                         disabled: !this.options.id,
                         callback: this.deleteArticle.bind(this)
+                    }
+                };
+
+                editDropdown.deletePage = {
+                    options: {
+                        title: this.translations.deletePage,
+                        disabled: (!this.options.page || this.options.page === 1),
+                        callback: this.deleteArticlePage.bind(this)
                     }
                 };
             }
@@ -170,8 +202,7 @@ define([
                     }
                 };
             }
-            
-            
+
             if (!this.sandbox.util.isEmpty(editDropdown)) {
                 buttons.edit = {
                     options: {
@@ -185,7 +216,7 @@ define([
 
             return {
                 tabs: {
-                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale,
+                    url: '/admin/content-navigations?alias=article&id=' + this.options.id + '&locale=' + this.options.locale + (this.options.page ? '&page=' + this.options.page : ''),
                     options: {
                         data: function() {
                             return this.sandbox.util.deepCopy(this.data);
@@ -194,7 +225,10 @@ define([
                             return this.templates.url({id: this.options.id, locale: this.options.locale});
                         }.bind(this),
                         config: this.options.config,
-                        preview: this.preview
+                        preview: this.preview,
+                        adapter: this.getAdapter(),
+                        page: this.options.page,
+                        id: this.options.id
                     },
                     componentOptions: {
                         values: _.defaults(this.data, {type: null})
@@ -212,6 +246,11 @@ define([
         },
 
         initialize: function() {
+            this.$el.addClass('article-form');
+            SmartContentManager.initialize();
+
+            this.startPageSwitcher();
+
             this.bindCustomEvents();
             this.showDraftLabel();
             this.setHeaderBar(true);
@@ -227,6 +266,7 @@ define([
             this.sandbox.on('sulu.toolbar.save', this.save.bind(this));
             this.sandbox.on('sulu.tab.data-changed', this.setData.bind(this));
             this.sandbox.on('sulu.article.error', this.handleError.bind(this));
+            this.sandbox.on('sulu.article.update-page-switcher', this.updatePageSwitcher.bind(this));
             this.sandbox.on('husky.tabs.header.item.select', this.tabChanged.bind(this));
             this.sandbox.on('sulu.header.language-changed', this.languageChanged.bind(this));
         },
@@ -243,12 +283,13 @@ define([
 
             this.sandbox.sulu.saveUserSetting(this.options.config.settingsKey, item.id);
 
-            if (-1 === _(this.data.concreteLanguages).indexOf(item.id)) {
-                OpenGhost.openGhost.call(this, this.data, this.translations.openGhostOverlay).then(function(copy, src) {
+            var data = this.getAdapter().prepareData(this.data, this);
+            if (-1 === _(data.concreteLanguages).indexOf(item.id)) {
+                OpenGhost.openGhost.call(this, data, this.translations.openGhostOverlay).then(function(copy, src) {
                     if (!!copy) {
                         CopyLocale.copyLocale.call(
                             this,
-                            this.data.id,
+                            data.id,
                             src,
                             [item.id],
                             function() {
@@ -281,12 +322,21 @@ define([
         /**
          * Handles the error based on its error code.
          *
+         * @param {Number} statusCode
          * @param {Number} errorCode
          * @param {Object} data
          * @param {string} action
          */
-        handleError: function(errorCode, data, action) {
+        handleError: function(statusCode, errorCode, data, action) {
             switch (errorCode) {
+                case errorCodes.resourceLocatorAlreadyExists:
+                    this.sandbox.emit(
+                        'sulu.labels.error.show',
+                        'labels.error.content-save-resource-locator',
+                        'labels.error'
+                    );
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');
+                    break;
                 default:
                     this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
                     this.sandbox.emit('sulu.header.toolbar.item.enable', 'save');
@@ -295,32 +345,47 @@ define([
 
         deleteArticle: function() {
             this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
-                if (wasConfirmed) {
-                    ArticleManager.remove(this.options.id, this.options.locale).then(function() {
-                        this.toList();
-                    }.bind(this));
+                if (!wasConfirmed) {
+                    return;
                 }
+
+                this.sandbox.emit('sulu.header.toolbar.item.loading', 'edit');
+                ArticleManager.remove(this.options.id, this.options.locale).then(function() {
+                    this.toList();
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit', false);
+                }.bind(this)).fail(function() {
+                    this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit', false);
+                }.bind(this));
+            }.bind(this));
+        },
+
+        deleteArticlePage: function() {
+            this.sandbox.sulu.showDeleteDialog(function(wasConfirmed) {
+                if (!wasConfirmed) {
+                    return;
+                }
+
+                var pageData = this.getAdapter().prepareData(this.data, this);
+                ArticleManager.removePage(this.options.id, pageData.id, this.options.locale).then(function() {
+                    ArticleRouter.toEditForce(this.options.id, this.options.locale);
+                }.bind(this));
             }.bind(this));
         },
 
         toEdit: function(locale, id) {
-            this.sandbox.emit('sulu.router.navigate', 'articles/' + (locale || this.options.locale) + '/edit:' + (id || this.options.id) + '/' + (this.options.content  || 'details'), true, true);
+            if (!!this.options.page && this.options.page !== 1) {
+                return ArticleRouter.toPageEdit((id || this.options.id), this.options.page, (locale || this.options.locale))
+            }
+
+            ArticleRouter.toEdit((id || this.options.id), (locale || this.options.locale), this.options.content);
         },
 
-        toList: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles:' + (this.options.type || this.data.articleType) + '/' + this.options.locale);
-            }
+        toList: function(locale) {
+            ArticleRouter.toList((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
-        toAdd: function() {
-            if (this.options.config.typeNames.length === 1) {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add', true, true);
-            } else {
-                this.sandbox.emit('sulu.router.navigate', 'articles/' + this.options.locale + '/add:' + (this.options.type || this.data.articleType), true, true);
-            }
+        toAdd: function(locale) {
+            ArticleRouter.toAdd((locale || this.options.locale), (this.options.type || this.data.articleType));
         },
 
         save: function(action) {
@@ -381,15 +446,16 @@ define([
          * Routes either to the list, article-add or article-edit, depending on the passed parameter.
          *
          * @param action {String} 'new', 'add' or null
-         * @param toEdit {Boolean} if true and no action has been passed the method routes to 'edit'
          */
-        afterSaveAction: function(action, toEdit) {
+        afterSaveAction: function(action) {
             if (action === 'back') {
                 this.toList();
             } else if (action === 'new') {
                 this.toAdd();
-            } else if (toEdit) {
+            } else if (!this.options.id) {
                 this.toEdit(this.options.locale, this.data.id);
+            } else if (!this.options.page) {
+                ArticleRouter.toPageEdit(this.data.id, this.data._embedded.pages.length + 1, this.options.locale);
             }
         },
 
@@ -434,12 +500,7 @@ define([
                     ArticleManager.removeDraft(this.data.id, this.options.locale).always(function() {
                         this.sandbox.emit('sulu.header.toolbar.item.enable', 'edit');
                     }.bind(this)).then(function(response) {
-                        this.sandbox.emit(
-                            'sulu.router.navigate',
-                            this.sandbox.mvc.history.fragment,
-                            true,
-                            true
-                        );
+                        ArticleRouter.toEdit(this.options.id, this.options.locale);
                         this.saved(response.id, response);
                     }.bind(this)).fail(function() {
                         this.sandbox.emit('husky.label.header.reset');
@@ -473,37 +534,37 @@ define([
         },
 
         loadComponentData: function() {
-            var promise = $.Deferred();
-
             if (!this.options.id) {
-                promise.resolve({});
-
-                return promise;
+                return {_embedded: {pages: []}};
             }
 
-            this.sandbox.util.load(this.getUrl()).done(function(data) {
-                this.preview = Preview.initialize({});
-                this.preview.start(
-                    'Sulu\\Bundle\\ArticleBundle\\Document\\ArticleDocument',
-                    this.options.id,
-                    this.options.locale,
-                    data
-                );
+            return this.sandbox.util.load(this.getUrl()).done(function(data) {
+                this.preview = this.getAdapter().startPreview(this, data);
 
-                promise.resolve(data);
+                return data;
             }.bind(this));
+        },
 
-            return promise;
+        getAdapter: function() {
+            if (this.adapter) {
+                return this.adapter;
+            }
+
+            return this.adapter = (this.options.page === 1 ? Article : ArticlePage);
         },
 
         destroy: function() {
             if (!!this.preview) {
-                Preview.destroy(this.preview);
+                this.getAdapter().destroyPreview(this.preview);
+            }
+
+            if (!!this.$dropdownElement) {
+                this.sandbox.stop(this.$dropdownElement);
             }
         },
 
         showState: function(published) {
-            if (!!published) {
+            if (!!published && !this.data.type) {
                 this.sandbox.emit('sulu.header.toolbar.item.hide', 'stateTest');
                 this.sandbox.emit('sulu.header.toolbar.item.show', 'statePublished');
             } else {
@@ -547,7 +608,7 @@ define([
 
         copy: function() {
             ArticleManager.copy(this.data.id, this.options.locale).done(function(data) {
-                this.toEdit(this.options.locale, data.id);
+                ArticleRouter.toEdit(data.id, this.options.locale);
             }.bind(this));
         },
 
@@ -564,7 +625,7 @@ define([
                 this.sandbox.emit('sulu.labels.success.show', 'labels.success.content-save-desc', 'labels.success');
             }
 
-            this.afterSaveAction(action, !this.options.id);
+            this.afterSaveAction(action);
         },
 
         loadLocalizations: function() {
@@ -589,6 +650,111 @@ define([
          */
         getCopyLocaleUrl: function(id, src, dest) {
             return ArticleManager.getCopyLocaleUrl(id, src, dest);
+        },
+
+        startPageSwitcher: function() {
+            var page = this.options.page,
+                pages = this.data._embedded.pages || [],
+                max = pages.length + 1,
+                data = [];
+
+            if (!page) {
+                page = ++max;
+            }
+
+            for (var i = 1; i <= max; i++) {
+                data.push({id: i, title: Util.sprintf(this.translations.pageOf, i, max)});
+            }
+
+            // new page is only available for existing articles
+            if (this.options.id) {
+                data = data.concat([
+                    {divider: true},
+                    {id: 'add', title: this.translations.newPage}
+                ]);
+            }
+
+            // ordering is only available if more than one page exists
+            if (pages.length > 1) {
+                data.push({id: 'order', title: this.translations.orderPage});
+            }
+
+            this.$dropdownElement = $(this.templates.pageSwitcher({label: Util.sprintf(this.translations.pageOf, page, max)}));
+
+            var $rightContainer = $(constants.headerRightSelector);
+            $rightContainer.prepend(this.$dropdownElement);
+            $rightContainer.addClass('wide');
+
+            this.sandbox.start([{
+                name: 'dropdown@husky',
+                options: {
+                    el: this.$dropdownElement,
+                    instanceName: 'header-pages',
+                    alignment: 'right',
+                    valueName: 'title',
+                    data: data,
+                    clickCallback: function(item) {
+                        if (item.id === 'add') {
+                            return ArticleRouter.toPageAdd(this.options.id, this.options.locale);
+                        } else if (item.id === 'order') {
+                            return this.orderPages();
+                        } else if (item.id === 1) {
+                            return ArticleRouter.toEdit(this.options.id, this.options.locale);
+                        }
+
+                        return ArticleRouter.toPageEdit(this.options.id, item.id, this.options.locale);
+                    }.bind(this)
+                }
+            }]);
+
+            this.updatePageSwitcher();
+        },
+
+        /**
+         * Updates visibility of page-switcher for given template.
+         *
+         * @param {String} template
+         */
+        updatePageSwitcher: function(template) {
+            template = template || this.data.template || this.options.config.types[this.options.type].default;
+            if (!this.options.config.templates[template].multipage.enabled) {
+                return this.$dropdownElement.hide();
+            }
+
+            this.$dropdownElement.show();
+        },
+
+        orderPages: function() {
+            var $container = $('<div/>'),
+                pages = (this.data._embedded.pages || []),
+                pageTitleProperty = this.data._pageTitlePropertyName,
+                data = [];
+
+            this.$el.append($container);
+
+            for (var i = 0, length = pages.length; i < length; i++) {
+                var title = this.translations.page + ' ' + pages[i].pageNumber;
+                if (pageTitleProperty && pages[i][pageTitleProperty]) {
+                    title = pages[i][pageTitleProperty];
+                }
+
+                data.push({id: pages[i].id, title: title});
+            }
+
+            this.sandbox.start([{
+                name: 'articles/edit/page-order@suluarticle',
+                options: {
+                    el: $container,
+                    pages: data,
+                    saveCallback: function(pages) {
+                        return ArticleManager.orderPages(this.options.id, pages, this.options.locale).done(function() {
+                            ArticleRouter.toEditForce(this.options.id, this.options.locale, this.options.content);
+                        }.bind(this)).fail(function() {
+                            this.sandbox.emit('sulu.labels.error.show', 'labels.error.content-save-desc', 'labels.error');
+                        }.bind(this));
+                    }.bind(this)
+                }
+            }]);
         }
     }
 });

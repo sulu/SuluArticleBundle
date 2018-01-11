@@ -25,9 +25,16 @@
                         <title lang="en">Title</title>
                         <title lang="de">Titel</title>
                     </meta>
+
                     <params>
                         <param name="headline" value="true"/>
                     </params>
+
+                    <tag name="sulu_article.article_title"/>
+                </property>
+
+                <property name="pageTitle" type="text_line" mandatory="true">
+                    <tag name="sulu_article.page_title"/>
                 </property>
 
                 <property name="routePath" type="route">

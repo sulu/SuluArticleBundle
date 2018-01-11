@@ -1,24 +1,26 @@
-# Doctrine Configuration
-doctrine:
-    dbal:
-        dbname:   "su_articles_test"
-
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/articles"
-                    type: "article"
-
 ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
     connections:
         default:
             index_name: su_articles_test
+            analysis:
+                tokenizer:
+                    - pathTokenizer
+                analyzer:
+                    - pathAnalyzer
         live:
             index_name: su_articles_test_live
+            analysis:
+                tokenizer:
+                    - pathTokenizer
+                analyzer:
+                    - pathAnalyzer
     managers:
         default:
             connection: default
@@ -28,10 +30,3 @@ ongr_elasticsearch:
             connection: live
             mappings:
                 - SuluArticleBundle
-# Sulu Routing
-sulu_route:
-    mappings:
-        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: schema
-            options:
-                route_schema: /articles/{object.getTitle()}

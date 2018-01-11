@@ -1,0 +1,10 @@
+<div id="{{ id|raw }}"
+     data-property='{{ property|json_encode }}'
+     data-mapper-property="{{ property.name }}"
+     data-form="true"
+     data-type="page-tree-route"
+     data-type-instance-name="{{ id|raw }}"
+     data-aura-component="page-tree-route@suluarticle"
+     data-aura-locale="{{ languageCode }}"
+     data-aura-instance-name="{{ id|raw }}"
+     data-aura-history-api="/admin/api/routes?history=true&entityClass=<%= entityClass %>&entityId=<%= entityId %>&locale={{ languageCode }}"/>

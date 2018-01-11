@@ -13,12 +13,17 @@ require.config({
         suluarticlecss: '../../suluarticle/css',
 
         'type/article-selection': '../../suluarticle/js/validation/types/article-selection',
+        'type/page-tree-route': '../../suluarticle/js/validation/types/page-tree-route',
 
-        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager'
+        'services/suluarticle/article-manager': '../../suluarticle/js/services/manager',
+        'services/suluarticle/article-router': '../../suluarticle/js/services/router',
+        'services/suluarticle/property-configuration': '../../suluarticle/js/services/property-configuration',
+        'services/suluarticle/list-helper': '../../suluarticle/js/services/list-helper',
+        'services/suluarticle/overlay-filter-helper': '../../suluarticle/js/services/overlay-filter-helper',
     }
 });
 
-define(['underscore', 'config'], function(_, Config) {
+define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) {
 
     'use strict';
 
@@ -27,7 +32,7 @@ define(['underscore', 'config'], function(_, Config) {
             locales = [];
 
         _.each(config, function(item) {
-            locales = locales.concat(Object.keys(item));
+            locales = _.union(locales, Object.keys(item));
         });
 
         return locales;
@@ -44,6 +49,7 @@ define(['underscore', 'config'], function(_, Config) {
 
             // set config for this bundle
             var locales = getContentLocales(),
+                articleConfig = Config.get('sulu_article'),
                 config = {
                     defaultLocale: locales[0],
                     locales: locales,
@@ -51,10 +57,15 @@ define(['underscore', 'config'], function(_, Config) {
                         return {id: locale, title: locale};
                     }),
                     settingsKey: 'articleLanguage',
-                    typeNames: Object.keys(Config.get('sulu_article').types),
-                    types: Config.get('sulu_article').types,
-                    displayTabAll: Config.get('sulu_article').displayTabAll
+                    typeNames: Object.keys(articleConfig.types),
+                    types: articleConfig.types,
+                    templates: articleConfig.templates,
+                    displayTabAll: articleConfig.displayTabAll,
+                    defaultAuthor: articleConfig.defaultAuthor,
+                    pageTreeEnabled: articleConfig.pageTreeEnabled,
+                    classes: articleConfig.classes,
                 };
+
             Config.set('sulu_article', config);
 
             /**
@@ -128,6 +139,20 @@ define(['underscore', 'config'], function(_, Config) {
                     }
                 });
             }
+
+            app.sandbox.mvc.routes.push({
+                route: 'articles/:locale/edit::id/add-page/:content',
+                callback: function(locale, id, content) {
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="null" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                }
+            });
+
+            app.sandbox.mvc.routes.push({
+                route: 'articles/:locale/edit::id/page::page/:content',
+                callback: function(locale, id, page, content) {
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="' + page + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                }
+            });
 
             app.sandbox.mvc.routes.push({
                 route: 'articles/:locale/edit::id/:content',

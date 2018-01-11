@@ -7,7 +7,6 @@
 | Fixed tickets | fixes #issuenum
 | Related issues/PRs | #issuenum
 | License | MIT
-| Documentation PR | sulu/sulu-docs#prnum
 
 #### What's in this PR?
 
@@ -35,4 +34,4 @@ Describe BC breaks/deprecations here. (remove this section if not needed)
 
 #### To Do
 
-- [ ] Create a documentation PR
+- [ ] Add documentation page

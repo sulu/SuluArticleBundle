@@ -15,13 +15,15 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
+use Sulu\Component\Content\PreResolvableContentTypeInterface;
 use Sulu\Component\Content\SimpleContentType;
 
 /**
- * This class provides article selection.
+ * Provides article_selection content-type.
  */
-class ArticleSelectionContentType extends SimpleContentType
+class ArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface
 {
     use ArticleViewDocumentIdTrait;
 
@@ -29,6 +31,11 @@ class ArticleSelectionContentType extends SimpleContentType
      * @var Manager
      */
     private $searchManager;
+
+    /**
+     * @var ReferenceStoreInterface
+     */
+    private $referenceStore;
 
     /**
      * @var string
@@ -42,14 +49,20 @@ class ArticleSelectionContentType extends SimpleContentType
 
     /**
      * @param Manager $searchManager
+     * @param ReferenceStoreInterface $referenceStore
      * @param string $articleDocumentClass
      * @param string $template
      */
-    public function __construct(Manager $searchManager, $articleDocumentClass, $template)
-    {
+    public function __construct(
+        Manager $searchManager,
+        ReferenceStoreInterface $referenceStore,
+        $articleDocumentClass,
+        $template
+    ) {
         parent::__construct('Article', []);
 
         $this->searchManager = $searchManager;
+        $this->referenceStore = $referenceStore;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->template = $template;
     }
@@ -60,7 +73,7 @@ class ArticleSelectionContentType extends SimpleContentType
     public function getContentData(PropertyInterface $property)
     {
         $value = $property->getValue();
-        if ($value === null || !is_array($value) || count($value) === 0) {
+        if (null === $value || !is_array($value) || 0 === count($value)) {
             return [];
         }
 
@@ -87,5 +100,20 @@ class ArticleSelectionContentType extends SimpleContentType
     public function getTemplate()
     {
         return $this->template;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function preResolve(PropertyInterface $property)
+    {
+        $uuids = $property->getValue();
+        if (!is_array($uuids)) {
+            return;
+        }
+
+        foreach ($uuids as $uuid) {
+            $this->referenceStore->add($uuid);
+        }
     }
 }
