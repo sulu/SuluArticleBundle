@@ -1,6 +1,7 @@
 # Doctrine Configuration
 doctrine:
     dbal:
+        host: 127.0.0.1
         dbname: "su_articles_test"
 
 sulu_core:

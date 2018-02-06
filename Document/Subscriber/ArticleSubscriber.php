@@ -109,6 +109,7 @@ class ArticleSubscriber implements EventSubscriberInterface
                 ['hydratePageData', -2000],
             ],
             Events::PERSIST => [
+                ['handleUuid', 480],
                 ['handleScheduleIndex', -500],
                 ['setChildrenStructureType', 0],
                 ['persistPageData', -2000],
@@ -132,6 +133,17 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::COPY => ['handleCopy'],
             Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
+    }
+
+    public function handleUuid(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $event->getNode()->addMixin('mix:referenceable');
+        $event->getNode()->setProperty('jcr:uuid', $document->getUuid());
     }
 
     /**

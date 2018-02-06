@@ -9,7 +9,14 @@
         "ongr/elasticsearch-bundle": "^1.2.9 || ~5.0",
         "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
         "jackalope/jackalope": "^1.2.8 || >=1.3.3",
-        "jms/serializer-bundle": "^1.1 || ^2.0"
+        "jms/serializer-bundle": "^1.1 || ^2.0",
+        "prooph/service-bus": "^6.2",
+        "prooph/event-sourcing": "^5.3",
+        "prooph/event-store": "^7.3",
+        "prooph/pdo-event-store": "^1.6",
+        "prooph/event-store-bus-bridge": "^3.1",
+        "prooph/snapshotter": "^2.1",
+        "prooph/pdo-snapshot-store": "^1.4"
     },
     "require-dev": {
         "massive/build-bundle": "~0.3.0",

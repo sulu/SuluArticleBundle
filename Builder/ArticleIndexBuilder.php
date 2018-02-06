@@ -69,6 +69,6 @@ class ArticleIndexBuilder extends SuluBuilder
         }
 
         $this->output->writeln(sprintf('Drop and create index for "<comment>%s</comment>" manager.', $name));
-        $manager->dropAndCreateIndex();
+        // $manager->dropAndCreateIndex();
     }
 }
