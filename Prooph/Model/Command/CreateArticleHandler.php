@@ -26,28 +26,22 @@ class CreateArticleHandler
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function __invoke(CreateArticle $command): void
+    public function __invoke(CreateArticleCommand $command): void
     {
         // TODO generate route-path (add it to structure-data and data)
 
-        $structureType = $command->data()['template'];
+        $structureType = $command->requestData()['template'];
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
 
         $structureData = [];
         foreach ($metadata->getProperties() as $property) {
-            if (array_key_exists($property->getName(), $command->data())) {
-                $structureData[$property->getName()] = $command->data()[$property->getName()];
+            if (array_key_exists($property->getName(), $command->requestData())) {
+                $structureData[$property->getName()] = $command->requestData()[$property->getName()];
             }
         }
 
-        $article = Article::createWithData(
-            $command->id(),
-            $command->locale(),
-            $structureType,
-            $structureData,
-            $command->data(),
-            $command->userId()
-        );
+        $article = Article::create($command->id(), $command->userId());
+        $article->modifyTranslationStructure($command->locale(), $structureType, $structureData, $command->userId(), $command->requestData());
         $this->repository->save($article);
     }
 }

@@ -6,10 +6,13 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model;
 
 use Prooph\EventSourcing\AggregateChanged;
 use Prooph\EventSourcing\AggregateRoot;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleCreated;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticlePublished;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleUnpublished;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleUpdated;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ChangeTranslationStructure;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateArticle;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
 use Sulu\Component\Content\Document\WorkflowStage;
 
 class Article extends AggregateRoot
@@ -20,154 +23,131 @@ class Article extends AggregateRoot
     private $id;
 
     /**
-     * @var string
+     * @var int
      */
-    private $locale;
+    private $createdBy;
 
     /**
-     * @var string
+     * @var \DateTimeImmutable
      */
-    private $structureType;
-
-    /**
-     * @var array
-     */
-    private $structureData;
-
-    /**
-     * @var string
-     */
-    private $title;
+    private $createdAt;
 
     /**
      * @var int
      */
-    private $creator;
+    private $modifiedBy;
+
+    /**
+     * @var \DateTimeImmutable
+     */
+    private $modifiedAt;
 
     /**
      * @var int
      */
-    private $changer;
+    private $removedBy;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeImmutable
      */
-    private $created;
+    private $removedAt;
 
     /**
-     * @var \DateTime
+     * @var ArticleTranslation[]
      */
-    private $changed;
+    private $translations = [];
 
-    /**
-     * @var int
-     */
-    private $author;
+    static public function create(string $id, int $userId)
+    {
+        $article = new self();
+        $article->recordThat(CreateArticle::occur($id, ['createdBy' => $userId]));
 
-    /**
-     * @var \DateTime
-     */
-    private $authored;
+        return $article;
+    }
 
-    /**
-     * @var \DateTime
-     */
-    private $published;
-
-    /**
-     * @var int
-     */
-    private $workflowStage = WorkflowStage::TEST;
-
-    // TODO pageTitle, routePath, versions, extensions, pages
-
-    static public function createWithData(
-        string $id,
+    public function modifyTranslationStructure(
         string $locale,
         string $structureType,
         array $structureData,
-        array $data,
-        int $userId
-    ): self {
-        $obj = new self();
-        $obj->recordThat(
-            ArticleCreated::occur(
-                $id,
-                [
-                    'locale' => $locale,
-                    'structureType' => $structureType,
-                    'structureData' => $structureData,
-                    'creator' => $userId,
-                    'created' => (new \DateTime())->format(\DateTime::ATOM),
-                    'changer' => $userId,
-                    'changed' => (new \DateTime())->format(\DateTime::ATOM),
-                    'data' => $data,
-                ]
-            )
-        );
+        int $userId,
+        array $requestData
+    ) {
+        $translation = $this->findTranslation($locale);
+        if (!$translation) {
+            $this->recordThat(
+                CreateTranslation::occur(
+                    $this->id,
+                    [
+                        'locale' => $locale,
+                        'createdBy' => $userId,
+                        'structureType' => $structureType,
+                        'requestData' => $requestData,
+                    ]
+                )
+            );
 
-        return $obj;
-    }
-
-    public function publish(string $locale, int $userId)
-    {
-        $this->recordThat(
-            ArticlePublished::occur(
-                $this->id,
-                [
-                    'locale' => $locale,
-                    'changer' => $userId,
-                    'changed' => (new \DateTime())->format(\DateTime::ATOM),
-                    'published' => (new \DateTime())->format(\DateTime::ATOM),
-                ]
-            )
-        );
-
-        return $this;
-    }
-
-    public function unpublish(string $locale, int $userId)
-    {
-        $this->recordThat(
-            ArticleUnpublished::occur(
-                $this->id,
-                [
-                    'locale' => $locale,
-                    'changer' => $userId,
-                    'changed' => (new \DateTime())->format(\DateTime::ATOM),
-                ]
-            )
-        );
-
-        return $this;
-    }
-
-    public function updateWithData(
-        string $locale,
-        string $structureType,
-        array $structureData,
-        array $data,
-        int $userId
-    ): self {
-        if ($structureType !== $this->structureType) {
-            // TODO change template
+            $translation = new ArticleTranslation();
+        } elseif ($structureType !== $translation->structureType) {
+            $this->recordThat(
+                ChangeTranslationStructure::occur(
+                    $this->id,
+                    [
+                        'locale' => $locale,
+                        'structureType' => $structureType,
+                        'createdBy' => $userId,
+                    ]
+                )
+            );
         }
 
-        $structureData = array_diff($structureData, $this->structureData);
-
         $this->recordThat(
-            ArticleUpdated::occur(
+            ModifyTranslationStructure::occur(
                 $this->id,
                 [
                     'locale' => $locale,
-                    'structureType' => $structureType,
-                    'structureData' => $structureData,
-                    'changer' => $userId,
-                    'changed' => (new \DateTime())->format(\DateTime::ATOM),
-                    'data' => $data,
+                    'structureData' => array_diff($structureData, $translation->structureData),
+                    'createdBy' => $userId,
+                    'requestData' => $requestData,
                 ]
             )
         );
+
+        return $this;
+    }
+
+    public function publishTranslation(string $locale, int $userId)
+    {
+        $this->recordThat(
+            PublishTranslation::occur(
+                $this->id,
+                [
+                    'locale' => $locale,
+                    'createdBy' => $userId,
+                ]
+            )
+        );
+
+        return $this;
+    }
+
+    public function unpublishTranslation(string $locale, int $userId)
+    {
+        $this->recordThat(
+            UnpublishTranslation::occur(
+                $this->id,
+                [
+                    'locale' => $locale,
+                    'createdBy' => $userId,
+                ]
+            )
+        );
+
+        return $this;
+    }
+
+    public function remove(int $userId)
+    {
+        $this->recordThat(RemoveArticle::occur($this->id, ['createdBy' => $userId]));
 
         return $this;
     }
@@ -177,44 +157,63 @@ class Article extends AggregateRoot
         return $this->id;
     }
 
+    public function findTranslation(string $locale): ?ArticleTranslation
+    {
+        if (!array_key_exists($locale, $this->translations)) {
+            return null;
+        }
+
+        return $this->translations[$locale];
+    }
+
     protected function apply(AggregateChanged $event): void
     {
-        switch (get_class($event)) {
-            case ArticleCreated::class:
-                /** @var ArticleCreated $event */
-                $this->id = $event->aggregateId();
-                $this->locale = $event->locale();
-                $this->structureType = $event->structureType();
-                $this->structureData = $event->structureData();
-                $this->changed = $event->changed();
-                $this->changer = $event->changer();
-                $this->authored = $this->created = $event->created();
-                $this->author = $this->creator = $event->creator();
-                $this->title = $event->structureData()['title'];
-                break;
-            case ArticlePublished::class:
-                /** @var ArticlePublished $event */
-                $this->id = $event->aggregateId();
-                $this->locale = $event->locale();
-                $this->workflowStage = WorkflowStage::PUBLISHED;
-                $this->changed = $event->changed();
-                $this->changer = $event->changer();
-                $this->published = $event->published();
-                break;
-            case ArticleUnpublished::class:
-                /** @var ArticleUnpublished $event */
-                $this->id = $event->aggregateId();
-                $this->locale = $event->locale();
-                $this->workflowStage = WorkflowStage::TEST;
-                $this->changed = $event->changed();
-                $this->changer = $event->changer();
-                break;
-            case ArticleUpdated::class:
-                /** @var ArticleUpdated $event */
-                $this->id = $event->aggregateId();
-                $this->locale = $event->locale();
-                $this->structureData = array_merge($this->structureData, $event->structureData());
-                break;
+        if ($event instanceof CreateArticle) {
+            $this->id = $event->aggregateId();
+            $this->createdAt = $event->createdAt();
+            $this->createdBy = $event->createdBy();
+        } elseif ($event instanceof CreateTranslation) {
+            $this->translations[$event->locale()] = $translation = new ArticleTranslation();
+            $translation->locale = $event->locale();
+            $translation->structureType = $event->structureType();
+            $translation->createdAt = $event->createdAt();
+            $translation->createdBy = $event->createdBy();
+        } elseif ($event instanceof ChangeTranslationStructure) {
+            $translation = $this->findTranslation($event->locale());
+            $translation->structureType = $event->structureType();
+            $translation->modifiedAt = $event->createdAt();
+            $translation->modifiedBy = $event->createdBy();
+            $this->modifiedAt = $event->createdAt();
+            $this->modifiedBy = $event->createdBy();
+        } elseif ($event instanceof ModifyTranslationStructure) {
+            $translation = $this->findTranslation($event->locale());
+            $translation->structureData = array_merge($translation->structureData, $event->structureData());
+            $translation->modifiedAt = $event->createdAt();
+            $translation->modifiedBy = $event->createdBy();
+            $this->modifiedAt = $event->createdAt();
+            $this->modifiedBy = $event->createdBy();
+        } elseif ($event instanceof PublishTranslation) {
+            $translation = $this->findTranslation($event->locale());
+            $translation->workflowStage = WorkflowStage::PUBLISHED;
+            $translation->publishedAt = $event->createdAt();
+            $translation->publishedBy = $event->createdBy();
+            $translation->modifiedAt = $event->createdAt();
+            $translation->modifiedBy = $event->createdBy();
+            $this->modifiedAt = $event->createdAt();
+            $this->modifiedBy = $event->createdBy();
+        } elseif ($event instanceof UnpublishTranslation) {
+            $translation = $this->findTranslation($event->locale());
+            $translation->workflowStage = WorkflowStage::TEST;
+            $translation->modifiedAt = $event->createdAt();
+            $translation->modifiedBy = $event->createdBy();
+            $this->modifiedAt = $event->createdAt();
+            $this->modifiedBy = $event->createdBy();
+        } elseif ($event instanceof RemoveArticle) {
+            $this->translations = [];
+            $this->removedAt = $event->createdAt();
+            $this->removedBy = $event->createdBy();
+            $this->modifiedAt = $event->createdAt();
+            $this->modifiedBy = $event->createdBy();
         }
     }
 }

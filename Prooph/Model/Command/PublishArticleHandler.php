@@ -19,11 +19,11 @@ class PublishArticleHandler
         $this->repository = $repository;
     }
 
-    public function __invoke(PublishArticle $command): void
+    public function __invoke(PublishArticleCommand $command): void
     {
         $article = $this->repository->get($command->id());
 
-        $article = $article->publish($command->locale(), $command->userId());
+        $article = $article->publishTranslation($command->locale(), $command->userId());
         $this->repository->save($article);
 
         // TODO create route

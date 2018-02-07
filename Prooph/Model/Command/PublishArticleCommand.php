@@ -7,7 +7,7 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadTrait;
 
-class UnpublishArticle extends Command
+class PublishArticleCommand extends Command
 {
     use PayloadTrait;
 

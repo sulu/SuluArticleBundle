@@ -7,7 +7,7 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepository;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 
-class UpdateArticleHandler
+class ModifyArticleHandler
 {
     /**
      * @var ArticleRepository
@@ -25,25 +25,25 @@ class UpdateArticleHandler
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function __invoke(UpdateArticle $command): void
+    public function __invoke(ModifyArticleCommand $command): void
     {
-        $structureType = $command->data()['template'];
+        $structureType = $command->requestData()['template'];
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
 
         $structureData = [];
         foreach ($metadata->getProperties() as $property) {
-            if (array_key_exists($property->getName(), $command->data())) {
-                $structureData[$property->getName()] = $command->data()[$property->getName()];
+            if (array_key_exists($property->getName(), $command->requestData())) {
+                $structureData[$property->getName()] = $command->requestData()[$property->getName()];
             }
         }
 
         $article = $this->repository->get($command->id());
-        $article = $article->updateWithData(
+        $article = $article->modifyTranslationStructure(
             $command->locale(),
             $structureType,
             $structureData,
-            $command->data(),
-            $command->userId()
+            $command->userId(),
+            $command->requestData()
         );
         $this->repository->save($article);
     }

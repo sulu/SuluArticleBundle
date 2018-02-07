@@ -7,7 +7,7 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadTrait;
 
-class CreateArticle extends Command
+class UnpublishArticleCommand extends Command
 {
     use PayloadTrait;
 
@@ -19,11 +19,6 @@ class CreateArticle extends Command
     public function locale(): string
     {
         return $this->payload()['locale'];
-    }
-
-    public function data(): array
-    {
-        return $this->payload()['data'];
     }
 
     public function userId(): int

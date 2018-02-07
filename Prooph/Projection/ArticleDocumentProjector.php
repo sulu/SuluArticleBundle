@@ -6,10 +6,11 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Projection;
 
 use Sulu\Bundle\ArticleBundle\Controller\ArticleController;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleCreated;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticlePublished;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleUnpublished;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ArticleUpdated;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\MetadataFactoryInterface;
@@ -39,35 +40,43 @@ class ArticleDocumentProjector
         $this->formFactory = $formFactory;
     }
 
-    public function onArticleCreated(ArticleCreated $event): void
+    public function onCreateTranslation(CreateTranslation $event): void
     {
         /** @var ArticleDocument $document */
         $document = $this->documentManager->create(ArticleController::DOCUMENT_TYPE);
         $document->setUuid($event->aggregateId());
 
-        $this->persistDocument($document, $event->data(), $event->locale(), $event->creator());
+        $this->persistDocument($document, $event->requestData(), $event->locale(), $event->createdBy());
         $this->documentManager->flush();
     }
 
-    public function onArticlePublished(ArticlePublished $event): void
+    public function onPublishTranslation(PublishTranslation $event): void
     {
         $document = $this->documentManager->find($event->aggregateId(), $event->locale());
         $this->documentManager->publish($document, $event->locale());
         $this->documentManager->flush();
     }
 
-    public function onArticleUnpublished(ArticleUnpublished $event): void
+    public function onUnpublishTranslation(UnpublishTranslation $event): void
     {
         $document = $this->documentManager->find($event->aggregateId(), $event->locale());
         $this->documentManager->unpublish($document, $event->locale());
         $this->documentManager->flush();
     }
 
-    public function onArticleUpdated(ArticleUpdated $event): void
+    public function onModifyTranslationStructure(ModifyTranslationStructure $event): void
     {
         $document = $this->documentManager->find($event->aggregateId(), $event->locale());
 
-        $this->persistDocument($document, $event->data(), $event->locale(), $event->changer());
+        $this->persistDocument($document, $event->requestData(), $event->locale(), $event->createdBy());
+        $this->documentManager->flush();
+    }
+
+    public function onRemoveArticle(RemoveArticle $event): void
+    {
+        $document = $this->documentManager->find($event->aggregateId());
+
+        $this->documentManager->remove($document);
         $this->documentManager->flush();
     }
 
