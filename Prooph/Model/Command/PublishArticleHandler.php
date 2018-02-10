@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepository;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
 
 class PublishArticleHandler
 {
     /**
-     * @var ArticleRepository
+     * @var ArticleRepositoryInterface
      */
     private $repository;
 
-    public function __construct(ArticleRepository $repository)
+    public function __construct(ArticleRepositoryInterface $repository)
     {
         $this->repository = $repository;
     }

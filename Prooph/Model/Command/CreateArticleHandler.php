@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepository;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 
 class CreateArticleHandler
 {
     /**
-     * @var ArticleRepository
+     * @var ArticleRepositoryInterface
      */
     private $repository;
 
@@ -20,7 +20,7 @@ class CreateArticleHandler
      */
     private $metadataFactory;
 
-    public function __construct(ArticleRepository $repository, StructureMetadataFactoryInterface $metadataFactory)
+    public function __construct(ArticleRepositoryInterface $repository, StructureMetadataFactoryInterface $metadataFactory)
     {
         $this->repository = $repository;
         $this->metadataFactory = $metadataFactory;
@@ -40,7 +40,7 @@ class CreateArticleHandler
             }
         }
 
-        $article = Article::create($command->id(), $command->userId());
+        $article = $this->repository->create($command->id(), $command->userId());
         $article->modifyTranslationStructure($command->locale(), $structureType, $structureData, $command->userId(), $command->requestData());
         $this->repository->save($article);
     }

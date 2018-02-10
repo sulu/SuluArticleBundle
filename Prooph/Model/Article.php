@@ -13,49 +13,54 @@ use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
-use Sulu\Component\Content\Document\WorkflowStage;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverPool;
 
 class Article extends AggregateRoot
 {
     /**
      * @var string
      */
-    private $id;
+    public $id;
 
     /**
      * @var int
      */
-    private $createdBy;
+    public $createdBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    private $createdAt;
+    public $createdAt;
 
     /**
      * @var int
      */
-    private $modifiedBy;
+    public $modifiedBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    private $modifiedAt;
+    public $modifiedAt;
 
     /**
      * @var int
      */
-    private $removedBy;
+    public $removedBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    private $removedAt;
+    public $removedAt;
 
     /**
      * @var ArticleTranslation[]
      */
-    private $translations = [];
+    public $translations = [];
+
+    /**
+     * @var EventResolverPool
+     */
+    static public $eventResolver;
 
     static public function create(string $id, int $userId)
     {
@@ -168,52 +173,14 @@ class Article extends AggregateRoot
 
     protected function apply(AggregateChanged $event): void
     {
-        if ($event instanceof CreateArticle) {
-            $this->id = $event->aggregateId();
-            $this->createdAt = $event->createdAt();
-            $this->createdBy = $event->createdBy();
-        } elseif ($event instanceof CreateTranslation) {
-            $this->translations[$event->locale()] = $translation = new ArticleTranslation();
-            $translation->locale = $event->locale();
-            $translation->structureType = $event->structureType();
-            $translation->createdAt = $event->createdAt();
-            $translation->createdBy = $event->createdBy();
-        } elseif ($event instanceof ChangeTranslationStructure) {
-            $translation = $this->findTranslation($event->locale());
-            $translation->structureType = $event->structureType();
-            $translation->modifiedAt = $event->createdAt();
-            $translation->modifiedBy = $event->createdBy();
-            $this->modifiedAt = $event->createdAt();
-            $this->modifiedBy = $event->createdBy();
-        } elseif ($event instanceof ModifyTranslationStructure) {
-            $translation = $this->findTranslation($event->locale());
-            $translation->structureData = array_merge($translation->structureData, $event->structureData());
-            $translation->modifiedAt = $event->createdAt();
-            $translation->modifiedBy = $event->createdBy();
-            $this->modifiedAt = $event->createdAt();
-            $this->modifiedBy = $event->createdBy();
-        } elseif ($event instanceof PublishTranslation) {
-            $translation = $this->findTranslation($event->locale());
-            $translation->workflowStage = WorkflowStage::PUBLISHED;
-            $translation->publishedAt = $event->createdAt();
-            $translation->publishedBy = $event->createdBy();
-            $translation->modifiedAt = $event->createdAt();
-            $translation->modifiedBy = $event->createdBy();
-            $this->modifiedAt = $event->createdAt();
-            $this->modifiedBy = $event->createdBy();
-        } elseif ($event instanceof UnpublishTranslation) {
-            $translation = $this->findTranslation($event->locale());
-            $translation->workflowStage = WorkflowStage::TEST;
-            $translation->modifiedAt = $event->createdAt();
-            $translation->modifiedBy = $event->createdBy();
-            $this->modifiedAt = $event->createdAt();
-            $this->modifiedBy = $event->createdBy();
-        } elseif ($event instanceof RemoveArticle) {
-            $this->translations = [];
-            $this->removedAt = $event->createdAt();
-            $this->removedBy = $event->createdBy();
-            $this->modifiedAt = $event->createdAt();
-            $this->modifiedBy = $event->createdBy();
-        }
+        self::$eventResolver->resolve($this, $event);
+    }
+
+    /**
+     * Allow extensibility from outside this class.
+     */
+    public function recordThat(AggregateChanged $event): void
+    {
+        parent::recordThat($event);
     }
 }

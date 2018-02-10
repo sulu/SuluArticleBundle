@@ -51,11 +51,13 @@ use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\RemoveArticleCommand;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\RemoveArticleHandler;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\UnpublishArticleCommand;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\UnpublishArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\ArticleResolver;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverPool;
 use Sulu\Bundle\ArticleBundle\Prooph\Projection\ArticleDocumentProjector;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -634,8 +636,11 @@ class ArticleController extends RestController implements ClassResourceInterface
         $eventPublisher = new EventPublisher($eventBus);
         $eventPublisher->attachToEventStore($eventStore);
 
+        $eventResolverPool = new EventResolverPool();
+        $eventResolverPool->addEventResolver(new ArticleResolver());
+
         $pdoSnapshotStore = new PdoSnapshotStore($pdo);
-        $userRepository = new ArticleRepository($eventStore, $pdoSnapshotStore);
+        $userRepository = new ArticleRepository($eventStore, $pdoSnapshotStore, $eventResolverPool);
 
         $projectionManager = new MySqlProjectionManager($eventStore, $pdo);
 

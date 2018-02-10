@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 
-use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepository;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 
 class ModifyArticleHandler
 {
     /**
-     * @var ArticleRepository
+     * @var ArticleRepositoryInterface
      */
     private $repository;
 
@@ -19,7 +19,7 @@ class ModifyArticleHandler
      */
     private $metadataFactory;
 
-    public function __construct(ArticleRepository $repository, StructureMetadataFactoryInterface $metadataFactory)
+    public function __construct(ArticleRepositoryInterface $repository, StructureMetadataFactoryInterface $metadataFactory)
     {
         $this->repository = $repository;
         $this->metadataFactory = $metadataFactory;
