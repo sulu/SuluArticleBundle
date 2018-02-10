@@ -645,10 +645,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $projectionManager = new MySqlProjectionManager($eventStore, $pdo);
 
         $structureFactory = $this->get('sulu_content.structure.factory');
+        $routeGenerator = $this->get('sulu_route.chain_generator');
+        $conflictResolver = $this->get('sulu_route.manager.conflict_resolver.auto_increment');
 
         $commandBus = new CommandBus();
         $router = new CommandRouter();
-        $router->route(CreateArticleCommand::class)->to(new CreateArticleHandler($userRepository, $structureFactory));
+        $router->route(CreateArticleCommand::class)->to(new CreateArticleHandler($userRepository, $structureFactory, $routeGenerator, $conflictResolver));
         $router->route(PublishArticleCommand::class)->to(new PublishArticleHandler($userRepository));
         $router->route(UnpublishArticleCommand::class)->to(new UnpublishArticleHandler($userRepository));
         $router->route(ModifyArticleCommand::class)->to(new ModifyArticleHandler($userRepository, $structureFactory));

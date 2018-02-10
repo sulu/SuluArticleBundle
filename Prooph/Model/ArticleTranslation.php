@@ -2,9 +2,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Prooph\Model;
 
+use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 
-class ArticleTranslation
+class ArticleTranslation implements RoutableInterface
 {
     /**
      * @var string
@@ -20,6 +22,11 @@ class ArticleTranslation
      * @var string
      */
     public $title;
+
+    /**
+     * @var string
+     */
+    public $routePath;
 
     /**
      * @var string
@@ -66,5 +73,31 @@ class ArticleTranslation
      */
     public $workflowStage = WorkflowStage::TEST;
 
-    // TODO pageTitle, routePath, versions, extensions, pages, author
+    // TODO pageTitle, versions, extensions, pages, author
+
+    /**
+     * @var  RouteInterface
+     */
+    private $route;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    public function setRoute(RouteInterface $route)
+    {
+        $this->route = $route;
+        $this->routePath = $route->getPath();
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
 }
