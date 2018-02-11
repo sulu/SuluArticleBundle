@@ -41,24 +41,24 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ArticleBundle\Prooph\Infrastruture\ArticleRepository;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\CreateArticleCommand;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\CreateArticleHandler;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\ModifyArticleCommand;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\ModifyArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\DeleteArticleCommand;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PostArticleCommand;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PublishArticleCommand;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PublishArticleHandler;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\RemoveArticleCommand;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\RemoveArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PutArticleCommand;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\UnpublishArticleCommand;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\UnpublishArticleHandler;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\ArticleResolver;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverPool;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Handler\DeleteArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Handler\PostArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Handler\PublishArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Handler\PutArticleHandler;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Handler\UnpublishArticleHandler;
 use Sulu\Bundle\ArticleBundle\Prooph\Projection\ArticleDocumentProjector;
+use Sulu\Bundle\ArticleBundle\Prooph\Projection\ArticleIndexProjector;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
@@ -313,7 +313,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         $locale = $this->getRequestParameter($request, 'locale', true);
         $this->getCommandBus()->dispatch(
-            new CreateArticleCommand(
+            new PostArticleCommand(
                 [
                     'id' => $id,
                     'locale' => $locale,
@@ -361,7 +361,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
 
         $this->getCommandBus()->dispatch(
-            new ModifyArticleCommand(
+            new PutArticleCommand(
                 [
                     'id' => $uuid,
                     'locale' => $locale,
@@ -397,7 +397,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         foreach ($ids as $id) {
             $this->getCommandBus()->dispatch(
-                new RemoveArticleCommand(
+                new DeleteArticleCommand(
                     [
                         'id' => $id,
                         'userId' => $this->getUser()->getId(),
@@ -419,7 +419,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     public function deleteAction($id)
     {
         $this->getCommandBus()->dispatch(
-            new RemoveArticleCommand(
+            new DeleteArticleCommand(
                 [
                     'id' => $id,
                     'userId' => $this->getUser()->getId(),
@@ -636,11 +636,8 @@ class ArticleController extends RestController implements ClassResourceInterface
         $eventPublisher = new EventPublisher($eventBus);
         $eventPublisher->attachToEventStore($eventStore);
 
-        $eventResolverPool = new EventResolverPool();
-        $eventResolverPool->addEventResolver(new ArticleResolver());
-
         $pdoSnapshotStore = new PdoSnapshotStore($pdo);
-        $userRepository = new ArticleRepository($eventStore, $pdoSnapshotStore, $eventResolverPool);
+        $userRepository = new ArticleRepository(Article::class, $eventStore, $pdoSnapshotStore);
 
         $projectionManager = new MySqlProjectionManager($eventStore, $pdo);
 
@@ -650,23 +647,36 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         $commandBus = new CommandBus();
         $router = new CommandRouter();
-        $router->route(CreateArticleCommand::class)->to(new CreateArticleHandler($userRepository, $structureFactory, $routeGenerator, $conflictResolver));
+        $router->route(PostArticleCommand::class)->to(new PostArticleHandler($userRepository, $structureFactory, $routeGenerator, $conflictResolver));
         $router->route(PublishArticleCommand::class)->to(new PublishArticleHandler($userRepository));
         $router->route(UnpublishArticleCommand::class)->to(new UnpublishArticleHandler($userRepository));
-        $router->route(ModifyArticleCommand::class)->to(new ModifyArticleHandler($userRepository, $structureFactory));
-        $router->route(RemoveArticleCommand::class)->to(new RemoveArticleHandler($userRepository));
+        $router->route(PutArticleCommand::class)->to(new PutArticleHandler($userRepository, $structureFactory));
+        $router->route(DeleteArticleCommand::class)->to(new DeleteArticleHandler($userRepository));
         $router->attachToMessageBus($commandBus);
 
-        $userProjector = new ArticleDocumentProjector(
-            $this->getDocumentManager(), $this->getMetadataFactory(), $this->get('form.factory')
+        $documentProjector = new ArticleDocumentProjector(
+            $this->getDocumentManager(),
+            $this->getMetadataFactory(),
+            $this->get('form.factory')
+        );
+
+        $indexProjector = new ArticleIndexProjector(
+            $this->getDocumentManager(),
+            $this->get('sulu_article.elastic_search.article_indexer'),
+            $this->get('sulu_article.elastic_search.article_live_indexer')
         );
 
         $eventRouter = new EventRouter();
-        $eventRouter->route(CreateTranslation::class)->to([$userProjector, 'onCreateTranslation']);
-        $eventRouter->route(PublishTranslation::class)->to([$userProjector, 'onPublishTranslation']);
-        $eventRouter->route(UnpublishTranslation::class)->to([$userProjector, 'onUnpublishTranslation']);
-        $eventRouter->route(ModifyTranslationStructure::class)->to([$userProjector, 'onModifyTranslationStructure']);
-        $eventRouter->route(RemoveArticle::class)->to([$userProjector, 'onRemoveArticle']);
+        $eventRouter->route(CreateTranslation::class)->to([$documentProjector, 'onCreateTranslation']);
+        $eventRouter->route(CreateTranslation::class)->to([$indexProjector, 'onCreateTranslation']);
+        $eventRouter->route(PublishTranslation::class)->to([$documentProjector, 'onPublishTranslation']);
+        $eventRouter->route(PublishTranslation::class)->to([$indexProjector, 'onPublishTranslation']);
+        $eventRouter->route(UnpublishTranslation::class)->to([$documentProjector, 'onUnpublishTranslation']);
+        $eventRouter->route(UnpublishTranslation::class)->to([$indexProjector, 'onUnpublishTranslation']);
+        $eventRouter->route(ModifyTranslationStructure::class)->to([$documentProjector, 'onModifyTranslationStructure']);
+        $eventRouter->route(ModifyTranslationStructure::class)->to([$indexProjector, 'onModifyTranslationStructure']);
+        $eventRouter->route(RemoveArticle::class)->to([$documentProjector, 'onRemoveArticle']);
+        $eventRouter->route(RemoveArticle::class)->to([$indexProjector, 'onRemoveArticle']);
         $eventRouter->attachToMessageBus($eventBus);
 
         return $commandBus;

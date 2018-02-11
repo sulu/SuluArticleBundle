@@ -178,7 +178,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->articleSubscriber->handleRemove($this->prophesizeEvent(RemoveEvent::class));
 
-        $this->indexer->remove($this->document->reveal())->shouldBeCalled();
+        $this->indexer->remove($this->uuid)->shouldBeCalled();
         $this->indexer->flush()->shouldBeCalled();
         $this->liveIndexer->index(Argument::any())->shouldNotBeCalled();
         $this->liveIndexer->flush()->shouldNotBeCalled();
@@ -190,7 +190,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->indexer->remove(Argument::any())->shouldNotBeCalled();
         $this->indexer->flush()->shouldNotBeCalled();
-        $this->liveIndexer->remove($this->document->reveal())->shouldBeCalled();
+        $this->liveIndexer->remove($this->uuid)->shouldBeCalled();
         $this->liveIndexer->flush()->shouldBeCalled();
     }
 

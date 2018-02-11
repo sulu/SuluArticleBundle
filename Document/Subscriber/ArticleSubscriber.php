@@ -115,19 +115,15 @@ class ArticleSubscriber implements EventSubscriberInterface
                 ['persistPageData', -2000],
             ],
             Events::REMOVE => [
-                ['handleRemove', -500],
-                ['handleRemoveLive', -500],
                 ['handleRemovePage', -500],
             ],
             Events::PUBLISH => [
-                ['handleScheduleIndexLive', 0],
                 ['handleScheduleIndex', 0],
                 ['synchronizeChildren', 0],
                 ['publishChildren', 0],
                 ['persistPageData', -2000],
             ],
             Events::REORDER => [['persistPageDataOnReorder', -2000]],
-            Events::UNPUBLISH => 'handleUnpublish',
             Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
             Events::COPY => ['handleCopy'],
@@ -154,13 +150,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function handleScheduleIndex(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            if (!$document instanceof ArticlePageDocument) {
-                return;
-            }
-
-            $document = $document->getParent();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
         }
+
+        $document = $document->getParent();
 
         $this->documents[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
@@ -176,13 +170,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function handleScheduleIndexLive(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            if (!$document instanceof ArticlePageDocument) {
-                return;
-            }
-
-            $document = $document->getParent();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
         }
+
+        $document = $document->getParent();
 
         $this->liveDocuments[$document->getUuid()] = [
             'uuid' => $document->getUuid(),
@@ -456,38 +448,6 @@ class ArticleSubscriber implements EventSubscriberInterface
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
-    }
-
-    /**
-     * Removes article-document.
-     *
-     * @param RemoveEvent $event
-     */
-    public function handleRemove(RemoveEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        $this->indexer->remove($document);
-        $this->indexer->flush();
-    }
-
-    /**
-     * Removes article-document.
-     *
-     * @param RemoveEvent|UnpublishEvent $event
-     */
-    public function handleRemoveLive($event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
-            return;
-        }
-
-        $this->liveIndexer->remove($document);
-        $this->liveIndexer->flush();
     }
 
     /**

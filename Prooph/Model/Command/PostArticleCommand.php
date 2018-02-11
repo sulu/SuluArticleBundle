@@ -7,7 +7,7 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadTrait;
 
-class CreateArticleCommand extends Command
+class PostArticleCommand extends Command
 {
     use PayloadTrait;
 

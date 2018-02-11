@@ -7,13 +7,23 @@ namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
 use Prooph\Common\Messaging\Command;
 use Prooph\Common\Messaging\PayloadTrait;
 
-class RemoveArticleCommand extends Command
+class PutArticleCommand extends Command
 {
     use PayloadTrait;
 
     public function id(): string
     {
         return $this->payload()['id'];
+    }
+
+    public function locale(): string
+    {
+        return $this->payload()['locale'];
+    }
+
+    public function requestData(): array
+    {
+        return $this->payload()['requestData'];
     }
 
     public function userId(): int

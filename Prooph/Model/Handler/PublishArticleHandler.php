@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
+namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Handler;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PublishArticleCommand;
 
 class PublishArticleHandler
 {

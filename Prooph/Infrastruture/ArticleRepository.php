@@ -11,37 +11,31 @@ use Prooph\EventStore\EventStore;
 use Prooph\SnapshotStore\SnapshotStore;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\CreateArticle;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverInterface;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverPool;
 
 class ArticleRepository extends AggregateRepository implements ArticleRepositoryInterface
 {
     /**
-     * @var EventResolverInterface[]
+     * @var string
      */
-    private $eventResolverPool;
+    private $className;
 
-    public function __construct(
-        EventStore $eventStore,
-        SnapshotStore $snapshotStore,
-        EventResolverPool $eventResolverPool
-    ) {
+    public function __construct(string $className, EventStore $eventStore, SnapshotStore $snapshotStore)
+    {
         parent::__construct(
             $eventStore,
-            AggregateType::fromAggregateRootClass(Article::class),
+            AggregateType::fromAggregateRootClass($className),
             new AggregateTranslator(),
             $snapshotStore,
             null,
             true
         );
 
-        Article::$eventResolver = $eventResolverPool;
+        $this->className = $className;
     }
 
     public function create(string $id, int $userId): Article
     {
-        return Article::create($id, $userId);
+        return $this->className::create($id, $userId);
     }
 
     public function save(Article $article): void

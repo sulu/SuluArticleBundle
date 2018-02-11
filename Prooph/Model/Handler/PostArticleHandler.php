@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
+namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Handler;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleTranslation;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PostArticleCommand;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 
-class CreateArticleHandler
+class PostArticleHandler
 {
     const ROUTE_PROPERTY = 'routePath';
 
@@ -49,7 +50,7 @@ class CreateArticleHandler
         $this->conflictResolver = $conflictResolver;
     }
 
-    public function __invoke(CreateArticleCommand $command): void
+    public function __invoke(PostArticleCommand $command): void
     {
         $structureType = $command->requestData()['template'];
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
@@ -78,7 +79,7 @@ class CreateArticleHandler
     }
 
     private function generateRoute(
-        CreateArticleCommand $command,
+        PostArticleCommand $command,
         string $structureType,
         array $structureData,
         string $propertyName

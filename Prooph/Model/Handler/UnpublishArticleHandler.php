@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
+namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Handler;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Article;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\UnpublishArticleCommand;
 
-class RemoveArticleHandler
+class UnpublishArticleHandler
 {
     /**
      * @var ArticleRepositoryInterface
@@ -19,11 +20,11 @@ class RemoveArticleHandler
         $this->repository = $repository;
     }
 
-    public function __invoke(RemoveArticleCommand $command): void
+    public function __invoke(UnpublishArticleCommand $command): void
     {
         $article = $this->repository->get($command->id());
 
-        $article = $article->remove($command->userId());
+        $article = $article->unpublishTranslation($command->locale(), $command->userId());
         $this->repository->save($article);
     }
 }

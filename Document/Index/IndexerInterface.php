@@ -44,9 +44,9 @@ interface IndexerInterface
     /**
      * Removes document from index.
      *
-     * @param ArticleDocument $document
+     * @param string $uuid
      */
-    public function remove($document);
+    public function remove($uuid);
 
     /**
      * Flushes index.

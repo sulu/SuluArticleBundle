@@ -13,54 +13,49 @@ use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\ModifyTranslationStructure;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\PublishTranslation;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\RemoveArticle;
 use Sulu\Bundle\ArticleBundle\Prooph\Model\Event\UnpublishTranslation;
-use Sulu\Bundle\ArticleBundle\Prooph\Model\Resolver\EventResolverPool;
+use Sulu\Component\Content\Document\WorkflowStage;
 
 class Article extends AggregateRoot
 {
     /**
      * @var string
      */
-    public $id;
+    private $id;
 
     /**
      * @var int
      */
-    public $createdBy;
+    private $createdBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    public $createdAt;
+    private $createdAt;
 
     /**
      * @var int
      */
-    public $modifiedBy;
+    private $modifiedBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    public $modifiedAt;
+    private $modifiedAt;
 
     /**
      * @var int
      */
-    public $removedBy;
+    private $removedBy;
 
     /**
      * @var \DateTimeImmutable
      */
-    public $removedAt;
+    private $removedAt;
 
     /**
      * @var ArticleTranslation[]
      */
-    public $translations = [];
-
-    /**
-     * @var EventResolverPool
-     */
-    static public $eventResolver;
+    private $translations = [];
 
     static public function create(string $id, int $userId)
     {
@@ -171,16 +166,90 @@ class Article extends AggregateRoot
         return $this->translations[$locale];
     }
 
-    protected function apply(AggregateChanged $event): void
+    public function whenCreateArticle(CreateArticle $event): void
     {
-        self::$eventResolver->resolve($this, $event);
+        $this->id = $event->aggregateId();
+        $this->createdAt = $event->createdAt();
+        $this->createdBy = $event->createdBy();
     }
 
-    /**
-     * Allow extensibility from outside this class.
-     */
-    public function recordThat(AggregateChanged $event): void
+    public function whenCreateTranslation(CreateTranslation $event): void
     {
-        parent::recordThat($event);
+        $this->translations[$event->locale()] = $translation = new ArticleTranslation();
+        $translation->locale = $event->locale();
+        $translation->structureType = $event->structureType();
+        $translation->createdAt = $event->createdAt();
+        $translation->createdBy = $event->createdBy();
+    }
+
+    public function whenChangeTranslationStructure(ChangeTranslationStructure $event)
+    {
+        $translation = $this->findTranslation($event->locale());
+        $translation->structureType = $event->structureType();
+        $translation->modifiedAt = $event->createdAt();
+        $translation->modifiedBy = $event->createdBy();
+        $this->modifiedAt = $event->createdAt();
+        $this->modifiedBy = $event->createdBy();
+    }
+
+    public function whenModifyTranslationStructure(ModifyTranslationStructure $event)
+    {
+        $translation = $this->findTranslation($event->locale());
+        $translation->structureData = array_merge($translation->structureData, $event->structureData());
+        $translation->modifiedAt = $event->createdAt();
+        $translation->modifiedBy = $event->createdBy();
+        $this->modifiedAt = $event->createdAt();
+        $this->modifiedBy = $event->createdBy();
+    }
+
+    public function whenPublishTranslation(PublishTranslation $event)
+    {
+        $translation = $this->findTranslation($event->locale());
+        $translation->workflowStage = WorkflowStage::PUBLISHED;
+        $translation->publishedAt = $event->createdAt();
+        $translation->publishedBy = $event->createdBy();
+        $translation->modifiedAt = $event->createdAt();
+        $translation->modifiedBy = $event->createdBy();
+        $this->modifiedAt = $event->createdAt();
+        $this->modifiedBy = $event->createdBy();
+    }
+
+    public function whenUnpublishTranslation(UnpublishTranslation $event)
+    {
+        $translation = $this->findTranslation($event->locale());
+        $translation->workflowStage = WorkflowStage::TEST;
+        $translation->modifiedAt = $event->createdAt();
+        $translation->modifiedBy = $event->createdBy();
+        $this->modifiedAt = $event->createdAt();
+        $this->modifiedBy = $event->createdBy();
+    }
+
+    public function whenRemoveArticle(RemoveArticle $event)
+    {
+        $this->translations = [];
+        $this->removedAt = $event->createdAt();
+        $this->removedBy = $event->createdBy();
+        $this->modifiedAt = $event->createdAt();
+        $this->modifiedBy = $event->createdBy();
+    }
+
+    protected function apply(AggregateChanged $event): void
+    {
+        $handler = $this->determineEventHandlerMethodFor($event);
+        if (!method_exists($this, $handler)) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Missing event handler method %s for aggregate root %s',
+                    $handler,
+                    get_class($this)
+                )
+            );
+        }
+        $this->{$handler}($event);
+    }
+
+    protected function determineEventHandlerMethodFor(AggregateChanged $e): string
+    {
+        return 'when' . implode(array_slice(explode('\\', get_class($e)), -1));
     }
 }

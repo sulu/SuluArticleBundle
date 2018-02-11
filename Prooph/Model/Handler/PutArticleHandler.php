@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Command;
+namespace Sulu\Bundle\ArticleBundle\Prooph\Model\Handler;
 
 use Sulu\Bundle\ArticleBundle\Prooph\Model\ArticleRepositoryInterface;
+use Sulu\Bundle\ArticleBundle\Prooph\Model\Command\PutArticleCommand;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 
-class ModifyArticleHandler
+class PutArticleHandler
 {
     /**
      * @var ArticleRepositoryInterface
@@ -25,7 +26,7 @@ class ModifyArticleHandler
         $this->metadataFactory = $metadataFactory;
     }
 
-    public function __invoke(ModifyArticleCommand $command): void
+    public function __invoke(PutArticleCommand $command): void
     {
         $structureType = $command->requestData()['template'];
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);

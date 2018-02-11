@@ -365,11 +365,11 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($document)
+    public function remove($uuid)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
-            ->addQuery(new TermQuery('uuid', $document->getUuid()))
+            ->addQuery(new TermQuery('uuid', $uuid))
             ->setSize(1000);
         foreach ($repository->findDocuments($search) as $viewDocument) {
             $this->manager->remove($viewDocument);
