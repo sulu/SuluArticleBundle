@@ -17,7 +17,7 @@ composer require sulu/article-bundle
 
 ### Add bundles to AbstractKernel
 
-The bundle should be registered after the `SuluCoreBundle`.
+The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
 
 ```php
 /* app/AbstractKernel.php */
