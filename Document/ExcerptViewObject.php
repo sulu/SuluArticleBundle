@@ -71,28 +71,28 @@ class ExcerptViewObject
     /**
      * @var CategoryViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:CategoryViewObject", multiple=true)
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\CategoryViewObject", multiple=true)
      */
     public $categories;
 
     /**
      * @var TagViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:TagViewObject", multiple=true)
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\TagViewObject", multiple=true)
      */
     public $tags;
 
     /**
      * @var MediaViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:MediaViewObject", multiple=true)
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\MediaViewObject", multiple=true)
      */
     public $icon;
 
     /**
      * @var MediaViewObject[]|Collection
      *
-     * @Embedded(class="SuluArticleBundle:MediaViewObject", multiple=true)
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\MediaViewObject", multiple=true)
      */
     public $images;
 

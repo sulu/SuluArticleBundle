@@ -166,14 +166,14 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var ExcerptViewObject
      *
-     * @Embedded(class="SuluArticleBundle:ExcerptViewObject")
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\ExcerptViewObject")
      */
     protected $excerpt;
 
     /**
      * @var SeoViewObject
      *
-     * @Embedded(class="SuluArticleBundle:SeoViewObject")
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\SeoViewObject")
      */
     protected $seo;
 
@@ -230,7 +230,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var LocalizationStateViewObject
      *
-     * @Embedded(class="SuluArticleBundle:LocalizationStateViewObject")
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject")
      */
     protected $localizationState;
 
@@ -258,7 +258,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var ArticlePageViewObject[]
      *
-     * @Embedded(class="SuluArticleBundle:ArticlePageViewObject", multiple=true)
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject", multiple=true)
      */
     protected $pages = [];
 
