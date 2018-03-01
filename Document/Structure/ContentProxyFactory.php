@@ -15,6 +15,8 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
+use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Factory for content-proxies.
@@ -32,15 +34,18 @@ class ContentProxyFactory
     private $proxyFactory;
 
     /**
-     * @param ContentTypeManagerInterface $contentTypeManager
-     * @param LazyLoadingValueHolderFactory $proxyFactory
+     * @var RequestStack
      */
+    private $requestStack;
+
     public function __construct(
         ContentTypeManagerInterface $contentTypeManager,
-        LazyLoadingValueHolderFactory $proxyFactory
+        LazyLoadingValueHolderFactory $proxyFactory,
+        RequestStack $requestStack
     ) {
         $this->contentTypeManager = $contentTypeManager;
         $this->proxyFactory = $proxyFactory;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -80,6 +85,8 @@ class ContentProxyFactory
      */
     private function resolveContent(StructureInterface $structure, array $data)
     {
+        $structure->setWebspaceKey($this->getWebspaceKey());
+
         $content = [];
         foreach ($structure->getProperties(true) as $child) {
             if (array_key_exists($child->getName(), $data)) {
@@ -130,6 +137,8 @@ class ContentProxyFactory
      */
     private function resolveView(StructureInterface $structure, array $data)
     {
+        $structure->setWebspaceKey($this->getWebspaceKey());
+
         $view = [];
         foreach ($structure->getProperties(true) as $child) {
             if (array_key_exists($child->getName(), $data)) {
@@ -141,5 +150,24 @@ class ContentProxyFactory
         }
 
         return $view;
+    }
+
+    /**
+     * @return string
+     */
+    private function getWebspaceKey()
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request) {
+            return null;
+        }
+
+        /** @var RequestAttributes $attributes */
+        $attributes = $request->attributes->get('_sulu');
+        if (!$attributes) {
+            return null;
+        }
+
+        return $attributes->getAttribute('webspaceKey');
     }
 }

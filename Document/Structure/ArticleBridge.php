@@ -19,6 +19,11 @@ use Sulu\Component\Content\Compat\Structure\StructureBridge;
 class ArticleBridge extends StructureBridge
 {
     /**
+     * @var string
+     */
+    private $webspaceKey = null;
+
+    /**
      * {@inheritdoc}
      */
     public function getView()
@@ -71,6 +76,14 @@ class ArticleBridge extends StructureBridge
      */
     public function getWebspaceKey()
     {
-        return;
+        return $this->webspaceKey;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setWebspaceKey($webspace)
+    {
+        $this->webspaceKey = $webspace;
     }
 }

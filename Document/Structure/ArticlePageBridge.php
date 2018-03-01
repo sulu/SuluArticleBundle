@@ -11,18 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Structure;
 
-use Sulu\Component\Content\Compat\Structure\StructureBridge;
-
 /**
  * Own structure bridge for articles.
  */
-class ArticlePageBridge extends StructureBridge
+class ArticlePageBridge extends ArticleBridge
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getWebspaceKey()
-    {
-        return;
-    }
 }
