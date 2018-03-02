@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
+use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
@@ -194,23 +195,37 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
         }
 
-        $search->setSize($limit);
-        $search->setFrom(($page - 1) * $limit);
+        if ($limit) {
+            $search->setSize($limit);
+            $search->setFrom(($page - 1) * $limit);
 
-        $result = [];
-        $searchResult = $repository->findDocuments($search);
-        foreach ($searchResult as $document) {
-            if (false !== ($index = array_search($document->getUuid(), $ids))) {
-                $result[$index] = $document;
-            } else {
-                $result[] = $document;
+
+            $result = [];
+            $searchResult = $repository->findDocuments($search);
+            foreach ($searchResult as $document) {
+                if (false !== ($index = array_search($document->getUuid(), $ids))) {
+                    $result[$index] = $document;
+                } else {
+                    $result[] = $document;
+                }
+            }
+
+            if (count($ids)) {
+                ksort($result);
+                $result = array_values($result);
+            }
+        } else {
+            $search->setSize(1000);
+            $search->setScroll('1m');
+
+            $searchResult = $repository->execute($search, Result::RESULTS_RAW_ITERATOR);
+            $result = [];
+            foreach ($searchResult as $document) {
+                $result[] = $document['_source'];
             }
         }
 
-        if (count($ids)) {
-            ksort($result);
-            $result = array_values($result);
-        }
+        $count = $searchResult->count();
 
         return $this->handleView(
             $this->view(
@@ -221,7 +236,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $request->query->all(),
                     $page,
                     $limit,
-                    $searchResult->count()
+                    $count
                 )
             )
         );

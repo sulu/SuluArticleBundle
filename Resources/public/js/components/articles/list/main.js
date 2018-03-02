@@ -155,7 +155,15 @@ define([
                 toolbar: {
                     buttons: {
                         addArticle: {options: button},
-                        deleteSelected: {}
+                        deleteSelected: {},
+                        export: {
+                            options: {
+                                url: '/admin/api/articles.csv',
+                                urlParameter: {
+                                    locale: this.options.locale
+                                }
+                            }
+                        }
                     },
 
                     languageChanger: {
