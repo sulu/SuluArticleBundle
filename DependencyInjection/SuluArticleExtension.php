@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -191,6 +192,10 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $bundles = $container->getParameter('kernel.bundles');
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
+        } elseif ('task' === $config['content_types']['page_tree_route']['page_route_cascade']) {
+            throw new InvalidConfigurationException(
+                'You need to install the SuluAutomationBundle to use task cascading!'
+            );
         }
 
         $container->setAlias(
