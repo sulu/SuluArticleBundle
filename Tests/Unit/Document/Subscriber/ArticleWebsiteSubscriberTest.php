@@ -27,6 +27,10 @@ use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
+use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,12 +71,22 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $requestAttributes = $this->prophesize(RequestAttributes::class);
+        $requestAttributes->getAttribute('webspaceKey')->willReturn('sulu_io');
+
+        $request = $this->prophesize(Request::class);
+        $request->reveal()->attributes = new ParameterBag(['_sulu' => $requestAttributes->reveal()]);
+
+        $requestStack = $this->prophesize(RequestStack::class);
+        $requestStack->getCurrentRequest()->willReturn($request->reveal());
+
         $this->structureManager = $this->prophesize(StructureManagerInterface::class);
         $this->contentTypeManager = $this->prophesize(ContentTypeManagerInterface::class);
         $this->proxyFactory = new LazyLoadingValueHolderFactory();
         $this->contentProxyFactory = new ContentProxyFactory(
             $this->contentTypeManager->reveal(),
-            $this->proxyFactory
+            $this->proxyFactory,
+            $requestStack->reveal()
         );
         $this->extensionManager = $this->prophesize(ExtensionManagerInterface::class);
 
