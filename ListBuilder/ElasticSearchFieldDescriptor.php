@@ -19,6 +19,11 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
  */
 class ElasticSearchFieldDescriptor extends FieldDescriptor
 {
+    public static function build($name, $translation = null)
+    {
+        return new ElasticSearchFieldDescriptorBuilder($name, $translation);
+    }
+
     /**
      * @var string
      */

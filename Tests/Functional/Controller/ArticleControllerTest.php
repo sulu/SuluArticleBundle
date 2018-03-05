@@ -275,7 +275,7 @@ class ArticleControllerTest extends SuluTestCase
         $client = $this->createAuthenticatedClient();
 
         // Retrieve articles in 'de'.
-        $client->request('GET', '/api/articles?locale=de&type=blog');
+        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title');
         $this->assertHttpStatusCode(200, $client->getResponse());
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -293,7 +293,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article2['id'], $title2], $items);
 
         // Retrieve articles in 'en'.
-        $client->request('GET', '/api/articles?locale=en&type=blog');
+        $client->request('GET', '/api/articles?locale=en&type=blog&fields=title');
         $this->assertHttpStatusCode(200, $client->getResponse());
         $response = json_decode($client->getResponse()->getContent(), true);
 
@@ -420,7 +420,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog');
+        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -476,7 +476,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&authoredFrom=2016-01-09&authoredTo=2016-01-11');
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&type=blog&authoredFrom=2016-01-09&authoredTo=2016-01-11&fields=title'
+        );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -499,7 +502,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&workflowStage=published');
+        $client->request('GET', '/api/articles?locale=de&type=blog&workflowStage=published&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -522,7 +525,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=awesome&type=blog');
+        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=awesome&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -545,7 +548,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&searchFields=route_path&search=/articles&type=blog');
+        $client->request(
+            'GET',
+            '/api/articles?locale=de&searchFields=route_path&search=/articles&type=blog&fields=title'
+        );
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -569,7 +575,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=AwEsoMe&type=blog');
+        $client->request('GET', '/api/articles?locale=de&searchFields=title&search=AwEsoMe&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -591,7 +597,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&sortBy=title&sortOrder=desc&type=blog');
+        $client->request('GET', '/api/articles?locale=de&sortBy=title&sortOrder=desc&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -615,7 +621,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog');
+        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -634,7 +640,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article1['id'], $article1['title']], $items);
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=video');
+        $client->request('GET', '/api/articles?locale=de&type=video&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -889,7 +895,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         // get all articles in default locale
-        $client->request('GET', '/api/articles?locale=' . $locale . '&type=blog');
+        $client->request('GET', '/api/articles?locale=' . $locale . '&type=blog&fields=title');
         $this->assertHttpStatusCode(200, $client->getResponse());
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
@@ -906,7 +912,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article2['id'], $article2['title']], $items);
 
         // get all articles in dest locale (both should be ghosts)
-        $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog');
+        $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog&fields=title');
         $this->assertHttpStatusCode(200, $client->getResponse());
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
@@ -934,7 +940,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals([$locale, $destLocale], $response['concreteLanguages']);
 
         // get all articles in dest locale (now only one should be a ghost)
-        $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog');
+        $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog&fields=title');
         $this->assertHttpStatusCode(200, $client->getResponse());
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);

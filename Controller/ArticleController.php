@@ -13,8 +13,8 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use Guzzle\Inflection\Inflector;
 use JMS\Serializer\SerializationContext;
-use ONGR\ElasticsearchBundle\Result\Result;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
@@ -34,6 +34,7 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
+use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\RequestParametersTrait;
 use Sulu\Component\Rest\RestController;
@@ -61,39 +62,51 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => new ElasticSearchFieldDescriptor('id', null, 'public.id', false, false, 'string', '', '', false),
-            'typeTranslation' => new ElasticSearchFieldDescriptor(
-                'typeTranslation',
-                'typeTranslation.raw',
-                'sulu_article.list.type',
-                !$this->getParameter('sulu_article.display_tab_all'),
-                false
-            ),
-            'title' => new ElasticSearchFieldDescriptor('title', 'title.raw', 'public.title', false, true),
-            'creatorFullName' => new ElasticSearchFieldDescriptor(
-                'creatorFullName',
-                'creatorFullName.raw',
-                'sulu_article.list.creator',
-                true,
-                false
-            ),
-            'changerFullName' => new ElasticSearchFieldDescriptor(
-                'changerFullName',
-                'changerFullName.raw',
-                'sulu_article.list.changer',
-                false,
-                false
-            ),
-            'authorFullName' => new ElasticSearchFieldDescriptor(
-                'authorFullName',
-                'authorFullName.raw',
-                'sulu_article.author',
-                false,
-                false
-            ),
-            'created' => new ElasticSearchFieldDescriptor('created', null, 'public.created', true, false, 'datetime'),
-            'changed' => new ElasticSearchFieldDescriptor('changed', null, 'public.changed', false, false, 'datetime'),
-            'authored' => new ElasticSearchFieldDescriptor('authored', null, 'sulu_article.authored', false, false, 'date'),
+            'uuid' => ElasticSearchFieldDescriptor::build('id', 'public.id')
+                ->setDisable(true)
+                ->build(),
+            'typeTranslation' => ElasticSearchFieldDescriptor::build('typeTranslation', 'sulu_article.list.type')
+                ->setSortField('typeTranslation.raw')
+                ->setDisable(!$this->getParameter('sulu_article.display_tab_all'))
+                ->build(),
+            'title' => ElasticSearchFieldDescriptor::build('title', 'public.title')
+                ->setSortField('title.raw')
+                ->build(),
+            'creatorFullName' => ElasticSearchFieldDescriptor::build('creatorFullName', 'sulu_article.list.creator')
+                ->setSortField('creatorFullName.raw')
+                ->build(),
+            'changerFullName' => ElasticSearchFieldDescriptor::build('changerFullName', 'sulu_article.list.changer')
+                ->setSortField('changerFullName.raw')
+                ->build(),
+            'authorFullName' => ElasticSearchFieldDescriptor::build('authorFullName', 'sulu_article.author')
+                ->setSortField('authorFullName.raw')
+                ->build(),
+            'created' => ElasticSearchFieldDescriptor::build('created', 'public.created')
+                ->setSortField('authored')
+                ->setType('datetime')
+                ->setDisable(true)
+                ->build(),
+            'changed' => ElasticSearchFieldDescriptor::build('changed', 'public.changed')
+                ->setSortField('authored')
+                ->setType('datetime')
+                ->setDisable(true)
+                ->build(),
+            'authored' => ElasticSearchFieldDescriptor::build('authored', 'sulu_article.authored')
+                ->setSortField('authored')
+                ->setType('datetime')
+                ->build(),
+            'localizationState' => ElasticSearchFieldDescriptor::build('localizationState')
+                ->setDisable(true)
+                ->build(),
+            'published' => ElasticSearchFieldDescriptor::build('published')
+                ->setDisable(true)
+                ->build(),
+            'publishedState' => ElasticSearchFieldDescriptor::build('publishedState')
+                ->setDisable(true)
+                ->build(),
+            'routePath' => ElasticSearchFieldDescriptor::build('routePath')
+                ->setDisable(true)
+                ->build(),
         ];
     }
 
@@ -195,34 +208,41 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
         }
 
+        $fieldDescriptors = $this->getFieldDescriptors();
+
         if ($limit) {
             $search->setSize($limit);
             $search->setFrom(($page - 1) * $limit);
 
-
-            $result = [];
-            $searchResult = $repository->findDocuments($search);
-            foreach ($searchResult as $document) {
-                if (false !== ($index = array_search($document->getUuid(), $ids))) {
-                    $result[$index] = $document;
-                } else {
-                    $result[] = $document;
+            $fields = array_merge(
+                $restHelper->getFields() ?: [],
+                ['id', 'localizationState', 'publishedState', 'published']
+            );
+            $fieldDescriptors = array_filter(
+                $fieldDescriptors,
+                function (FieldDescriptorInterface $fieldDescriptor) use ($fields) {
+                    return in_array($fieldDescriptor->getName(), $fields);
                 }
-            }
-
-            if (count($ids)) {
-                ksort($result);
-                $result = array_values($result);
-            }
+            );
         } else {
             $search->setSize(1000);
             $search->setScroll('1m');
+        }
 
-            $searchResult = $repository->execute($search, Result::RESULTS_RAW_ITERATOR);
-            $result = [];
-            foreach ($searchResult as $document) {
-                $result[] = $document['_source'];
+        $searchResult = $repository->findRaw($search);
+        $result = [];
+        foreach ($searchResult as $document) {
+            $documentData = $this->normalize($document['_source'], $fieldDescriptors);
+            if (false !== ($index = array_search($documentData['id'], $ids))) {
+                $result[$index] = $documentData;
+            } else {
+                $result[] = $documentData;
             }
+        }
+
+        if (count($ids)) {
+            ksort($result);
+            $result = array_values($result);
         }
 
         $count = $searchResult->count();
@@ -243,6 +263,24 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
+     * @param FieldDescriptorInterface[] $fieldDescriptors
+     */
+    private function normalize(array $document, array $fieldDescriptors)
+    {
+        $result = [];
+        foreach ($fieldDescriptors as $fieldDescriptor) {
+            $property = Inflector::getDefault()->snake($fieldDescriptor->getName());
+            if ('id' === $property) {
+                $property = 'uuid';
+            }
+
+            $result[$fieldDescriptor->getName()] = array_key_exists($property, $document) ? $document[$property] : null;
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns query to filter by given range.
      *
      * @param string $field
@@ -259,7 +297,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string  $uuid
+     * @param string $uuid
      * @param Request $request
      *
      * @return Response
@@ -502,7 +540,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Persists the document using the given information.
+     * Persists the document using the given Formation.
      *
      * @param array  $data
      * @param object $document
@@ -584,7 +622,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function getSortFieldName($sortBy)
     {
-        $sortBy = $this->uncamelize($sortBy);
+        $sortBy = Inflector::getDefault()->snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();
 
         if (array_key_exists($sortBy, $fieldDescriptors)) {
@@ -592,24 +630,6 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         return null;
-    }
-
-    /**
-     * Converts camel case string into normalized string with underscore.
-     *
-     * @param string $camel
-     *
-     * @return string
-     */
-    private function uncamelize($camel)
-    {
-        $camel = preg_replace(
-            '/(?!^)[[:upper:]][[:lower:]]/',
-            '$0',
-            preg_replace('/(?!^)[[:upper:]]+/', '_$0', $camel)
-        );
-
-        return strtolower($camel);
     }
 
     /**
