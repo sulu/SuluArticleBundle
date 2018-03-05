@@ -170,6 +170,7 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory">
             <argument type="service" id="sulu.content.type_manager"/>
             <argument type="service" id="sulu_article.content.data_provider.proxy_factory"/>
+            <argument type="service" id="request_stack"/>
         </service>
 
         <service id="sulu_article.content_proxy_listener"

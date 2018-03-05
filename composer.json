@@ -20,7 +20,8 @@
         "jackalope/jackalope-jackrabbit": "^1.2",
         "phpunit/phpunit": "^4.8 || ^5.0",
         "sulu/automation-bundle": "^1.2",
-        "php-task/task-bundle": "^1.2"
+        "php-task/task-bundle": "^1.2",
+        "php-task/php-task": "^1.2"
     },
     "conflict": {
         "php": "^7.2"
