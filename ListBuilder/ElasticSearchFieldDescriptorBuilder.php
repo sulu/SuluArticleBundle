@@ -62,7 +62,7 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
-    public function setDisable($disabled)
+    public function setDisabled($disabled)
     {
         $this->disabled = $disabled;
 

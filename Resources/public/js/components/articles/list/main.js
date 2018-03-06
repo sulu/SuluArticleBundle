@@ -147,6 +147,11 @@ define([
                 };
             }
 
+            var urlParameter = {locale: this.options.locale};
+            if (this.options.type) {
+                urlParameter.type = this.options.type;
+            }
+
             return {
                 noBack: true,
 
@@ -159,9 +164,7 @@ define([
                         export: {
                             options: {
                                 url: '/admin/api/articles.csv',
-                                urlParameter: {
-                                    locale: this.options.locale
-                                }
+                                urlParameter: urlParameter
                             }
                         }
                     },

@@ -62,50 +62,50 @@ class ArticleController extends RestController implements ClassResourceInterface
     private function getFieldDescriptors()
     {
         return [
-            'uuid' => ElasticSearchFieldDescriptor::build('id', 'public.id')
-                ->setDisable(true)
+            'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
+                ->setDisabled(true)
                 ->build(),
-            'typeTranslation' => ElasticSearchFieldDescriptor::build('typeTranslation', 'sulu_article.list.type')
+            'typeTranslation' => ElasticSearchFieldDescriptor::create('typeTranslation', 'sulu_article.list.type')
                 ->setSortField('typeTranslation.raw')
-                ->setDisable(!$this->getParameter('sulu_article.display_tab_all'))
+                ->setDisabled(!$this->getParameter('sulu_article.display_tab_all'))
                 ->build(),
-            'title' => ElasticSearchFieldDescriptor::build('title', 'public.title')
+            'title' => ElasticSearchFieldDescriptor::create('title', 'public.title')
                 ->setSortField('title.raw')
                 ->build(),
-            'creatorFullName' => ElasticSearchFieldDescriptor::build('creatorFullName', 'sulu_article.list.creator')
+            'creatorFullName' => ElasticSearchFieldDescriptor::create('creatorFullName', 'sulu_article.list.creator')
                 ->setSortField('creatorFullName.raw')
                 ->build(),
-            'changerFullName' => ElasticSearchFieldDescriptor::build('changerFullName', 'sulu_article.list.changer')
+            'changerFullName' => ElasticSearchFieldDescriptor::create('changerFullName', 'sulu_article.list.changer')
                 ->setSortField('changerFullName.raw')
                 ->build(),
-            'authorFullName' => ElasticSearchFieldDescriptor::build('authorFullName', 'sulu_article.author')
+            'authorFullName' => ElasticSearchFieldDescriptor::create('authorFullName', 'sulu_article.author')
                 ->setSortField('authorFullName.raw')
                 ->build(),
-            'created' => ElasticSearchFieldDescriptor::build('created', 'public.created')
+            'created' => ElasticSearchFieldDescriptor::create('created', 'public.created')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisable(true)
+                ->setDisabled(true)
                 ->build(),
-            'changed' => ElasticSearchFieldDescriptor::build('changed', 'public.changed')
+            'changed' => ElasticSearchFieldDescriptor::create('changed', 'public.changed')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisable(true)
+                ->setDisabled(true)
                 ->build(),
-            'authored' => ElasticSearchFieldDescriptor::build('authored', 'sulu_article.authored')
+            'authored' => ElasticSearchFieldDescriptor::create('authored', 'sulu_article.authored')
                 ->setSortField('authored')
                 ->setType('datetime')
                 ->build(),
-            'localizationState' => ElasticSearchFieldDescriptor::build('localizationState')
-                ->setDisable(true)
+            'localizationState' => ElasticSearchFieldDescriptor::create('localizationState')
+                ->setDisabled(true)
                 ->build(),
-            'published' => ElasticSearchFieldDescriptor::build('published')
-                ->setDisable(true)
+            'published' => ElasticSearchFieldDescriptor::create('published')
+                ->setDisabled(true)
                 ->build(),
-            'publishedState' => ElasticSearchFieldDescriptor::build('publishedState')
-                ->setDisable(true)
+            'publishedState' => ElasticSearchFieldDescriptor::create('publishedState')
+                ->setDisabled(true)
                 ->build(),
-            'routePath' => ElasticSearchFieldDescriptor::build('routePath')
-                ->setDisable(true)
+            'routePath' => ElasticSearchFieldDescriptor::create('routePath')
+                ->setDisabled(true)
                 ->build(),
         ];
     }
