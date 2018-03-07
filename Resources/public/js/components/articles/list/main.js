@@ -147,6 +147,11 @@ define([
                 };
             }
 
+            var urlParameter = {locale: this.options.locale};
+            if (this.options.type) {
+                urlParameter.type = this.options.type;
+            }
+
             return {
                 noBack: true,
 
@@ -155,7 +160,13 @@ define([
                 toolbar: {
                     buttons: {
                         addArticle: {options: button},
-                        deleteSelected: {}
+                        deleteSelected: {},
+                        export: {
+                            options: {
+                                url: '/admin/api/articles.csv',
+                                urlParameter: urlParameter
+                            }
+                        }
                     },
 
                     languageChanger: {
