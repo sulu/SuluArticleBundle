@@ -105,23 +105,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             );
         }
 
-        if ($container->hasExtension('sulu_route')) {
-            $container->prependExtensionConfig(
-                'sulu_route',
-                [
-                    'mappings' => [
-                        ArticlePageDocument::class => [
-                            'generator' => 'article_page',
-                            'options' => [
-                                'route_schema' => '/{translator.trans("page")}-{object.getPageNumber()}',
-                                'parent' => '{object.getParent().getRoutePath()}',
-                            ],
-                        ],
-                    ],
-                ]
-            );
-        }
-
         if ($container->hasExtension('fos_rest')) {
             $container->prependExtensionConfig(
                 'fos_rest',
