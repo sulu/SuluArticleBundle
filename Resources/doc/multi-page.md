@@ -38,10 +38,10 @@ To change the default postfix use following configuration in your `app/config/co
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
-            generator: article_page
+            generator: "article_page"
             options:
-                route_schema: '/{translator.trans("page")}-{object.getPageNumber()}'
-                parent: '{object.getParent().getRoutePath()}'
+                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
+                parent: "{object.getParent().getRoutePath()}"
 ```
 
 ## Pagination

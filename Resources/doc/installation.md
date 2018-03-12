@@ -34,9 +34,14 @@ new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: schema
+            generator: "schema"
             options:
-                route_schema: /articles/{object.getTitle()}
+                route_schema: "/articles/{object.getTitle()}"
+        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
+            generator: "article_page"
+            options:
+                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
+                parent: "{object.getParent().getRoutePath()}"
 
 sulu_core:
     content:
