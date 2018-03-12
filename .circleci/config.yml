@@ -6,6 +6,7 @@ jobs:
       - image: circleci/php:7.1-node-browsers
         environment:
           - ES_VERSION=5.6.8
+          - ARTICLE_TEST_CASE=extend
       - image: circleci/mysql:5.7
         environment:
           - MYSQL_USER=root
@@ -54,4 +55,8 @@ jobs:
             ./Tests/app/console sulu:document:initialize
             ./Tests/app/console ongr:es:index:create -m default
             ./Tests/app/console ongr:es:index:create -m live
+      - run:
+          name: List Bundles
+          command:
+            ./Tests/app/console debug:config
       - run: php -d memory_limit=2G ./vendor/bin/phpunit
