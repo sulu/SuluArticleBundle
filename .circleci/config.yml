@@ -1,0 +1,57 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/php:7.1-node-browsers
+        environment:
+          - ES_VERSION=5.6.8
+      - image: circleci/mysql:5.7
+        environment:
+          - MYSQL_USER=root
+          - MYSQL_PASSWORD=
+          - MYSQL_ALLOW_EMPTY_PASSWORD=true
+          - MYSQL_DATABASE=circle_test
+    steps:
+      - checkout
+      - run: 
+          name: Install OS dependencies (mysql, gd)
+          command: |
+            sudo apt-get install -y libpng-dev
+            sudo docker-php-ext-install pdo_mysql gd
+          parallel: true
+      - run:
+          name: Install Elasticsearch
+          command: |
+            curl -L -o elasticsearch.zip https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip
+            unzip elasticsearch.zip
+          parallel: true
+      - run: sudo composer self-update
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.json" }}
+            - composer-v1-
+      - run: composer install -n --prefer-dist
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.json" }}
+          paths:
+            - vendor
+      - run:
+          name: Run Elasticsearch
+          command: |
+            ./elasticsearch-${ES_VERSION}/bin/elasticsearch
+          background: true
+      - run:
+          name: Test Elasticsearch
+          command: |
+            sleep 10 && wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
+            cat index.html
+      - run:
+          name: Command Create Test Database
+          command: |
+            ./Tests/app/console doctrine:database:create
+            ./Tests/app/console doctrine:schema:update --force
+            ./Tests/app/console sulu:document:initialize
+            ./Tests/app/console ongr:es:index:create -m default
+            ./Tests/app/console ongr:es:index:create -m live
+      - run: php -d memory_limit=2G ./vendor/bin/phpunit
