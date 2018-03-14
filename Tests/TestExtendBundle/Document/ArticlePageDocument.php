@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument as SuluArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument as SuluArticlePageDocument;
 
 class ArticlePageDocument extends SuluArticlePageDocument
 {

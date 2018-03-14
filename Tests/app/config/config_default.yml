@@ -1,11 +1,11 @@
 # This file will not be included when run under extend
 sulu_route:
     mappings:
-        Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticleDocument:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
             generator: "schema"
             options:
                 route_schema: "/articles/{object.getTitle()}"
-        Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticlePageDocument:
+        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
             generator: "article_page"
             options:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"

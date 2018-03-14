@@ -87,6 +87,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
     {
         $action = $request->get('action');
         $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
+
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
@@ -190,6 +191,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
         }
 
         $article = $this->getDocumentManager()->find($articleUuid, $locale);
+
         if (!array_key_exists('template', $data)) {
             $data['template'] = $article->getStructureType();
         }

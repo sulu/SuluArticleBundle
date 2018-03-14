@@ -308,7 +308,7 @@ class ArticlePageDocument implements
      */
     public function getClass()
     {
-        return self::class;
+        return get_class($this);
     }
 
     /**
