@@ -82,6 +82,7 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($value, $locale)));
+        $search->setSize(count($value));
 
         $result = [];
         /** @var ArticleViewDocumentInterface $articleDocument */
