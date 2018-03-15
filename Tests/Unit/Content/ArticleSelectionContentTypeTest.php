@@ -66,6 +66,8 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
                 }
             )
         )->shouldBeCalled();
+        $search->setSize(2)->shouldBeCalled();
+
         $repository->findDocuments($search->reveal())->willReturn($articles);
 
         $contentType = new ArticleSelectionContentType(
