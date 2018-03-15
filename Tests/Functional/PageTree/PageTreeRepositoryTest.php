@@ -128,6 +128,7 @@ class PageTreeRepositoryTest extends SuluTestCase
         ];
 
         $article = $this->createArticle($this->getPathData($pages[0], 'article-1'));
+
         $articlePages = [
             $this->createArticlePage($article, 'Test page 1'),
             $this->createArticlePage($article, 'Test page 2'),

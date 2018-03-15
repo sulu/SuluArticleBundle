@@ -251,7 +251,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {
-        if (ArticlePageDocument::class !== $event->getMetadata()->getClass()) {
+        if (ArticlePageDocument::class !== $event->getMetadata()->getClass()
+            && !is_subclass_of($event->getMetadata()->getClass(), ArticlePageDocument::class)
+        ) {
             return;
         }
 

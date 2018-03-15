@@ -11,6 +11,7 @@
 
 use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
+use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
@@ -24,7 +25,15 @@ class AppKernel extends SuluTestKernel
      */
     public function registerBundles()
     {
-        return array_merge(parent::registerBundles(), [new SuluArticleBundle(), new ONGRElasticsearchBundle()]);
+        $bundles = parent::registerBundles();
+        $bundles[] = new SuluArticleBundle();
+        $bundles[] = new ONGRElasticsearchBundle();
+
+        if ('extend' === getenv('ARTICLE_TEST_CASE')) {
+            $bundles[] = new TestExtendBundle();
+        }
+
+        return $bundles;
     }
 
     /**
@@ -37,7 +46,14 @@ class AppKernel extends SuluTestKernel
         if ('jackrabbit' === getenv('SYMFONY__PHPCR__TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
+
         $loader->load(__DIR__ . '/config/config.yml');
+        $type = 'default';
+        if (getenv('ARTICLE_TEST_CASE')) {
+            $type = getenv('ARTICLE_TEST_CASE');
+        }
+
+        $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
 
         $esVersion = getenv('ES_VERSION');
         if (version_compare($esVersion, '2.2', '>=') && version_compare($esVersion, '5.0', '<')) {

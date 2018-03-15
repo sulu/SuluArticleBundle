@@ -1262,7 +1262,7 @@ class ArticleControllerTest extends SuluTestCase
             );
 
             $route = $this->findRoute($responsePages[$i]['route'], 'de');
-            $this->assertEquals(ArticlePageDocument::class, $route->getEntityClass());
+            $this->assertTrue(is_subclass_of($route->getEntityClass(), ArticlePageDocument::class) || ArticlePageDocument::class === $route->getEntityClass());
             $this->assertEquals($responsePages[$i]['id'], $route->getEntityId());
             $this->assertEquals('de', $route->getLocale());
             $this->assertFalse($route->isHistory());

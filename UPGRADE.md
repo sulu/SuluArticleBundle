@@ -1,5 +1,23 @@
 # Upgrade
 
+## dev-master
+
+### ArticlePageDocument route definition need to be defined
+
+The ArticleBundle will not longer prepend the configuration for the article page routes
+for this you need to define them in your configuration (app/config/config.yml):
+
+```yml
+sulu_route:
+    mappings:
+        # ...
+        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
+            generator: "article_page"
+            options:
+                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
+                parent: "{object.getParent().getRoutePath()}"
+```
+
 ## 1.0.0-RC5
 
 ### Author and Authored

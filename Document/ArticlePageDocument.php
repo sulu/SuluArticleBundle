@@ -47,17 +47,17 @@ class ArticlePageDocument implements
     /**
      * @var string
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      */
-    private $pageTitle;
+    protected $pageTitle;
 
     /**
      * @var ArticleDocument
      */
-    private $parent;
+    protected $parent;
 
     /**
      * @var string
@@ -67,17 +67,17 @@ class ArticlePageDocument implements
     /**
      * @var string
      */
-    private $locale;
+    protected $locale;
 
     /**
      * @var string
      */
-    private $originalLocale;
+    protected $originalLocale;
 
     /**
      * @var string
      */
-    private $structureType;
+    protected $structureType;
 
     /**
      * @var StructureInterface
@@ -87,17 +87,17 @@ class ArticlePageDocument implements
     /**
      * @var RouteInterface
      */
-    private $route;
+    protected $route;
 
     /**
      * @var string
      */
-    private $routePath;
+    protected $routePath;
 
     /**
      * @var int
      */
-    private $pageNumber;
+    protected $pageNumber;
 
     public function __construct()
     {
@@ -308,7 +308,7 @@ class ArticlePageDocument implements
      */
     public function getClass()
     {
-        return self::class;
+        return get_class($this);
     }
 
     /**

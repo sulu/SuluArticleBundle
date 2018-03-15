@@ -72,47 +72,47 @@ class ArticleDocument implements
     /**
      * @var object
      */
-    private $parent;
+    protected $parent;
 
     /**
      * @var string
      */
-    private $title;
+    protected $title;
 
     /**
      * @var string
      */
-    private $pageTitle;
+    protected $pageTitle;
 
     /**
      * @var array
      */
-    private $pages;
+    protected $pages;
 
     /**
      * @var RouteInterface
      */
-    private $route;
+    protected $route;
 
     /**
      * @var string
      */
-    private $routePath;
+    protected $routePath;
 
     /**
      * @var string
      */
-    private $locale;
+    protected $locale;
 
     /**
      * @var string
      */
-    private $originalLocale;
+    protected $originalLocale;
 
     /**
      * @var string
      */
-    private $structureType;
+    protected $structureType;
 
     /**
      * @var StructureInterface
@@ -142,12 +142,12 @@ class ArticleDocument implements
     /**
      * @var int
      */
-    private $author;
+    protected $author;
 
     /**
      * @var \DateTime
      */
-    private $authored;
+    protected $authored;
 
     /**
      * Document's extensions ie seo, ...
@@ -301,7 +301,7 @@ class ArticleDocument implements
      */
     public function getClass()
     {
-        return self::class;
+        return get_class($this);
     }
 
     /**

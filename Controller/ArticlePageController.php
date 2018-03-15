@@ -14,7 +14,6 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
-use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
@@ -88,6 +87,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
     {
         $action = $request->get('action');
         $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
+
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
@@ -187,10 +187,11 @@ class ArticlePageController extends RestController implements ClassResourceInter
     private function persistDocument($data, $document, $locale, $articleUuid)
     {
         if (array_key_exists('title', $data)) {
-            throw new ParameterNotAllowedException('title', ArticlePageDocument::class);
+            throw new ParameterNotAllowedException('title', get_class($document));
         }
 
         $article = $this->getDocumentManager()->find($articleUuid, $locale);
+
         if (!array_key_exists('template', $data)) {
             $data['template'] = $article->getStructureType();
         }

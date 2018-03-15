@@ -31,6 +31,11 @@ sulu_route:
             generator: schema
             options:
                 route_schema: /articles/{object.getTitle()}
+        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
+            generator: "article_page"
+            options:
+                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
+                parent: "{object.getParent().getRoutePath()}"
 ```
 
 This schema will be used for all articles which will be created in the future. Older articles
