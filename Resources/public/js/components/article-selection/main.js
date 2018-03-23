@@ -31,7 +31,7 @@ define([
 
         defaults = {
             options: {
-                url: '/admin/api/articles',
+                url: '/admin/api/articles?fields=title',
                 eventNamespace: 'sulu.article-selection',
                 resultKey: 'articles',
                 dataAttribute: 'article-selection',
