@@ -4,7 +4,7 @@
     "type": "sulu-bundle",
     "license": "MIT",
     "require": {
-        "php": "^5.5 || ^7.0",
+        "php": "^7.1",
         "sulu/sulu": "dev-develop as 1.6.16",
         "ongr/elasticsearch-bundle": "^1.2.9 || ~5.0",
         "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
