@@ -114,9 +114,9 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $article->getPageNumber()->willReturn(1);
 
         $structureMetadata = new StructureMetadata('default');
-        $structureMetadata->view = 'default.html.twig';
-        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
-        $structureMetadata->controller = 'SuluArticleBundle:Default:index';
+        $structureMetadata->setView('default.html.twig');
+        $structureMetadata->setCacheLifetime(['type' => 'seconds', 'value' => 3600]);
+        $structureMetadata->setController('SuluArticleBundle:Default:index');
 
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($article->reveal());
         $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);
@@ -153,9 +153,9 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $articlePage->getParent()->willReturn($article->reveal());
 
         $structureMetadata = new StructureMetadata('default');
-        $structureMetadata->view = 'default.html.twig';
-        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
-        $structureMetadata->controller = 'SuluArticleBundle:Default:index';
+        $structureMetadata->setView('default.html.twig');
+        $structureMetadata->setCacheLifetime(['type' => 'seconds', 'value' => 3600]);
+        $structureMetadata->setController('SuluArticleBundle:Default:index');
 
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($articlePage->reveal());
         $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);

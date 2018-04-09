@@ -54,7 +54,9 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
     public function testGenerate()
     {
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type1']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type1']],
+        ]);
 
         $this->structureMetadataFactory->getStructureMetadata('article', 'test1')->willReturn($metadata);
 
@@ -72,7 +74,9 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(RouteSchemaNotFoundException::class);
 
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type3']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type3']],
+        ]);
 
         $this->structureMetadataFactory->getStructureMetadata('article', 'test3')->willReturn($metadata);
 

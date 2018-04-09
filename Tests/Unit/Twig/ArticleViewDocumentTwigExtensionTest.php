@@ -133,7 +133,9 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
     private function getMetadataFactory()
     {
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'blog']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'blog']]
+        ]);
 
         $metadataFactory = $this->prophesize(StructureMetadataFactory::class);
         $metadataFactory->getStructureMetadata('article', 'blog')->willReturn($metadata);

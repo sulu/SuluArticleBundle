@@ -11,10 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Guzzle\Inflection\Inflector;
-use JMS\Serializer\SerializationContext;
+use ONGR\ElasticsearchBundle\Mapping\Caser;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
@@ -269,7 +270,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         $result = [];
         foreach ($fieldDescriptors as $fieldDescriptor) {
-            $property = Inflector::getDefault()->snake($fieldDescriptor->getName());
+            $property = Caser::snake($fieldDescriptor->getName());
             if ('id' === $property) {
                 $property = 'uuid';
             }
@@ -314,12 +315,12 @@ class ArticleController extends RestController implements ClassResourceInterface
             ]
         );
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
@@ -341,12 +342,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
@@ -379,12 +380,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         $this->handleActionParameter($action, $document, $locale);
         $this->getDocumentManager()->flush();
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
@@ -501,13 +502,14 @@ class ArticleController extends RestController implements ClassResourceInterface
                     throw new RestException('Unrecognized action: ' . $action);
             }
 
+            // create context
+            $context = new Context();
+            $context->setSerializeNull(true);
+            $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
             // prepare view
             $view = $this->view($data);
-            $view->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            );
+            $view->setContext($context);
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
         }
@@ -622,7 +624,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function getSortFieldName($sortBy)
     {
-        $sortBy = Inflector::getDefault()->snake($sortBy);
+        $sortBy = Caser::snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();
 
         if (array_key_exists($sortBy, $fieldDescriptors)) {

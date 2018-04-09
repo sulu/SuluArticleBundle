@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
@@ -66,12 +67,12 @@ class ArticlePageController extends RestController implements ClassResourceInter
             throw new ArticlePageNotFoundException($uuid, $articleUuid);
         }
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
@@ -95,12 +96,12 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $this->handleActionParameter($action, $document->getParent(), $locale);
         $this->getDocumentManager()->flush();
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
@@ -134,12 +135,12 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $this->handleActionParameter($action, $document->getParent(), $locale);
         $this->getDocumentManager()->flush();
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticlePage', 'smallArticle'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 

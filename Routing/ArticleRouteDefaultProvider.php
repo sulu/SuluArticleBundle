@@ -91,11 +91,11 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         return [
             'object' => $object,
-            'view' => $metadata->view,
+            'view' => $metadata->getView(),
             'pageNumber' => $pageNumber,
             'structure' => $structure,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
-            '_controller' => $metadata->controller,
+            '_controller' => $metadata->getController(),
         ];
     }
 
@@ -132,7 +132,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     private function getCacheLifetime($metadata)
     {
-        $cacheLifetime = $metadata->cacheLifetime;
+        $cacheLifetime = $metadata->getCacheLifetime();
 
         if (!$cacheLifetime) {
             return null;
