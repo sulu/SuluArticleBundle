@@ -21,7 +21,7 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
+use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 
 class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
 {

@@ -20,7 +20,7 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
+use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 
 /**
  * Provides route-defaults for articles.
