@@ -63,11 +63,15 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         return [
             'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'typeTranslation' => ElasticSearchFieldDescriptor::create('typeTranslation', 'sulu_article.list.type')
                 ->setSortField('typeTranslation.raw')
-                ->setDisabled(!$this->getParameter('sulu_article.display_tab_all'))
+                ->setVisibility(
+                    $this->getParameter('sulu_article.display_tab_all') ?
+                        FieldDescriptorInterface::VISIBILITY_YES :
+                        FieldDescriptorInterface::VISIBILITY_NEVER
+                )
                 ->build(),
             'title' => ElasticSearchFieldDescriptor::create('title', 'public.title')
                 ->setSortField('title.raw')
@@ -84,28 +88,28 @@ class ArticleController extends RestController implements ClassResourceInterface
             'created' => ElasticSearchFieldDescriptor::create('created', 'public.created')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'changed' => ElasticSearchFieldDescriptor::create('changed', 'public.changed')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'authored' => ElasticSearchFieldDescriptor::create('authored', 'sulu_article.authored')
                 ->setSortField('authored')
                 ->setType('datetime')
                 ->build(),
             'localizationState' => ElasticSearchFieldDescriptor::create('localizationState')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'published' => ElasticSearchFieldDescriptor::create('published')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'publishedState' => ElasticSearchFieldDescriptor::create('publishedState')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'routePath' => ElasticSearchFieldDescriptor::create('routePath')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
         ];
     }

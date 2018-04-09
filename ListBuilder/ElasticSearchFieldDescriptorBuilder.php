@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\ListBuilder;
 
+use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
+
 final class ElasticSearchFieldDescriptorBuilder
 {
     /**
@@ -29,14 +31,9 @@ final class ElasticSearchFieldDescriptorBuilder
     private $sortField = null;
 
     /**
-     * @var bool
+     * @var string
      */
-    private $disabled = false;
-
-    /**
-     * @var bool
-     */
-    private $default = false;
+    private $visibility = FieldDescriptorInterface::VISIBILITY_NO;
 
     /**
      * @var string
@@ -62,16 +59,9 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
-    public function setDisabled($disabled)
+    public function setVisibility($visibility)
     {
-        $this->disabled = $disabled;
-
-        return $this;
-    }
-
-    public function setDefault($default)
-    {
-        $this->default = $default;
+        $this->visibility = $visibility;
 
         return $this;
     }
@@ -89,8 +79,7 @@ final class ElasticSearchFieldDescriptorBuilder
             $this->name,
             $this->sortField,
             $this->translation,
-            $this->disabled,
-            $this->default,
+            $this->visibility,
             $this->type,
             '',
             '',
