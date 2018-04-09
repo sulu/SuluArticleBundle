@@ -114,6 +114,72 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertCount(0, $result->getItems());
     }
 
+    public function testResolveDataItemsStructureTypeParam()
+    {
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with structureType simple
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['structureTypes' => new PropertyParameter('structureTypes', 'simple')],
+            ['locale' => 'de']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(1, $result->getItems());
+        $this->assertEquals($item2['id'], $result->getItems()[0]->getId());
+    }
+
+    public function testResolveDataItemsStructureTypeParamMultiple()
+    {
+        $item1 = $this->createArticle('Test #1', 'default');
+        $item2 = $this->createArticle('Test #2', 'simple');
+        $item3 = $this->createArticle('Test no match', 'default_fallback');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with structureType default or simple
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['structureTypes' => new PropertyParameter('structureTypes', 'default,simple')],
+            ['locale' => 'de']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(2, $result->getItems());
+        $this->assertContains(
+            $item1['id'],
+            [$result->getItems()[0]->getId(), $result->getItems()[1]->getId()]
+        );
+        $this->assertContains(
+            $item2['id'],
+            [$result->getItems()[0]->getId(), $result->getItems()[1]->getId()]
+        );
+    }
+
+    public function testResolveDataItemsStructureTypeParamWrong()
+    {
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with structureType default_fallback
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['structureTypes' => new PropertyParameter('structureTypes', 'default_fallback')],
+            ['locale' => 'de']
+        );
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(0, $result->getItems());
+    }
+
     public function testResolveDataItemsPagination()
     {
         $items = [
