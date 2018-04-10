@@ -60,4 +60,4 @@ jobs:
           name: List Bundles
           command:
             ./Tests/app/console debug:config
-      - run: php -d memory_limit=2G ./vendor/bin/phpunit
+      - run: php -d memory_limit=2G ./vendor/bin/phpunit --filter ArticleViewDocumentTwigExtensionTest
