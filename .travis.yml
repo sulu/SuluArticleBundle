@@ -36,7 +36,7 @@ before_install:
   - export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
   - java -version
   - |
-    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
+    if [[ SULU_PHPCR_TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
             cd downloads
             wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar
