@@ -14,13 +14,13 @@ namespace Sulu\Bundle\ArticleBundle\Routing;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
 
 /**
  * Provides route-defaults for articles.
@@ -91,11 +91,11 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         return [
             'object' => $object,
-            'view' => $metadata->view,
+            'view' => $metadata->getView(),
             'pageNumber' => $pageNumber,
             'structure' => $structure,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
-            '_controller' => $metadata->controller,
+            '_controller' => $metadata->getController(),
         ];
     }
 
@@ -132,7 +132,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     private function getCacheLifetime($metadata)
     {
-        $cacheLifetime = $metadata->cacheLifetime;
+        $cacheLifetime = $metadata->getCacheLifetime();
 
         if (!$cacheLifetime) {
             return null;

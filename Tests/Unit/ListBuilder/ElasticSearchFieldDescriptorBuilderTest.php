@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Factory;
 
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptorBuilder;
+use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 
 class ElasticSearchFieldDescriptorBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,24 +42,14 @@ class ElasticSearchFieldDescriptorBuilderTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals('public.title', $fieldDescriptor->getTranslation());
     }
 
-    public function testSetDisabled()
+    public function testSetVisibility()
     {
         $builder = new ElasticSearchFieldDescriptorBuilder('title', 'public.title');
 
-        $builder->setDisabled(true);
+        $builder->setVisibility(FieldDescriptorInterface::VISIBILITY_ALWAYS);
 
         $fieldDescriptor = $builder->build();
-        $this->assertTrue($fieldDescriptor->getDisabled());
-    }
-
-    public function testSetDefault()
-    {
-        $builder = new ElasticSearchFieldDescriptorBuilder('title', 'public.title');
-
-        $builder->setDefault(true);
-
-        $fieldDescriptor = $builder->build();
-        $this->assertTrue($fieldDescriptor->getDefault());
+        $this->assertSame(FieldDescriptorInterface::VISIBILITY_ALWAYS, $fieldDescriptor->getVisibility());
     }
 
     public function testSetSortField()

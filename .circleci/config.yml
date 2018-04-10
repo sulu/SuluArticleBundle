@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Run Elasticsearch
           command: |
-            ./elasticsearch-${ES_VERSION}/bin/elasticsearch
+            ES_JAVA_OPTS="-Xms512m -Xmx1024m" ./elasticsearch-${ES_VERSION}/bin/elasticsearch
           background: true
       - run:
           name: Test Elasticsearch
