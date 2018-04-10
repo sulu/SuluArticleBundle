@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Run Elasticsearch
           command: |
-            ./elasticsearch-${ES_VERSION}/bin/elasticsearch
+            ES_JAVA_OPTS="-Xms2g -Xmx2g" ./elasticsearch-${ES_VERSION}/bin/elasticsearch
           background: true
       - run:
           name: Test Elasticsearch
@@ -60,4 +60,4 @@ jobs:
           name: List Bundles
           command:
             ./Tests/app/console debug:config
-      - run: php -d memory_limit=2G ./vendor/bin/phpunit --filter ArticleViewDocumentTwigExtensionTest
+      - run: php -d memory_limit=2G ./vendor/bin/phpunit
