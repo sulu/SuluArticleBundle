@@ -59,7 +59,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @return ElasticSearchFieldDescriptor[]
      */
-    private function getFieldDescriptors()
+    protected function getFieldDescriptors()
     {
         return [
             'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
