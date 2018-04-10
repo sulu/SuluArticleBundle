@@ -33,7 +33,7 @@ final class ElasticSearchFieldDescriptorBuilder
     /**
      * @var string
      */
-    private $visibility = FieldDescriptorInterface::VISIBILITY_NO;
+    private $visibility = FieldDescriptorInterface::VISIBILITY_NEVER;
 
     /**
      * @var string
