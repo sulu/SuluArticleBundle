@@ -15,7 +15,7 @@ use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
-use Sulu\Component\HttpCache\HttpCache;
+use Sulu\Bundle\HttpCacheBundle\Cache\AbstractHttpCache;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -126,11 +126,11 @@ class WebsiteArticleController extends Controller
         if ($cacheLifetime) {
             $response->setPublic();
             $response->headers->set(
-                HttpCache::HEADER_REVERSE_PROXY_TTL,
+                AbstractHttpCache::HEADER_REVERSE_PROXY_TTL,
                 $cacheLifetime
             );
-            $response->setMaxAge($this->getParameter('sulu_http_cache.handler.public.max_age'));
-            $response->setSharedMaxAge($this->getParameter('sulu_http_cache.handler.public.shared_max_age'));
+            $response->setMaxAge($this->getParameter('sulu_http_cache.cache.max_age'));
+            $response->setSharedMaxAge($this->getParameter('sulu_http_cache.cache.shared_max_age'));
         }
 
         return $response;
