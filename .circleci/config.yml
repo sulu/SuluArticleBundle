@@ -43,7 +43,6 @@ jobs:
           command: |
             ES_JAVA_OPTS="-Xms512m -Xmx1024m" ./elasticsearch-${ES_VERSION}/bin/elasticsearch
           background: true
-          no_output_timeout: 30m
       - run:
           name: Test Elasticsearch
           command: |
