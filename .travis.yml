@@ -17,7 +17,7 @@ matrix:
   include:
     - php: 7.1
       env:
-        - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
+        - COMPOSER_FLAGS="--prefer-lowest --prefer-stable --prefer-dist --no-interaction"
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
     - php: 7.1
