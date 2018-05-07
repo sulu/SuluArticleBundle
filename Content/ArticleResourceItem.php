@@ -197,4 +197,9 @@ class ArticleResourceItem implements ResourceItemInterface
     {
         return $this->getUuid();
     }
+
+    public function __get($name)
+    {
+        return $this->article->$name;
+    }
 }
