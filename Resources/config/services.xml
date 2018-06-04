@@ -45,7 +45,7 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleGhostIndexer">
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
-            <argument type="service" id="sulu_contact.contact_repository"/>
+            <argument type="service" id="sulu.repository.contact"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
             <argument type="service" id="es.manager.default"/>
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
@@ -62,7 +62,7 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_security.user_manager"/>
-            <argument type="service" id="sulu_contact.contact_repository"/>
+            <argument type="service" id="sulu.repository.contact"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_article.elastic_search.factory.excerpt"/>
