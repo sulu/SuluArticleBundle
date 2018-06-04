@@ -33,7 +33,12 @@ final class ElasticSearchFieldDescriptorBuilder
     /**
      * @var string
      */
-    private $visibility = FieldDescriptorInterface::VISIBILITY_NEVER;
+    private $visibility = FieldDescriptorInterface::VISIBILITY_YES;
+
+    /**
+     * @var string
+     */
+    private $searchability = FieldDescriptorInterface::SEARCHABILITY_NEVER;
 
     /**
      * @var string
@@ -45,13 +50,13 @@ final class ElasticSearchFieldDescriptorBuilder
      */
     private $sortable = false;
 
-    public function __construct($name, $translation)
+    public function __construct(string $name, string $translation = null)
     {
         $this->name = $name;
         $this->translation = $translation;
     }
 
-    public function setSortField($sortField)
+    public function setSortField(string $sortField)
     {
         $this->sortField = $sortField;
         $this->sortable = true;
@@ -59,14 +64,21 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
-    public function setVisibility($visibility)
+    public function setVisibility(string $visibility)
     {
         $this->visibility = $visibility;
 
         return $this;
     }
 
-    public function setType($type)
+    public function setSearchability(string $searchability)
+    {
+        $this->searchability = $searchability;
+
+        return $this;
+    }
+
+    public function setType(string $type)
     {
         $this->type = $type;
 
@@ -80,6 +92,7 @@ final class ElasticSearchFieldDescriptorBuilder
             $this->sortField,
             $this->translation,
             $this->visibility,
+            $this->searchability,
             $this->type,
             '',
             '',
