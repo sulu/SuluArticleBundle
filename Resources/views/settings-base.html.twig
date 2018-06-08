@@ -1,7 +1,37 @@
 <form id="settings-form" class="grid">
+    {% block shadow %}
+        <div class="grid-row section" id="shadow-container">
+            <h2 class="divider m-bottom-20" title="Shadow Section">
+                <%= translations.shadowPage %>
+            </h2>
+
+            <div class="grid">
+                <div class="grid-row">
+                    <label for="shadow_on_checkbox">
+                        <div class="custom-checkbox">
+                            <input id="shadow_on_checkbox" class="trigger-save-button form-element" type="checkbox"/>
+                            <span class="icon"></span>
+                        </div>
+                        <span class="clickable"><%= translations.shadowEnable %></span>
+                    </label>
+                    <div class="input-description"><%= translations.publishedShadow %></div>
+                </div>
+                <div class="grid-row">
+                    <div class="grid-col-6 form-group">
+                        <label for="content-node-type">
+                            <span class="clickable"><%= translations.shadowBaseLanguage %></span>
+                        </label>
+
+                        <div id="shadow_base_language_select"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+
     {% block changelog %}
         <div class="grid-row section m-top-40" id="changelog-container" style="display: none;">
-            <h2 class="divider m-bottom-20" title="Shadow Section">
+            <h2 class="divider m-bottom-20" title="Changelog Section">
                 <%= translations.changelog %>
             </h2>
 
