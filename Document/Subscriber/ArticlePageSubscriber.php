@@ -19,6 +19,7 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Event\HydrateEvent;
 use Sulu\Component\DocumentManager\Event\MetadataLoadEvent;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
@@ -88,6 +89,9 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            Events::HYDRATE => [
+                ['setParentOnHydrate', 1],
+            ],
             Events::PERSIST => [
                 ['setTitleOnPersist', 2000],
                 ['setNodeOnPersist', 480],
@@ -98,6 +102,26 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             Events::REMOVE => ['setWorkflowStageOnArticle'],
             Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
+    }
+
+    /**
+     * Hydrate parent to avoid proxiing it.
+     *
+     * @param HydrateEvent $event
+     */
+    public function setParentOnHydrate(HydrateEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument || $document->getParent()) {
+            return;
+        }
+
+        $parent = $this->documentManager->find(
+            $event->getNode()->getParent()->getIdentifier(),
+            $event->getLocale(),
+            $event->getOptions()
+        );
+        $document->setParent($parent);
     }
 
     /**
