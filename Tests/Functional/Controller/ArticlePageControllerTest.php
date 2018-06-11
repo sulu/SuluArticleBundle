@@ -210,6 +210,38 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($response['id'], $articleViewDocument->getPages()[0]->uuid);
     }
 
+    public function testPutPublish($title = 'Test-Article', $pageTitle = 'New-Page-Title', $template = 'default_pages')
+    {
+        $article = $this->createArticle($title, $template);
+        $page = $this->post($article);
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de&action=publish',
+            [
+                'pageTitle' => $pageTitle,
+                'article' => 'Sulu is awesome',
+            ]
+        );
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals($this->getRoute($title, 2), $response['route']);
+        $this->assertEquals($pageTitle, $response['pageTitle']);
+        $this->assertEquals($template, $response['template']);
+        $this->assertEquals('Sulu is awesome', $response['article']);
+        $this->assertEquals(2, $response['pageNumber']);
+
+        $articleViewDocument = $this->findViewDocument($article['id'], 'de');
+        $this->assertCount(1, $articleViewDocument->getPages());
+        $this->assertEquals(2, $articleViewDocument->getPages()[0]->pageNumber);
+        $this->assertEquals($pageTitle, $articleViewDocument->getPages()[0]->title);
+        $this->assertEquals($response['id'], $articleViewDocument->getPages()[0]->uuid);
+    }
+
     public function testDelete()
     {
         $article = $this->createArticle();
