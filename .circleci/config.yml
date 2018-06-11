@@ -32,7 +32,7 @@ jobs:
           keys:
             - composer-v2-{{ checksum "composer.json" }}
             - composer-v2-
-      - run: php -d memory_limit=2G composer install -n --prefer-dist
+      - run: php -d memory_limit=2G /usr/local/bin/composer install -n --prefer-dist
       - save_cache:
           key: composer-v2-{{ checksum "composer.json" }}
           paths:
