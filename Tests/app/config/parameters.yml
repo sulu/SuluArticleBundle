@@ -1,0 +1,8 @@
+parameters:
+    database_driver:    pdo_mysql
+    database_host:      mysql
+    database_port:      ~
+    database_name:      mydb_test
+    database_user:      user
+    database_password:  userpass
+    elasticsearch_host: elasticsearch

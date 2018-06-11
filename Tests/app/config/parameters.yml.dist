@@ -1,0 +1,8 @@
+parameters:
+    database_driver:    pdo_mysql
+    database_host:      127.0.0.1
+    database_port:      ~
+    database_name:      su_articles_test
+    database_user:      root
+    database_password:  ~
+    elasticsearch_host: 127.0.01
