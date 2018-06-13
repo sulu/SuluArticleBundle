@@ -198,6 +198,30 @@
                 <source>sulu_article.broken-template.title</source>
                 <target>Artikel-Template ist beschädigt</target>
             </trans-unit>
+            <trans-unit id="shadow-01" resname="sulu_article.shadow_article">
+                <source>sulu_article.shadow_article</source>
+                <target>Shadow Artikel</target>
+            </trans-unit>
+            <trans-unit id="shadow-02" resname="sulu_article.published-shadow">
+                <source>sulu_article.published-shadow</source>
+                <target>Der Veröffentlichungsstatus wird vom Status des Hauptartikels übernommen.</target>
+            </trans-unit>
+            <trans-unit id="shadow-03" resname="sulu_article.form.settings.shadow.enable">
+                <source>sulu_article.form.settings.shadow.enable</source>
+                <target>Shadow Artikel aktivieren</target>
+            </trans-unit>
+            <trans-unit id="shadow-04" resname="sulu_article.form.settings.shadow.base_language">
+                <source>sulu_article.form.settings.shadow.base_language</source>
+                <target>Shadow Artikel Sprache</target>
+            </trans-unit>
+            <trans-unit id="shadow-05" resname="sulu_article.form.settings.shadow.no_base_language">
+                <source>sulu_article.form.settings.shadow.no_base_language</source>
+                <target>Keine Shadow Artikel Sprache vorhanden ...</target>
+            </trans-unit>
+            <trans-unit id="shadow-06" resname="sulu_article.form.settings.shadow.select_base_language">
+                <source>sulu_article.form.settings.shadow.select_base_language</source>
+                <target>Sprache auswählen ...</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

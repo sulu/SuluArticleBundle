@@ -33,10 +33,10 @@ define([
             changedOnly: 'sulu_article.form.settings.changelog.changed-only',
             created: 'sulu_article.form.settings.changelog.created',
             createdOnly: 'sulu_article.form.settings.changelog.created-only',
-            shadowPage: 'sulu.content.form.settings.shadow_page',
-            shadowEnable: 'sulu.content.form.settings.shadow.enable',
-            publishedShadow: 'sulu-content.published-shadow',
-            shadowBaseLanguage: 'sulu.content.form.settings.shadow.base_language',
+            shadowArticle: 'sulu_article.shadow_article',
+            shadowEnable: 'sulu_article.form.settings.shadow.enable',
+            publishedShadow: 'sulu_article.published-shadow',
+            shadowBaseLanguage: 'sulu_article.form.settings.shadow.base_language',
         }
     },
 
@@ -171,22 +171,15 @@ define([
                     }
                 }
             ]);
+
+            if (this.data.shadowOn) {
+                this.sandbox.dom.attr('#shadow_on_checkbox', 'checked', true);
+            }
         },
 
         updateVisibilityForShadowCheckbox: function(isInitial) {
-            var shadow = isShadow.call(this),
-                tabAction,
-                $shadowDescription = this.sandbox.dom.find('#shadow-container .input-description');
-
-            if (false === isInitial) {
-                tabAction = 'hide';
-            }
-
-            if (tabAction === 'hide') {
-                this.sandbox.emit('husky.toolbar.header.item.disable', 'state', false);
-            } else {
-                this.sandbox.emit('husky.toolbar.header.item.enable', 'state', false);
-            }
+            var shadow = isShadow.call(this);
+            var $shadowDescription = this.sandbox.dom.find('#shadow-container .input-description');
 
             if (!!shadow) {
                 this.sandbox.emit('sulu.article.show-save-items', 'shadow');
@@ -203,10 +196,6 @@ define([
 
         rendered: function() {
             this.updateChangelog(this.data);
-            if (this.data.shadowOn) {
-                this.sandbox.dom.attr('#shadow_on_checkbox', 'checked', true);
-                this.sandbox.emit('husky.toolbar.header.item.disable', 'state', false);
-            }
             this.bindDomEvents();
         },
 

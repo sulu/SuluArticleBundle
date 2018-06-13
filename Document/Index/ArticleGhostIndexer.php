@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -50,9 +51,10 @@ class ArticleGhostIndexer extends ArticleIndexer
      * @param SeoFactory $seoFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param TranslatorInterface $translator
+     * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $inspector
      * @param array $typeConfiguration
      * @param WebspaceManagerInterface $webspaceManager
-     * @param DocumentManagerInterface $documentManager
      */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
@@ -64,9 +66,10 @@ class ArticleGhostIndexer extends ArticleIndexer
         SeoFactory $seoFactory,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator,
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $inspector,
         array $typeConfiguration,
-        WebspaceManagerInterface $webspaceManager,
-        DocumentManagerInterface $documentManager
+        WebspaceManagerInterface $webspaceManager
     ) {
         parent::__construct(
             $structureMetadataFactory,
@@ -78,6 +81,8 @@ class ArticleGhostIndexer extends ArticleIndexer
             $seoFactory,
             $eventDispatcher,
             $translator,
+            $documentManager,
+            $inspector,
             $typeConfiguration
         );
 
@@ -90,7 +95,14 @@ class ArticleGhostIndexer extends ArticleIndexer
      */
     public function index(ArticleDocument $document)
     {
+        if ($document->isShadowLocaleEnabled()) {
+            $this->indexShadow($document);
+
+            return;
+        }
+
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
+        $this->createOrUpdateShadows($document);
         $this->createOrUpdateGhosts($document);
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
@@ -109,15 +121,22 @@ class ArticleGhostIndexer extends ArticleIndexer
                 continue;
             }
 
+            /** @var ArticleDocument $ghostDocument */
+            $ghostDocument = $this->documentManager->find(
+                $document->getUuid(),
+                $locale
+            );
+
+            $localizationState = $this->inspector->getLocalizationState($ghostDocument);
+
+            // Only index ghosts
+            if (LocalizationState::GHOST !== $localizationState) {
+                continue;
+            }
+
             // Try index the article ghosts.
             $article = $this->createOrUpdateArticle(
-                $this->documentManager->find(
-                    $document->getUuid(),
-                    $locale,
-                    [
-                        'load_ghost_content' => true,
-                    ]
-                ),
+                $ghostDocument,
                 $localization->getLocale(),
                 LocalizationState::GHOST
             );

@@ -198,6 +198,30 @@
                 <source>sulu_article.broken-template.title</source>
                 <target>Article-Template is broken</target>
             </trans-unit>
+            <trans-unit id="shadow-01" resname="sulu_article.shadow_article">
+                <source>sulu_article.shadow_article</source>
+                <target>Shadow Article</target>
+            </trans-unit>
+            <trans-unit id="shadow-02" resname="sulu_article.published-shadow">
+                <source>sulu_article.published-shadow</source>
+                <target>The publishing state will be retrieved from the state of the main article..</target>
+            </trans-unit>
+            <trans-unit id="shadow-03" resname="sulu_article.form.settings.shadow.enable">
+                <source>sulu_article.form.settings.shadow.enable</source>
+                <target>Enable Shadow Article</target>
+            </trans-unit>
+            <trans-unit id="shadow-04" resname="sulu_article.form.settings.shadow.base_language">
+                <source>sulu_article.form.settings.shadow.base_language</source>
+                <target>Shadow Article Language</target>
+            </trans-unit>
+            <trans-unit id="shadow-05" resname="sulu_article.form.settings.shadow.no_base_language">
+                <source>sulu_article.form.settings.shadow.no_base_language</source>
+                <target>No Shadow Article language exists ...</target>
+            </trans-unit>
+            <trans-unit id="shadow-06" resname="sulu_article.form.settings.shadow.select_base_language">
+                <source>sulu_article.form.settings.shadow.select_base_language</source>
+                <target>Choose language ...</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
