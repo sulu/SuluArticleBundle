@@ -295,7 +295,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle();
         $page = $this->post($article);
 
-        $article = $this->createArticleLocale($article, 'XXX');
+        $article = $this->createArticleLocale($article, 'Test');
 
         $client = $this->createAuthenticatedClient();
         $client->request(

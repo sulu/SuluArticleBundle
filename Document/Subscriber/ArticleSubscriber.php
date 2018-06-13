@@ -79,6 +79,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $liveDocuments = [];
 
     /**
+     * @var array
+     */
+    private $changedChildren = [];
+
+    /**
      * @param IndexerInterface $indexer
      * @param IndexerInterface $liveIndexer
      * @param DocumentManagerInterface $documentManager
@@ -128,7 +133,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::REORDER => [['persistPageDataOnReorder', -2000]],
             Events::UNPUBLISH => 'handleUnpublish',
             Events::REMOVE_DRAFT => [['handleScheduleIndex', -1024], ['removeDraftChildren', 0]],
-            Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
+            Events::FLUSH => [['handleFlushChildren', -1024], ['handleFlush', -2048], ['handleFlushLive', -2048]],
             Events::COPY => ['handleCopy'],
             Events::METADATA_LOAD => ['handleMetadataLoad'],
         ];
@@ -371,6 +376,38 @@ class ArticleSubscriber implements EventSubscriberInterface
      *
      * @param FlushEvent $event
      */
+    public function handleFlushChildren()
+    {
+        if (count($this->changedChildren) < 1) {
+            return;
+        }
+
+        foreach ($this->changedChildren as $child) {
+            /** @var ArticlePageDocument $childDocument */
+            $childDocument = $this->documentManager->find($child['uuid'], $child['locale']);
+
+            $localizationState = $this->documentInspector->getLocalizationState($childDocument);
+
+            if (LocalizationState::GHOST === $localizationState) {
+                continue;
+            }
+
+            $parent = $childDocument->getParent();
+
+            if ($parent->getStructureType() !== $childDocument->getStructureType()) {
+                $childDocument->setStructureType($parent->getStructureType());
+                $this->documentManager->persist($childDocument,  $child['locale']);
+            }
+        }
+
+        $this->changedChildren = [];
+    }
+
+    /**
+     * Index all scheduled article documents with default indexer.
+     *
+     * @param FlushEvent $event
+     */
     public function handleFlush(FlushEvent $event)
     {
         if (count($this->documents) < 1) {
@@ -510,12 +547,14 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         foreach ($document->getChildren() as $child) {
-            if (LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)
-                && $document->getStructureType() !== $child->getStructureType()
-            ) {
-                $child->setStructureType($document->getStructureType());
-                $this->documentManager->persist($child, $event->getLocale(), $event->getOptions());
+            if (!$child instanceof ArticlePageDocument) {
+                continue;
             }
+
+            $this->changedChildren[$child->getUuid()] = [
+                'uuid' => $child->getUuid(),
+                'locale' => $child->getLocale(),
+            ];
         }
     }
 
