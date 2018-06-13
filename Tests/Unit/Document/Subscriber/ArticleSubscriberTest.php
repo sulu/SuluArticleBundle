@@ -174,6 +174,34 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->liveIndexer->flush()->shouldBeCalled();
     }
 
+    public function testHandleFlushChildren()
+    {
+        $event = $this->prophesizeEvent(PersistEvent::class);
+
+        $children = [];
+
+        for ($id = 1; $id < 4; ++$id) {
+            $child = $this->prophesize(ArticlePageDocument::class);
+            $child->getUuid()->willReturn($id);
+            $child->getLocale()->willReturn($this->locale);
+            $child->getParent()->willReturn($this->document);
+            $child->getStructureType()->willReturn('my-test');
+            $child->setStructureType('test')->shouldBeCalled();
+
+            $this->documentManager->find($id, $this->locale)->willReturn($child);
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+            $this->documentManager->persist($child, $this->locale)->shouldBeCalled();
+
+            $children[] = $child;
+        }
+
+        $this->document->getStructureType()->willReturn('test');
+        $this->document->getChildren()->willReturn($children);
+
+        $this->articleSubscriber->handleChildrenPersist($event);
+        $this->articleSubscriber->handleFlushChildren($this->prophesize(FlushEvent::class)->reveal());
+    }
+
     public function testHandleRemove()
     {
         $this->articleSubscriber->handleRemove($this->prophesizeEvent(RemoveEvent::class));
@@ -353,36 +381,6 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->documentInspector->getNode($child)->willReturn($node->reveal());
 
         $this->articleSubscriber->removeDraftChildren($this->prophesizeEvent(RemoveDraftEvent::class, $this->locale));
-    }
-
-    public function testSetChildrenStructureType()
-    {
-        $children = [
-            $this->prophesize(ArticlePageDocument::class),
-            $this->prophesize(ArticlePageDocument::class),
-            $this->prophesize(ArticlePageDocument::class),
-        ];
-
-        $this->document->getStructureType()->willReturn('test');
-        $this->document->getChildren()->willReturn(
-            array_map(
-                function ($child) {
-                    return $child->reveal();
-                },
-                $children
-            )
-        );
-
-        foreach ($children as $child) {
-            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
-            $this->documentManager->persist($child, $this->locale, Argument::any())->shouldBeCalled();
-            $child->getStructureType()->willReturn('my-test');
-            $child->setStructureType('test')->shouldBeCalled();
-        }
-
-        $this->articleSubscriber->setChildrenStructureType(
-            $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
-        );
     }
 
     public function testHydratePagData()

@@ -81,7 +81,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    private $changedChildren = [];
+    private $children = [];
 
     /**
      * @param IndexerInterface $indexer
@@ -115,7 +115,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             ],
             Events::PERSIST => [
                 ['handleScheduleIndex', -500],
-                ['setChildrenStructureType', 0],
+                ['handleChildrenPersist', 0],
                 ['persistPageData', -2000],
             ],
             Events::REMOVE => [
@@ -372,17 +372,17 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Index all scheduled article documents with default indexer.
+     * Work through scheduled children.
      *
      * @param FlushEvent $event
      */
-    public function handleFlushChildren()
+    public function handleFlushChildren(FlushEvent $event)
     {
-        if (count($this->changedChildren) < 1) {
+        if (count($this->children) < 1) {
             return;
         }
 
-        foreach ($this->changedChildren as $child) {
+        foreach ($this->children as $child) {
             /** @var ArticlePageDocument $childDocument */
             $childDocument = $this->documentManager->find($child['uuid'], $child['locale']);
 
@@ -400,7 +400,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             }
         }
 
-        $this->changedChildren = [];
+        $this->children = [];
     }
 
     /**
@@ -535,11 +535,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Set structure-type to pages.
+     * Schedule all children.
      *
      * @param PersistEvent $event
      */
-    public function setChildrenStructureType(PersistEvent $event)
+    public function handleChildrenPersist(PersistEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -551,7 +551,7 @@ class ArticleSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->changedChildren[$child->getUuid()] = [
+            $this->children[$child->getUuid()] = [
                 'uuid' => $child->getUuid(),
                 'locale' => $child->getLocale(),
             ];
