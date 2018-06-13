@@ -396,7 +396,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
             if ($parent->getStructureType() !== $childDocument->getStructureType()) {
                 $childDocument->setStructureType($parent->getStructureType());
-                $this->documentManager->persist($childDocument,  $child['locale']);
+                $this->documentManager->persist($childDocument, $child['locale']);
             }
         }
 
