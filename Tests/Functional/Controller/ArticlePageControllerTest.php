@@ -57,6 +57,8 @@ class ArticlePageControllerTest extends SuluTestCase
             ]
         );
 
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
         return json_decode($client->getResponse()->getContent(), true);
     }
 
@@ -74,6 +76,8 @@ class ArticlePageControllerTest extends SuluTestCase
             ]
         );
 
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
         return json_decode($client->getResponse()->getContent(), true);
     }
 
@@ -81,6 +85,8 @@ class ArticlePageControllerTest extends SuluTestCase
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/api/articles/' . $uuid . '?locale=' . $locale);
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
 
         return json_decode($client->getResponse()->getContent(), true);
     }
@@ -289,7 +295,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle();
         $page = $this->post($article);
 
-        $article = $this->createArticleLocale($article);
+        $article = $this->createArticleLocale($article, 'XXX');
 
         $client = $this->createAuthenticatedClient();
         $client->request(
