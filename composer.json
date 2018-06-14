@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
-        "sulu/sulu": "dev-develop",
+        "sulu/sulu": "^2.0",
         "symfony/config": "^3.4",
         "symfony/dependency-injection": "^3.4",
         "symfony/force-lowest": "^3.4",
@@ -31,6 +31,10 @@
         "php-task/task-bundle": "^1.2",
         "php-task/php-task": "^1.2",
         "doctrine/data-fixtures": "^1.0"
+    },
+    "conflict": {
+        "php": "^7.2",
+        "ongr/elasticsearch-bundle": "^5.0.6"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
