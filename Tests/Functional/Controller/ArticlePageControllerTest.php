@@ -57,6 +57,8 @@ class ArticlePageControllerTest extends SuluTestCase
             ]
         );
 
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
         return json_decode($client->getResponse()->getContent(), true);
     }
 
@@ -74,6 +76,8 @@ class ArticlePageControllerTest extends SuluTestCase
             ]
         );
 
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
         return json_decode($client->getResponse()->getContent(), true);
     }
 
@@ -81,6 +85,8 @@ class ArticlePageControllerTest extends SuluTestCase
     {
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/api/articles/' . $uuid . '?locale=' . $locale);
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
 
         return json_decode($client->getResponse()->getContent(), true);
     }
@@ -284,27 +290,22 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('ghost', $article['type']['name']);
     }
 
-    public function testHandleGhostArticlePage($pageTitle = 'Sulu is awesome')
+    public function testHandleSecondLocale($title = 'Sulu ist toll')
     {
-        $article = $this->createArticle();
-        $page = $this->post($article);
+        $articleDE = $this->createArticle($title);
+        $page1 = $this->post($articleDE, 'Sulu ist toll - Page 1');
 
-        $article = $this->createArticleLocale($article);
+        $this->createArticleLocale($articleDE, 'Sulu is great');
 
+        // page 1 should exists with empty pageTitle
         $client = $this->createAuthenticatedClient();
-        $client->request(
-            'PUT',
-            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
-            [
-                'pageTitle' => $pageTitle,
-            ]
-        );
+        $client->request('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page1['id'] . '?locale=en');
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertArrayNotHasKey('type', $response);
-        $this->assertEquals($pageTitle, $response['pageTitle']);
+        $this->assertEquals('', $response['pageTitle']);
     }
 
     private function purgeIndex()
