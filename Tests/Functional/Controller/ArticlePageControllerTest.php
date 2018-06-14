@@ -290,13 +290,14 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('ghost', $article['type']['name']);
     }
 
-    public function testHandleGhostArticlePage($title = 'Sulu ist toll')
+    public function testHandleSecondLocale($title = 'Sulu ist toll')
     {
         $articleDE = $this->createArticle($title);
         $page1 = $this->post($articleDE, 'Sulu ist toll - Page 1');
 
         $this->createArticleLocale($articleDE, 'Sulu is great');
 
+        // page 1 should exists with empty pageTitle
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page1['id'] . '?locale=en');
 
