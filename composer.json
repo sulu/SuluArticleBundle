@@ -6,7 +6,11 @@
     "require": {
         "php": "^7.1",
         "sulu/sulu": "^2.0",
-        "symfony/symfony": "^3.4",
+        "symfony/config": "^3.4",
+        "symfony/dependency-injection": "^3.4",
+        "symfony/force-lowest": "^3.4",
+        "symfony/http-foundation": "^3.4",
+        "symfony/http-kernel": "^3.4",
         "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
         "ongr/elasticsearch-bundle": "^1.2.9 || ~5.0",
         "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
