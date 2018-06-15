@@ -20,6 +20,7 @@ use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Component\Content\Document\LocalizationState;
 
 class ArticlePageControllerTest extends SuluTestCase
 {
@@ -73,6 +74,23 @@ class ArticlePageControllerTest extends SuluTestCase
                 'pageTitle' => $title,
                 'template' => $template,
                 'authored' => '2016-01-01',
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    private function createArticleShadow($article, $locale = 'en', $shadowLocale = 'de')
+    {
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
+            [
+                'shadowOn' => true,
+                'shadowBaseLanguage' => $shadowLocale,
             ]
         );
 
@@ -295,17 +313,78 @@ class ArticlePageControllerTest extends SuluTestCase
         $articleDE = $this->createArticle($title);
         $page1 = $this->post($articleDE, 'Sulu ist toll - Page 1');
 
-        $this->createArticleLocale($articleDE, 'Sulu is great');
+        $articleEN = $this->createArticleLocale($articleDE, 'Sulu is great');
 
         // page 1 should exists with empty pageTitle
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page1['id'] . '?locale=en');
+        $client->request('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page1['id'] . '?locale=en');
 
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertArrayNotHasKey('type', $response);
         $this->assertEquals('', $response['pageTitle']);
+    }
+
+    public function testHandleShadowArticlePageForEN($title = 'Sulu ist toll')
+    {
+        $articleDE = $this->createArticle($title);
+        $page2 = $this->post($articleDE, 'Sulu ist toll - Page 2');
+        $page3 = $this->post($articleDE, 'Sulu ist toll - Page 3');
+        $page4 = $this->post($articleDE, 'Sulu ist toll - Page 4');
+
+        $articleEN = $this->createArticleLocale($articleDE, 'Sulu is great');
+        $articleShadow = $this->createArticleShadow($articleEN);
+
+        // check the article itself
+        $this->assertEquals('Sulu ist toll', $articleShadow['title']);
+
+        // load second page
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page2['id'] . '?locale=en');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertEquals('Sulu ist toll', $response['title']);
+        $this->assertTrue($response['shadowOn']);
+        $this->assertEquals('de', $response['shadowBaseLanguage']);
+        $this->assertEquals('/articles/sulu-is-great/page-2', $response['route']);
+
+        $articleViewDocument = $this->findViewDocument($articleEN['id'], 'en');
+        $this->assertEquals('en', $articleViewDocument->getLocale());
+        $this->assertEquals('/articles/sulu-is-great', $articleViewDocument->getRoutePath());
+        $this->assertEquals('Sulu ist toll', $articleViewDocument->getTitle());
+        $this->assertEquals(LocalizationState::SHADOW, $articleViewDocument->getLocalizationState()->state);
+        $this->assertEquals('de', $articleViewDocument->getLocalizationState()->locale);
+        $this->assertCount(3, $articleViewDocument->getPages());
+        $this->assertEquals('Sulu ist toll - Page 2', $articleViewDocument->getPages()[0]->title);
+        $this->assertEquals('Sulu ist toll - Page 3', $articleViewDocument->getPages()[1]->title);
+        $this->assertEquals('Sulu ist toll - Page 4', $articleViewDocument->getPages()[2]->title);
+        $this->assertEquals('/articles/sulu-is-great/page-2', $articleViewDocument->getPages()[0]->routePath);
+        $this->assertEquals('/articles/sulu-is-great/page-3', $articleViewDocument->getPages()[1]->routePath);
+        $this->assertEquals('/articles/sulu-is-great/page-4', $articleViewDocument->getPages()[2]->routePath);
+    }
+
+    public function testHandleShadowArticlePageForDE($title = 'Sulu is great')
+    {
+        $articleEN = $this->createArticle($title, 'default_pages', 'en');
+        $page2 = $this->post($articleEN, 'Sulu is great - Page 2', 'default_pages', 'en');
+        $page3 = $this->post($articleEN, 'Sulu is great - Page 3', 'default_pages', 'en');
+
+        $articleDE = $this->createArticleLocale($articleEN, 'Sulu is great', 'default_pages', 'de');
+        $articleShadow = $this->createArticleShadow($articleDE, 'de', 'en');
+
+        // check the article itself
+        $this->assertEquals('Sulu is great', $articleShadow['title']);
+
+        // load second page
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page2['id'] . '?locale=de');
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $this->assertEquals('Sulu is great', $response['title']);
+        $this->assertEquals('Sulu is great - Page 2', $response['pageTitle']);
     }
 
     private function purgeIndex()

@@ -93,6 +93,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
                 ['setParentOnHydrate', 1],
             ],
             Events::PERSIST => [
+                ['checkOptions', 10000],
                 ['setTitleOnPersist', 2000],
                 ['setNodeOnPersist', 480],
                 ['setPageTitleOnPersist'],
@@ -118,10 +119,29 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
         $parent = $this->documentManager->find(
             $event->getNode()->getParent()->getIdentifier(),
-            $event->getLocale(),
+            $document->getOriginalLocale(),
             $event->getOptions()
         );
         $document->setParent($parent);
+    }
+
+    /**
+     * Check for missing persist options.
+     *
+     * @param PersistEvent $event
+     */
+    public function checkOptions(PersistEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticlePageDocument) {
+            return;
+        }
+
+        $autoRename = $event->getOption('auto_rename');
+
+        if (false !== $autoRename) {
+            throw new \InvalidArgumentException('Persist "ArticlePageDocument" only with option "auto_rename" set to "false" allowed');
+        }
     }
 
     /**

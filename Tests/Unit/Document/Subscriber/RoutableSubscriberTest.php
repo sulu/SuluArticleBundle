@@ -27,6 +27,7 @@ use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -153,9 +154,11 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $route = $this->prophesize(RouteInterface::class);
         $this->document->setRoute($route->reveal())->shouldBeCalled();
-        $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getLocale()->willReturn('de');
         $this->document->getStructureType()->willReturn('default');
         $this->routeRepository->findByPath('/test', 'de')->willReturn($route->reveal());
+
+        $this->documentInspector->getLocalizationState($this->document)->willReturn(LocalizationState::LOCALIZED);
 
         $metadata = $this->prophesize(StructureMetadata::class);
         $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
@@ -180,14 +183,50 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
     }
 
+    public function testHandleHydrateShadow()
+    {
+        $route = $this->prophesize(RouteInterface::class);
+        $this->document->setRoute($route->reveal())->shouldBeCalled();
+        $this->document->getLocale()->willReturn('de');
+        $this->document->getOriginalLocale()->willReturn('en');
+        $this->document->getStructureType()->willReturn('default');
+        $this->routeRepository->findByPath('/test', 'en')->willReturn($route->reveal());
+
+        $this->documentInspector->getLocalizationState($this->document)->willReturn(LocalizationState::SHADOW);
+
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(RoutableSubscriber::TAG_NAME)->willReturn(false);
+        $this->metadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'en')
+            ->willReturn('i18n:en-' . RoutableSubscriber::ROUTE_FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:de-' . RoutableSubscriber::ROUTE_FIELD, null)
+            ->willReturn('/test');
+        $this->document->getClass()->willReturn(ArticleDocument::class);
+        $this->document->getUuid()->willReturn('123-123-123');
+
+        $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'en')->willReturn($route->reveal());
+
+        $this->propertyEncoder->localizedSystemName(RoutableSubscriber::ROUTE_FIELD, 'en')
+            ->willReturn('i18n:de-' . RoutableSubscriber::ROUTE_FIELD);
+        $this->node->getPropertyValueWithDefault('i18n:en-' . RoutableSubscriber::ROUTE_FIELD, null)
+            ->willReturn('/test');
+
+        $this->document->setRoutePath('/test')->shouldBeCalled();
+
+        $this->routableSubscriber->handleHydrate($this->prophesizeEvent(HydrateEvent::class));
+    }
+
     public function testHandleHydrateTaggedProperty()
     {
         $route = $this->prophesize(RouteInterface::class);
         $this->document->setRoute($route->reveal())->shouldBeCalled();
         $this->document->getUuid()->willReturn('123-123-123');
-        $this->document->getOriginalLocale()->willReturn('de');
+        $this->document->getLocale()->willReturn('de');
         $this->document->getStructureType()->willReturn('default');
         $this->document->getClass()->willReturn(ArticleDocument::class);
+
+        $this->documentInspector->getLocalizationState($this->document)->willReturn(LocalizationState::LOCALIZED);
 
         $this->routeRepository->findByEntity(ArticleDocument::class, '123-123-123', 'de')->willReturn($route->reveal());
 

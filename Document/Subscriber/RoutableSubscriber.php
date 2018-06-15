@@ -24,6 +24,7 @@ use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
@@ -159,15 +160,16 @@ class RoutableSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $document->getOriginalLocale());
+        $locale = $document->getLocale();
+        if (LocalizationState::SHADOW === $this->documentInspector->getLocalizationState($document)) {
+            $locale = $document->getOriginalLocale();
+        }
+
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $locale);
         $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
         $document->setRoutePath($routePath);
 
-        $route = $this->routeRepository->findByEntity(
-            $document->getClass(),
-            $document->getUuid(),
-            $document->getOriginalLocale()
-        );
+        $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
         if ($route) {
             $document->setRoute($route);
         }
