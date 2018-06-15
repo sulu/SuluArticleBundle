@@ -512,7 +512,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
                     [
                         'title' => 'Test Überschrift',
                         'routePath' => '/test-ueberschrift',
-                    ]
+                    ],
                 ]
             ));
 
@@ -522,7 +522,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
                     [
                         'title' => 'Test Headline',
                         'routePath' => '/test-headline',
-                    ]
+                    ],
                 ]
             ));
 
@@ -534,7 +534,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
                 [
                     'title' => 'Test Überschrift',
                     'routePath' => '/test-headline',
-                ]
+                ],
             ]
         )->shouldBeCalled();
 

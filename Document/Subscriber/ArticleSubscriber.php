@@ -367,7 +367,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         );
         $pages = json_decode($pages, true);
 
-        for ($i = 0; $i < count($originalPages); $i++) {
+        for ($i = 0; $i < count($originalPages); ++$i) {
             $pages[$i]['routePath'] = $originalPages[$i]['routePath'];
         }
 
