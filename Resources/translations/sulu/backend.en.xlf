@@ -204,7 +204,7 @@
             </trans-unit>
             <trans-unit id="shadow-02" resname="sulu_article.published-shadow">
                 <source>sulu_article.published-shadow</source>
-                <target>The publishing state will be retrieved from the state of the main article..</target>
+                <target>The publishing state will be retrieved from the state of the main article.</target>
             </trans-unit>
             <trans-unit id="shadow-03" resname="sulu_article.form.settings.shadow.enable">
                 <source>sulu_article.form.settings.shadow.enable</source>
