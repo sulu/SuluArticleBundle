@@ -198,6 +198,30 @@
                 <source>sulu_article.broken-template.title</source>
                 <target>Le modèle d'article est cassé</target>
             </trans-unit>
+            <trans-unit id="shadow-01" resname="sulu_article.shadow_article">
+                 <source>sulu_article.shadow_article</source>
+                 <target>Article de substitution</target>
+             </trans-unit>
+             <trans-unit id="shadow-02" resname="sulu_article.published-shadow">
+                 <source>sulu_article.published-shadow</source>
+                 <target>L'état de publication de l'article principal sera appliqué...</target>
+             </trans-unit>
+             <trans-unit id="shadow-03" resname="sulu_article.form.settings.shadow.enable">
+                 <source>sulu_article.form.settings.shadow.enable</source>
+                 <target>Activer l'article de substitution</target>
+             </trans-unit>
+             <trans-unit id="shadow-04" resname="sulu_article.form.settings.shadow.base_language">
+                 <source>sulu_article.form.settings.shadow.base_language</source>
+                 <target>Langue de l'article de substitution</target>
+             </trans-unit>
+             <trans-unit id="shadow-05" resname="sulu_article.form.settings.shadow.no_base_language">
+                 <source>sulu_article.form.settings.shadow.no_base_language</source>
+                 <target>La langue de l'article de substitution n'existe pas...</target>
+             </trans-unit>
+             <trans-unit id="shadow-06" resname="sulu_article.form.settings.shadow.select_base_language">
+                 <source>sulu_article.form.settings.shadow.select_base_language</source>
+                 <target>Choisissez une langue ...</target>
+             </trans-unit>
         </body>
     </file>
 </xliff>

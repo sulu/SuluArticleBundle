@@ -198,6 +198,30 @@
                 <source>sulu_article.broken-template.title</source>
                 <target>Artikel template is beschadigd</target>
             </trans-unit>
+            <trans-unit id="shadow-01" resname="sulu_article.shadow_article">
+                <source>sulu_article.shadow_article</source>
+                <target>Schaduwartikel</target>
+            </trans-unit>
+            <trans-unit id="shadow-02" resname="sulu_article.published-shadow">
+                <source>sulu_article.published-shadow</source>
+                <target>De publicatiestatus wordt overgenomen uit de status van het hoofdartikel.</target>
+            </trans-unit>
+            <trans-unit id="shadow-03" resname="sulu_article.form.settings.shadow.enable">
+                <source>sulu_article.form.settings.shadow.enable</source>
+                <target>Schaduwartikel activeren</target>
+            </trans-unit>
+            <trans-unit id="shadow-04" resname="sulu_article.form.settings.shadow.base_language">
+                <source>sulu_article.form.settings.shadow.base_language</source>
+                <target>Taal van schaduwartikel</target>
+            </trans-unit>
+            <trans-unit id="shadow-05" resname="sulu_article.form.settings.shadow.no_base_language">
+                <source>sulu_article.form.settings.shadow.no_base_language</source>
+                <target>Er bestaat geen taal voor schaduwartikelen...</target>
+            </trans-unit>
+            <trans-unit id="shadow-06" resname="sulu_article.form.settings.shadow.select_base_language">
+                <source>sulu_article.form.settings.shadow.select_base_language</source>
+                <target>Kies een taal ...</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
