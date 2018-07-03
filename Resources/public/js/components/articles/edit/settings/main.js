@@ -32,8 +32,16 @@ define([
             changed: 'sulu_article.form.settings.changelog.changed',
             changedOnly: 'sulu_article.form.settings.changelog.changed-only',
             created: 'sulu_article.form.settings.changelog.created',
-            createdOnly: 'sulu_article.form.settings.changelog.created-only'
+            createdOnly: 'sulu_article.form.settings.changelog.created-only',
+            shadowArticle: 'sulu_article.shadow_article',
+            shadowEnable: 'sulu_article.form.settings.shadow.enable',
+            publishedShadow: 'sulu_article.published-shadow',
+            shadowBaseLanguage: 'sulu_article.form.settings.shadow.base_language',
         }
+    },
+
+    isShadow = function() {
+        return this.sandbox.dom.prop('#shadow_on_checkbox', 'checked');
     };
 
     return {
@@ -57,7 +65,11 @@ define([
                 creator: data.creator,
                 changer: data.changer,
                 created: data.created,
-                changed: data.changed
+                changed: data.changed,
+                concreteLanguages: data.concreteLanguages,
+                enabledShadowLanguages: data.enabledShadowLanguages,
+                shadowOn: data.shadowOn,
+                shadowBaseLanguage: data.shadowBaseLanguage,
             };
         },
 
@@ -102,7 +114,84 @@ define([
                 ]);
             }
 
+            this.startShadowSelect();
+            this.updateVisibilityForShadowCheckbox(true);
+
             this.rendered();
+        },
+
+        startShadowSelect: function() {
+            var shadowsForSelect = [],
+                existingShadowForCurrentLanguage = null,
+                selectedLanguage;
+
+            if (this.data.enabledShadowLanguages[this.options.locale] !== undefined) {
+                existingShadowForCurrentLanguage = this.data.enabledShadowLanguages[this.options.locale];
+            }
+
+            this.sandbox.util.each(this.data.concreteLanguages, function(i, language) {
+                if (this.options.locale === language) {
+                    return;
+                }
+
+                var disabled = false;
+                if (existingShadowForCurrentLanguage === language) {
+                    disabled = true;
+                }
+                shadowsForSelect.push({
+                    id: language,
+                    name: language,
+                    disabled: disabled
+                });
+            }.bind(this));
+
+            selectedLanguage = this.data.shadowBaseLanguage;
+
+            // show at least a message
+            if (shadowsForSelect.length === 0) {
+                shadowsForSelect = [
+                    {
+                        id: -1,
+                        name: this.sandbox.translate('sulu.content.form.settings.shadow.no_base_language'),
+                        disabled: true
+                    }
+                ];
+            }
+
+            this.sandbox.start([
+                {
+                    name: 'select@husky',
+                    options: {
+                        el: '#shadow_base_language_select',
+                        instanceName: 'settings',
+                        multipleSelect: false,
+                        defaultLabel: this.sandbox.translate('sulu.content.form.settings.shadow.select_base_language'),
+                        data: shadowsForSelect,
+                        preSelectedElements: [selectedLanguage]
+                    }
+                }
+            ]);
+
+            if (this.data.shadowOn) {
+                this.sandbox.dom.attr('#shadow_on_checkbox', 'checked', true);
+            }
+        },
+
+        updateVisibilityForShadowCheckbox: function(isInitial) {
+            var shadow = isShadow.call(this);
+            var $shadowDescription = this.sandbox.dom.find('#shadow-container .input-description');
+
+            if (!!shadow) {
+                this.sandbox.emit('sulu.article.show-save-items', 'shadow');
+                $shadowDescription.show();
+            } else {
+                this.sandbox.emit('sulu.article.show-save-items', 'content');
+                $shadowDescription.hide();
+            }
+
+            if (!isInitial) {
+                this.sandbox.emit('sulu.tab.dirty');
+            }
         },
 
         rendered: function() {
@@ -121,6 +210,14 @@ define([
             }
 
             var data = this.sandbox.form.getData(this.formId);
+            var baseLanguages = this.sandbox.dom.data('#shadow_base_language_select', 'selectionValues');
+
+            data.shadowOn = isShadow.call(this);
+            data.shadowBaseLanguage = null;
+            if (!!data.shadowOn && !!baseLanguages && baseLanguages.length > 0) {
+                data.shadowBaseLanguage = baseLanguages[0];
+            }
+
             _.each(data, function(value, key) {
                 this.data[key] = value;
             }.bind(this));
@@ -234,7 +331,7 @@ define([
                     {
                         created: formattedTime
                     }
-                )
+                );
             }
 
             this.sandbox.dom.text('#created', creationText);
@@ -263,7 +360,7 @@ define([
                     {
                         changed: formattedTime
                     }
-                )
+                );
             }
 
             this.sandbox.dom.text('#changed', changedText);
@@ -383,6 +480,10 @@ define([
         bindDomEvents: function() {
             this.sandbox.dom.on('#change-author', 'click', function() {
                 this.openAuthorSelection();
+            }.bind(this));
+
+            this.sandbox.dom.on('#shadow_on_checkbox', 'click', function() {
+                this.updateVisibilityForShadowCheckbox(false);
             }.bind(this));
         },
 

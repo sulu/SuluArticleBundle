@@ -307,11 +307,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
             $uuid,
-            $locale,
-            [
-                'load_ghost_content' => true,
-                'load_shadow_content' => false,
-            ]
+            $locale
         );
 
         return $this->handleView(

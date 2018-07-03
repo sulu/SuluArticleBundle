@@ -32,6 +32,7 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
                 published: 'public.published',
                 unpublished: 'public.unpublished',
                 publishedWithDraft: 'public.published-with-draft',
+                shadowArticle: 'sulu_article.shadow_article',
                 filterByAuthor: 'sulu_article.list.filter.by-author',
                 filterMe: 'sulu_article.list.filter.me',
                 filterByCategory: 'sulu_article.list.filter.by-category',
@@ -44,6 +45,7 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
         templates = {
             draftIcon: _.template('<span class="draft-icon" title="<%= title %>"/>'),
             publishedIcon: _.template('<span class="published-icon" title="<%= title %>"/>'),
+            shadowIcon: _.template('<span class="fa-share" title="<%= title %>"></span>'),
         };
 
     return {
@@ -167,6 +169,15 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
                 item.localizationState.locale !== locale
             ) {
                 badge.title = item.localizationState.locale;
+
+                return badge;
+            }
+
+            if (!!item.localizationState &&
+                item.localizationState.state === 'shadow'
+            ) {
+                badge.title = templates.shadowIcon({title: translations.shadowArticle});
+                badge.cssClass = 'badge-none badge-color-black';
 
                 return badge;
             }

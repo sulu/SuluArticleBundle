@@ -55,7 +55,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
             $locale,
             [
                 'load_ghost_content' => true,
-                'load_shadow_content' => false,
+                'load_shadow_content' => true,
             ]
         );
 

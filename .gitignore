@@ -1,5 +1,5 @@
 # PHPUnit
-/app/config/parameters.yml
+/Tests/app/config/parameters.yml
 /app/phpunit.xml
 /phpunit.xml
 

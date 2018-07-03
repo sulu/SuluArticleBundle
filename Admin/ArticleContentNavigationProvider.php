@@ -38,6 +38,11 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
         $tabs['details']->setAction($action);
         $tabs['details']->setPosition(10);
         $tabs['details']->setComponent('articles/edit/details@suluarticle');
+        $tabs['details']->setDisplayConditions(
+            [
+                new DisplayCondition('shadowOn', DisplayCondition::OPERATOR_EQUAL, false),
+            ]
+        );
 
         if ($page < 2) {
             $tabs['seo'] = new ContentNavigationItem('content-navigation.contents.seo');
@@ -49,6 +54,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
             $tabs['seo']->setDisplayConditions(
                 [
                     new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
+                    new DisplayCondition('shadowOn', DisplayCondition::OPERATOR_EQUAL, false),
                 ]
             );
 
@@ -61,6 +67,7 @@ class ArticleContentNavigationProvider implements ContentNavigationProviderInter
             $tabs['excerpt']->setDisplayConditions(
                 [
                     new DisplayCondition('type', DisplayCondition::OPERATOR_EQUAL, null),
+                    new DisplayCondition('shadowOn', DisplayCondition::OPERATOR_EQUAL, false),
                 ]
             );
 
