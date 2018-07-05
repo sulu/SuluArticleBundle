@@ -1,4 +1,62 @@
 <form id="settings-form" class="grid">
+    {% block webspaceSettings %}
+        <% if (config.showWebspaceSettings) { %>
+            <div class="grid-row section" id="webspace-settings-container">
+                <h2 class="divider m-bottom-20" title="Webspace Section">
+                    <%= translations.webspaceSettings %>
+                </h2>
+
+                <div class="grid">
+                    <div class="grid-row">
+                        <label for="customize_on_checkbox">
+                            <div class="custom-checkbox">
+                                <input id="customize_on_checkbox" class="trigger-save-button form-element" type="checkbox"/>
+                                <span class="icon"></span>
+                            </div>
+                            <span class="clickable"><%= translations.webspaceSettingsCustomizeEnable %></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid" id="webspace-settings-info-default" style="display: none;">
+                    <div class="grid-row">
+                        <span>
+                            <%= translations.webspaceSettingsMainWebspace %>: <%= config.defaultMainWebspace %>
+                        </span>
+                    </div>
+                    <% if (config.defaultAdditionalWebspaces) { %>
+                        <div class="grid-row" id="webspace-settings-info-additional-webspaces">
+                            <span>
+                                <%= translations.webspaceSettingsAdditionalWebspaces %>: <%= config.defaultAdditionalWebspaces.join(', ') %>
+                            </span>
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="grid" id="webspace-settings-customize-form" style="display: none;">
+                    <div class="grid-row">
+                        <div class="grid-col-6 form-group">
+                            <label for="main_webspace_select">
+                                <span class="clickable"><%= translations.webspaceSettingsMainWebspace %></span>
+                            </label>
+
+                            <div id="main_webspace_select"></div>
+                        </div>
+                    </div>
+                    <div class="grid-row">
+                        <div class="grid-col-6 form-group">
+                            <label for="additional_webspace_multi_select">
+                                <span class="clickable"><%= translations.webspaceSettingsAdditionalWebspaces %></span>
+                            </label>
+
+                            <div id="additional_webspace_multi_select"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    {% endblock %}
+
     {% block shadow %}
         <div class="grid-row section" id="shadow-container">
             <h2 class="divider m-bottom-20" title="Shadow Section">

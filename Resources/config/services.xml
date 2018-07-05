@@ -17,9 +17,12 @@
             <tag name="sulu.context" context="admin"/>
         </service>
         <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
+            <argument type="service" id="sulu_core.webspace.webspace_manager" />
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%sulu_article.types%</argument>
             <argument type="collection">
+                <argument key="defaultMainWebspace">%sulu_article.default_main_webspace%</argument>
+                <argument key="defaultAdditionalWebspaces">%sulu_article.default_additional_webspaces%</argument>
                 <argument key="displayTabAll">%sulu_article.display_tab_all%</argument>
                 <argument key="defaultAuthor">%sulu_article.default_author%</argument>
                 <argument key="pageTreeEnabled">%sulu_article.page_tree_enabled%</argument>
