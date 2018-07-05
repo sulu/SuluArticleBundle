@@ -141,12 +141,12 @@ class ArticleJsConfig implements JsConfigInterface
 
         $defaultMainWebspace = $this->parameter['defaultMainWebspace'];
         if (!$defaultMainWebspace || !$this->webspaceManager->findWebspaceByKey($defaultMainWebspace)) {
-            throw new \InvalidArgumentException('You have more than one webspace, so you need to set config parameter "sulu_article.default_main_webspace" to one of "' . join(',', array_column($webspaces, 'key')) . '"');
+            throw new \InvalidArgumentException('You have more than one webspace, so you need to set config parameter "sulu_article.default_main_webspace" to one of "' . implode(',', array_column($webspaces, 'key')) . '"');
         }
 
         foreach ($this->parameter['defaultAdditionalWebspaces'] as $defaultAdditionalWebspace) {
             if (!$this->webspaceManager->findWebspaceByKey($defaultAdditionalWebspace)) {
-                throw new \InvalidArgumentException('Configured default additional webspace "' . $defaultAdditionalWebspace . '" not found. Available webspaces: "' . join(',', array_column($webspaces, 'key')) . '"');
+                throw new \InvalidArgumentException('Configured default additional webspace "' . $defaultAdditionalWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
             }
         }
 
