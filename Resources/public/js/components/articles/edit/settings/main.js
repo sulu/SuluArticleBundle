@@ -213,7 +213,7 @@ define([
             var value = undefined;
 
             this.sandbox.emit('husky.select.main_webspace_select.get-checked', function(selected) {
-                value = selected;
+                value = selected[0];
             }.bind(this));
 
             return value;
@@ -349,7 +349,7 @@ define([
             var data = this.sandbox.form.getData(this.formId);
             var baseLanguages = this.sandbox.dom.data('#shadow_base_language_select', 'selectionValues');
 
-            if (isWebspaceSettingsCustom()) {
+            if (isWebspaceSettingsCustom.call(this)) {
                 data.mainWebspace = this.getSelectedMainWebspace();
                 data.additionalWebspaces = this.getSelectedAdditionalWebspace();
             }
