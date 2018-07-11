@@ -17,7 +17,7 @@ use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Handles document-manager events to create/update/remove routes.
+ * Handles document-manager events to set webspace settings.
  */
 class WebspaceSubscriber implements EventSubscriberInterface
 {

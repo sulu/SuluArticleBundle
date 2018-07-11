@@ -12,9 +12,15 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Resolver;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
 class WebspaceResolver
 {
+    /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
     /**
      * @var string
      */
@@ -30,9 +36,11 @@ class WebspaceResolver
      * @param string[] $defaultAdditionalWebspaces
      */
     public function __construct(
+        WebspaceManagerInterface $webspaceManager,
         $defaultMainWebspace,
         $defaultAdditionalWebspaces
     ) {
+        $this->webspaceManager = $webspaceManager;
         $this->defaultMainWebspace = $defaultMainWebspace;
         $this->defaultAdditionalWebspaces = $defaultAdditionalWebspaces;
     }
@@ -44,7 +52,17 @@ class WebspaceResolver
      */
     public function resolveMainWebspace(WebspaceBehavior $document)
     {
-        return $document->getMainWebspace() ? $document->getMainWebspace() : $this->defaultMainWebspace;
+        if (!$this->hasMoreThanOneWebspace()) {
+            $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
+
+            return reset($webspaces)->getKey();
+        }
+
+        if ($document->getMainWebspace()) {
+            return $document->getMainWebspace();
+        }
+
+        return $this->defaultMainWebspace;
     }
 
     /**
@@ -54,6 +72,24 @@ class WebspaceResolver
      */
     public function resolveAdditionalWebspaces(WebspaceBehavior $document)
     {
-        return $document->getAdditionalWebspaces() ? $document->getAdditionalWebspaces(): $this->defaultAdditionalWebspaces;
+        if (!$this->hasMoreThanOneWebspace()) {
+            return [];
+        }
+
+        if ($document->getAdditionalWebspaces()) {
+            return $document->getAdditionalWebspaces();
+        }
+
+        return $this->defaultAdditionalWebspaces;
+    }
+
+    /**
+     * Check if system has more than one webspace.
+     *
+     * @return bool
+     */
+    private function hasMoreThanOneWebspace()
+    {
+        return count($this->webspaceManager->getWebspaceCollection()->getWebspaces()) > 1;
     }
 }

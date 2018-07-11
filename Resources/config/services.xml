@@ -54,6 +54,7 @@
             <argument type="service" id="translator"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
         </service>
@@ -70,6 +71,7 @@
             <argument type="service" id="translator"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector" />
+            <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
         </service>
 
@@ -382,6 +384,7 @@
         <!-- resolver -->
         <service id="sulu_article.resolver.webspaces"
                  class="Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver">
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
             <argument>%sulu_article.default_main_webspace%</argument>
             <argument>%sulu_article.default_additional_webspaces%</argument>
         </service>

@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
@@ -53,6 +54,7 @@ class ArticleGhostIndexer extends ArticleIndexer
      * @param TranslatorInterface $translator
      * @param DocumentManagerInterface $documentManager
      * @param DocumentInspector $inspector
+     * @param WebspaceResolver $webspaceResolver
      * @param array $typeConfiguration
      * @param WebspaceManagerInterface $webspaceManager
      */
@@ -68,6 +70,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         TranslatorInterface $translator,
         DocumentManagerInterface $documentManager,
         DocumentInspector $inspector,
+        WebspaceResolver $webspaceResolver,
         array $typeConfiguration,
         WebspaceManagerInterface $webspaceManager
     ) {
@@ -83,6 +86,7 @@ class ArticleGhostIndexer extends ArticleIndexer
             $translator,
             $documentManager,
             $inspector,
+            $webspaceResolver,
             $typeConfiguration
         );
 

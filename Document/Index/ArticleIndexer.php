@@ -23,6 +23,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
@@ -105,6 +106,11 @@ class ArticleIndexer implements IndexerInterface
     protected $inspector;
 
     /**
+     * @var WebspaceResolver
+     */
+    protected $webspaceResolver;
+
+    /**
      * @var array
      */
     protected $typeConfiguration;
@@ -121,6 +127,7 @@ class ArticleIndexer implements IndexerInterface
      * @param TranslatorInterface $translator
      * @param DocumentManagerInterface $documentManager
      * @param DocumentInspector $inspector
+     * @param WebspaceResolver $webspaceResolver
      * @param array $typeConfiguration
      */
     public function __construct(
@@ -135,6 +142,7 @@ class ArticleIndexer implements IndexerInterface
         TranslatorInterface $translator,
         DocumentManagerInterface $documentManager,
         DocumentInspector $inspector,
+        WebspaceResolver $webspaceResolver,
         array $typeConfiguration
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
@@ -148,6 +156,7 @@ class ArticleIndexer implements IndexerInterface
         $this->translator = $translator;
         $this->documentManager = $documentManager;
         $this->inspector = $inspector;
+        $this->webspaceResolver = $webspaceResolver;
         $this->typeConfiguration = $typeConfiguration;
     }
 
@@ -253,8 +262,8 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setContentData(json_encode($document->getStructure()->toArray()));
 
-        $article->setMainWebspace($document->getMainWebspace());
-        $article->setAdditionalWebspaces($document->getAdditionalWebspaces());
+        $article->setMainWebspace($this->webspaceResolver->resolveMainWebspace($document));
+        $article->setAdditionalWebspaces($this->webspaceResolver->resolveAdditionalWebspaces($document));
 
         $this->mapPages($document, $article);
 

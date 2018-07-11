@@ -342,6 +342,7 @@ define([
             this.updateChangelog(this.data);
             this.bindDomEvents();
             this.bindEvents();
+            this.listenForChange();
         },
 
         /**
