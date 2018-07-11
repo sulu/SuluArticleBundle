@@ -58,6 +58,11 @@
   border-bottom: 2px solid #999;
 }
 
+/* line 62, ../../scss/modules/edit.scss */
+#webspace-settings-info-default {
+  color: #999;
+}
+
 /* line 3, ../../scss/modules/list.scss */
 .content-title .type:empty:before, .content-title .type:empty:after {
   content: "";

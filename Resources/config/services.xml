@@ -121,6 +121,20 @@
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
+        <service id="sulu_article.subscriber.webspace"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\WebspaceSubscriber">
+            <argument type="service" id="sulu_route.chain_generator"/>
+            <argument type="service" id="sulu_route.manager.route_manager"/>
+            <argument type="service" id="sulu.repository.route"/>
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+            <argument type="service" id="sulu_content.structure.factory"/>
+            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
         <service id="sulu_article.subscriber.routable"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
             <argument type="service" id="sulu_route.chain_generator"/>
@@ -212,6 +226,8 @@
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_http_cache.cache_lifetime.resolver"/>
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+            <argument type="service" id="sulu_core.webspace.request_analyzer"/>
 
             <tag name="sulu_route.defaults_provider"/>
         </service>
@@ -361,6 +377,13 @@
 
         <service id="sulu_article.builder.index" class="Sulu\Bundle\ArticleBundle\Builder\ArticleIndexBuilder">
             <tag name="massive_build.builder" />
+        </service>
+
+        <!-- resolver -->
+        <service id="sulu_article.resolver.webspaces"
+                 class="Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver">
+            <argument>%sulu_article.default_main_webspace%</argument>
+            <argument>%sulu_article.default_additional_webspaces%</argument>
         </service>
     </services>
 </container>

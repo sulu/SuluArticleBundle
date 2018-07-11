@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
@@ -54,7 +55,8 @@ class ArticleDocument implements
     LocalizedAuthorBehavior,
     ChildrenBehavior,
     ArticleInterface,
-    ShadowLocaleBehavior
+    ShadowLocaleBehavior,
+    WebspaceBehavior
 {
     /**
      * @var string
@@ -197,6 +199,20 @@ class ArticleDocument implements
      * @var string
      */
     protected $shadowLocale;
+
+    /**
+     * Main webspace.
+     *
+     * @var null|string
+     */
+    protected $mainWebspace;
+
+    /**
+     * Additional webspaces.
+     *
+     * @var null|string[]
+     */
+    protected $additionalWebspaces;
 
     public function __construct()
     {
@@ -622,5 +638,37 @@ class ArticleDocument implements
     public function setShadowLocaleEnabled($shadowLocaleEnabled)
     {
         $this->shadowLocaleEnabled = $shadowLocaleEnabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMainWebspace()
+    {
+        return $this->mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMainWebspace($mainWebspace)
+    {
+        $this->mainWebspace = $mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalWebspaces()
+    {
+        return $this->additionalWebspaces;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdditionalWebspaces($additionalWebspaces)
+    {
+        $this->additionalWebspaces = $additionalWebspaces;
     }
 }

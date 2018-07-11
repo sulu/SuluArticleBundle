@@ -50,6 +50,10 @@ define([
 
         save: function(component, data, action) {
             data.template = component.template;
+            
+            if (!data.hasOwnProperty('additionalWebspaces')) {
+                data.additionalWebspaces = null;
+            }
 
             _.each(data, function(value, key) {
                 component.data[key] = value;

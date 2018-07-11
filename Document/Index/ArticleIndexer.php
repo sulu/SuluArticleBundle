@@ -253,6 +253,9 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setContentData(json_encode($document->getStructure()->toArray()));
 
+        $article->setMainWebspace($document->getMainWebspace());
+        $article->setAdditionalWebspaces($document->getAdditionalWebspaces());
+
         $this->mapPages($document, $article);
 
         return $article;

@@ -48,7 +48,7 @@ define([
         return this.sandbox.dom.prop('#shadow_on_checkbox', 'checked');
     },
 
-    isWebspaceSettingsCustom = function() {
+    hasCustomWebspaceSettings = function() {
         return this.sandbox.dom.prop('#customize_on_checkbox', 'checked');
     };
 
@@ -78,6 +78,8 @@ define([
                 enabledShadowLanguages: data.enabledShadowLanguages,
                 shadowOn: data.shadowOn,
                 shadowBaseLanguage: data.shadowBaseLanguage,
+                mainWebspace: data.mainWebspace,
+                additionalWebspaces: data.additionalWebspaces,
             };
         },
 
@@ -252,12 +254,14 @@ define([
 
                 if (mainWebspace === webspace.id) {
                     selectedMainWebspace.push(webspace.id);
-                } else {
-                    availableAdditionalWebspaces.push(webspace);
 
-                    if (additionalWebspaces.indexOf(webspace.id) > -1) {
-                        selectedAdditionalWebspaces.push(webspace.id);
-                    }
+                    return;
+                }
+
+                availableAdditionalWebspaces.push(webspace);
+
+                if (additionalWebspaces.indexOf(webspace.id) > -1) {
+                    selectedAdditionalWebspaces.push(webspace.id);
                 }
             }.bind(this));
 
@@ -310,10 +314,14 @@ define([
                     }
                 }
             ]);
+
+            if (this.data.mainWebspace) {
+                this.sandbox.dom.attr('#customize_on_checkbox', 'checked', true);
+            }
         },
 
         updateVisibilityForWebspaceSettingsCustomizeCheckbox: function(isInitial) {
-            var webspaceSettingsCustom = isWebspaceSettingsCustom.call(this);
+            var webspaceSettingsCustom = hasCustomWebspaceSettings.call(this);
             var $webspaceSettingsInfoDefault = this.sandbox.dom.find('#webspace-settings-info-default');
             var $webspaceSettingsCustomizeForm = this.sandbox.dom.find('#webspace-settings-customize-form');
 
@@ -349,7 +357,9 @@ define([
             var data = this.sandbox.form.getData(this.formId);
             var baseLanguages = this.sandbox.dom.data('#shadow_base_language_select', 'selectionValues');
 
-            if (isWebspaceSettingsCustom.call(this)) {
+            data.mainWebspace = null;
+            data.additionalWebspaces = null;
+            if (hasCustomWebspaceSettings.call(this)) {
                 data.mainWebspace = this.getSelectedMainWebspace();
                 data.additionalWebspaces = this.getSelectedAdditionalWebspace();
             }
@@ -640,7 +650,7 @@ define([
 
         bindEvents: function() {
             this.sandbox.on('husky.select.main_webspace_select.selected.item', function() {
-                this.updateWebspaceSettingsComponents(false);
+                this.updateWebspaceSettingsComponents();
             }.bind(this));
         },
 

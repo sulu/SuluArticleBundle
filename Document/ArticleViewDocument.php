@@ -280,6 +280,20 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $view;
 
     /**
+     * @var string
+     *
+     * @Property(type="string")
+     */
+    protected $mainWebspace;
+
+    /**
+     * @var string[]
+     *
+     * @Property(type="string")
+     */
+    protected $additionalWebspaces;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -801,6 +815,42 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setView(\ArrayObject $view)
     {
         $this->view = $view;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMainWebspace()
+    {
+        return $this->mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMainWebspace($mainWebspace)
+    {
+        $this->mainWebspace = $mainWebspace;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalWebspaces()
+    {
+        return $this->additionalWebspaces;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdditionalWebspaces($additionalWebspace)
+    {
+        $this->additionalWebspaces = $additionalWebspace;
 
         return $this;
     }

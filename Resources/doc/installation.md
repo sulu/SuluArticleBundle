@@ -69,6 +69,33 @@ sulu_article:
     prefix: /admin/articles
 ```
 
+### Webspace behavior
+
+When you have more than one webspace in your Sulu installation you should provide a default main webspace and optional additional webspaces for which the article is valid.
+
+#### Functionality
+
+Normally an article will be delivered only for the main webspace. Further an article can be delivered for
+the additional webspaces which are configured. To prevent duplicate content issues a canonical tag with the
+url for the main webspace is inclued in the HTML head.
+
+More information about this topic:
+* Duplicate content: https://moz.com/learn/seo/duplicate-content
+* Canonicalization: https://moz.com/learn/seo/canonicalization
+
+#### Configuration
+```yml
+sulu_article:
+    default_main_webspace: 'webspace1'
+    default_additional_webspaces:
+        - 'webspace2'
+        - 'webspace3'
+```
+
+#### Content Manager
+
+For each article the default webspace configuration can be overwritten by the content manager.
+
 ## Create Template
 
 Add xml template for structure in configured folder:
@@ -122,6 +149,8 @@ php bin/console ongr:es:index:create --manager=live
 # app/config/config.yml
 
 sulu_article:
+    default_main_webspace: null
+    default_additional_webspaces: []
     smart_content:
         default_limit:        100
     content_types:

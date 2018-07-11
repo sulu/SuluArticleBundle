@@ -481,4 +481,28 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setView(\ArrayObject $view);
+
+    /**
+     * @return string
+     */
+    public function getMainWebspace();
+
+    /**
+     * @param null|string $mainWebspace
+     *
+     * @return $this
+     */
+    public function setMainWebspace($mainWebspace);
+
+    /**
+     * @return null|string[]
+     */
+    public function getAdditionalWebspaces();
+
+    /**
+     * @param null|string[] $additionalWebspace
+     *
+     * @return $this
+     */
+    public function setAdditionalWebspaces($additionalWebspace);
 }

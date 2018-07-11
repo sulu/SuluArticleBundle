@@ -566,6 +566,10 @@ class ArticleController extends RestController implements ClassResourceInterface
             $document->setAuthor(null);
         }
 
+        if (array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
+            $document->setAdditionalWebspaces(null);
+        }
+
         $this->getDocumentManager()->persist(
             $document,
             $locale,
