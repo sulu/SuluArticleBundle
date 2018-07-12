@@ -16,6 +16,9 @@ use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
+use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArticleDataProviderTest extends SuluTestCase
 {
@@ -377,6 +380,77 @@ class ArticleDataProviderTest extends SuluTestCase
         );
 
         $this->assertCount(3, $result->getItems());
+    }
+
+    public function testResolveResourceItemsWithIgnoreWebspaces()
+    {
+        $this->createArticle('Test-Article 1', 'default', 'test', []);
+        $this->createArticle('Test-Article 2', 'default', 'test2', ['sulu_io']);
+        $this->createArticle('Test-Article 2', 'default', 'sulu_io', []);
+        $this->createArticle();
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // push fake request with `sulu_io`
+        $this->pushFakeRequest('sulu_io');
+
+        $result = $dataProvider->resolveResourceItems(
+            [],
+            ['ignore_webspaces' => new PropertyParameter('ignore_webspaces', true)],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $items = $result->getItems();
+        $this->assertCount(4, $items);
+        $this->assertEquals('test', $items[0]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[1]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[2]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[3]->getTargetWebspace());
+
+        $this->popFakeRequest();
+
+        // push fake request with `test`
+        $this->pushFakeRequest('test');
+
+        $result = $dataProvider->resolveResourceItems(
+            [],
+            ['ignore_webspaces' => new PropertyParameter('ignore_webspaces', true)],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $items = $result->getItems();
+        $this->assertCount(4, $items);
+        $this->assertEquals('test', $items[0]->getTargetWebspace());
+        $this->assertEquals('test2', $items[1]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[2]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[3]->getTargetWebspace());
+
+        $this->popFakeRequest();
+    }
+
+    private function pushFakeRequest($webspaceKey)
+    {
+        $webspaceManager = $this->getContainer()->get('sulu_core.webspace.webspace_manager');
+        $webspace = $webspaceManager->findWebspaceByKey($webspaceKey);
+
+        $fakeRequest = Request::create('/', 'GET');
+        $fakeRequest->setLocale('de');
+        $fakeRequest->attributes->set('_sulu', new RequestAttributes(
+            [
+                'webspace' => $webspace,
+            ]
+        ));
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->push($fakeRequest);
+    }
+
+    private function popFakeRequest()
+    {
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->pop();
     }
 
     public function testResolveDataItemsWithIgnoreWebspaces()

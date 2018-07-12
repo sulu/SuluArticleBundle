@@ -505,4 +505,16 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setAdditionalWebspaces($additionalWebspace);
+
+    /**
+     * @return string
+     */
+    public function getTargetWebspace();
+
+    /**
+     * @param string $targetWebspace
+     *
+     * @return $this
+     */
+    public function setTargetWebspace($targetWebspace);
 }

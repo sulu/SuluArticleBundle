@@ -203,6 +203,13 @@
             <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
         </service>
 
+        <service id="sulu_article.target_webspace_listener"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\TargetWebspaceListener">
+            <argument type="service" id="sulu_core.webspace.request_analyzer"/>
+
+            <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
+        </service>
+
         <service id="sulu_article.serializer.website_article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>

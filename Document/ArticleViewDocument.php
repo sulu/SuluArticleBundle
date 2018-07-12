@@ -294,6 +294,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $additionalWebspaces;
 
     /**
+     * @var string
+     */
+    protected $targetWebspace;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -851,6 +856,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setAdditionalWebspaces($additionalWebspace)
     {
         $this->additionalWebspaces = $additionalWebspace;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetWebspace()
+    {
+        return $this->targetWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTargetWebspace($targetWebspace)
+    {
+        $this->targetWebspace = $targetWebspace;
 
         return $this;
     }
