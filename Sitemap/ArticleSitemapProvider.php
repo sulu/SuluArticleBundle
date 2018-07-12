@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Sitemap;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
@@ -20,6 +21,7 @@ use Sulu\Bundle\WebsiteBundle\Sitemap\Sitemap;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapAlternateLink;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapProviderInterface;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
 /**
  * Integrates articles into sitemap.
@@ -37,13 +39,23 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     private $documentFactory;
 
     /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
      * @param Manager $manager
      * @param DocumentFactoryInterface $documentFactory
+     * @param WebspaceManagerInterface $webspaceManager
      */
-    public function __construct(Manager $manager, DocumentFactoryInterface $documentFactory)
-    {
+    public function __construct(
+        Manager $manager,
+        DocumentFactoryInterface $documentFactory,
+        WebspaceManagerInterface $webspaceManager
+    ) {
         $this->manager = $manager;
         $this->documentFactory = $documentFactory;
+        $this->webspaceManager = $webspaceManager;
     }
 
     /**
@@ -52,13 +64,18 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     public function build($page, $portalKey)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
+        $portal = $this->webspaceManager->findPortalByKey($portalKey);
+
+        if (!$portal) {
+            throw new \InvalidArgumentException('Portal with key "' . $portalKey . '" not found');
+        }
 
         $result = [];
 
         $from = 0;
         $size = 1000;
         do {
-            $bulk = $this->getBulk($repository, $from, $size);
+            $bulk = $this->getBulk($repository, $portal->getWebspace()->getKey(), $from, $size);
             /** @var SitemapUrl[] $alternatives */
             $sitemapUrlListByUuid = [];
 
@@ -110,12 +127,17 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $sitemapUrlList;
     }
 
-    private function getBulk(Repository $repository, $from, $size)
+    private function getBulk(Repository $repository, $webspaceKey, $from, $size)
     {
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'))
             ->setFrom($from)
             ->setSize($size);
+
+        $webspaceQuery = new BoolQuery();
+        $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
+        $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+        $search->addQuery($webspaceQuery);
 
         return $repository->findDocuments($search);
     }
