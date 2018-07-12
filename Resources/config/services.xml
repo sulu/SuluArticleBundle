@@ -256,6 +256,14 @@
             <tag name="sulu.route_generator" alias="article_page"/>
         </service>
 
+        <!-- route enhancer -->
+        <service id="sulu_article.route_enhancer"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteEnhancer">
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+            <argument>%kernel.environment%</argument>
+        </service>
+
         <!-- content -->
         <service id="sulu_article.content.data_provider.proxy_factory"
                  class="ProxyManager\Factory\LazyLoadingValueHolderFactory">
