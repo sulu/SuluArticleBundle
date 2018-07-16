@@ -79,12 +79,18 @@ class ArticleViewDocumentRepository
      * @param int $limit
      * @param null|array $types
      * @param null|string $locale
+     * @param null|string $webspaceKey
      *
      * @return DocumentIterator
      */
-    public function findRecent($excludeUuid = null, $limit = self::DEFAULT_LIMIT, array $types = null, $locale = null)
-    {
-        $search = $this->createSearch($limit, $types, $locale);
+    public function findRecent(
+        $excludeUuid = null,
+        $limit = self::DEFAULT_LIMIT,
+        array $types = null,
+        $locale = null,
+        $webspaceKey = null
+    ) {
+        $search = $this->createSearch($limit, $types, $locale, $webspaceKey);
 
         if ($excludeUuid) {
             $search->addQuery(new TermQuery('uuid', $excludeUuid), BoolQuery::MUST_NOT);
@@ -102,12 +108,18 @@ class ArticleViewDocumentRepository
      * @param int $limit
      * @param null|array $types
      * @param null|string $locale
+     * @param null|string $webspaceKey
      *
      * @return DocumentIterator
      */
-    public function findSimilar($uuid, $limit = self::DEFAULT_LIMIT, array $types = null, $locale = null)
-    {
-        $search = $this->createSearch($limit, $types, $locale);
+    public function findSimilar(
+        $uuid,
+        $limit = self::DEFAULT_LIMIT,
+        array $types = null,
+        $locale = null,
+        $webspaceKey = null
+    ) {
+        $search = $this->createSearch($limit, $types, $locale, $webspaceKey);
 
         $search->addQuery(
             new MoreLikeThisQuery(
@@ -125,16 +137,21 @@ class ArticleViewDocumentRepository
     }
 
     /**
-     * Creates search with default queries (size, locale, types).
+     * Creates search with default queries (size, locale, types, webspace).
      *
      * @param int $limit
      * @param null|array $types
      * @param null|string $locale
+     * @param null|string $webspaceKey
      *
      * @return Search
      */
-    private function createSearch($limit, array $types = null, $locale = null)
-    {
+    private function createSearch(
+        $limit, array
+        $types = null,
+        $locale = null,
+        $webspaceKey = null
+    ) {
         $search = $this->repository->createSearch();
 
         // set size
@@ -152,6 +169,19 @@ class ArticleViewDocumentRepository
                 $typesQuery->add(new TermQuery('type', $type), BoolQuery::SHOULD);
             }
             $search->addQuery($typesQuery);
+        }
+
+        // filter by webspace if provided
+        if ($webspaceKey) {
+            $webspaceQuery = new BoolQuery();
+
+            // check for mainWebspace
+            $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
+
+            // check for additionalWebspaces
+            $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+
+            $search->addQuery($webspaceQuery);
         }
 
         return $search;

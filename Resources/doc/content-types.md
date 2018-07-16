@@ -47,7 +47,7 @@ the articles.
 |------------------|---------|-------------------------------------------------------------------------------------|
 | types            | string  | Comma separated list of types which can be selected                                 |
 | structureTypes   | string  | Comma separated list of structure types (template keys) which can be selected       |
-| ignore_webspaces | bool    | If set to `true` all articles will be loaded, otherwise the webspace needs to match |
+| ignoreWebspaces  | bool    | If set to `true` all articles will be loaded, otherwise the webspace needs to match |
 
 ### Returns
 

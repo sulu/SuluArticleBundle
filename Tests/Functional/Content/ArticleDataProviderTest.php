@@ -396,7 +396,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
         $result = $dataProvider->resolveResourceItems(
             [],
-            ['ignore_webspaces' => new PropertyParameter('ignore_webspaces', true)],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
             ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
@@ -414,7 +414,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
         $result = $dataProvider->resolveResourceItems(
             [],
-            ['ignore_webspaces' => new PropertyParameter('ignore_webspaces', true)],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
             ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
@@ -469,7 +469,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
         $result = $dataProvider->resolveDataItems(
             [],
-            ['ignore_webspaces' => new PropertyParameter('ignore_webspaces', true)],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
             ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 

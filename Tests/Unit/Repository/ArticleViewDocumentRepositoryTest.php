@@ -65,6 +65,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
             [],
             ['123-123-123', ['blog', 'article']],
             ['321-321-321', ['blog'], 'en', 10],
+            ['444-444-444', ['blog'], 'en', 10, 'test_webspace'],
         ];
     }
 
@@ -75,15 +76,53 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param array $types
      * @param string $locale
      * @param int $limit
+     * @param string $webspaceKey
      */
-    public function testFindSimilar($uuid = '123-123-123', array $types = ['blog'], $locale = 'de', $limit = 12)
-    {
+    public function testFindSimilar(
+        $uuid = '123-123-123',
+        array $types = ['blog'],
+        $locale = 'de',
+        $limit = 12,
+        $webspaceKey = null
+    ) {
         $termQuery = [];
         foreach ($types as $type) {
             $termQuery[] = [
                 'term' => ['type' => $type],
             ];
         }
+
+        $mustQuery = [];
+        $mustQuery[] = [
+            'bool' => [
+                'should' => $termQuery,
+            ],
+        ];
+
+        if ($webspaceKey) {
+            $mustQuery[] = [
+                'bool' => [
+                    'should' => [
+                        [
+                            'term' => ['main_webspace' => $webspaceKey],
+                        ],
+                        [
+                            'term' => ['additional_webspaces' => $webspaceKey],
+                        ],
+                    ],
+                ],
+            ];
+        }
+
+        $mustQuery[] = [
+            'more_like_this' => [
+                'like' => null,
+                'fields' => ['title', 'teaser_description'],
+                'min_term_freq' => 1,
+                'min_doc_freq' => 2,
+                'ids' => [$uuid . '-' . $locale],
+            ],
+        ];
 
         $expectedSearch = [
             'bool' => [
@@ -92,22 +131,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
                         'term' => ['locale' => $locale],
                     ],
                 ],
-                'must' => [
-                    [
-                        'bool' => [
-                            'should' => $termQuery,
-                        ],
-                    ],
-                    [
-                        'more_like_this' => [
-                            'like' => null,
-                            'fields' => ['title', 'teaser_description'],
-                            'min_term_freq' => 1,
-                            'min_doc_freq' => 2,
-                            'ids' => [$uuid . '-' . $locale],
-                        ],
-                    ],
-                ],
+                'must' => $mustQuery,
             ],
         ];
 
@@ -123,7 +147,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $documentIterator->reveal(),
-            $this->articleViewDocumentRepository->findSimilar($uuid, $limit, $types, $locale)
+            $this->articleViewDocumentRepository->findSimilar($uuid, $limit, $types, $locale, $webspaceKey)
         );
     }
 
@@ -134,12 +158,14 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param array $types
      * @param string $locale
      * @param int $limit
+     * @param string $webspaceKey
      */
     public function testFindRecent(
         $excludeUuid = '123-123-123',
         array $types = ['blog'],
         $locale = 'de',
-        $limit = 12
+        $limit = 12,
+        $webspaceKey = null
     ) {
         $termQuery = [];
         foreach ($types as $type) {
@@ -172,6 +198,21 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
+        if ($webspaceKey) {
+            $expectedSearch['bool']['must'][] = [
+                'bool' => [
+                    'should' => [
+                        [
+                            'term' => ['main_webspace' => $webspaceKey],
+                        ],
+                        [
+                            'term' => ['additional_webspaces' => $webspaceKey],
+                        ],
+                    ],
+                ],
+            ];
+        }
+
         $documentIterator = $this->prophesize(DocumentIterator::class);
 
         $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
@@ -185,7 +226,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $documentIterator->reveal(),
-            $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale)
+            $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale, $webspaceKey)
         );
     }
 }
