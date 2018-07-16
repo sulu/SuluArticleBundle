@@ -2,6 +2,11 @@
 
 ## dev-master
 
+### Multi webspace behavior
+
+When you have a multi webspace setup you need to follow the new instructions:
+[multi webspaces](Resources/doc/multi-webspaces.md)
+
 ### ArticlePageDocument route definition need to be defined
 
 The ArticleBundle will not longer prepend the configuration for the article page routes

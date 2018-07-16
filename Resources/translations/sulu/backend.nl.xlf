@@ -222,6 +222,22 @@
                 <source>sulu_article.form.settings.shadow.select_base_language</source>
                 <target>Kies een taal ...</target>
             </trans-unit>
+            <trans-unit id="webspace-settings-01" resname="sulu_article.form.settings.webspace_settings">
+                <source>sulu_article.form.settings.webspace_settings</source>
+                <target>Webspace instellingen</target>
+            </trans-unit>
+            <trans-unit id="webspace-settings-02" resname="sulu_article.form.settings.webspace_settings.customize_enable">
+                <source>sulu_article.form.settings.webspace_settings.customize_enable</source>
+                <target>Aanpassen</target>
+            </trans-unit>
+            <trans-unit id="webspace-settings-03" resname="sulu_article.form.settings.webspace_settings.main_webspace">
+                <source>sulu_article.form.settings.webspace_settings.main_webspace</source>
+                <target>Hoofd-webspace</target>
+            </trans-unit>
+            <trans-unit id="webspace-settings-04" resname="sulu_article.form.settings.webspace_settings.additional_webspaces">
+                <source>sulu_article.form.settings.webspace_settings.additional_webspaces</source>
+                <target>Overige webspaces</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
