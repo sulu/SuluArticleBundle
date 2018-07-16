@@ -404,5 +404,13 @@
             <argument>%sulu_article.default_main_webspace%</argument>
             <argument>%sulu_article.default_additional_webspaces%</argument>
         </service>
+
+        <!-- Search -->
+        <service id="sulu_article.search.subscriber" class="Sulu\Bundle\ArticleBundle\Search\ArticleSearchSubscriber">
+            <argument type="service" id="massive_search.factory" />
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+
+            <tag name="kernel.event_subscriber" />
+        </service>
     </services>
 </container>
