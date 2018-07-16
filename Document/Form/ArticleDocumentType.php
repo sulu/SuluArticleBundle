@@ -38,8 +38,7 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('shadowLocaleEnabled', CheckboxType::class);
         $builder->add('shadowLocale', TextType::class);
         $builder->add('mainWebspace', TextType::class);
-        $builder->add('additionalWebspaces'
-            , CollectionType::class,
+        $builder->add('additionalWebspaces', CollectionType::class,
             [
                 'entry_type' => TextType::class,
                 'entry_options' => [

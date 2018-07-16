@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class WebspaceSubscriber implements EventSubscriberInterface
 {
     const MAIN_WEBSPACE_PROPERTY = 'mainWebspace';
+
     const ADDITIONAL_WEBSPACES_PROPERTY = 'additionalWebspaces';
 
     /**

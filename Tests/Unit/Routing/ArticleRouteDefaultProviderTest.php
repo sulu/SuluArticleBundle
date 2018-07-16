@@ -110,7 +110,7 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         return [
             [$articleDocument, 'test', 'test', [], false],
             [$articleDocumentPublished, 'test', 'test', [], true],
-            [$articleDocumentPublished, 'test', 'other_webspace', ['test','one_more_other_webspace'], true],
+            [$articleDocumentPublished, 'test', 'other_webspace', ['test', 'one_more_other_webspace'], true],
             [$unknownDocument, 'test', null, [], false],
         ];
     }

@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Form\Listener;
 
-use Sulu\Component\Content\Document\WorkflowStage;
 use Symfony\Component\Form\FormEvent;
 
 /**
