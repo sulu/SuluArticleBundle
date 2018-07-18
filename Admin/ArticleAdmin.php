@@ -29,16 +29,32 @@ class ArticleAdmin extends Admin
     const SECURITY_CONTEXT = 'sulu.modules.articles';
 
     /**
+     * @var SecurityCheckerInterface
+     */
+    protected $securityChecker;
+
+    /**
+     * @var string
+     */
+    protected $title;
+
+    /**
      * @param SecurityCheckerInterface $securityChecker
      * @param string $title
      */
     public function __construct(SecurityCheckerInterface $securityChecker, $title)
     {
-        $rootNavigationItem = new NavigationItem($title);
+        $this->securityChecker = $securityChecker;
+        $this->title = $title;
+    }
+
+    public function getNavigation(): Navigation
+    {
+        $rootNavigationItem = new NavigationItem($this->title);
         $section = new NavigationItem('navigation.modules');
         $section->setPosition(20);
 
-        if ($securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
+        if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
             $roles = new NavigationItem('sulu_article.title', $section);
             $roles->setPosition(9);
             $roles->setAction('articles');
@@ -49,7 +65,7 @@ class ArticleAdmin extends Admin
             $rootNavigationItem->addChild($section);
         }
 
-        $this->setNavigation(new Navigation($rootNavigationItem));
+        return new Navigation($rootNavigationItem);
     }
 
     /**
