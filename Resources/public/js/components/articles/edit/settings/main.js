@@ -60,12 +60,19 @@ define([
 
         authorFullname: null,
 
+        disableWebspaceSettingsForm: false,
+
         /**
          * This method function has to be overwritten by the implementation to convert the data from "options.data".
          *
          * @param {object} data
          */
         parseData: function(data) {
+            // check if route type is page tree
+            if (data.routePath && typeof data.routePath === 'object' && data.routePath.hasOwnProperty('page')) {
+                this.disableWebspaceSettingsForm = true;
+            }
+
             return {
                 id: data.id,
                 author: data.author,
@@ -285,11 +292,17 @@ define([
                 return;
             }
 
+            if (this.disableWebspaceSettingsForm) {
+                // disable customize checkbox
+                $('#customize_on_checkbox').attr('disabled', 'disabled');
+            }
+
             // start selects
             this.sandbox.start([
                 {
                     name: 'select@husky',
                     options: {
+                        disabled: this.disableWebspaceSettingsForm,
                         el: '#main_webspace_select',
                         instanceName: 'main_webspace_select',
                         multipleSelect: false,
@@ -304,6 +317,7 @@ define([
                 {
                     name: 'select@husky',
                     options: {
+                        disabled: this.disableWebspaceSettingsForm,
                         el: '#additional_webspace_multi_select',
                         instanceName: 'additional_webspace_multi_select',
                         multipleSelect: true,

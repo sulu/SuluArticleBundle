@@ -28,6 +28,7 @@ use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
@@ -49,6 +50,7 @@ class ArticleIndexer implements IndexerInterface
 {
     use StructureTagTrait;
     use ArticleViewDocumentIdTrait;
+    use PageTreeTrait;
 
     /**
      * @var StructureMetadataFactoryInterface
@@ -161,6 +163,14 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getStructureMetadataFactory()
+    {
+        return $this->structureMetadataFactory;
+    }
+
+    /**
      * Returns translation for given article type.
      *
      * @param string $type
@@ -211,7 +221,7 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
-        $this->setParentPageUuid($structureMetadata, $document, $article);
+        $this->setParentPageUuid($document, $article);
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
@@ -330,51 +340,20 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Set parent-page-uuid to view-document.
      *
-     * @param StructureMetadata $metadata
      * @param ArticleDocument $document
      * @param ArticleViewDocumentInterface $article
      */
     private function setParentPageUuid(
-        StructureMetadata $metadata,
         ArticleDocument $document,
         ArticleViewDocumentInterface $article
     ) {
-        $propertyMetadata = $this->getRoutePathProperty($metadata);
-        if (!$propertyMetadata) {
+        $parentPageUuid = $this->getParentPageUuidFromPageTree($document);
+
+        if (!$parentPageUuid) {
             return;
         }
 
-        $property = $document->getStructure()->getProperty($propertyMetadata->getName());
-        if (!$property || PageTreeRouteContentType::NAME !== $propertyMetadata->getType() || !$property->getValue()) {
-            return;
-        }
-
-        $value = $property->getValue();
-        if (!$value || !isset($value['page']) || !isset($value['page']['uuid'])) {
-            return;
-        }
-
-        $article->setParentPageUuid($value['page']['uuid']);
-    }
-
-    /**
-     * Returns property-metadata for route-path property.
-     *
-     * @param StructureMetadata $metadata
-     *
-     * @return PropertyMetadata
-     */
-    private function getRoutePathProperty(StructureMetadata $metadata)
-    {
-        if ($metadata->hasTag(RoutableSubscriber::TAG_NAME)) {
-            return $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME);
-        }
-
-        if (!$metadata->hasProperty(RoutableSubscriber::ROUTE_FIELD)) {
-            return;
-        }
-
-        return $metadata->getProperty(RoutableSubscriber::ROUTE_FIELD);
+        $article->setParentPageUuid($parentPageUuid);
     }
 
     /**
