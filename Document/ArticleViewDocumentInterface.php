@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document;
 
 use ONGR\ElasticsearchBundle\Collection\Collection;
+use ONGR\ElasticsearchBundle\Result\ObjectIterator;
 
 /**
  * Interface for indexable article-document.
@@ -428,11 +429,11 @@ interface ArticleViewDocumentInterface
     /**
      * Set pages.
      *
-     * @param Collection $pages
+     * @param ObjectIterator $pages
      *
      * @return $this
      */
-    public function setPages(Collection $pages);
+    public function setPages(ObjectIterator $pages);
 
     /**
      * Returns contentData.
