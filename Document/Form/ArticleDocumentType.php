@@ -11,11 +11,14 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
+use Sulu\Bundle\ArticleBundle\Document\Form\Listener\DataNormalizer;
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -34,6 +37,17 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->add('extensions', TextType::class, ['property_path' => 'extensionsData']);
         $builder->add('shadowLocaleEnabled', CheckboxType::class);
         $builder->add('shadowLocale', TextType::class);
+        $builder->add('mainWebspace', TextType::class);
+        $builder->add('additionalWebspaces', CollectionType::class,
+            [
+                'entry_type' => TextType::class,
+                'entry_options' => [
+                    'required' => false,
+                ],
+                'allow_add' => true,
+                'allow_delete' => true,
+            ]
+        );
 
         $builder->add('author', TextType::class);
         $builder->add(
@@ -43,6 +57,8 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
                 'widget' => 'single_text',
             ]
         );
+
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [DataNormalizer::class, 'normalize']);
     }
 
     /**

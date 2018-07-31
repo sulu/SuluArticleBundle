@@ -255,6 +255,46 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
+    public function testPutCustomWebspaceSettings($title = 'Sulu is nice', $locale = 'de')
+    {
+        $article = $this->testPost();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
+            [
+                'title' => $title,
+                'template' => 'default',
+                'mainWebspace' => 'test',
+                'additionalWebspaces' => ['sulu_io'],
+            ]
+        );
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        // check response
+        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals('test', $response['mainWebspace']);
+        $this->assertEquals(['sulu_io'], $response['additionalWebspaces']);
+
+        // check if phpcr document is correct
+        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
+        /** @var ArticleDocument $document */
+        $document = $documentManager->find($response['id'], 'de');
+
+        $this->assertEquals($title, $document->getTitle());
+        $this->assertEquals('test', $document->getMainWebspace());
+        $this->assertEquals(['sulu_io'], $document->getAdditionalWebspaces());
+
+        /** @var ArticleViewDocument $viewDocument */
+        $viewDocument = $this->findViewDocument($response['id'], 'de');
+        $this->assertNotNull($viewDocument);
+        $this->assertEquals('test', $viewDocument->getMainWebspace());
+        $this->assertEquals(['sulu_io'], $viewDocument->getAdditionalWebspaces());
+    }
+
     public function testGetGhost()
     {
         $title = 'Sulu ist toll';

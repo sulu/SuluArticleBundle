@@ -69,6 +69,18 @@ sulu_article:
     prefix: /admin/articles
 ```
 
+### Configure multi webspace setup
+
+```yml
+sulu_article:
+    default_main_webspace: 'webspace1'
+    default_additional_webspaces:
+        - 'webspace2'
+        - 'webspace3'
+```
+
+More information about this topic can be found in the section [multi-webspaces](multi-webspaces.md).
+
 ## Create Template
 
 Add xml template for structure in configured folder:
@@ -122,6 +134,8 @@ php bin/console ongr:es:index:create --manager=live
 # app/config/config.yml
 
 sulu_article:
+    default_main_webspace: null
+    default_additional_webspaces: []
     smart_content:
         default_limit:        100
     content_types:

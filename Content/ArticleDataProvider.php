@@ -135,7 +135,10 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     public function getDefaultPropertyParameter()
     {
-        return ['type' => new PropertyParameter('type', null)];
+        return [
+            'type' => new PropertyParameter('type', null),
+            'ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', false),
+        ];
     }
 
     /**
@@ -153,7 +156,9 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filters['structureTypes'] = $this->getStructureTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
-        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
+        $locale = $options['locale'];
+        $webspaceKey = $this->getWebspaceKey($propertyParameter, $options);
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $locale, $webspaceKey);
 
         $result = [];
         /** @var ArticleViewDocumentInterface $document */
@@ -179,7 +184,9 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filters['structureTypes'] = $this->getStructureTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
-        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $options['locale']);
+        $locale = $options['locale'];
+        $webspaceKey = $this->getWebspaceKey($propertyParameter, $options);
+        $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $locale, $webspaceKey);
 
         $result = [];
         /** @var ArticleViewDocumentInterface $document */
@@ -197,6 +204,29 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         return;
+    }
+
+    /**
+     * @param array $propertyParameter
+     * @param array $options
+     *
+     * @return string|null
+     */
+    private function getWebspaceKey(array $propertyParameter, array $options)
+    {
+        if (array_key_exists('ignoreWebspaces', $propertyParameter)) {
+            $value = $propertyParameter['ignoreWebspaces']->getValue();
+
+            if (true === $value) {
+                return null;
+            }
+        }
+
+        if (array_key_exists('webspaceKey', $options)) {
+            return $options['webspaceKey'];
+        }
+
+        return null;
     }
 
     /**
@@ -228,10 +258,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param int $page
      * @param int $pageSize
      * @param string $locale
+     * @param null|string $webspaceKey
      *
      * @return \Countable
      */
-    private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale)
+    private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale, $webspaceKey)
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
@@ -244,6 +275,18 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
             $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
             $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
+        }
+
+        if ($webspaceKey) {
+            $webspaceQuery = new BoolQuery();
+
+            // check for mainWebspace
+            $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
+
+            // check for additionalWebspaces
+            $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+
+            $search->addQuery($webspaceQuery);
         }
 
         return $repository->findDocuments($search);

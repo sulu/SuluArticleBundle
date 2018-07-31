@@ -21,6 +21,7 @@ use Sulu\Bundle\ArticleBundle\Exception\ArticleInRequestNotFoundException;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -96,13 +97,15 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      * @param int $limit
      * @param null|array $types
      * @param null|string $locale
+     * @param bool $ignoreWebspaces
      *
      * @return ArticleResourceItem[]
      */
     public function loadRecent(
         $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null
+        $locale = null,
+        $ignoreWebspaces = false
     ) {
         $excludeUuid = null;
 
@@ -122,7 +125,15 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
             $locale = $request->getLocale();
         }
 
-        $articleViewDocuments = $this->articleViewDocumentRepository->findRecent($excludeUuid, $limit, $types, $locale);
+        $webspaceKey = $this->getWebspaceKey($request, $ignoreWebspaces);
+
+        $articleViewDocuments = $this->articleViewDocumentRepository->findRecent(
+            $excludeUuid,
+            $limit,
+            $types,
+            $locale,
+            $webspaceKey
+        );
 
         return $this->getResourceItems($articleViewDocuments);
     }
@@ -133,6 +144,7 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
      * @param int $limit
      * @param array|null $types
      * @param null $locale
+     * @param bool $ignoreWebspaces
      *
      * @throws ArticleInRequestNotFoundException
      *
@@ -141,7 +153,8 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     public function loadSimilar(
         $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null
+        $locale = null,
+        $ignoreWebspaces = false
     ) {
         $uuid = null;
 
@@ -164,7 +177,15 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
             $locale = $request->getLocale();
         }
 
-        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar($uuid, $limit, $types, $locale);
+        $webspaceKey = $this->getWebspaceKey($request, $ignoreWebspaces);
+
+        $articleViewDocuments = $this->articleViewDocumentRepository->findSimilar(
+            $uuid,
+            $limit,
+            $types,
+            $locale,
+            $webspaceKey
+        );
 
         return $this->getResourceItems($articleViewDocuments);
     }
@@ -208,5 +229,31 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
         );
 
         return $this->getType($structureMetadata);
+    }
+
+    /**
+     * @param Request $request
+     * @param bool $ignoreWebspaces
+     *
+     * @return null|string
+     */
+    private function getWebspaceKey(Request $request, $ignoreWebspaces)
+    {
+        if ($ignoreWebspaces) {
+            return null;
+        }
+
+        $sulu = $request->get('_sulu');
+        if (!$sulu) {
+            return null;
+        }
+
+        /** @var Webspace $webspace */
+        $webspace = $sulu->getAttribute('webspace');
+        if (!$webspace) {
+            return null;
+        }
+
+        return $webspace->getKey();
     }
 }

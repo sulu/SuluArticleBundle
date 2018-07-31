@@ -43,5 +43,7 @@
 
         <property name="shadowLocale" type="string" serialized-name="shadowBaseLanguage" groups="defaultArticle"/>
         <property name="shadowLocaleEnabled" type="boolean" serialized-name="shadowOn" groups="defaultArticle"/>
+        <property name="mainWebspace" type="string" serialized-name="mainWebspace" groups="defaultArticle"/>
+        <property name="additionalWebspaces" type="array" serialized-name="additionalWebspaces" groups="defaultArticle"/>
     </class>
 </serializer>
