@@ -29,6 +29,11 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('sulu_article')
             ->children()
+                ->scalarNode('default_main_webspace')->defaultNull()->end()
+                ->arrayNode('default_additional_webspaces')
+                    ->prototype('scalar')->end()
+                    ->defaultValue([])
+                ->end()
                 ->arrayNode('smart_content')
                     ->addDefaultsIfNotSet()
                     ->children()

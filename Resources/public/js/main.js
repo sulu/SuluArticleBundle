@@ -64,6 +64,10 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                     defaultAuthor: articleConfig.defaultAuthor,
                     pageTreeEnabled: articleConfig.pageTreeEnabled,
                     classes: articleConfig.classes,
+                    showWebspaceSettings: articleConfig.showWebspaceSettings,
+                    defaultMainWebspace: articleConfig.defaultMainWebspace,
+                    defaultAdditionalWebspaces: articleConfig.defaultAdditionalWebspaces,
+                    webspaces: articleConfig.webspaces,
                 };
 
             Config.set('sulu_article', config);

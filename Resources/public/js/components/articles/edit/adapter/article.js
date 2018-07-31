@@ -50,10 +50,19 @@ define([
 
         save: function(component, data, action) {
             data.template = component.template;
+            
+            if (!data.hasOwnProperty('additionalWebspaces')) {
+                data.additionalWebspaces = null;
+            }
 
             _.each(data, function(value, key) {
                 component.data[key] = value;
             });
+
+            var routePathProperty = component.getRoutePathProperty();
+            if (component.data[routePathProperty.name] && component.data[routePathProperty.name] === '/') {
+                delete component.data[routePathProperty.name];
+            }
 
             if (!!component.data.type && component.data.type.name === 'ghost') {
                 delete component.data['_hash'];

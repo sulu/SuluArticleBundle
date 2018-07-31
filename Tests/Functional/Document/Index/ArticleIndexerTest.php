@@ -57,6 +57,99 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->clear();
     }
 
+    public function testIndexDefaultWithRoute()
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $this->assertEquals($document->getUuid(), $viewDocument->getUuid());
+        $this->assertEquals('/articles/test-article', $viewDocument->getRoutePath());
+        $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
+        $this->assertTrue($viewDocument->getPublishedState());
+        $this->assertEquals('localized', $viewDocument->getLocalizationState()->state);
+        $this->assertNull($viewDocument->getLocalizationState()->locale);
+    }
+
+    public function testIndexShadow()
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+
+        $secondLocale = 'de';
+
+        // now add second locale
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+
+        // now transform second locale to shadow
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'shadowOn' => true,
+                'shadowBaseLanguage' => 'en',
+            ],
+            null,
+            null
+        );
+
+        $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
+
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
+        $this->assertEquals('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
+        $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
+        $this->assertTrue($viewDocument->getPublishedState());
+        $this->assertEquals('shadow', $viewDocument->getLocalizationState()->state);
+        $this->assertEquals($this->locale, $viewDocument->getLocalizationState()->locale);
+        $this->assertEquals($secondLocale, $viewDocument->getLocale());
+        $this->assertEquals('Test Article', $viewDocument->getTitle());
+
+        $contentData = json_decode($viewDocument->getContentData(), true);
+        $this->assertEquals($contentData['article'], 'Test content');
+
+        // now update the source locale
+        // the shadow should be update also
+        $this->updateArticle(
+            $article['id'],
+            $this->locale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test content - CHANGED!',
+            ],
+            'Test Article - CHANGED!',
+            'default_with_route'
+        );
+
+        $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
+        $this->assertEquals('Test Article - CHANGED!', $viewDocument->getTitle());
+
+        $contentData = json_decode($viewDocument->getContentData(), true);
+        $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
+    }
+
     public function testIndexPageTreeRoute()
     {
         $page = $this->createPage();
@@ -163,6 +256,46 @@ class ArticleIndexerTest extends SuluTestCase
     }
 
     /**
+     * Update existing article.
+     *
+     * @param string $uuid
+     * @param string $locale
+     * @param array $data
+     * @param string $title
+     * @param string $template
+     *
+     * @return mixed
+     */
+    private function updateArticle(
+        $uuid,
+        $locale = null,
+        array $data = [],
+        $title = 'Test Article',
+        $template = 'default'
+    ) {
+        $requestData = $data;
+
+        if ($title) {
+            $requestData['title'] = $title;
+        }
+
+        if ($template) {
+            $requestData['template'] = $template;
+        }
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $uuid . '?locale=' . ($locale ? $locale : $this->locale) . '&action=publish',
+            $requestData
+        );
+
+        $this->assertEquals('200', $client->getResponse()->getStatusCode());
+
+        return json_decode($client->getResponse()->getContent(), true);
+    }
+
+    /**
      * Create article page.
      *
      * @param array $article
@@ -223,11 +356,12 @@ class ArticleIndexerTest extends SuluTestCase
      * Find view-document.
      *
      * @param string $uuid
+     * @param string $locale
      *
      * @return ArticleViewDocument
      */
-    private function findViewDocument($uuid)
+    private function findViewDocument($uuid, $locale = null)
     {
-        return $this->manager->find(ArticleViewDocument::class, $uuid . '-' . $this->locale);
+        return $this->manager->find(ArticleViewDocument::class, $uuid . '-' . ($locale ? $locale : $this->locale));
     }
 }

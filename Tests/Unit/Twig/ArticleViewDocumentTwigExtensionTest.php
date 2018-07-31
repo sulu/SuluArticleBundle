@@ -22,6 +22,8 @@ use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStore;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactory;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Metadata\MetadataFactory;
+use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -42,19 +44,27 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 $articleDocuments[0]->getStructureType(),
             ],
-            $articleDocuments[0]->getLocale()
+            $articleDocuments[0]->getLocale(),
+            'webspace_key'
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
         $articleResourceItemFactory->createResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
         $articleResourceItemFactory->createResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
 
+        $webspace = $this->prophesize(Webspace::class);
+        $webspace->getKey()->willReturn('webspace_key');
+
+        $requestAttributes = $this->prophesize(RequestAttributes::class);
+        $requestAttributes->getAttribute('webspace')->willReturn($webspace->reveal());
+
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
         $request->getLocale()->willReturn('de');
+        $request->get('_sulu')->willReturn($requestAttributes->reveal());
 
         $requestStack = $this->prophesize(RequestStack::class);
-        $requestStack->getCurrentRequest()->wilLReturn($request);
+        $requestStack->getCurrentRequest()->willReturn($request->reveal());
 
         $referenceStore = $this->prophesize(ReferenceStore::class);
         $referenceStore->add($articleDocuments[1]->getUuid())->shouldBeCalled();
@@ -92,19 +102,27 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 $articleDocuments[0]->getStructureType(),
             ],
-            $articleDocuments[0]->getLocale()
+            $articleDocuments[0]->getLocale(),
+            'webspace_key'
         )->willReturn($documentIterator);
 
         $articleResourceItemFactory = $this->prophesize(ArticleResourceItemFactory::class);
         $articleResourceItemFactory->createResourceItem($articleViewDocuments[1])->willReturn($articleResourceItems[1]);
         $articleResourceItemFactory->createResourceItem($articleViewDocuments[2])->willReturn($articleResourceItems[2]);
 
+        $webspace = $this->prophesize(Webspace::class);
+        $webspace->getKey()->willReturn('webspace_key');
+
+        $requestAttributes = $this->prophesize(RequestAttributes::class);
+        $requestAttributes->getAttribute('webspace')->willReturn($webspace->reveal());
+
         $request = $this->prophesize(Request::class);
         $request->get('object')->willReturn($articleDocuments[0]);
         $request->getLocale()->willReturn('de');
+        $request->get('_sulu')->willReturn($requestAttributes->reveal());
 
         $requestStack = $this->prophesize(RequestStack::class);
-        $requestStack->getCurrentRequest()->wilLReturn($request);
+        $requestStack->getCurrentRequest()->willReturn($request->reveal());
 
         $referenceStore = $this->prophesize(ReferenceStore::class);
         $referenceStore->add($articleDocuments[1]->getUuid())->shouldBeCalled();

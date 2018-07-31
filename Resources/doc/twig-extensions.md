@@ -14,6 +14,7 @@ Returns recent published articles, filter by given parameters.
 - **limit**: *integer* - optional: set the limit - default: 5
 - **types**: *array* - optional: filter for article types - default: type of the requested article or null
 - **locale**: *string* - optional: filter for locale - default: locale of the request
+- **ignoreWebspaces**: *bool* - ignore webspace settings - default: false
 
 ### Returns
 
@@ -35,6 +36,7 @@ Note: Which fields are included in this request can be configured with `sulu_art
 - **limit**: *integer* - optional: set the limit - default: 5
 - **types**: *array* - optional: filter for article types - default: type of the requested article
 - **locale**: *string* - optional: filter for locale - default: locale of the request
+- **ignoreWebspaces**: *bool* - ignore webspace settings - default: false
 
 ### Returns
 

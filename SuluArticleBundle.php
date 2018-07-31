@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle;
 
 use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\PageTreeCompilerPass;
+use Sulu\Bundle\ArticleBundle\DependencyInjection\RouteEnhancerCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\StructureValidatorCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,5 +32,6 @@ class SuluArticleBundle extends Bundle
         $container->addCompilerPass(new PageTreeCompilerPass());
         $container->addCompilerPass(new ConverterCompilerPass());
         $container->addCompilerPass(new StructureValidatorCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
+        $container->addCompilerPass(new RouteEnhancerCompilerPass());
     }
 }

@@ -307,11 +307,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
             $uuid,
-            $locale,
-            [
-                'load_ghost_content' => true,
-                'load_shadow_content' => false,
-            ]
+            $locale
         );
 
         return $this->handleView(
@@ -568,6 +564,10 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (array_key_exists('author', $data) && null === $data['author']) {
             $document->setAuthor(null);
+        }
+
+        if (array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
+            $document->setAdditionalWebspaces(null);
         }
 
         $this->getDocumentManager()->persist(
