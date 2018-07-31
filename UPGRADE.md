@@ -1,6 +1,6 @@
 # Upgrade
 
-## dev-master
+## 1.0.0-RC7
 
 ### Multi webspace behavior
 
