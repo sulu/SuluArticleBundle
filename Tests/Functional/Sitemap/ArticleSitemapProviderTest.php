@@ -45,7 +45,7 @@ class ArticleSitemapProviderTest extends SuluTestCase
     {
         $article1 = $this->createArticle('1', 'default', 'sulu_io', []);
         $article2 = $this->createArticle('2', 'simple', 'test', ['sulu_io']);
-        $article3 = $this->createArticle('3', 'default', 'test', ['test2']);
+        $article3 = $this->createArticle('3', 'default', 'test', ['test-2']);
 
         /** @var SitemapUrl[] $result */
         $result = $this->articleSitemapProvider->build(0, 'sulucmf_at');
@@ -60,7 +60,7 @@ class ArticleSitemapProviderTest extends SuluTestCase
         $this->assertEquals($article3['route'], $result[1]->getLoc());
 
         /** @var SitemapUrl[] $result */
-        $result = $this->articleSitemapProvider->build(0, 'test2');
+        $result = $this->articleSitemapProvider->build(0, 'test-2');
         $this->assertCount(1, $result);
         $this->assertEquals($article3['route'], $result[0]->getLoc());
     }

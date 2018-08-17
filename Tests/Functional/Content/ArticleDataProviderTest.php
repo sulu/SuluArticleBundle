@@ -363,7 +363,7 @@ class ArticleDataProviderTest extends SuluTestCase
     {
         $items = [
             $this->createArticle('Test-Article 1', 'default', 'test'),
-            $this->createArticle('Test-Article 2', 'default', 'test2', ['sulu_io']),
+            $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']),
             $this->createArticle('Test-Article 2', 'default', 'sulu_io'),
             $this->createArticle(),
         ];
@@ -385,7 +385,7 @@ class ArticleDataProviderTest extends SuluTestCase
     public function testResolveResourceItemsWithIgnoreWebspaces()
     {
         $this->createArticle('Test-Article 1', 'default', 'test', []);
-        $this->createArticle('Test-Article 2', 'default', 'test2', ['sulu_io']);
+        $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']);
         $this->createArticle('Test-Article 2', 'default', 'sulu_io', []);
         $this->createArticle();
 
@@ -421,7 +421,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $items = $result->getItems();
         $this->assertCount(4, $items);
         $this->assertEquals('test', $items[0]->getTargetWebspace());
-        $this->assertEquals('test2', $items[1]->getTargetWebspace());
+        $this->assertEquals('test-2', $items[1]->getTargetWebspace());
         $this->assertEquals('sulu_io', $items[2]->getTargetWebspace());
         $this->assertEquals('sulu_io', $items[3]->getTargetWebspace());
 
@@ -457,7 +457,7 @@ class ArticleDataProviderTest extends SuluTestCase
     {
         $items = [
             $this->createArticle('Test-Article 1', 'default', 'test'),
-            $this->createArticle('Test-Article 2', 'default', 'test2', ['sulu_io']),
+            $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']),
             $this->createArticle('Test-Article 2', 'default', 'sulu_io'),
             $this->createArticle(),
         ];
