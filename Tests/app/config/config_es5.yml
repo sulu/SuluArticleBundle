@@ -10,10 +10,14 @@ ongr_elasticsearch:
         default:
             index:
                 index_name: su_articles_test
+                hosts:
+                    - "%elasticsearch_host%"
             mappings:
                 - SuluArticleBundle
         live:
             index:
                 index_name: su_articles_test_live
+                hosts:
+                    - "%elasticsearch_host%"
             mappings:
                 - SuluArticleBundle

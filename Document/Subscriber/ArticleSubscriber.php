@@ -79,6 +79,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $liveDocuments = [];
 
     /**
+     * @var array
+     */
+    private $children = [];
+
+    /**
      * @param IndexerInterface $indexer
      * @param IndexerInterface $liveIndexer
      * @param DocumentManagerInterface $documentManager
@@ -110,7 +115,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             ],
             Events::PERSIST => [
                 ['handleScheduleIndex', -500],
-                ['setChildrenStructureType', 0],
+                ['handleChildrenPersist', 0],
                 ['persistPageData', -2000],
             ],
             Events::REMOVE => [
@@ -333,10 +338,40 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $pages = $event->getNode()->getPropertyValueWithDefault(
-            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $event->getLocale()),
+            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $document->getOriginalLocale()),
             json_encode([])
         );
-        $document->setPages(json_decode($pages, true));
+        $pages = json_decode($pages, true);
+
+        if (LocalizationState::SHADOW === $this->documentInspector->getLocalizationState($document)) {
+            $pages = $this->loadPageDataForShadow($event->getNode(), $document, $pages);
+        }
+
+        $document->setPages($pages);
+    }
+
+    /**
+     * Load `routePath` from current locale into `pageData`.
+     *
+     * @param NodeInterface $node
+     * @param ArticleDocument $document
+     * @param array $originalPages
+     *
+     * @return array
+     */
+    private function loadPageDataForShadow(NodeInterface $node, ArticleDocument $document, array $originalPages)
+    {
+        $pages = $node->getPropertyValueWithDefault(
+            $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $document->getLocale()),
+            json_encode([])
+        );
+        $pages = json_decode($pages, true);
+
+        for ($i = 0; $i < count($originalPages); ++$i) {
+            $pages[$i]['routePath'] = $originalPages[$i]['routePath'];
+        }
+
+        return $pages;
     }
 
     /**
@@ -379,7 +414,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         foreach ($this->documents as $documentData) {
             $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
-            $this->documentManager->refresh($document, $documentData['locale']);
+            $this->documentManager->refresh($document);
 
             $this->indexer->index($document);
         }
@@ -400,7 +435,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         foreach ($this->liveDocuments as $documentData) {
             $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
-            $this->documentManager->refresh($document, $documentData['locale']);
+            $this->documentManager->refresh($document);
 
             $this->liveIndexer->index($document);
         }
@@ -498,23 +533,55 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Set structure-type to pages.
+     * Schedule all children.
      *
      * @param PersistEvent $event
      */
-    public function setChildrenStructureType(PersistEvent $event)
+    public function handleChildrenPersist(PersistEvent $event)
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
             return;
         }
 
-        foreach ($document->getChildren() as $child) {
-            if (LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)
-                && $document->getStructureType() !== $child->getStructureType()
-            ) {
-                $child->setStructureType($document->getStructureType());
-                $this->documentManager->persist($child, $event->getLocale(), $event->getOptions());
+        foreach ($document->getChildren() as $childDocument) {
+            if (!$childDocument instanceof ArticlePageDocument) {
+                continue;
+            }
+
+            $localizationState = $this->documentInspector->getLocalizationState($childDocument);
+
+            if (LocalizationState::GHOST === $localizationState) {
+                continue;
+            }
+
+            $changed = false;
+
+            if ($document->getStructureType() !== $childDocument->getStructureType()) {
+                $childDocument->setStructureType($document->getStructureType());
+                $changed = true;
+            }
+
+            if ($document->getShadowLocale() !== $childDocument->getShadowLocale()) {
+                $childDocument->setShadowLocale($document->getShadowLocale());
+                $changed = true;
+            }
+
+            if ($document->isShadowLocaleEnabled() !== $childDocument->isShadowLocaleEnabled()) {
+                $childDocument->setShadowLocaleEnabled($document->isShadowLocaleEnabled());
+                $changed = true;
+            }
+
+            if ($changed) {
+                $this->documentManager->persist(
+                    $childDocument,
+                    $childDocument->getLocale(),
+                    [
+                        'clear_missing_content' => false,
+                        'auto_name' => false,
+                        'auto_rename' => false,
+                    ]
+                );
             }
         }
     }

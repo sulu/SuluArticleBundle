@@ -148,7 +148,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->handleScheduleIndex($event);
 
         $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
-        $this->documentManager->refresh($this->document->reveal(), $this->locale)->willReturn($this->document->reveal());
+        $this->documentManager->refresh($this->document->reveal())->willReturn($this->document->reveal());
 
         $this->articleSubscriber->handleFlush($this->prophesize(FlushEvent::class)->reveal());
 
@@ -164,7 +164,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->handleScheduleIndexLive($event);
 
         $this->documentManager->find($this->uuid, $this->locale)->willReturn($this->document->reveal());
-        $this->documentManager->refresh($this->document->reveal(), $this->locale)->willReturn($this->document->reveal());
+        $this->documentManager->refresh($this->document->reveal())->willReturn($this->document->reveal());
 
         $this->articleSubscriber->handleFlushLive($this->prophesize(FlushEvent::class)->reveal());
 
@@ -355,44 +355,123 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->articleSubscriber->removeDraftChildren($this->prophesizeEvent(RemoveDraftEvent::class, $this->locale));
     }
 
-    public function testSetChildrenStructureType()
+    public function testHandleChildrenPersistWithoutChanges()
     {
-        $children = [
-            $this->prophesize(ArticlePageDocument::class),
-            $this->prophesize(ArticlePageDocument::class),
-            $this->prophesize(ArticlePageDocument::class),
-        ];
+        $children = [];
 
-        $this->document->getStructureType()->willReturn('test');
-        $this->document->getChildren()->willReturn(
-            array_map(
-                function ($child) {
-                    return $child->reveal();
-                },
-                $children
-            )
-        );
-
-        foreach ($children as $child) {
-            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
-            $this->documentManager->persist($child, $this->locale, Argument::any())->shouldBeCalled();
+        for ($id = 1; $id < 4; ++$id) {
+            $child = $this->prophesize(ArticlePageDocument::class);
+            $child->getUuid()->willReturn($id);
+            $child->getLocale()->willReturn($this->locale);
+            $child->getShadowLocale()->willReturn(null);
+            $child->isShadowLocaleEnabled()->willReturn(false);
             $child->getStructureType()->willReturn('my-test');
-            $child->setStructureType('test')->shouldBeCalled();
+
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $children[] = $child;
         }
 
-        $this->articleSubscriber->setChildrenStructureType(
+        $this->document->getStructureType()->willReturn('my-test');
+        $this->document->getChildren()->willReturn($children);
+        $this->document->getShadowLocale()->willReturn(null);
+        $this->document->isShadowLocaleEnabled()->willReturn(false);
+
+        $this->articleSubscriber->handleChildrenPersist(
             $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
         );
     }
 
-    public function testHydratePagData()
+    public function testHandleChildrenPersistWithStructureTypeChange()
+    {
+        $children = [];
+
+        for ($id = 1; $id < 4; ++$id) {
+            /** @var ArticlePageDocument $child */
+            $child = $this->prophesize(ArticlePageDocument::class);
+            $child->getUuid()->willReturn($id);
+            $child->getLocale()->willReturn($this->locale);
+            $child->getShadowLocale()->willReturn(null);
+            $child->isShadowLocaleEnabled()->willReturn(false);
+            $child->getStructureType()->willReturn('old');
+            $child->setStructureType('changed-structure')->shouldBeCalled();
+
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $this->documentManager->persist(
+                $child,
+                $this->locale,
+                [
+                    'clear_missing_content' => false,
+                    'auto_name' => false,
+                    'auto_rename' => false,
+                ]
+            )->shouldBeCalled();
+
+            $children[] = $child;
+        }
+
+        $this->document->getStructureType()->willReturn('changed-structure');
+        $this->document->getChildren()->willReturn($children);
+        $this->document->getShadowLocale()->willReturn(null);
+        $this->document->isShadowLocaleEnabled()->willReturn(false);
+
+        $this->articleSubscriber->handleChildrenPersist(
+            $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
+        );
+    }
+
+    public function testHandleChildrenPersistShadow()
+    {
+        $children = [];
+
+        for ($id = 1; $id < 4; ++$id) {
+            /** @var ArticlePageDocument $child */
+            $child = $this->prophesize(ArticlePageDocument::class);
+            $child->getUuid()->willReturn($id);
+            $child->getLocale()->willReturn($this->locale);
+            $child->getShadowLocale()->willReturn(null);
+            $child->isShadowLocaleEnabled()->willReturn(false);
+            $child->getStructureType()->willReturn('nice_structure');
+            $child->setShadowLocaleEnabled(true)->shouldBeCalled();
+            $child->setShadowLocale('de')->shouldBeCalled();
+
+            $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $this->documentManager->persist(
+                $child,
+                $this->locale,
+                [
+                    'clear_missing_content' => false,
+                    'auto_name' => false,
+                    'auto_rename' => false,
+                ]
+            )->shouldBeCalled();
+
+            $children[] = $child;
+        }
+
+        $this->document->getStructureType()->willReturn('nice_structure');
+        $this->document->getChildren()->willReturn($children);
+        $this->document->getShadowLocale()->willReturn('de');
+        $this->document->isShadowLocaleEnabled()->willReturn(true);
+
+        $this->articleSubscriber->handleChildrenPersist(
+            $this->prophesizeEvent(PersistEvent::class, $this->locale, [])
+        );
+    }
+
+    public function testHydratePageData()
     {
         $node = $this->prophesize(NodeInterface::class);
 
         $event = $this->prophesize(HydrateEvent::class);
         $event->getDocument()->willReturn($this->document->reveal());
         $event->getNode()->willReturn($node->reveal());
-        $event->getLocale()->willReturn($this->locale);
+
+        $this->documentInspector->getLocalizationState(
+            $this->document->reveal()
+        )->willReturn(LocalizationState::LOCALIZED);
 
         $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
         $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
@@ -402,6 +481,62 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn(json_encode([['title' => 'Test title']]));
 
         $this->document->setPages([['title' => 'Test title']])->shouldBeCalled();
+        $this->document->getOriginalLocale()->willReturn($this->locale);
+
+        $this->articleSubscriber->hydratePageData($event->reveal());
+    }
+
+    public function testHydratePageDataShadow()
+    {
+        $node = $this->prophesize(NodeInterface::class);
+
+        $event = $this->prophesize(HydrateEvent::class);
+        $event->getDocument()->willReturn($this->document->reveal());
+        $event->getNode()->willReturn($node->reveal());
+
+        $this->documentInspector->getLocalizationState(
+            $this->document->reveal()
+        )->willReturn(LocalizationState::SHADOW);
+
+        $propertyNameEN = 'i18n:' . 'en' . '-' . ArticleSubscriber::PAGES_PROPERTY;
+        $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, 'en')
+            ->willReturn($propertyNameEN);
+
+        $propertyNameDE = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
+        $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
+            ->willReturn($propertyNameDE);
+
+        $node->getPropertyValueWithDefault($propertyNameDE, json_encode([]))
+            ->willReturn(json_encode(
+                [
+                    [
+                        'title' => 'Test Überschrift',
+                        'routePath' => '/test-ueberschrift',
+                    ],
+                ]
+            ));
+
+        $node->getPropertyValueWithDefault($propertyNameEN, json_encode([]))
+            ->willReturn(json_encode(
+                [
+                    [
+                        'title' => 'Test Headline',
+                        'routePath' => '/test-headline',
+                    ],
+                ]
+            ));
+
+        $this->document->getLocale()->willReturn($this->locale);
+        $this->document->getOriginalLocale()->willReturn('en');
+
+        $this->document->setPages(
+            [
+                [
+                    'title' => 'Test Überschrift',
+                    'routePath' => '/test-headline',
+                ],
+            ]
+        )->shouldBeCalled();
 
         $this->articleSubscriber->hydratePageData($event->reveal());
     }

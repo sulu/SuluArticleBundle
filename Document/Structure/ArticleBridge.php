@@ -41,24 +41,14 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Will be called by SuluCollector to collect profiler data.
-     */
-    public function getShadowLocales()
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Will be called by SuluCollector to collect profiler data.
-     */
     public function getEnabledShadowLanguages()
     {
-        return null;
+        return $this->inspector->getShadowLocales($this->getDocument());
+    }
+
+    public function getConcreteLanguages()
+    {
+        return $this->inspector->getConcreteLocales($this->getDocument());
     }
 
     /**

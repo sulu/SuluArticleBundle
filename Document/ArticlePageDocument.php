@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
+use Sulu\Component\Content\Document\Behavior\ShadowLocaleBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
@@ -37,7 +38,8 @@ class ArticlePageDocument implements
     LocalizedStructureBehavior,
     RoutablePageBehavior,
     PageBehavior,
-    ArticleInterface
+    ArticleInterface,
+    ShadowLocaleBehavior
 {
     /**
      * @var string
@@ -98,6 +100,20 @@ class ArticlePageDocument implements
      * @var int
      */
     protected $pageNumber;
+
+    /**
+     * Shadow locale is enabled.
+     *
+     * @var bool
+     */
+    protected $shadowLocaleEnabled = false;
+
+    /**
+     * Shadow locale.
+     *
+     * @var string
+     */
+    protected $shadowLocale;
 
     public function __construct()
     {
@@ -359,5 +375,37 @@ class ArticlePageDocument implements
     public function getExtensionsData()
     {
         return $this->getParent()->getExtensionsData();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShadowLocale()
+    {
+        return $this->shadowLocale;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShadowLocale($shadowLocale)
+    {
+        $this->shadowLocale = $shadowLocale;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isShadowLocaleEnabled()
+    {
+        return $this->shadowLocaleEnabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShadowLocaleEnabled($shadowLocaleEnabled)
+    {
+        $this->shadowLocaleEnabled = $shadowLocaleEnabled;
     }
 }
