@@ -282,14 +282,14 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(type="keyword")
      */
     protected $mainWebspace;
 
     /**
      * @var string[]
      *
-     * @Property(type="string")
+     * @Property(type="keyword")
      */
     protected $additionalWebspaces;
 
