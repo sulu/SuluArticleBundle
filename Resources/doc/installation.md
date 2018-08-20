@@ -132,7 +132,6 @@ php bin/console ongr:es:index:create --manager=live
 Make sure you've set the correct permissions in the Sulu backend for this bundle!
 `Settings > User Roles`
 
-
 ## Possible bundle configurations:
 
 ```yml
