@@ -190,6 +190,14 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
         }
 
+        if ($this->getBooleanRequestParameter($request, 'exclude-shadows', false, false)) {
+            $search->addQuery(new TermQuery('localization_state.state', 'shadow'), BoolQuery::MUST_NOT);
+        }
+
+        if ($this->getBooleanRequestParameter($request, 'exclude-ghosts', false, false)) {
+            $search->addQuery(new TermQuery('localization_state.state', 'ghost'), BoolQuery::MUST_NOT);
+        }
+
         $authoredFrom = $request->get('authoredFrom');
         $authoredTo = $request->get('authoredTo');
         if ($authoredFrom || $authoredTo) {
