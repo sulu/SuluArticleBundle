@@ -67,6 +67,7 @@ define([
                 brokenTemplateMessage: 'sulu_content.broken-template.message',
                 brokenTemplateName: 'sulu_content.broken-template.message.template-name',
                 brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
+                showOnlyLocalizedArticlesToggler: 'sulu_article.list.filter.localized-articles',
                 openGhostOverlay: {
                     info: 'sulu_article.settings.open-ghost-overlay.info',
                     new: 'sulu_article.settings.open-ghost-overlay.new',
@@ -166,15 +167,15 @@ define([
                 },
                 toggler = 'toggler-on';
 
-            this.showGhostPages = this.sandbox.sulu.getUserSetting(SHOW_GHOST_ARTICLES_KEY);
+            this.showOnlyLocalizedArticles = this.sandbox.sulu.getUserSetting(SHOW_GHOST_ARTICLES_KEY);
 
-            if (this.showGhostPages !== null) {
-                toggler = (!!JSON.parse(this.showGhostPages) ? 'toggler-on' : 'toggler');
+            if (this.showOnlyLocalizedArticles !== null) {
+                toggler = (!!JSON.parse(this.showOnlyLocalizedArticles) ? 'toggler-on' : 'toggler');
             }
 
             toolbarButtons[toggler] = {
                 options: {
-                    title: 'content.contents.show-ghost-pages'
+                    title: this.translations.showOnlyLocalizedArticlesToggler,
                 }
             };
 
@@ -218,8 +219,8 @@ define([
                 'sortBy=authored',
                 'sortOrder=desc',
                 'locale=' + this.options.locale,
-                'exclude-ghosts=' + (this.showGhostPages ? 'true' : 'false'),
-                'exclude-shadows=' + (this.showGhostPages ? 'true' : 'false'),
+                'exclude-ghosts=' + (this.showOnlyLocalizedArticles ? 'true' : 'false'),
+                'exclude-shadows=' + (this.showOnlyLocalizedArticles ? 'true' : 'false'),
             ];
 
             if (this.options.type) {
@@ -421,11 +422,11 @@ define([
             }.bind(this));
 
             this.sandbox.on('husky.toggler.sulu-toolbar.changed', function (checked) {
-                this.showGhostPages = checked;
-                this.sandbox.sulu.saveUserSetting(SHOW_GHOST_ARTICLES_KEY, this.showGhostPages);
+                this.showOnlyLocalizedArticles = !checked;
+                this.sandbox.sulu.saveUserSetting(SHOW_GHOST_ARTICLES_KEY, this.showOnlyLocalizedArticles);
                 this.sandbox.emit('husky.datagrid.articles.url.update', {
-                    'exclude-ghosts': this.showGhostPages,
-                    'exclude-shadows': this.showGhostPages,
+                    'exclude-ghosts': this.showOnlyLocalizedArticles,
+                    'exclude-shadows': this.showOnlyLocalizedArticles,
                 });
             }, this);
         },
