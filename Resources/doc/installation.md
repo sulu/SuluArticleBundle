@@ -128,6 +128,10 @@ php bin/console ongr:es:index:create
 php bin/console ongr:es:index:create --manager=live
 ```
 
+## Permissions:
+Make sure you've set the correct permissions in the Sulu backend for this bundle!
+`Settings > User Roles`
+
 ## Possible bundle configurations:
 
 ```yml
