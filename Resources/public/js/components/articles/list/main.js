@@ -19,60 +19,63 @@ define([
 
     'use strict';
 
-    var defaults = {
-        options: {
-            config: {},
-            storageName: 'articles'
-        },
+    var SHOW_GHOST_ARTICLES_KEY = 'list-show-ghost-articles',
 
-        templates: {
-            list: [
-                '<div class="content-title">',
-                '    <h2><%= translations.headline %> <span class="type"><%= type %></span></h2>',
-                '</div>',
-                '<div class="list-toolbar-container"></div>',
-                '<div class="list-info"></div>',
-                '<div class="datagrid-container"></div>',
-                '<div class="dialog"></div>'
-            ].join(''),
+        defaults = {
+            options: {
+                config: {},
+                storageName: 'articles'
+            },
 
-            route: [
-                'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
-            ].join(''),
+            templates: {
+                list: [
+                    '<div class="content-title">',
+                    '    <h2><%= translations.headline %> <span class="type"><%= type %></span></h2>',
+                    '</div>',
+                    '<div class="list-toolbar-container"></div>',
+                    '<div class="list-info"></div>',
+                    '<div class="datagrid-container"></div>',
+                    '<div class="dialog"></div>'
+                ].join(''),
 
-            brokenTemplate: [
-                '<p><%= translations.brokenTemplateMessage %></p>',
-                '<p>',
-                '    <%= translations.brokenTemplateName %>: <%= item.originalStructureType %><br/>',
-                '    <%= translations.brokenTemplateUuid %>: <%= item.id %>',
-                '</p>'
-            ].join('')
-        },
+                route: [
+                    'articles', '<% if (!!type) { %>:<%=type%><% } %>', '/<%=locale%>'
+                ].join(''),
 
-        translations: {
-            headline: 'sulu_article.list.title',
-            published: 'public.published',
-            unpublished: 'public.unpublished',
-            publishedWithDraft: 'public.published-with-draft',
-            filterMe: 'sulu_article.list.filter.me',
-            filterAll: 'sulu_article.list.filter.all',
-            filterByAuthor: 'sulu_article.list.filter.by-author',
-            filterByCategory: 'sulu_article.list.filter.by-category',
-            filterByTag: 'sulu_article.list.filter.by-tag',
-            filterByPage: 'sulu_article.list.filter.by-page',
-            filterByTimescale: 'sulu_article.list.filter.by-timescale',
-            brokenTemplateTitle: 'sulu_article.broken-template.title',
-            brokenTemplateMessage: 'sulu_content.broken-template.message',
-            brokenTemplateName: 'sulu_content.broken-template.message.template-name',
-            brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
-            openGhostOverlay: {
-                info: 'sulu_article.settings.open-ghost-overlay.info',
-                new: 'sulu_article.settings.open-ghost-overlay.new',
-                copy: 'sulu_article.settings.open-ghost-overlay.copy',
-                ok: 'sulu_article.settings.open-ghost-overlay.ok'
+                brokenTemplate: [
+                    '<p><%= translations.brokenTemplateMessage %></p>',
+                    '<p>',
+                    '    <%= translations.brokenTemplateName %>: <%= item.originalStructureType %><br/>',
+                    '    <%= translations.brokenTemplateUuid %>: <%= item.id %>',
+                    '</p>'
+                ].join('')
+            },
+
+            translations: {
+                headline: 'sulu_article.list.title',
+                published: 'public.published',
+                unpublished: 'public.unpublished',
+                publishedWithDraft: 'public.published-with-draft',
+                filterMe: 'sulu_article.list.filter.me',
+                filterAll: 'sulu_article.list.filter.all',
+                filterByAuthor: 'sulu_article.list.filter.by-author',
+                filterByCategory: 'sulu_article.list.filter.by-category',
+                filterByTag: 'sulu_article.list.filter.by-tag',
+                filterByPage: 'sulu_article.list.filter.by-page',
+                filterByTimescale: 'sulu_article.list.filter.by-timescale',
+                brokenTemplateTitle: 'sulu_article.broken-template.title',
+                brokenTemplateMessage: 'sulu_content.broken-template.message',
+                brokenTemplateName: 'sulu_content.broken-template.message.template-name',
+                brokenTemplateUuid: 'sulu_content.broken-template.message.uuid',
+                showOnlyLocalizedArticlesToggler: 'sulu_article.list.filter.localized-articles',
+                openGhostOverlay: {
+                    info: 'sulu_article.settings.open-ghost-overlay.info',
+                    new: 'sulu_article.settings.open-ghost-overlay.new',
+                    copy: 'sulu_article.settings.open-ghost-overlay.copy',
+                    ok: 'sulu_article.settings.open-ghost-overlay.ok'
+                }
             }
-        }
-    };
+        };
 
     return {
 
@@ -152,22 +155,37 @@ define([
                 urlParameter.type = this.options.type;
             }
 
+            var toolbarButtons = {
+                    addArticle: {options: button},
+                    deleteSelected: {},
+                    export: {
+                        options: {
+                            url: '/admin/api/articles.csv',
+                            urlParameter: urlParameter
+                        }
+                    }
+                },
+                toggler = 'toggler-on';
+
+            this.showOnlyLocalizedArticles = this.sandbox.sulu.getUserSetting(SHOW_GHOST_ARTICLES_KEY);
+
+            if (this.showOnlyLocalizedArticles !== null) {
+                toggler = (!!JSON.parse(this.showOnlyLocalizedArticles) ? 'toggler-on' : 'toggler');
+            }
+
+            toolbarButtons[toggler] = {
+                options: {
+                    title: this.translations.showOnlyLocalizedArticlesToggler,
+                }
+            };
+
             return {
                 noBack: true,
 
                 tabs: tabs,
 
                 toolbar: {
-                    buttons: {
-                        addArticle: {options: button},
-                        deleteSelected: {},
-                        export: {
-                            options: {
-                                url: '/admin/api/articles.csv',
-                                urlParameter: urlParameter
-                            }
-                        }
-                    },
+                    buttons: toolbarButtons,
 
                     languageChanger: {
                         data: this.options.config.languageChanger,
@@ -196,6 +214,22 @@ define([
             this.bindCustomEvents();
         },
 
+        getUrl: function () {
+            var urlParams = [
+                'sortBy=authored',
+                'sortOrder=desc',
+                'locale=' + this.options.locale,
+                'exclude-ghosts=' + (this.showOnlyLocalizedArticles ? 'true' : 'false'),
+                'exclude-shadows=' + (this.showOnlyLocalizedArticles ? 'true' : 'false'),
+            ];
+
+            if (this.options.type) {
+                urlParams.push('type=' + this.options.type);
+            }
+
+            return '/admin/api/articles?' + urlParams.join('&');
+        },
+
         render: function() {
             var type = this.options.config.types[this.options.type];
 
@@ -204,7 +238,6 @@ define([
                 type: type ? this.sandbox.translate(type.title) : ''
             }));
 
-            var urlArticleApi = '/admin/api/articles?sortBy=authored&sortOrder=desc&locale=' + this.options.locale + (this.options.type ? ('&type=' + this.options.type) : '');
             var toolbar = this.retrieveListToolbarTemplate(this.loadFilterFromStorage());
 
             this.sandbox.sulu.initListToolbarAndList.call(this,
@@ -217,7 +250,7 @@ define([
                 },
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
-                    url: urlArticleApi,
+                    url: this.getUrl(),
                     storageName: this.options.storageName,
                     searchInstanceName: 'articles',
                     searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
@@ -387,6 +420,15 @@ define([
             this.sandbox.on('husky.toolbar.articles.initialized', function() {
                 this.sandbox.emit('husky.toolbar.articles.item.mark', this.loadFilterFromStorage().filterKey);
             }.bind(this));
+
+            this.sandbox.on('husky.toggler.sulu-toolbar.changed', function (checked) {
+                this.showOnlyLocalizedArticles = !checked;
+                this.sandbox.sulu.saveUserSetting(SHOW_GHOST_ARTICLES_KEY, this.showOnlyLocalizedArticles);
+                this.sandbox.emit('husky.datagrid.articles.url.update', {
+                    'exclude-ghosts': this.showOnlyLocalizedArticles,
+                    'exclude-shadows': this.showOnlyLocalizedArticles,
+                });
+            }, this);
         },
 
         /**

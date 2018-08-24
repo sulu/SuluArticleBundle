@@ -387,6 +387,38 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article2['id'], $title2_EN], $items);
     }
 
+    public function testCGetExcludeGhost()
+    {
+        $this->purgeIndex();
+
+        $title1 = 'Sulu ist toll - Test 1';
+        $this->put($title1, 'de');
+
+        $title2 = 'Sulu ist toll - Test 2';
+        $article2 = $this->put($title2, 'de');
+
+        $title2_EN = $title2 . ' (EN)';
+        $this->put($title2_EN, 'en', null, $article2);
+
+        $client = $this->createAuthenticatedClient();
+
+        // Retrieve articles in 'de'.
+        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title&exclude-ghosts=true');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        // Retrieve articles in 'en'.
+        $client->request('GET', '/api/articles?locale=en&type=blog&fields=title&exclude-ghosts=true');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+    }
+
     public function testCGetShadow()
     {
         $this->purgeIndex();
@@ -447,6 +479,46 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article1['id'], $title1, ['state' => 'ghost', 'locale' => 'de']], $items);
         $this->assertContains([$article2['id'], $title2_EN, ['state' => 'localized']], $items);
         $this->assertContains([$article3['id'], $title3, ['state' => 'shadow', 'locale' => 'de']], $items);
+    }
+
+    public function testCGetExcludeShadow()
+    {
+        $this->purgeIndex();
+
+        $title1 = 'Sulu ist toll - Test 1';
+        $article1 = $this->put($title1, 'de');
+
+        $title2 = 'Sulu ist toll - Test 2';
+        $article2 = $this->put($title2, 'de');
+
+        // create second language for article2
+        $title2_EN = $title2 . ' (EN)';
+        $this->put($title2_EN, 'en', null, $article2);
+
+        $title3 = 'Sulu ist toll - Test 3';
+        $article3 = $this->put($title3, 'de');
+
+        // create shadow for article3
+        $title3_EN = $title2 . ' (EN)';
+        $this->put($title3_EN, 'en', 'de', $article3);
+
+        $client = $this->createAuthenticatedClient();
+
+        // Retrieve articles in 'de'.
+        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title&exclude-shadows=true');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(3, $response['total']);
+        $this->assertCount(3, $response['_embedded']['articles']);
+
+        // Retrieve articles in 'en'.
+        $client->request('GET', '/api/articles?locale=en&type=blog&fields=title,route&exclude-shadows=true');
+        $this->assertHttpStatusCode(200, $client->getResponse());
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
     }
 
     public function testPutExtensions(
