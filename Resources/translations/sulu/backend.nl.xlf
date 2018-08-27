@@ -146,6 +146,10 @@
                 <source>sulu_article.list.filter.by-timescale</source>
                 <target>Periode</target>
             </trans-unit>
+            <trans-unit id="list-filter-08" resname="sulu_article.list.filter.localized-articles">
+                <source>sulu_article.list.filter.localized-articles</source>
+                <target>Toon losse en schaduwartikelen</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filter artikelen voor contact</target>
