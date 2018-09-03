@@ -19,7 +19,7 @@ define([
 
     'use strict';
 
-    var SHOW_GHOST_ARTICLES_KEY = 'list-show-ghost-articles',
+    var SHOW_ONLY_LOCALIZED_ARTICLES_KEY = 'list-show-only-localized-articles',
 
         defaults = {
             options: {
@@ -165,13 +165,10 @@ define([
                         }
                     }
                 },
-                toggler = 'toggler-on';
+                toggler;
 
-            this.showOnlyLocalizedArticles = this.sandbox.sulu.getUserSetting(SHOW_GHOST_ARTICLES_KEY);
-
-            if (this.showOnlyLocalizedArticles !== null) {
-                toggler = (!!JSON.parse(this.showOnlyLocalizedArticles) ? 'toggler-on' : 'toggler');
-            }
+            this.showOnlyLocalizedArticles = this.sandbox.sulu.getUserSetting(SHOW_ONLY_LOCALIZED_ARTICLES_KEY);
+            toggler = !this.showOnlyLocalizedArticles ?  'toggler-on' : 'toggler';
 
             toolbarButtons[toggler] = {
                 options: {
@@ -423,7 +420,7 @@ define([
 
             this.sandbox.on('husky.toggler.sulu-toolbar.changed', function (checked) {
                 this.showOnlyLocalizedArticles = !checked;
-                this.sandbox.sulu.saveUserSetting(SHOW_GHOST_ARTICLES_KEY, this.showOnlyLocalizedArticles);
+                this.sandbox.sulu.saveUserSetting(SHOW_ONLY_LOCALIZED_ARTICLES_KEY, this.showOnlyLocalizedArticles);
                 this.sandbox.emit('husky.datagrid.articles.url.update', {
                     'exclude-ghosts': this.showOnlyLocalizedArticles,
                     'exclude-shadows': this.showOnlyLocalizedArticles,
