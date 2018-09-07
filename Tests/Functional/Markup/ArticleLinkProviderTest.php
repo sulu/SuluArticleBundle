@@ -58,8 +58,10 @@ class ArticleLinkProviderTest extends SuluTestCase
 
         $this->assertCount(2, $result);
         $this->assertEquals($articles[0]['id'], $result[0]->getId());
+        $this->assertEquals('http://{host}' . $articles[0]['route'], $result[0]->getUrl());
         $this->assertFalse($result[0]->isPublished());
         $this->assertEquals($articles[1]['id'], $result[1]->getId());
+        $this->assertEquals('http://{host}' . $articles[1]['route'], $result[1]->getUrl());
         $this->assertTrue($result[1]->isPublished());
     }
 
