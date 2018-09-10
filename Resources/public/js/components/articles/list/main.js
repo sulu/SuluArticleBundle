@@ -248,7 +248,7 @@ define([
                 {
                     el: this.sandbox.dom.find('.datagrid-container'),
                     url: this.getUrl(),
-                    storageName: this.options.storageName,
+                    storageName: this.options.storageName + '-' + this.options.locale,
                     searchInstanceName: 'articles',
                     searchFields: ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
                     resultKey: 'articles',
