@@ -4,7 +4,7 @@
           xsi:schemaLocation="http://schemas.sulu.io/webspace/webspace http://schemas.sulu.io/webspace/webspace-1.1.xsd">
 
     <name>Test2</name>
-    <key>test2</key>
+    <key>test-2</key>
 
     <localizations>
         <localization language="de" default="true"/>
@@ -31,7 +31,7 @@
     <portals>
         <portal>
             <name>Test2</name>
-            <key>test2</key>
+            <key>test-2</key>
 
             <environments>
                 <environment type="prod">

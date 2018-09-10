@@ -1,5 +1,16 @@
 # Upgrade
 
+## dev-master
+
+### Elasticsearch Mapping Changed
+
+Mapping has changed, reindex whole elasticsearch data:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
 ## 1.0.0-RC7
 
 ### Multi webspace behavior

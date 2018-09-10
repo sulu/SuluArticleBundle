@@ -146,6 +146,10 @@
                 <source>sulu_article.list.filter.by-timescale</source>
                 <target>Période</target>
             </trans-unit>
+            <trans-unit id="list-filter-08" resname="sulu_article.list.filter.localized-articles">
+                <source>sulu_article.list.filter.localized-articles</source>
+                <target>Voir les articles ghosts et shadow</target>
+            </trans-unit>
             <trans-unit id="contact-selection-overlay-01" resname="sulu_article.contact-selection-overlay.title">
                 <source>sulu_article.contact-selection-overlay.title</source>
                 <target>Filtrer les articles par contact</target>
