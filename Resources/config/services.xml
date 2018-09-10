@@ -325,8 +325,11 @@
         <service id="sulu_article.markup.link_provider" class="Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider">
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="request_stack"/>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_article.view_document.article.class%</argument>
+            <argument>%kernel.environment%</argument>
 
             <tag name="sulu.link.provider" alias="article"/>
         </service>
