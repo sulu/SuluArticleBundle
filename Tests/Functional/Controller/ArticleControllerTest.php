@@ -266,13 +266,13 @@ class ArticleControllerTest extends SuluTestCase
                 'Sulu is nice',
                 'de',
                 'test',
-                ['sulu_io', 'test-2']
+                ['sulu_io', 'test-2'],
             ],
             [
                 'Sulu is nice',
                 'de',
                 'sulu_io',
-                ['test-2']
+                ['test-2'],
             ],
             [
                 'Sulu is nice',
