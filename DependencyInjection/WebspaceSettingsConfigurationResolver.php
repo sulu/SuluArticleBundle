@@ -50,8 +50,8 @@ class WebspaceSettingsConfigurationResolver
             }
         }
 
-        if (array_key_exists('_fallback', $this->defaultMainWebspace)) {
-            return $this->defaultMainWebspace['_fallback'];
+        if (array_key_exists('default', $this->defaultMainWebspace)) {
+            return $this->defaultMainWebspace['default'];
         }
 
         throw new InvalidConfigurationException('Configured default main webspace for locale "' . $searchedLocale . '" not found');
@@ -70,8 +70,8 @@ class WebspaceSettingsConfigurationResolver
             }
         }
 
-        if (array_key_exists('_fallback', $this->defaultAdditionalWebspaces)) {
-            return $this->defaultAdditionalWebspaces['_fallback'];
+        if (array_key_exists('default', $this->defaultAdditionalWebspaces)) {
+            return $this->defaultAdditionalWebspaces['default'];
         }
 
         return [];

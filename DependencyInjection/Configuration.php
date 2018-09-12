@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
                     ->beforeNormalization()
                         ->ifString()
                         ->then(function ($v) {
-                            return ['_fallback' => $v];
+                            return ['default' => $v];
                         })
                     ->end()
                     ->prototype('scalar')->end()
@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
                             return count(array_filter(array_keys($v), 'is_string')) <= 0;
                         })
                         ->then(function ($v) {
-                            return ['_fallback' => $v];
+                            return ['default' => $v];
                         })
                     ->end()
                     ->arrayPrototype()->useAttributeAsKey('locale')->scalarPrototype()->end()->end()
