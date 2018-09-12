@@ -18,9 +18,7 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
     public function configuration()
     {
         return [
-            /**
-             * Case 1
-             */
+            // Case 1
             [
                 [
                     'default' => 'example1',
@@ -31,9 +29,7 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
                 'example1',
                 [],
             ],
-            /**
-             * Case 2
-             */
+            // Case 2
             [
                 [
                     'default' => 'example1',
@@ -44,9 +40,7 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
                 'example1',
                 [],
             ],
-            /**
-             * Case 3
-             */
+            // Case 3
             [
                 [
                     'default' => 'example1',
@@ -59,9 +53,7 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
                 'test1',
                 ['example1'],
             ],
-            /**
-             * Case 4
-             */
+            // Case 4
             [
                 [
                     'default' => 'example1',
@@ -74,9 +66,7 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
                 'test1',
                 ['example1'],
             ],
-            /**
-             * Case 5
-             */
+            // Case 5
             [
                 [
                     'default' => 'example1',
