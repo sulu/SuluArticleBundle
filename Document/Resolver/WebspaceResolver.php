@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Resolver;
 
+use Sulu\Bundle\ArticleBundle\DependencyInjection\WebspaceSettingsConfigurationResolver;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
@@ -22,27 +23,20 @@ class WebspaceResolver
     private $webspaceManager;
 
     /**
-     * @var string
+     * @var WebspaceSettingsConfigurationResolver
      */
-    private $defaultMainWebspace;
+    private $webspaceSettingsConfigurationResolver;
 
     /**
-     * @var string[]
-     */
-    private $defaultAdditionalWebspaces;
-
-    /**
-     * @param string $defaultMainWebspace
-     * @param string[] $defaultAdditionalWebspaces
+     * @param WebspaceManagerInterface $webspaceManager
+     * @param WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
      */
     public function __construct(
         WebspaceManagerInterface $webspaceManager,
-        $defaultMainWebspace,
-        $defaultAdditionalWebspaces
+        WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
     ) {
         $this->webspaceManager = $webspaceManager;
-        $this->defaultMainWebspace = $defaultMainWebspace;
-        $this->defaultAdditionalWebspaces = $defaultAdditionalWebspaces;
+        $this->webspaceSettingsConfigurationResolver = $webspaceSettingsConfigurationResolver;
     }
 
     /**
@@ -62,7 +56,7 @@ class WebspaceResolver
             return $document->getMainWebspace();
         }
 
-        return $this->defaultMainWebspace;
+        return $this->webspaceSettingsConfigurationResolver->getDefaultMainWebspaceForLocale($document->getOriginalLocale());
     }
 
     /**
@@ -80,7 +74,7 @@ class WebspaceResolver
             return $document->getAdditionalWebspaces();
         }
 
-        return $this->defaultAdditionalWebspaces;
+        return $this->webspaceSettingsConfigurationResolver->getDefaultAdditionalWebspacesForLocale($document->getOriginalLocale());
     }
 
     /**

@@ -12,8 +12,10 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\JsConfigInterface;
+use Sulu\Bundle\ArticleBundle\DependencyInjection\WebspaceSettingsConfigurationResolver;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Manager\WebspaceManager;
 
 /**
@@ -34,6 +36,11 @@ class ArticleJsConfig implements JsConfigInterface
     private $structureManager;
 
     /**
+     * @var WebspaceSettingsConfigurationResolver
+     */
+    private $webspaceSettingsConfigurationResolver;
+
+    /**
      * @var array
      */
     private $typeConfiguration;
@@ -46,17 +53,20 @@ class ArticleJsConfig implements JsConfigInterface
     /**
      * @param WebspaceManager $webspaceManager
      * @param StructureManagerInterface $structureManager
+     * @param WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
      * @param array $typeConfiguration
      * @param array $parameter
      */
     public function __construct(
         WebspaceManager $webspaceManager,
         StructureManagerInterface $structureManager,
+        WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver,
         array $typeConfiguration,
         array $parameter
     ) {
         $this->webspaceManager = $webspaceManager;
         $this->structureManager = $structureManager;
+        $this->webspaceSettingsConfigurationResolver = $webspaceSettingsConfigurationResolver;
         $this->typeConfiguration = $typeConfiguration;
         $this->parameter = $parameter;
     }
@@ -139,20 +149,37 @@ class ArticleJsConfig implements JsConfigInterface
             ];
         }
 
-        $defaultMainWebspace = $this->parameter['defaultMainWebspace'];
-        if (!$defaultMainWebspace || !$this->webspaceManager->findWebspaceByKey($defaultMainWebspace)) {
-            throw new \InvalidArgumentException('You have more than one webspace, so you need to set config parameter "sulu_article.default_main_webspace" to one of "' . implode(',', array_column($webspaces, 'key')) . '"');
-        }
-
-        foreach ($this->parameter['defaultAdditionalWebspaces'] as $defaultAdditionalWebspace) {
-            if (!$this->webspaceManager->findWebspaceByKey($defaultAdditionalWebspace)) {
-                throw new \InvalidArgumentException('Configured default additional webspace "' . $defaultAdditionalWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
+        $webspaceSettings = [];
+        /** @var Localization $localization */
+        foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
+            $defaultMainWebspace = $this->webspaceSettingsConfigurationResolver->getDefaultMainWebspaceForLocale($localization->getLocale());
+            if (!$this->webspaceManager->findWebspaceByKey($defaultMainWebspace)) {
+                throw new \InvalidArgumentException('Configured default main webspace "' . $defaultMainWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
             }
+
+            $defaultAdditionalWebspaces = [];
+            $additionalWebspaces = $this->webspaceSettingsConfigurationResolver->getDefaultAdditionalWebspacesForLocale($localization->getLocale());
+            foreach ($additionalWebspaces as $additionalWebspace) {
+                if ($defaultMainWebspace === $additionalWebspace) {
+                    throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" is the default main webspace.');
+                }
+
+                if (!$this->webspaceManager->findWebspaceByKey($additionalWebspace)) {
+                    throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
+                }
+                $defaultAdditionalWebspaces[] = $additionalWebspace;
+            }
+
+            $webspaceSettings[$localization->getLocale()] = [
+                'defaultMainWebspace' => $defaultMainWebspace,
+                'defaultAdditionalWebspaces' => $defaultAdditionalWebspaces,
+            ];
         }
 
         return [
             'showWebspaceSettings' => $showWebspaceSettings,
             'webspaces' => $webspaces,
+            'webspaceSettings' => $webspaceSettings,
         ];
     }
 }
