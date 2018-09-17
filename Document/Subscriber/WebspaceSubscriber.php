@@ -15,6 +15,8 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
@@ -48,16 +50,23 @@ class WebspaceSubscriber implements EventSubscriberInterface
     protected $documentInspector;
 
     /**
+     * @var PropertyEncoder
+     */
+    protected $propertyEncoder;
+
+    /**
      * @param StructureMetadataFactoryInterface $structureMetadataFactory
      */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         DocumentManagerInterface $documentManager,
-        DocumentInspector $documentInspector
+        DocumentInspector $documentInspector,
+        PropertyEncoder $propertyEncoder
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->documentManager = $documentManager;
         $this->documentInspector = $documentInspector;
+        $this->propertyEncoder = $propertyEncoder;
     }
 
     /**
@@ -90,8 +99,19 @@ class WebspaceSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $mainWebspace = $event->getNode()->getPropertyValueWithDefault(self::MAIN_WEBSPACE_PROPERTY, null);
-        $additionalWebspaces = $event->getNode()->getPropertyValueWithDefault(self::ADDITIONAL_WEBSPACES_PROPERTY, null);
+        $locale = $event->getLocale();
+        if (LocalizationState::GHOST === $this->documentInspector->getLocalizationState($document)) {
+            $locale = $document->getOriginalLocale();
+        }
+
+        $mainWebspace = $event->getNode()->getPropertyValueWithDefault(
+            $this->getMainWebspacePropertyName($locale),
+            null
+        );
+        $additionalWebspaces = $event->getNode()->getPropertyValueWithDefault(
+            $this->getAdditionalWebspacesPropertyName($locale),
+            null
+        );
 
         $document->setMainWebspace($mainWebspace);
         $document->setAdditionalWebspaces($additionalWebspaces);
@@ -124,7 +144,37 @@ class WebspaceSubscriber implements EventSubscriberInterface
             $additionalWebspaces = $document->getAdditionalWebspaces();
         }
 
-        $event->getNode()->setProperty(self::MAIN_WEBSPACE_PROPERTY, $mainWebspace);
-        $event->getNode()->setProperty(self::ADDITIONAL_WEBSPACES_PROPERTY, $additionalWebspaces);
+        $event->getNode()->setProperty(
+            $this->getMainWebspacePropertyName($document->getLocale()),
+            $mainWebspace
+        );
+        $event->getNode()->setProperty(
+            $this->getAdditionalWebspacesPropertyName($document->getLocale()),
+            $additionalWebspaces
+        );
+    }
+
+    /**
+     * Returns encoded "mainWebspace" property-name.
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getMainWebspacePropertyName($locale)
+    {
+        return $this->propertyEncoder->localizedSystemName(self::MAIN_WEBSPACE_PROPERTY, $locale);
+    }
+
+    /**
+     * Returns encoded "additionalWebspaces" property-name.
+     *
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getAdditionalWebspacesPropertyName($locale)
+    {
+        return $this->propertyEncoder->localizedSystemName(self::ADDITIONAL_WEBSPACES_PROPERTY, $locale);
     }
 }

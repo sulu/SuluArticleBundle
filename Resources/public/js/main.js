@@ -65,8 +65,7 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                     pageTreeEnabled: articleConfig.pageTreeEnabled,
                     classes: articleConfig.classes,
                     showWebspaceSettings: articleConfig.showWebspaceSettings,
-                    defaultMainWebspace: articleConfig.defaultMainWebspace,
-                    defaultAdditionalWebspaces: articleConfig.defaultAdditionalWebspaces,
+                    webspaceSettings: articleConfig.webspaceSettings,
                     webspaces: articleConfig.webspaces,
                 };
 
