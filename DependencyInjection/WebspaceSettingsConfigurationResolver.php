@@ -44,17 +44,15 @@ class WebspaceSettingsConfigurationResolver
      */
     public function getDefaultMainWebspaceForLocale($searchedLocale)
     {
-        foreach ($this->defaultMainWebspace as $locale => $mainWebspace) {
-            if ($searchedLocale === $locale) {
-                return $mainWebspace;
-            }
+        if (array_key_exists($searchedLocale, $this->defaultMainWebspace)) {
+            return $this->defaultMainWebspace[$searchedLocale];
         }
 
         if (array_key_exists('default', $this->defaultMainWebspace)) {
             return $this->defaultMainWebspace['default'];
         }
 
-        throw new InvalidConfigurationException('Configured default main webspace for locale "' . $searchedLocale . '" not found');
+        throw new InvalidConfigurationException('No configured default main webspace for locale "' . $searchedLocale . '" not found.');
     }
 
     /**
@@ -64,10 +62,8 @@ class WebspaceSettingsConfigurationResolver
      */
     public function getDefaultAdditionalWebspacesForLocale($searchedLocale)
     {
-        foreach ($this->defaultAdditionalWebspaces as $locale => $additionalWebspaces) {
-            if ($searchedLocale === $locale) {
-                return $additionalWebspaces;
-            }
+        if (array_key_exists($searchedLocale, $this->defaultAdditionalWebspaces)) {
+            return $this->defaultAdditionalWebspaces[$searchedLocale];
         }
 
         if (array_key_exists('default', $this->defaultAdditionalWebspaces)) {

@@ -152,23 +152,10 @@ class ArticleJsConfig implements JsConfigInterface
         $webspaceSettings = [];
         /** @var Localization $localization */
         foreach ($this->webspaceManager->getAllLocalizations() as $localization) {
-            $defaultMainWebspace = $this->webspaceSettingsConfigurationResolver->getDefaultMainWebspaceForLocale($localization->getLocale());
-            if (!$this->webspaceManager->findWebspaceByKey($defaultMainWebspace)) {
-                throw new \InvalidArgumentException('Configured default main webspace "' . $defaultMainWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
-            }
+            $locale = $localization->getLocale();
 
-            $defaultAdditionalWebspaces = [];
-            $additionalWebspaces = $this->webspaceSettingsConfigurationResolver->getDefaultAdditionalWebspacesForLocale($localization->getLocale());
-            foreach ($additionalWebspaces as $additionalWebspace) {
-                if ($defaultMainWebspace === $additionalWebspace) {
-                    throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" is the default main webspace.');
-                }
-
-                if (!$this->webspaceManager->findWebspaceByKey($additionalWebspace)) {
-                    throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
-                }
-                $defaultAdditionalWebspaces[] = $additionalWebspace;
-            }
+            $defaultMainWebspace = $this->getDefaultMainWebspace($locale, $webspaces);
+            $defaultAdditionalWebspaces = $this->getDefaultAdditionalWebspaces($defaultMainWebspace, $locale, $webspaces);
 
             $webspaceSettings[$localization->getLocale()] = [
                 'defaultMainWebspace' => $defaultMainWebspace,
@@ -181,5 +168,46 @@ class ArticleJsConfig implements JsConfigInterface
             'webspaces' => $webspaces,
             'webspaceSettings' => $webspaceSettings,
         ];
+    }
+
+    /**
+     * @param string $locale
+     * @param array $webspaces
+     *
+     * @return string
+     */
+    private function getDefaultMainWebspace($locale, $webspaces)
+    {
+        $defaultMainWebspace = $this->webspaceSettingsConfigurationResolver->getDefaultMainWebspaceForLocale($locale);
+        if (!$this->webspaceManager->findWebspaceByKey($defaultMainWebspace)) {
+            throw new \InvalidArgumentException('Configured default main webspace "' . $defaultMainWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
+        }
+
+        return $defaultMainWebspace;
+    }
+
+    /**
+     * @param string $defaultMainWebspace
+     * @param string $locale
+     * @param array $webspaces
+     *
+     * @return array
+     */
+    private function getDefaultAdditionalWebspaces($defaultMainWebspace, $locale, $webspaces)
+    {
+        $defaultAdditionalWebspaces = [];
+        $additionalWebspaces = $this->webspaceSettingsConfigurationResolver->getDefaultAdditionalWebspacesForLocale($locale);
+        foreach ($additionalWebspaces as $additionalWebspace) {
+            if ($defaultMainWebspace === $additionalWebspace) {
+                throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" is the default main webspace.');
+            }
+
+            if (!$this->webspaceManager->findWebspaceByKey($additionalWebspace)) {
+                throw new \InvalidArgumentException('Configured default additional webspace "' . $additionalWebspace . '" not found. Available webspaces: "' . implode(',', array_column($webspaces, 'key')) . '"');
+            }
+            $defaultAdditionalWebspaces[] = $additionalWebspace;
+        }
+
+        return $defaultAdditionalWebspaces;
     }
 }
