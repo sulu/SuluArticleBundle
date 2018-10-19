@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Object;
 use ONGR\ElasticsearchBundle\Annotation\Property;
-use ONGR\ElasticsearchBundle\Collection\Collection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Contains excerpt information for articles.

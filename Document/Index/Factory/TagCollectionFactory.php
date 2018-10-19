@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index\Factory;
 
-use ONGR\ElasticsearchBundle\Collection\Collection;
+use Doctrine\Common\Collections\Collection;
 use Sulu\Bundle\ArticleBundle\Document\TagViewObject;
 use Sulu\Bundle\TagBundle\Tag\TagManagerInterface;
 

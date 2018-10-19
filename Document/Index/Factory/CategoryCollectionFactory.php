@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index\Factory;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
-use ONGR\ElasticsearchBundle\Collection\Collection;
+use Doctrine\Common\Collections\Collection;
 use Sulu\Bundle\ArticleBundle\Document\CategoryViewObject;
 
 /**
