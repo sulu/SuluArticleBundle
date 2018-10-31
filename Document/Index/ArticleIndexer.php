@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
-use ONGR\ElasticsearchBundle\Collection\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
@@ -330,7 +330,7 @@ class ArticleIndexer implements IndexerInterface
             $page->contentData = json_encode($child->getStructure()->toArray());
         }
 
-        $article->setPages(new Collection($pages));
+        $article->setPages(new ArrayCollection($pages));
     }
 
     /**

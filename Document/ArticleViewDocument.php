@@ -11,11 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use Doctrine\Common\Collections\Collection;
 use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
-use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Indexable document for articles.
