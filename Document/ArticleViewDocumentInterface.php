@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use Doctrine\Common\Collections\Collection;
+use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Interface for indexable article-document.
