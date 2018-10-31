@@ -763,7 +763,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setPages(Collection $pages)
+    public function setPages($pages)
     {
         $this->pages = $pages;
 

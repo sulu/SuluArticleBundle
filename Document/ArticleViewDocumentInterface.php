@@ -432,7 +432,7 @@ interface ArticleViewDocumentInterface
      *
      * @return $this
      */
-    public function setPages(Collection $pages);
+    public function setPages($pages);
 
     /**
      * Returns contentData.
