@@ -6,7 +6,7 @@
     "require": {
         "php": "^5.5 || ^7.0",
         "sulu/sulu": "^1.6.8",
-        "ongr/elasticsearch-bundle": "^1.2.9 || ~5.0",
+        "ongr/elasticsearch-bundle": "^1.2.9 || ^5.2",
         "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
         "jackalope/jackalope": "^1.2.8 || >=1.3.3",
         "jms/serializer-bundle": "^1.1 || ^2.0"
@@ -22,10 +22,6 @@
         "sulu/automation-bundle": "^1.2",
         "php-task/task-bundle": "^1.2",
         "php-task/php-task": "^1.2"
-    },
-    "conflict": {
-        "php": "^7.2",
-        "ongr/elasticsearch-bundle": "^5.0.6"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
