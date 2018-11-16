@@ -25,7 +25,7 @@
     },
     "conflict": {
         "php": "^7.2",
-        "ongr/elasticsearch-bundle": "^5.2.0" 
+        "ongr/elasticsearch-bundle": "^5.2.0"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
