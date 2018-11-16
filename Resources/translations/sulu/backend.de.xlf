@@ -4,11 +4,11 @@
         <body>
             <trans-unit id="1" resname="sulu_article.title">
                 <source>sulu_article.title</source>
-                <target>Artikels</target>
+                <target>Artikel</target>
             </trans-unit>
             <trans-unit id="2" resname="sulu_article.list.title">
                 <source>sulu_article.list.title</source>
-                <target>Artikels</target>
+                <target>Artikel</target>
             </trans-unit>
             <trans-unit id="3" resname="sulu_article.list.creator">
                 <source>sulu_article.list.creator</source>
