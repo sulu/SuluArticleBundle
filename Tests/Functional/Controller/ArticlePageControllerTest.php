@@ -54,7 +54,7 @@ class ArticlePageControllerTest extends SuluTestCase
                 'title' => $title,
                 'pageTitle' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 
@@ -73,7 +73,7 @@ class ArticlePageControllerTest extends SuluTestCase
                 'title' => $title,
                 'pageTitle' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 

@@ -15,7 +15,6 @@ use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
-use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Indexable document for articles.
@@ -763,7 +762,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setPages(Collection $pages)
+    public function setPages($pages)
     {
         $this->pages = $pages;
 

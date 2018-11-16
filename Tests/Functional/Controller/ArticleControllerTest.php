@@ -70,7 +70,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => $template,
-            'authored' => $authored,
+            'authored' => date('c', strtotime($authored)),
             'action' => $action,
         ];
 
@@ -94,7 +94,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'pageTitle' => $pageTitle,
                 'template' => $article['template'],
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 
@@ -129,7 +129,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
@@ -174,7 +174,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => 'default',
-            'authored' => '2016-01-01',
+            'authored' => date('c', strtotime('2016-01-01')),
         ];
 
         if ($shadowLocale) {
@@ -225,7 +225,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
@@ -1254,7 +1254,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['categories' => [$category->getId()]]],
             ]
         );
@@ -1286,7 +1286,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['tags' => [$tag->getName()]]],
             ]
         );
@@ -1564,7 +1564,7 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'page_tree_route',
                 'routePath' => $routePathData,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 
