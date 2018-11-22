@@ -79,6 +79,17 @@ To use this approach you have to change the content-type of the property `routeP
 `page_tree_route`. This will change the UI for this property in the Sulu-Admin and behind the 
 scenes the routes will be handled in a different way.  
 
+```xml
+<property name="routePath" type="page_tree_route">
+    <meta>
+        <title lang="en">Resourcelocator</title>
+        <title lang="de">Adresse</title>
+    </meta>
+</property>
+```
+
+You still can define the rear part generation of the url like descripted above.
+
 **Route update**
 
 When changing a url of a page the system also update the routes of all the linked articles.
