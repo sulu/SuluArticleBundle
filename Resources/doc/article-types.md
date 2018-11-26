@@ -33,7 +33,7 @@ This key can the be used to translate the key with the
 The type can also be used to predefine a filter for the smart-content provider for articles. You can simply add the following param to the template definition:
 
 ```xml
-<property name="articles" type="smart-content">
+<property name="articles" type="smart_content">
     <params>
         <param name="types" value="my_article_type,my_custom_article_type"/>
     </params>
