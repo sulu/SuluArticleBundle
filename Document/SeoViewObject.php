@@ -11,13 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use ONGR\ElasticsearchBundle\Annotation\Object;
+use ONGR\ElasticsearchBundle\Annotation\ObjectType;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 
 /**
  * Contains seo information for articles.
  *
- * @Object
+ * @ObjectType
  */
 class SeoViewObject
 {
