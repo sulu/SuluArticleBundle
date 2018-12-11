@@ -11,14 +11,14 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use ONGR\ElasticsearchBundle\Annotation\Object;
+use ONGR\ElasticsearchBundle\Annotation\ObjectType;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 use Sulu\Bundle\MediaBundle\Api\Media;
 
 /**
  * Contains the ids and display-options.
  *
- * @Object
+ * @ObjectType
  */
 class MediaViewObject
 {

@@ -475,7 +475,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     private function addBoolQuery($filterName, array $filters, $field, $operator, BoolQuery $query, &$queriesCount)
     {
-        if (0 !== count($tags = $this->getFilter($filters, $filterName))) {
+        if (0 !== count($tags = $this->getFilter($filters, $filterName, []))) {
             ++$queriesCount;
             $query->add($this->getBoolQuery($field, $tags, $operator));
         }
