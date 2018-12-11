@@ -37,6 +37,10 @@ before_install:
   - export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
+  - | # enable swap
+    /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
+    /sbin/mkswap /var/swap.1
+    /sbin/swapon /var/swap.1
   - composer self-update
 
 install:
