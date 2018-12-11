@@ -38,9 +38,11 @@ before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - | # enable swap
-    /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
-    /sbin/mkswap /var/swap.1
-    /sbin/swapon /var/swap.1
+    sudo fallocate -l 4G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    sudo sysctl vm.swappiness=10
   - composer self-update
 
 install:
