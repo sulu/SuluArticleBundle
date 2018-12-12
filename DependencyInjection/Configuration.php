@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                             return ['default' => $v];
                         })
                     ->end()
-                    ->arrayPrototype()->useAttributeAsKey('locale')->scalarPrototype()->end()->end()
+                    ->prototype('array')->useAttributeAsKey('locale')->scalarPrototype()->end()->end()
                     ->defaultValue([])
                 ->end()
                 ->arrayNode('smart_content')
