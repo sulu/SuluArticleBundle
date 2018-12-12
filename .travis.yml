@@ -22,7 +22,7 @@ matrix:
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - ENABLE_SWAP=true
-    - php: 7.2
+    - php: 7.3
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
@@ -36,7 +36,7 @@ addons:
 before_install:
   - sudo update-java-alternatives -s java-8-oracle
   - export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
-  - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
+  - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini || true ; fi
   - phpenv config-add Tests/travis.php.ini
   - | # enable swap
     if [[ $ENABLE_SWAP == 'true' ]]; then
@@ -47,9 +47,10 @@ before_install:
         sudo sysctl vm.swappiness=10
     fi
   - composer self-update
+  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update ; fi
+  - if [[ $COMPOSER_FLAGS != *'--prefer-lowest'* ]]; then travis_retry composer require --dev sulu/sulu:dev-master --no-update ; fi
 
 install:
-  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update ; fi
   - composer update $COMPOSER_FLAGS
   - composer info -i
   - java -version
