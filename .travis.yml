@@ -48,7 +48,7 @@ before_install:
     fi
   - composer self-update
   - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update ; fi
-  - if [[ $COMPOSER_FLAGS != *'--prefer-lowest'* ]]; then travis_retry composer require --dev sulu/sulu:dev-master --no-update ; fi
+  - if [[ $COMPOSER_FLAGS != *'--prefer-lowest'* ]]; then travis_retry composer require sulu/sulu:"dev-master as 1.6.24" --no-update ; fi
 
 install:
   - composer update $COMPOSER_FLAGS
