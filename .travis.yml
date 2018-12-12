@@ -21,6 +21,7 @@ matrix:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction -vvv"
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
+        - ENABLE_SWAP=true
     - php: 7.2
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
@@ -38,11 +39,13 @@ before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - | # enable swap
-    sudo fallocate -l 4G /swapfile
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    sudo sysctl vm.swappiness=10
+    if [[ $ENABLE_SWAP == 'true' ]]; then
+        sudo fallocate -l 4G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        sudo sysctl vm.swappiness=10
+    fi
   - composer self-update
 
 install:
