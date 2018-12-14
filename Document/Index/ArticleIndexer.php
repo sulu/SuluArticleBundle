@@ -321,6 +321,10 @@ class ArticleIndexer implements IndexerInterface
         $pages = [];
         /** @var ArticlePageDocument $child */
         foreach ($document->getChildren() as $child) {
+            if (!$child instanceof ArticlePageDocument) {
+                continue;
+            }
+
             /** @var ArticlePageViewObject $page */
             $pages[] = $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
