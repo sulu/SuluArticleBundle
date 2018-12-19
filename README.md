@@ -29,7 +29,7 @@ For detailed requirements see [composer.json](https://github.com/sulu/SuluArticl
 Our dependency `ongr/elasticsearch-bundle`
 (see [ongr-io/ElasticsearchBundle#832](https://github.com/ongr-io/ElasticsearchBundle/issues/832) and 
 [ongr-io/ElasticsearchBundle#828](https://github.com/ongr-io/ElasticsearchBundle/issues/828)) isn't supporting
-PHP `^7.2` and Elasticsearch `^6.0`.
+Elasticsearch `^6.0`.
 
 ## Documentation
 
