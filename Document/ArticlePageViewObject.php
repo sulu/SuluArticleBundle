@@ -11,13 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use ONGR\ElasticsearchBundle\Annotation\Object;
+use ONGR\ElasticsearchBundle\Annotation\ObjectType;
 use ONGR\ElasticsearchBundle\Annotation\Property;
 
 /**
  * Contains page information.
  *
- * @Object
+ * @ObjectType
  */
 class ArticlePageViewObject
 {

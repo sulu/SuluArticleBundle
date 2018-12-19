@@ -11,10 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
+use Sulu\Component\DocumentManager\Behavior\Mapping\LocaleBehavior;
+
 /**
  * This behavior adds the webspace functionality to articles.
  */
-interface WebspaceBehavior
+interface WebspaceBehavior extends LocaleBehavior
 {
     /**
      * @return null|string

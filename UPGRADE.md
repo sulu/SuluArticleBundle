@@ -2,6 +2,17 @@
 
 ## dev-master
 
+### Localized webspace settings
+
+Reindex elasticsearch data:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
+Check also the new possible localized configuration.
+
 ### Elasticsearch Mapping Changed
 
 Mapping has changed, reindex whole elasticsearch data:

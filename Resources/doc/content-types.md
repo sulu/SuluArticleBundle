@@ -54,6 +54,21 @@ the articles.
 The content-type returns a list of `ArticleResourceItem` (get the underlying
 [ArticleViewDocumentInterface](article-view-document.md) with `ArticleResourceItem::getContent()`) instances.
 
+### Example
+
+```xml
+<property name="articles" type="smart_content">
+    <meta>
+        <title lang="en">Articles</title>
+        <title lang="de">Artikel</title>
+    </meta>
+
+    <params>
+        <param name="provider" value="articles"/>
+    </params>
+</property>
+```
+
 ## Teaser-Selection
 
 Also for the [teaser-selection](http://docs.sulu.io/en/latest/reference/content-types/teaser_selection.html)

@@ -70,7 +70,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => $template,
-            'authored' => $authored,
+            'authored' => date('c', strtotime($authored)),
             'action' => $action,
         ];
 
@@ -94,7 +94,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'pageTitle' => $pageTitle,
                 'template' => $article['template'],
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 
@@ -129,7 +129,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
@@ -174,7 +174,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => 'default',
-            'authored' => '2016-01-01',
+            'authored' => date('c', strtotime('2016-01-01')),
         ];
 
         if ($shadowLocale) {
@@ -225,7 +225,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
@@ -255,7 +255,37 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
     }
 
-    public function testPutCustomWebspaceSettings($title = 'Sulu is nice', $locale = 'de')
+    public function provideCustomWebspaceSettings()
+    {
+        return [
+            [
+                'Sulu is nice',
+                'de',
+            ],
+            [
+                'Sulu is nice',
+                'de',
+                'test',
+                ['sulu_io', 'test-2'],
+            ],
+            [
+                'Sulu is nice',
+                'de',
+                'sulu_io',
+                ['test-2'],
+            ],
+            [
+                'Sulu is nice',
+                'de',
+                'sulu_io',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCustomWebspaceSettings
+     */
+    public function testPutCustomWebspaceSettings($title, $locale, $mainWebspace = null, $additionalWebspaces = null)
     {
         $article = $this->testPost();
 
@@ -266,8 +296,8 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'mainWebspace' => 'test',
-                'additionalWebspaces' => ['sulu_io'],
+                'mainWebspace' => $mainWebspace,
+                'additionalWebspaces' => $additionalWebspaces,
             ]
         );
 
@@ -276,8 +306,8 @@ class ArticleControllerTest extends SuluTestCase
         // check response
         $response = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('test', $response['mainWebspace']);
-        $this->assertEquals(['sulu_io'], $response['additionalWebspaces']);
+        $this->assertEquals($mainWebspace, $response['mainWebspace']);
+        $this->assertEquals($additionalWebspaces, $response['additionalWebspaces']);
 
         // check if phpcr document is correct
         $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
@@ -285,14 +315,58 @@ class ArticleControllerTest extends SuluTestCase
         $document = $documentManager->find($response['id'], 'de');
 
         $this->assertEquals($title, $document->getTitle());
-        $this->assertEquals('test', $document->getMainWebspace());
-        $this->assertEquals(['sulu_io'], $document->getAdditionalWebspaces());
+        $this->assertEquals($mainWebspace, $document->getMainWebspace());
+        $this->assertEquals($additionalWebspaces, $document->getAdditionalWebspaces());
 
         /** @var ArticleViewDocument $viewDocument */
         $viewDocument = $this->findViewDocument($response['id'], 'de');
         $this->assertNotNull($viewDocument);
-        $this->assertEquals('test', $viewDocument->getMainWebspace());
-        $this->assertEquals(['sulu_io'], $viewDocument->getAdditionalWebspaces());
+        $this->assertEquals(!$mainWebspace ? 'sulu_io' : $mainWebspace, $viewDocument->getMainWebspace());
+        $this->assertEquals(!$additionalWebspaces ? [] : $additionalWebspaces, $viewDocument->getAdditionalWebspaces());
+
+        // test that ghost do not server webspace settings
+        $response = $this->get($article['id'], 'en');
+        $this->assertEquals($title, $response['title']);
+        $this->assertNull($response['mainWebspace']);
+        $this->assertNull($response['additionalWebspaces']);
+
+        $viewDocument = $this->findViewDocument($response['id'], 'en');
+        $this->assertNotNull($viewDocument);
+        $this->assertEquals('sulu_io', $viewDocument->getMainWebspace());
+        $this->assertEquals([], $viewDocument->getAdditionalWebspaces());
+    }
+
+    /**
+     * @dataProvider provideCustomWebspaceSettings
+     */
+    public function testPutCustomWebspaceSettingsWithShadow($title, $locale, $mainWebspace = null, $additionalWebspaces = null)
+    {
+        $article = $this->testPost();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=' . $locale,
+            [
+                'title' => $title,
+                'template' => 'default',
+                'mainWebspace' => $mainWebspace,
+                'additionalWebspaces' => $additionalWebspaces,
+            ]
+        );
+
+        $this->put('Sulu is great', 'en', $locale, $article);
+
+        $response = $this->get($article['id'], 'en');
+        $this->assertEquals($title, $response['title']);
+        $this->assertEquals($mainWebspace, $response['mainWebspace']);
+        $this->assertEquals($additionalWebspaces, $response['additionalWebspaces']);
+
+        /** @var ArticleViewDocument $viewDocument */
+        $viewDocument = $this->findViewDocument($response['id'], 'en');
+        $this->assertNotNull($viewDocument);
+        $this->assertEquals(!$mainWebspace ? 'sulu_io' : $mainWebspace, $viewDocument->getMainWebspace());
+        $this->assertEquals(!$additionalWebspaces ? [] : $additionalWebspaces, $viewDocument->getAdditionalWebspaces());
     }
 
     public function testGetGhost()
@@ -1180,7 +1254,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['categories' => [$category->getId()]]],
             ]
         );
@@ -1212,7 +1286,7 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['tags' => [$tag->getName()]]],
             ]
         );
@@ -1490,7 +1564,7 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'page_tree_route',
                 'routePath' => $routePathData,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 

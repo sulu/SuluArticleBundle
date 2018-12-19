@@ -21,13 +21,13 @@
                 <div class="grid" id="webspace-settings-info-default" style="display: none;">
                     <div class="grid-row">
                         <span>
-                            <%= translations.webspaceSettingsMainWebspace %>: <%= config.defaultMainWebspace %>
+                            <%= translations.webspaceSettingsMainWebspace %>: <%= config.webspaceSettings[locale].defaultMainWebspace %>
                         </span>
                     </div>
-                    <% if (config.defaultAdditionalWebspaces) { %>
+                    <% if (config.webspaceSettings[locale].defaultAdditionalWebspaces) { %>
                         <div class="grid-row" id="webspace-settings-info-additional-webspaces">
                             <span>
-                                <%= translations.webspaceSettingsAdditionalWebspaces %>: <%= config.defaultAdditionalWebspaces.join(', ') %>
+                                <%= translations.webspaceSettingsAdditionalWebspaces %>: <%= config.webspaceSettings[locale].defaultAdditionalWebspaces.join(', ') %>
                             </span>
                         </div>
                     <% } %>

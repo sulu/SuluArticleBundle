@@ -190,7 +190,7 @@ class PageTreeRepositoryTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'page_tree_route',
                 'routePath' => $routePathData,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 

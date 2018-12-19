@@ -244,8 +244,8 @@ define([
             var config = Config.get('sulu_article');
 
             if (isInitial) {
-                mainWebspace = this.data.mainWebspace ? this.data.mainWebspace : config.defaultMainWebspace;
-                additionalWebspaces = this.data.additionalWebspaces ? this.data.additionalWebspaces : config.defaultAdditionalWebspaces;
+                mainWebspace = this.data.mainWebspace ? this.data.mainWebspace : config.webspaceSettings[this.options.locale].defaultMainWebspace;
+                additionalWebspaces = this.data.additionalWebspaces ? this.data.additionalWebspaces : config.webspaceSettings[this.options.locale].defaultAdditionalWebspaces;
             } else {
                 mainWebspace = this.getSelectedMainWebspace();
                 additionalWebspaces = this.getSelectedAdditionalWebspace();
@@ -427,6 +427,7 @@ define([
                 {
                     translations: this.translations,
                     config: Config.get('sulu_article'),
+                    locale: this.options.locale,
                 }
             );
         },

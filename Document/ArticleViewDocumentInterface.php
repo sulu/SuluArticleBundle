@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
@@ -428,11 +429,11 @@ interface ArticleViewDocumentInterface
     /**
      * Set pages.
      *
-     * @param Collection $pages
+     * @param Collection|ArrayCollection $pages
      *
      * @return $this
      */
-    public function setPages(Collection $pages);
+    public function setPages($pages);
 
     /**
      * Returns contentData.
