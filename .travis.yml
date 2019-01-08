@@ -22,7 +22,7 @@ matrix:
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - ENABLE_SWAP=true
-    - php: 7.2
+    - php: 7.3
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
