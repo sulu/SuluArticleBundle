@@ -34,7 +34,7 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         parent::buildForm($builder, $options);
 
         // extensions
-        $builder->add('extensions', TextType::class, ['property_path' => 'extensionsData']);
+        $builder->add('extensions', UnstructuredType::class, ['property_path' => 'extensionsData']);
         $builder->add('shadowLocaleEnabled', CheckboxType::class);
         $builder->add('shadowLocale', TextType::class);
         $builder->add('mainWebspace', TextType::class);
