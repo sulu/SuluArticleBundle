@@ -43,11 +43,6 @@ class ArticleSitemapProvider implements SitemapProviderInterface
      */
     private $webspaceManager;
 
-    /**
-     * @param Manager $manager
-     * @param DocumentFactoryInterface $documentFactory
-     * @param WebspaceManagerInterface $webspaceManager
-     */
     public function __construct(
         Manager $manager,
         DocumentFactoryInterface $documentFactory,
@@ -81,8 +76,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
 
             /** @var ArticleViewDocumentInterface $item */
             foreach ($bulk as $item) {
-                $sitemapUrl = new SitemapUrl($item->getRoutePath(), $item->getLocale(), $item->getChanged());
-                $result[] = $sitemapUrl;
+                $result[] = $url = $this->buildUrl($item);
 
                 if (!isset($sitemapUrlListByUuid[$item->getUuid()])) {
                     $sitemapUrlListByUuid[$item->getUuid()] = [];
@@ -90,14 +84,22 @@ class ArticleSitemapProvider implements SitemapProviderInterface
 
                 $sitemapUrlListByUuid[$item->getUuid()] = $this->setAlternatives(
                     $sitemapUrlListByUuid[$item->getUuid()],
-                    $sitemapUrl
+                    $url
                 );
             }
 
             $from += $size;
-        } while ($bulk->count() > $from || $from > self::PAGE_SIZE);
+        } while ($bulk->count() > $from && $from < static::PAGE_SIZE);
 
         return $result;
+    }
+
+    /**
+     * @return SitemapUrl
+     */
+    protected function buildUrl(ArticleViewDocumentInterface $articleView)
+    {
+        return new SitemapUrl($articleView->getRoutePath(), $articleView->getLocale(), $articleView->getChanged());
     }
 
     /**
@@ -159,6 +161,6 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'));
 
-        return ceil($repository->count($search) / self::PAGE_SIZE);
+        return ceil($repository->count($search) / static::PAGE_SIZE);
     }
 }
