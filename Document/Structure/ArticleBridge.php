@@ -24,11 +24,32 @@ class ArticleBridge extends StructureBridge
     private $webspaceKey = null;
 
     /**
+     * @var string
+     */
+    private $uuid;
+
+    /**
      * {@inheritdoc}
      */
     public function getView()
     {
         return $this->structure->view;
+    }
+
+    public function getUuid()
+    {
+        // is set for structure loaded with document from document-manager
+        // is not set when using structure with view-document
+        if ($this->document) {
+            return parent::getUuid();
+        }
+
+        return $this->uuid;
+    }
+
+    public function setUuid($uuid)
+    {
+        $this->uuid = $uuid;
     }
 
     /**
