@@ -15,9 +15,9 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ContentBundle\Teaser\Configuration\TeaserConfiguration;
-use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
-use Sulu\Bundle\ContentBundle\Teaser\Teaser;
+use Sulu\Bundle\PageBundle\Teaser\Configuration\TeaserConfiguration;
+use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
+use Sulu\Bundle\PageBundle\Teaser\Teaser;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**

@@ -98,7 +98,7 @@ articles.
 
     <ul>
         {% for article in articles %}
-            <li><a href="{{ sulu_content_path(article.routePath) }}">{{ article.title }}</a></li>
+            <li><a href="{{ sulu_page_path(article.routePath) }}">{{ article.title }}</a></li>
         {% endfor %}
     </ul>
 

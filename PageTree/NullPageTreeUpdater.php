@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\PageTree;
 
-use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 
 /**
  * Does nothing and is only used a placeholder if the "page_route_cache" is "off".

@@ -18,7 +18,7 @@ For each article the default webspace configuration can be overwritten by the co
 
 ## URL Generation
 
-The twig method [`sulu_content_path`](http://docs.sulu.io/en/latest/reference/twig-extensions/functions/sulu_content_path.html) can generate url with another webspace. 
+The twig method [`sulu_page_path`](http://docs.sulu.io/en/latest/reference/twig-extensions/functions/sulu_page_path.html) can generate url with another webspace. 
 Just give this method the `targetWebspace` of the article as second argument.
 
-For example: `sulu_content_path(article.routePath, article.targetWebspace)`.
+For example: `sulu_page_path(article.routePath, article.targetWebspace)`.

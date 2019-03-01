@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 use PHPCR\NodeInterface;
 use PHPCR\SessionInterface;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
-use Sulu\Bundle\ContentBundle\Document\PageDocument;
+use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;

@@ -70,7 +70,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
         if ($container->hasExtension('sulu_search')) {
             $container->prependExtensionConfig(
-                'sulu_content',
+                'sulu_page',
                 [
                     'search' => [
                         'mapping' => [
