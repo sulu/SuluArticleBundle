@@ -15,7 +15,6 @@ use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Embedded;
 use ONGR\ElasticsearchBundle\Annotation\Id;
 use ONGR\ElasticsearchBundle\Annotation\Property;
-use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
  * Indexable document for articles.
@@ -278,6 +277,25 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var \ArrayObject
      */
     protected $view;
+
+    /**
+     * @var string
+     *
+     * @Property(type="string", options={"analyzer": "keyword"})
+     */
+    protected $mainWebspace;
+
+    /**
+     * @var string[]
+     *
+     * @Property(type="string", options={"analyzer": "keyword"})
+     */
+    protected $additionalWebspaces;
+
+    /**
+     * @var string
+     */
+    protected $targetWebspace;
 
     /**
      * @param string $uuid
@@ -744,7 +762,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setPages(Collection $pages)
+    public function setPages($pages)
     {
         $this->pages = $pages;
 
@@ -801,6 +819,60 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setView(\ArrayObject $view)
     {
         $this->view = $view;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMainWebspace()
+    {
+        return $this->mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMainWebspace($mainWebspace)
+    {
+        $this->mainWebspace = $mainWebspace;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalWebspaces()
+    {
+        return $this->additionalWebspaces;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdditionalWebspaces($additionalWebspace)
+    {
+        $this->additionalWebspaces = $additionalWebspace;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetWebspace()
+    {
+        return $this->targetWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setTargetWebspace($targetWebspace)
+    {
+        $this->targetWebspace = $targetWebspace;
 
         return $this;
     }

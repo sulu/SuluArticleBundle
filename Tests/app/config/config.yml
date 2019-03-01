@@ -1,3 +1,6 @@
+imports:
+    - { resource: parameters.yml }
+
 # Doctrine Configuration
 doctrine:
     dbal:
@@ -38,3 +41,6 @@ sulu_route:
             options:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
                 parent: "{object.getParent().getRoutePath()}"
+
+sulu_article:
+    default_main_webspace: 'sulu_io'

@@ -194,6 +194,14 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
         }
 
+        if ($this->getBooleanRequestParameter($request, 'exclude-shadows', false, false)) {
+            $search->addQuery(new TermQuery('localization_state.state', 'shadow'), BoolQuery::MUST_NOT);
+        }
+
+        if ($this->getBooleanRequestParameter($request, 'exclude-ghosts', false, false)) {
+            $search->addQuery(new TermQuery('localization_state.state', 'ghost'), BoolQuery::MUST_NOT);
+        }
+
         $authoredFrom = $request->get('authoredFrom');
         $authoredTo = $request->get('authoredTo');
         if ($authoredFrom || $authoredTo) {
@@ -311,11 +319,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
             $uuid,
-            $locale,
-            [
-                'load_ghost_content' => true,
-                'load_shadow_content' => false,
-            ]
+            $locale
         );
 
         $context = new Context();
@@ -573,6 +577,10 @@ class ArticleController extends RestController implements ClassResourceInterface
 
         if (array_key_exists('author', $data) && null === $data['author']) {
             $document->setAuthor(null);
+        }
+
+        if (array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
+            $document->setAdditionalWebspaces(null);
         }
 
         $this->getDocumentManager()->persist(

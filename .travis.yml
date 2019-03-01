@@ -20,23 +20,24 @@ matrix:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-stable --prefer-dist --no-interaction"
         - ES_VERSION="2.4.4"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
-    - php: 7.1
+    - php: 7.3
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - SULU_PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
 
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
-
 before_install:
-  - sudo update-java-alternatives -s java-8-oracle
-  - export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
+  - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
+  - phpenv config-add Tests/travis.php.ini
+  - composer self-update
+
+install:
+  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update ; fi
+  - composer update $COMPOSER_FLAGS
+  - composer info -i
   - java -version
   - |
-    if [[ $SULU_PHPCR_TRANSPORT = jackrabbit ]]; then
+    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
             cd downloads
             wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar
@@ -44,18 +45,9 @@ before_install:
         fi
         java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar > /dev/null &
     fi
-  - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
-  - phpenv config-add Tests/travis.php.ini
-  - composer self-update
   - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
   - unzip elasticsearch.zip
   - ./elasticsearch-*/bin/elasticsearch -d
-
-install:
-  - if [[ $ES_VERSION == '2.'* ]]; then travis_retry composer require ongr/elasticsearch-bundle:^1.2.9 --no-update $COMPOSER_FLAGS ; fi
-  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update $COMPOSER_FLAGS ; fi
-  - travis_retry composer update $COMPOSER_FLAGS
-  - composer info -i
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
   - ./Tests/app/console sulu:document:initialize

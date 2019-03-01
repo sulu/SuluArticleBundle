@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
 use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
@@ -22,6 +23,8 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\Webspace\Analyzer\RequestAnalyzer;
+use Sulu\Component\Webspace\Webspace;
 
 class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,6 +54,16 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
     private $provider;
 
     /**
+     * @var WebspaceResolver
+     */
+    private $webspaceResolver;
+
+    /**
+     * @var RequestAnalyzer
+     */
+    private $requestAnalyzer;
+
+    /**
      * @var string
      */
     private $entityClass = ArticleDocument::class;
@@ -71,12 +84,16 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->cacheLifetimeResolver = $this->prophesize(CacheLifetimeResolverInterface::class);
         $this->structureManager = $this->prophesize(StructureManagerInterface::class);
+        $this->webspaceResolver = $this->prophesize(WebspaceResolver::class);
+        $this->requestAnalyzer = $this->prophesize(RequestAnalyzer::class);
 
         $this->provider = new ArticleRouteDefaultProvider(
             $this->documentManager->reveal(),
             $this->structureMetadataFactory->reveal(),
             $this->cacheLifetimeResolver->reveal(),
-            $this->structureManager->reveal()
+            $this->structureManager->reveal(),
+            $this->webspaceResolver->reveal(),
+            $this->requestAnalyzer->reveal()
         );
     }
 
@@ -91,18 +108,34 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $unknownDocument = new UnknownDocument();
 
         return [
-            [$articleDocument, false],
-            [$articleDocumentPublished, true],
-            [$unknownDocument, false],
+            [$articleDocument, 'test', 'test', [], false],
+            [$articleDocumentPublished, 'test', 'test', [], true],
+            [$articleDocumentPublished, 'test', 'other_webspace', ['test', 'one_more_other_webspace'], true],
+            [$unknownDocument, 'test', null, [], false],
         ];
     }
 
     /**
      * @dataProvider publishedDataProvider
      */
-    public function testIsPublished($document, $result)
-    {
+    public function testIsPublished(
+        $document,
+        $webspaceKey,
+        $documentMainWebspace,
+        $documentAdditionalWebspaces,
+        $result
+    ) {
+        if ($document instanceof ArticleDocument) {
+            $this->webspaceResolver->resolveMainWebspace($document)->willReturn($documentMainWebspace);
+            $this->webspaceResolver->resolveAdditionalWebspaces($document)->willReturn($documentAdditionalWebspaces);
+        }
+
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($document);
+
+        $webspace = $this->prophesize(Webspace::class);
+        $webspace->getKey()->willReturn($webspaceKey);
+
+        $this->requestAnalyzer->getWebspace()->willReturn($webspace->reveal());
 
         $this->assertEquals($result, $this->provider->isPublished($this->entityClass, $this->entityId, $this->locale));
     }

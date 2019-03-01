@@ -36,5 +36,8 @@
         <property name="published" type="DateTime" groups="website,defaultArticlePage,smallArticlePage,preview"/>
 
         <property name="parent" type="Sulu\Bundle\ArticleBundle\Document\ArticleDocument" groups="preview"/>
+
+        <property name="shadowLocale" type="string" serialized-name="shadowBaseLanguage" groups="defaultArticlePage"/>
+        <property name="shadowLocaleEnabled" type="boolean" serialized-name="shadowOn" groups="defaultArticlePage"/>
     </class>
 </serializer>

@@ -17,7 +17,9 @@
             <tag name="sulu.context" context="admin"/>
         </service>
         <service id="sulu_article.js_config" class="Sulu\Bundle\ArticleBundle\Admin\ArticleJsConfig">
+            <argument type="service" id="sulu_core.webspace.webspace_manager" />
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_bundle_article.webspace_settings_configuration_resolver"/>
             <argument>%sulu_article.types%</argument>
             <argument type="collection">
                 <argument key="displayTabAll">%sulu_article.display_tab_all%</argument>
@@ -49,9 +51,11 @@
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="translator"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
-            <argument type="service" id="sulu_document_manager.document_manager"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -64,6 +68,9 @@
             <argument type="service" id="sulu_article.elastic_search.factory.seo"/>
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="translator"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector" />
+            <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
         </service>
 
@@ -109,6 +116,15 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticleSubscriber">
             <argument type="service" id="sulu_article.elastic_search.article_indexer"/>
             <argument type="service" id="sulu_article.elastic_search.article_live_indexer"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+
+            <tag name="sulu_document_manager.event_subscriber"/>
+        </service>
+        <service id="sulu_article.subscriber.webspace"
+                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\WebspaceSubscriber">
+            <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
@@ -181,6 +197,13 @@
             <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
         </service>
 
+        <service id="sulu_article.target_webspace_listener"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\TargetWebspaceListener">
+            <argument type="service" id="sulu_core.webspace.request_analyzer"/>
+
+            <tag name="kernel.event_listener" event="es.post_convert_to_document" method="onPostConvertToDocument"/>
+        </service>
+
         <service id="sulu_article.serializer.website_article"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleWebsiteSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
@@ -206,6 +229,8 @@
             <argument type="service" id="sulu_content.structure.factory"/>
             <argument type="service" id="sulu_http_cache.cache_lifetime.resolver"/>
             <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+            <argument type="service" id="sulu_core.webspace.request_analyzer"/>
 
             <tag name="sulu_route.defaults_provider"/>
         </service>
@@ -230,6 +255,14 @@
             <argument type="service" id="sulu_route.generator.expression_token_provider"/>
 
             <tag name="sulu.route_generator" alias="article_page"/>
+        </service>
+
+        <!-- route enhancer -->
+        <service id="sulu_article.route_enhancer"
+                 class="Sulu\Bundle\ArticleBundle\Routing\ArticleRouteEnhancer">
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+            <argument>%kernel.environment%</argument>
         </service>
 
         <!-- content -->
@@ -272,6 +305,7 @@
         <service id="sulu_article.sitemap.articles" class="Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider">
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
 
             <tag name="sulu.sitemap.provider" alias="articles"/>
         </service>
@@ -291,8 +325,11 @@
         <service id="sulu_article.markup.link_provider" class="Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider">
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="request_stack"/>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_article.view_document.article.class%</argument>
+            <argument>%kernel.environment%</argument>
 
             <tag name="sulu.link.provider" alias="article"/>
         </service>
@@ -355,6 +392,27 @@
 
         <service id="sulu_article.builder.index" class="Sulu\Bundle\ArticleBundle\Builder\ArticleIndexBuilder">
             <tag name="massive_build.builder" />
+        </service>
+
+
+        <!-- webspace settings resolver -->
+        <service id="sulu_bundle_article.webspace_settings_configuration_resolver"
+                 class="Sulu\Bundle\ArticleBundle\DependencyInjection\WebspaceSettingsConfigurationResolver">
+            <argument>%sulu_article.default_main_webspace%</argument>
+            <argument>%sulu_article.default_additional_webspaces%</argument>
+        </service>
+        <service id="sulu_article.resolver.webspaces"
+                 class="Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver">
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_bundle_article.webspace_settings_configuration_resolver"/>
+        </service>
+
+        <!-- Search -->
+        <service id="sulu_article.search.subscriber" class="Sulu\Bundle\ArticleBundle\Search\ArticleSearchSubscriber">
+            <argument type="service" id="massive_search.factory" />
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
+
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 </container>

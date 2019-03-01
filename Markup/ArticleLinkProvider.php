@@ -19,6 +19,8 @@ use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkItem;
 use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Integrates articles into link-system.
@@ -38,6 +40,16 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $defaultManager;
 
     /**
+     * @var WebspaceManagerInterface
+     */
+    protected $webspaceManager;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * @var array
      */
     private $types;
@@ -48,21 +60,35 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $articleViewClass;
 
     /**
+     * @var string
+     */
+    private $environment;
+
+    /**
      * @param Manager $liveManager
      * @param Manager $defaultManager
+     * @param WebspaceManagerInterface $webspaceManager
+     * @param RequestStack $requestStack
      * @param array $types
      * @param string $articleViewClass
+     * @param string $environment
      */
     public function __construct(
         Manager $liveManager,
         Manager $defaultManager,
+        WebspaceManagerInterface $webspaceManager,
+        RequestStack $requestStack,
         array $types,
-        $articleViewClass
+        $articleViewClass,
+        $environment
     ) {
         $this->liveManager = $liveManager;
         $this->defaultManager = $defaultManager;
+        $this->webspaceManager = $webspaceManager;
+        $this->requestStack = $requestStack;
         $this->types = $types;
         $this->articleViewClass = $articleViewClass;
+        $this->environment = $environment;
     }
 
     /**
@@ -93,6 +119,13 @@ class ArticleLinkProvider implements LinkProviderInterface
      */
     public function preload(array $hrefs, $locale, $published = true)
     {
+        $request = $this->requestStack->getCurrentRequest();
+
+        $scheme = 'http';
+        if ($request) {
+            $scheme = $request->getScheme();
+        }
+
         $search = new Search();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($hrefs, $locale)));
         $search->setSize(count($hrefs));
@@ -107,14 +140,30 @@ class ArticleLinkProvider implements LinkProviderInterface
         $result = [];
         /** @var ArticleViewDocumentInterface $document */
         foreach ($documents as $document) {
-            $result[] = new LinkItem(
-                $document->getUuid(),
-                $document->getTitle(),
-                $document->getRoutePath(),
-                $document->getPublishedState()
-            );
+            $result[] = $this->createLinkItem($document, $locale, $scheme);
         }
 
         return $result;
+    }
+
+    /**
+     * @param ArticleViewDocumentInterface $document
+     * @param string $locale
+     * @param string $scheme
+     *
+     * @return LinkItem
+     */
+    protected function createLinkItem(ArticleViewDocumentInterface $document, $locale, $scheme)
+    {
+        $url = $this->webspaceManager->findUrlByResourceLocator(
+            $document->getRoutePath(),
+            $this->environment,
+            $locale,
+            $document->getTargetWebspace(),
+            null,
+            $scheme
+        );
+
+        return new LinkItem($document->getUuid(), $document->getTitle(), $url, $document->getPublishedState());
     }
 }

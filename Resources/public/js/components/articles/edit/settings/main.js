@@ -32,8 +32,24 @@ define([
             changed: 'sulu_article.form.settings.changelog.changed',
             changedOnly: 'sulu_article.form.settings.changelog.changed-only',
             created: 'sulu_article.form.settings.changelog.created',
-            createdOnly: 'sulu_article.form.settings.changelog.created-only'
+            createdOnly: 'sulu_article.form.settings.changelog.created-only',
+            shadowArticle: 'sulu_article.shadow_article',
+            shadowEnable: 'sulu_article.form.settings.shadow.enable',
+            publishedShadow: 'sulu_article.published-shadow',
+            shadowBaseLanguage: 'sulu_article.form.settings.shadow.base_language',
+            webspaceSettings: 'sulu_article.form.settings.webspace_settings',
+            webspaceSettingsCustomizeEnable: 'sulu_article.form.settings.webspace_settings.customize_enable',
+            webspaceSettingsMainWebspace: 'sulu_article.form.settings.webspace_settings.main_webspace',
+            webspaceSettingsAdditionalWebspaces: 'sulu_article.form.settings.webspace_settings.additional_webspaces',
         }
+    },
+
+    isShadow = function() {
+        return this.sandbox.dom.prop('#shadow_on_checkbox', 'checked');
+    },
+
+    hasCustomWebspaceSettings = function() {
+        return this.sandbox.dom.prop('#customize_on_checkbox', 'checked');
     };
 
     return {
@@ -44,12 +60,19 @@ define([
 
         authorFullname: null,
 
+        disableWebspaceSettingsForm: false,
+
         /**
          * This method function has to be overwritten by the implementation to convert the data from "options.data".
          *
          * @param {object} data
          */
         parseData: function(data) {
+            // check if route type is page tree
+            if (data.routePath && typeof data.routePath === 'object' && data.routePath.hasOwnProperty('page')) {
+                this.disableWebspaceSettingsForm = true;
+            }
+
             return {
                 id: data.id,
                 author: data.author,
@@ -57,7 +80,13 @@ define([
                 creator: data.creator,
                 changer: data.changer,
                 created: data.created,
-                changed: data.changed
+                changed: data.changed,
+                concreteLanguages: data.concreteLanguages,
+                enabledShadowLanguages: data.enabledShadowLanguages,
+                shadowOn: data.shadowOn,
+                shadowBaseLanguage: data.shadowBaseLanguage,
+                mainWebspace: data.mainWebspace,
+                additionalWebspaces: data.additionalWebspaces,
             };
         },
 
@@ -102,12 +131,232 @@ define([
                 ]);
             }
 
+            if (Config.get('sulu_article').showWebspaceSettings) {
+                // init/start webspace settings section
+                this.updateWebspaceSettingsComponents(true);
+                this.updateVisibilityForWebspaceSettingsCustomizeCheckbox(true);
+            }
+
+            // init/start shadow section
+            this.startShadowSelect();
+            this.updateVisibilityForShadowCheckbox(true);
+
             this.rendered();
+        },
+
+        startShadowSelect: function() {
+            var shadowsForSelect = [],
+                existingShadowForCurrentLanguage = null,
+                selectedLanguage;
+
+            if (this.data.enabledShadowLanguages[this.options.locale] !== undefined) {
+                existingShadowForCurrentLanguage = this.data.enabledShadowLanguages[this.options.locale];
+            }
+
+            this.sandbox.util.each(this.data.concreteLanguages, function(i, language) {
+                if (this.options.locale === language) {
+                    return;
+                }
+
+                var disabled = false;
+                if (existingShadowForCurrentLanguage === language) {
+                    disabled = true;
+                }
+                shadowsForSelect.push({
+                    id: language,
+                    name: language,
+                    disabled: disabled
+                });
+            }.bind(this));
+
+            selectedLanguage = this.data.shadowBaseLanguage;
+
+            // show at least a message
+            if (shadowsForSelect.length === 0) {
+                shadowsForSelect = [
+                    {
+                        id: -1,
+                        name: this.sandbox.translate('sulu.content.form.settings.shadow.no_base_language'),
+                        disabled: true
+                    }
+                ];
+            }
+
+            this.sandbox.start([
+                {
+                    name: 'select@husky',
+                    options: {
+                        el: '#shadow_base_language_select',
+                        instanceName: 'settings',
+                        multipleSelect: false,
+                        defaultLabel: this.sandbox.translate('sulu.content.form.settings.shadow.select_base_language'),
+                        data: shadowsForSelect,
+                        preSelectedElements: [selectedLanguage]
+                    }
+                }
+            ]);
+
+            if (this.data.shadowOn) {
+                this.sandbox.dom.attr('#shadow_on_checkbox', 'checked', true);
+            }
+        },
+
+        updateVisibilityForShadowCheckbox: function(isInitial) {
+            var shadow = isShadow.call(this);
+            var $shadowDescription = this.sandbox.dom.find('#shadow-container .input-description');
+
+            if (!!shadow) {
+                this.sandbox.emit('sulu.article.show-save-items', 'shadow');
+                $shadowDescription.show();
+            } else {
+                this.sandbox.emit('sulu.article.show-save-items', 'content');
+                $shadowDescription.hide();
+            }
+
+            if (!isInitial) {
+                this.sandbox.emit('sulu.tab.dirty');
+            }
+        },
+
+        getSelectedMainWebspace: function() {
+            var value = undefined;
+
+            this.sandbox.emit('husky.select.main_webspace_select.get-checked', function(selected) {
+                value = selected[0];
+            }.bind(this));
+
+            return value;
+        },
+
+        getSelectedAdditionalWebspace: function() {
+            var value = undefined;
+
+            this.sandbox.emit('husky.select.additional_webspace_multi_select.get-checked', function(selected) {
+                value = selected;
+            }.bind(this));
+
+            return value;
+        },
+
+        updateWebspaceSettingsComponents: function(isInitial) {
+            var mainWebspace;
+            var additionalWebspaces;
+            var config = Config.get('sulu_article');
+
+            if (isInitial) {
+                mainWebspace = this.data.mainWebspace ? this.data.mainWebspace : config.webspaceSettings[this.options.locale].defaultMainWebspace;
+                additionalWebspaces = this.data.additionalWebspaces ? this.data.additionalWebspaces : config.webspaceSettings[this.options.locale].defaultAdditionalWebspaces;
+            } else {
+                mainWebspace = this.getSelectedMainWebspace();
+                additionalWebspaces = this.getSelectedAdditionalWebspace();
+            }
+
+            var availableMainWebspaces = [];
+            var availableAdditionalWebspaces = [];
+            var selectedMainWebspace = [];
+            var selectedAdditionalWebspaces = [];
+
+            this.sandbox.util.each(config.webspaces, function(i, webspace) {
+                availableMainWebspaces.push(webspace);
+
+                if (mainWebspace === webspace.id) {
+                    selectedMainWebspace.push(webspace.id);
+
+                    return;
+                }
+
+                availableAdditionalWebspaces.push(webspace);
+
+                if (additionalWebspaces.indexOf(webspace.id) > -1) {
+                    selectedAdditionalWebspaces.push(webspace.id);
+                }
+            }.bind(this));
+
+            if (!isInitial) {
+                // update values of selects
+
+                this.sandbox.emit(
+                    'husky.select.main_webspace_select.update',
+                    availableMainWebspaces,
+                    selectedMainWebspace,
+                    false
+                );
+
+                this.sandbox.emit(
+                    'husky.select.additional_webspace_multi_select.update',
+                    availableAdditionalWebspaces,
+                    selectedAdditionalWebspaces,
+                    false
+                );
+
+                return;
+            }
+
+            if (this.disableWebspaceSettingsForm) {
+                // disable customize checkbox
+                $('#customize_on_checkbox').attr('disabled', 'disabled');
+            }
+
+            // start selects
+            this.sandbox.start([
+                {
+                    name: 'select@husky',
+                    options: {
+                        disabled: this.disableWebspaceSettingsForm,
+                        el: '#main_webspace_select',
+                        instanceName: 'main_webspace_select',
+                        multipleSelect: false,
+                        data: availableMainWebspaces,
+                        preSelectedElements: [selectedMainWebspace],
+                        defaultLabel: this.sandbox.translate('dropdown.please-choose'),
+                    }
+                }
+            ]);
+
+            this.sandbox.start([
+                {
+                    name: 'select@husky',
+                    options: {
+                        disabled: this.disableWebspaceSettingsForm,
+                        el: '#additional_webspace_multi_select',
+                        instanceName: 'additional_webspace_multi_select',
+                        multipleSelect: true,
+                        data: availableAdditionalWebspaces,
+                        preSelectedElements: selectedAdditionalWebspaces,
+                        defaultLabel: this.sandbox.translate('dropdown.please-choose'),
+                        checkedAllLabel: this.sandbox.translate('public.all'),
+                    }
+                }
+            ]);
+
+            if (this.data.mainWebspace) {
+                this.sandbox.dom.attr('#customize_on_checkbox', 'checked', true);
+            }
+        },
+
+        updateVisibilityForWebspaceSettingsCustomizeCheckbox: function(isInitial) {
+            var webspaceSettingsCustom = hasCustomWebspaceSettings.call(this);
+            var $webspaceSettingsInfoDefault = this.sandbox.dom.find('#webspace-settings-info-default');
+            var $webspaceSettingsCustomizeForm = this.sandbox.dom.find('#webspace-settings-customize-form');
+
+            if (webspaceSettingsCustom) {
+                $webspaceSettingsInfoDefault.hide();
+                $webspaceSettingsCustomizeForm.show();
+            } else {
+                $webspaceSettingsCustomizeForm.hide();
+                $webspaceSettingsInfoDefault.show();
+            }
+
+            if (!isInitial) {
+                this.sandbox.emit('sulu.tab.dirty');
+            }
         },
 
         rendered: function() {
             this.updateChangelog(this.data);
             this.bindDomEvents();
+            this.bindEvents();
+            this.listenForChange();
         },
 
         /**
@@ -121,6 +370,21 @@ define([
             }
 
             var data = this.sandbox.form.getData(this.formId);
+            var baseLanguages = this.sandbox.dom.data('#shadow_base_language_select', 'selectionValues');
+
+            data.mainWebspace = null;
+            data.additionalWebspaces = null;
+            if (hasCustomWebspaceSettings.call(this)) {
+                data.mainWebspace = this.getSelectedMainWebspace();
+                data.additionalWebspaces = this.getSelectedAdditionalWebspace();
+            }
+
+            data.shadowOn = isShadow.call(this);
+            data.shadowBaseLanguage = null;
+            if (!!data.shadowOn && !!baseLanguages && baseLanguages.length > 0) {
+                data.shadowBaseLanguage = baseLanguages[0];
+            }
+
             _.each(data, function(value, key) {
                 this.data[key] = value;
             }.bind(this));
@@ -159,7 +423,13 @@ define([
          * This method function has to be overwritten by the implementation to generate the form-template.
          */
         getTemplate: function() {
-            return this.templates.form({translations: this.translations})
+            return this.templates.form(
+                {
+                    translations: this.translations,
+                    config: Config.get('sulu_article'),
+                    locale: this.options.locale,
+                }
+            );
         },
 
         /**
@@ -234,7 +504,7 @@ define([
                     {
                         created: formattedTime
                     }
-                )
+                );
             }
 
             this.sandbox.dom.text('#created', creationText);
@@ -263,7 +533,7 @@ define([
                     {
                         changed: formattedTime
                     }
-                )
+                );
             }
 
             this.sandbox.dom.text('#changed', changedText);
@@ -383,6 +653,20 @@ define([
         bindDomEvents: function() {
             this.sandbox.dom.on('#change-author', 'click', function() {
                 this.openAuthorSelection();
+            }.bind(this));
+
+            this.sandbox.dom.on('#shadow_on_checkbox', 'click', function() {
+                this.updateVisibilityForShadowCheckbox(false);
+            }.bind(this));
+
+            this.sandbox.dom.on('#customize_on_checkbox', 'click', function() {
+                this.updateVisibilityForWebspaceSettingsCustomizeCheckbox(false);
+            }.bind(this));
+        },
+
+        bindEvents: function() {
+            this.sandbox.on('husky.select.main_webspace_select.selected.item', function() {
+                this.updateWebspaceSettingsComponents();
             }.bind(this));
         },
 

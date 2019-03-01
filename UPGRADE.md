@@ -8,6 +8,35 @@ The ElasticSearchFieldDescriptor changed see FieldDescriptor update in the UPGRA
 
 ## dev-master
 
+## 1.0.0
+
+### Localized webspace settings
+
+Reindex elasticsearch data:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
+Check also the new possible localized configuration.
+
+### Elasticsearch Mapping Changed
+
+Mapping has changed, reindex whole elasticsearch data:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
+## 1.0.0-RC7
+
+### Multi webspace behavior
+
+When you have a multi webspace setup you need to follow the new instructions:
+[multi webspaces](Resources/doc/multi-webspaces.md)
+
 ### ArticlePageDocument route definition need to be defined
 
 The ArticleBundle will not longer prepend the configuration for the article page routes

@@ -190,7 +190,7 @@ class PageTreeRepositoryTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'page_tree_route',
                 'routePath' => $routePathData,
-                'authored' => '2016-01-01',
+                'authored' => date('c', strtotime('2016-01-01')),
             ]
         );
 
@@ -213,6 +213,10 @@ class PageTreeRepositoryTest extends SuluTestCase
         $template = 'default_pages',
         $locale = 'de'
     ) {
+        if (!$article || !array_key_exists('id', $article)) {
+            throw new \Exception('Article array needs an ID!');
+        }
+
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',

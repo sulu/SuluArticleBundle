@@ -13,11 +13,13 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuthorBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
+use Sulu\Component\Content\Document\Behavior\ShadowLocaleBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\Behavior\WorkflowStageBehavior;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
@@ -52,7 +54,9 @@ class ArticleDocument implements
     VersionBehavior,
     LocalizedAuthorBehavior,
     ChildrenBehavior,
-    ArticleInterface
+    ArticleInterface,
+    ShadowLocaleBehavior,
+    WebspaceBehavior
 {
     /**
      * @var string
@@ -181,6 +185,34 @@ class ArticleDocument implements
      * @var ChildrenCollection
      */
     protected $children;
+
+    /**
+     * Shadow locale is enabled.
+     *
+     * @var bool
+     */
+    protected $shadowLocaleEnabled = false;
+
+    /**
+     * Shadow locale.
+     *
+     * @var string
+     */
+    protected $shadowLocale;
+
+    /**
+     * Main webspace.
+     *
+     * @var null|string
+     */
+    protected $mainWebspace;
+
+    /**
+     * Additional webspaces.
+     *
+     * @var null|string[]
+     */
+    protected $additionalWebspaces;
 
     public function __construct()
     {
@@ -574,5 +606,69 @@ class ArticleDocument implements
         $this->pages = $pages;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShadowLocale()
+    {
+        return $this->shadowLocale;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShadowLocale($shadowLocale)
+    {
+        $this->shadowLocale = $shadowLocale;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isShadowLocaleEnabled()
+    {
+        return $this->shadowLocaleEnabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShadowLocaleEnabled($shadowLocaleEnabled)
+    {
+        $this->shadowLocaleEnabled = $shadowLocaleEnabled;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMainWebspace()
+    {
+        return $this->mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMainWebspace($mainWebspace)
+    {
+        $this->mainWebspace = $mainWebspace;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdditionalWebspaces()
+    {
+        return $this->additionalWebspaces;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdditionalWebspaces($additionalWebspaces)
+    {
+        $this->additionalWebspaces = $additionalWebspaces;
     }
 }

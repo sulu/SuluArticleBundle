@@ -12,6 +12,9 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -19,6 +22,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticlePageDocumentType extends AbstractStructureBehaviorType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+
+        $builder->add('shadowLocaleEnabled', CheckboxType::class);
+        $builder->add('shadowLocale', TextType::class);
+    }
+
     /**
      * {@inheritdoc}
      */

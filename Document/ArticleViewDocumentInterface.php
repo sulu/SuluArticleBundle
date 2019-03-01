@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use ONGR\ElasticsearchBundle\Collection\Collection;
 
 /**
@@ -428,11 +429,11 @@ interface ArticleViewDocumentInterface
     /**
      * Set pages.
      *
-     * @param Collection $pages
+     * @param Collection|ArrayCollection $pages
      *
      * @return $this
      */
-    public function setPages(Collection $pages);
+    public function setPages($pages);
 
     /**
      * Returns contentData.
@@ -481,4 +482,40 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setView(\ArrayObject $view);
+
+    /**
+     * @return string
+     */
+    public function getMainWebspace();
+
+    /**
+     * @param null|string $mainWebspace
+     *
+     * @return $this
+     */
+    public function setMainWebspace($mainWebspace);
+
+    /**
+     * @return null|string[]
+     */
+    public function getAdditionalWebspaces();
+
+    /**
+     * @param null|string[] $additionalWebspace
+     *
+     * @return $this
+     */
+    public function setAdditionalWebspaces($additionalWebspace);
+
+    /**
+     * @return string
+     */
+    public function getTargetWebspace();
+
+    /**
+     * @param string $targetWebspace
+     *
+     * @return $this
+     */
+    public function setTargetWebspace($targetWebspace);
 }

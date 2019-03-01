@@ -183,6 +183,30 @@ class ArticleResourceItem implements ResourceItemInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTargetWebspace()
+    {
+        return $this->article->getTargetWebspace();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMainWebspace()
+    {
+        return $this->article->getMainWebspace();
+    }
+
+    /**
+     * @return null|string[]
+     */
+    public function getAdditionalWebspaces()
+    {
+        return $this->article->getAdditionalWebspaces();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getResource()

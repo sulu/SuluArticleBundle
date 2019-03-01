@@ -69,6 +69,51 @@ sulu_article:
     prefix: /admin/articles
 ```
 
+### Configure multi webspace setup
+
+Simple configuration:
+```yml
+sulu_article:
+    default_main_webspace: 'webspace1'
+    default_additional_webspaces:
+        - 'webspace2'
+        - 'webspace3'
+```
+
+Localized configuration:
+```yml
+sulu_article:
+    default_main_webspace: 
+        de: 'webspaceA'
+        en: 'webspaceX'
+    default_additional_webspaces:
+        de:
+            - 'webspaceN'
+            - 'webspaceM'
+        en:
+            - 'webspaceN'
+```
+
+Localized configuration with a defined default:
+```yml
+sulu_article:
+    default_main_webspace: 
+        default: 'webspaceA'
+        en: 'webspaceX'
+        fr: 'webspaceF'
+    default_additional_webspaces:
+        default:
+            - 'webspaceB'
+            - 'webspaceC'
+        de:
+            - 'webspaceN'
+            - 'webspaceM'
+        en:
+            - 'webspaceN'
+```
+
+More information about this topic can be found in the section [multi-webspaces](multi-webspaces.md).
+
 ## Create Template
 
 Add xml template for structure in configured folder:
@@ -116,12 +161,18 @@ php bin/console ongr:es:index:create
 php bin/console ongr:es:index:create --manager=live
 ```
 
+## Permissions:
+Make sure you've set the correct permissions in the Sulu backend for this bundle!
+`Settings > User Roles`
+
 ## Possible bundle configurations:
 
 ```yml
 # app/config/config.yml
 
 sulu_article:
+    default_main_webspace: null
+    default_additional_webspaces: []
     smart_content:
         default_limit:        100
     content_types:

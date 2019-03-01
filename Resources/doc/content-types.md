@@ -43,15 +43,31 @@ the articles.
 
 ### Parameters
 
-| Name           | Type    | Description                                                                   |
-|----------------|---------|-------------------------------------------------------------------------------|
-| types          | string  | Comma separated list of types which can be selected                           |
-| structureTypes | string  | Comma separated list of structure types (template keys) which can be selected |
+| Name             | Type    | Description                                                                         |
+|------------------|---------|-------------------------------------------------------------------------------------|
+| types            | string  | Comma separated list of types which can be selected                                 |
+| structureTypes   | string  | Comma separated list of structure types (template keys) which can be selected       |
+| ignoreWebspaces  | bool    | If set to `true` all articles will be loaded, otherwise the webspace needs to match |
 
 ### Returns
 
 The content-type returns a list of `ArticleResourceItem` (get the underlying
 [ArticleViewDocumentInterface](article-view-document.md) with `ArticleResourceItem::getContent()`) instances.
+
+### Example
+
+```xml
+<property name="articles" type="smart_content">
+    <meta>
+        <title lang="en">Articles</title>
+        <title lang="de">Artikel</title>
+    </meta>
+
+    <params>
+        <param name="provider" value="articles"/>
+    </params>
+</property>
+```
 
 ## Teaser-Selection
 

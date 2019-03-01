@@ -15,7 +15,6 @@ use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
-use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
@@ -23,18 +22,20 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
-use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
-use Sulu\Component\Content\Metadata\PropertyMetadata;
-use Sulu\Component\Content\Metadata\StructureMetadata;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\DocumentManager\Exception\DocumentManagerException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -45,6 +46,7 @@ class ArticleIndexer implements IndexerInterface
 {
     use StructureTagTrait;
     use ArticleViewDocumentIdTrait;
+    use PageTreeTrait;
 
     /**
      * @var StructureMetadataFactoryInterface
@@ -92,6 +94,21 @@ class ArticleIndexer implements IndexerInterface
     protected $translator;
 
     /**
+     * @var DocumentManagerInterface
+     */
+    protected $documentManager;
+
+    /**
+     * @var DocumentInspector
+     */
+    protected $inspector;
+
+    /**
+     * @var WebspaceResolver
+     */
+    protected $webspaceResolver;
+
+    /**
      * @var array
      */
     protected $typeConfiguration;
@@ -106,6 +123,9 @@ class ArticleIndexer implements IndexerInterface
      * @param SeoFactory $seoFactory
      * @param EventDispatcherInterface $eventDispatcher
      * @param TranslatorInterface $translator
+     * @param DocumentManagerInterface $documentManager
+     * @param DocumentInspector $inspector
+     * @param WebspaceResolver $webspaceResolver
      * @param array $typeConfiguration
      */
     public function __construct(
@@ -118,6 +138,9 @@ class ArticleIndexer implements IndexerInterface
         SeoFactory $seoFactory,
         EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator,
+        DocumentManagerInterface $documentManager,
+        DocumentInspector $inspector,
+        WebspaceResolver $webspaceResolver,
         array $typeConfiguration
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
@@ -129,7 +152,18 @@ class ArticleIndexer implements IndexerInterface
         $this->seoFactory = $seoFactory;
         $this->eventDispatcher = $eventDispatcher;
         $this->translator = $translator;
+        $this->documentManager = $documentManager;
+        $this->inspector = $inspector;
+        $this->webspaceResolver = $webspaceResolver;
         $this->typeConfiguration = $typeConfiguration;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getStructureMetadataFactory()
+    {
+        return $this->structureMetadataFactory;
     }
 
     /**
@@ -183,7 +217,7 @@ class ArticleIndexer implements IndexerInterface
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
-        $this->setParentPageUuid($structureMetadata, $document, $article);
+        $this->setParentPageUuid($document, $article);
         $article->setChanged($document->getChanged());
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
@@ -233,6 +267,9 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $article->setContentData(json_encode($document->getStructure()->toArray()));
+
+        $article->setMainWebspace($this->webspaceResolver->resolveMainWebspace($document));
+        $article->setAdditionalWebspaces($this->webspaceResolver->resolveAdditionalWebspaces($document));
 
         $this->mapPages($document, $article);
 
@@ -284,6 +321,10 @@ class ArticleIndexer implements IndexerInterface
         $pages = [];
         /** @var ArticlePageDocument $child */
         foreach ($document->getChildren() as $child) {
+            if (!$child instanceof ArticlePageDocument) {
+                continue;
+            }
+
             /** @var ArticlePageViewObject $page */
             $pages[] = $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
@@ -299,51 +340,20 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Set parent-page-uuid to view-document.
      *
-     * @param StructureMetadata $metadata
      * @param ArticleDocument $document
      * @param ArticleViewDocumentInterface $article
      */
     private function setParentPageUuid(
-        StructureMetadata $metadata,
         ArticleDocument $document,
         ArticleViewDocumentInterface $article
     ) {
-        $propertyMetadata = $this->getRoutePathProperty($metadata);
-        if (!$propertyMetadata) {
+        $parentPageUuid = $this->getParentPageUuidFromPageTree($document);
+
+        if (!$parentPageUuid) {
             return;
         }
 
-        $property = $document->getStructure()->getProperty($propertyMetadata->getName());
-        if (!$property || PageTreeRouteContentType::NAME !== $propertyMetadata->getType() || !$property->getValue()) {
-            return;
-        }
-
-        $value = $property->getValue();
-        if (!$value || !isset($value['page']) || !isset($value['page']['uuid'])) {
-            return;
-        }
-
-        $article->setParentPageUuid($value['page']['uuid']);
-    }
-
-    /**
-     * Returns property-metadata for route-path property.
-     *
-     * @param StructureMetadata $metadata
-     *
-     * @return PropertyMetadata
-     */
-    private function getRoutePathProperty(StructureMetadata $metadata)
-    {
-        if ($metadata->hasTag(RoutableSubscriber::TAG_NAME)) {
-            return $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME);
-        }
-
-        if (!$metadata->hasProperty(RoutableSubscriber::ROUTE_FIELD)) {
-            return;
-        }
-
-        return $metadata->getProperty(RoutableSubscriber::ROUTE_FIELD);
+        $article->setParentPageUuid($parentPageUuid);
     }
 
     /**
@@ -432,9 +442,57 @@ class ArticleIndexer implements IndexerInterface
      */
     public function index(ArticleDocument $document)
     {
+        if ($document->isShadowLocaleEnabled()) {
+            $this->indexShadow($document);
+
+            return;
+        }
+
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
+
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
+
+        $this->createOrUpdateShadows($document);
+    }
+
+    /**
+     * @param ArticleDocument $document
+     */
+    protected function indexShadow(ArticleDocument $document)
+    {
+        $shadowDocument = $this->documentManager->find(
+            $document->getUuid(),
+            $document->getOriginalLocale(),
+            [
+                'rehydrate' => true,
+            ]
+        );
+
+        $article = $this->createOrUpdateArticle($shadowDocument, $document->getOriginalLocale(), LocalizationState::SHADOW);
+
+        $this->dispatchIndexEvent($shadowDocument, $article);
+        $this->manager->persist($article);
+    }
+
+    /**
+     * @param ArticleDocument $document
+     */
+    protected function createOrUpdateShadows(ArticleDocument $document)
+    {
+        if ($document->isShadowLocaleEnabled()) {
+            return;
+        }
+
+        foreach ($this->inspector->getShadowLocales($document) as $shadowLocale) {
+            try {
+                /** @var ArticleDocument $shadowDocument */
+                $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);
+                $this->indexShadow($shadowDocument);
+            } catch (DocumentManagerException $documentManagerException) {
+                // do nothing
+            }
+        }
     }
 
     /**

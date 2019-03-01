@@ -16,6 +16,9 @@ use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
+use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArticleDataProviderTest extends SuluTestCase
 {
@@ -42,7 +45,7 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de']);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io']);
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
@@ -61,7 +64,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['types' => new PropertyParameter('types', 'video')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
@@ -81,7 +84,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['types' => new PropertyParameter('types', 'video,blog')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
@@ -108,7 +111,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['types' => new PropertyParameter('types', 'other')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(0, $result->getItems());
@@ -126,7 +129,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['structureTypes' => new PropertyParameter('structureTypes', 'simple')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
@@ -147,7 +150,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['structureTypes' => new PropertyParameter('structureTypes', 'default,simple')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertInstanceOf(DataProviderResult::class, $result);
@@ -174,7 +177,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['structureTypes' => new PropertyParameter('structureTypes', 'default_fallback')],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(0, $result->getItems());
@@ -191,10 +194,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], null, 1, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], null, 2, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -211,10 +214,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], 3, 1, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], 3, 2, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -230,10 +233,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], null, 1, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de'], null, 2, 2);
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -250,10 +253,10 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], 3, 1, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
-        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de'], 3, 2, 2);
+        $result = $dataProvider->resolveDataItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
     }
@@ -270,7 +273,7 @@ class ArticleDataProviderTest extends SuluTestCase
         /** @var DataProviderInterface $dataProvider */
         $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
 
-        $result = $dataProvider->resolveDataItems(['excluded' => [$items[0]['id']]], [], ['locale' => 'de']);
+        $result = $dataProvider->resolveDataItems(['excluded' => [$items[0]['id']]], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io']);
 
         $this->assertCount(3, $result->getItems());
         for ($i = 0; $i < 3; ++$i) {
@@ -295,7 +298,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['exclude_duplicates' => new PropertyParameter('exclude_duplicates', true)],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertCount(3, $result->getItems());
@@ -321,7 +324,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             ['exclude_duplicates' => new PropertyParameter('exclude_duplicates', false)],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertCount(4, $result->getItems());
@@ -347,7 +350,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveDataItems(
             [],
             [],
-            ['locale' => 'de']
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
         );
 
         $this->assertCount(4, $result->getItems());
@@ -356,15 +359,152 @@ class ArticleDataProviderTest extends SuluTestCase
         }
     }
 
-    private function createArticle($title = 'Test-Article', $template = 'default')
+    public function testResolveDataItemsWithCustomWebspaceSettings()
     {
+        $items = [
+            $this->createArticle('Test-Article 1', 'default', 'test'),
+            $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']),
+            $this->createArticle('Test-Article 2', 'default', 'sulu_io'),
+            $this->createArticle(),
+        ];
+
+        $referenceStore = $this->getContainer()->get('sulu_article.reference_store.article');
+        $referenceStore->add($items[0]['id']);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(
+            [],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $this->assertCount(3, $result->getItems());
+    }
+
+    public function testResolveResourceItemsWithIgnoreWebspaces()
+    {
+        $this->createArticle('Test-Article 1', 'default', 'test', []);
+        $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']);
+        $this->createArticle('Test-Article 2', 'default', 'sulu_io', []);
+        $this->createArticle();
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // push fake request with `sulu_io`
+        $this->pushFakeRequest('sulu_io');
+
+        $result = $dataProvider->resolveResourceItems(
+            [],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $items = $result->getItems();
+        $this->assertCount(4, $items);
+        $this->assertEquals('test', $items[0]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[1]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[2]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[3]->getTargetWebspace());
+
+        $this->popFakeRequest();
+
+        // push fake request with `test`
+        $this->pushFakeRequest('test');
+
+        $result = $dataProvider->resolveResourceItems(
+            [],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $items = $result->getItems();
+        $this->assertCount(4, $items);
+        $this->assertEquals('test', $items[0]->getTargetWebspace());
+        $this->assertEquals('test-2', $items[1]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[2]->getTargetWebspace());
+        $this->assertEquals('sulu_io', $items[3]->getTargetWebspace());
+
+        $this->popFakeRequest();
+    }
+
+    private function pushFakeRequest($webspaceKey)
+    {
+        $webspaceManager = $this->getContainer()->get('sulu_core.webspace.webspace_manager');
+        $webspace = $webspaceManager->findWebspaceByKey($webspaceKey);
+
+        $fakeRequest = Request::create('/', 'GET');
+        $fakeRequest->setLocale('de');
+        $fakeRequest->attributes->set('_sulu', new RequestAttributes(
+            [
+                'webspace' => $webspace,
+            ]
+        ));
+
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->push($fakeRequest);
+    }
+
+    private function popFakeRequest()
+    {
+        /** @var RequestStack $requestStack */
+        $requestStack = $this->getContainer()->get('request_stack');
+        $requestStack->pop();
+    }
+
+    public function testResolveDataItemsWithIgnoreWebspaces()
+    {
+        $items = [
+            $this->createArticle('Test-Article 1', 'default', 'test'),
+            $this->createArticle('Test-Article 2', 'default', 'test-2', ['sulu_io']),
+            $this->createArticle('Test-Article 2', 'default', 'sulu_io'),
+            $this->createArticle(),
+        ];
+
+        $referenceStore = $this->getContainer()->get('sulu_article.reference_store.article');
+        $referenceStore->add($items[0]['id']);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveDataItems(
+            [],
+            ['ignoreWebspaces' => new PropertyParameter('ignoreWebspaces', true)],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $this->assertCount(4, $result->getItems());
+    }
+
+    private function createArticle(
+        $title = 'Test-Article',
+        $template = 'default',
+        $mainWebspace = null,
+        $additionalWebspaces = null
+    ) {
+        $data = [
+            'title' => $title,
+            'template' => $template,
+        ];
+
+        if ($mainWebspace) {
+            $data['mainWebspace'] = $mainWebspace;
+        }
+
+        if ($additionalWebspaces) {
+            $data['additionalWebspaces'] = $additionalWebspaces;
+        }
+
         $client = $this->createAuthenticatedClient();
         $client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
-            ['title' => $title, 'template' => $template]
+            $data
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        $response = $client->getResponse();
+        $this->assertHttpStatusCode(200, $response);
+
+        return json_decode($response->getContent(), true);
     }
 }
