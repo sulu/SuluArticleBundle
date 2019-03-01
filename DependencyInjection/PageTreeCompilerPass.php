@@ -21,7 +21,7 @@ class PageTreeCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $structureFactory = $container->get('sulu_content.structure.factory');
+        $structureFactory = $container->get('sulu_page.structure.factory');
 
         $pageTreeEnabled = false;
         foreach ($structureFactory->getStructures('article') as $metadata) {

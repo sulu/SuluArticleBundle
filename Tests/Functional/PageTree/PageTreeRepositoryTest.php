@@ -47,7 +47,7 @@ class PageTreeRepositoryTest extends SuluTestCase
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $this->pageTreeRepository = new PageTreeRepository(
             $this->documentManager,
-            $this->getContainer()->get('sulu_content.structure.factory'),
+            $this->getContainer()->get('sulu_page.structure.factory'),
             $this->getContainer()->get('sulu_document_manager.property_encoder'),
             $this->getContainer()->get('sulu_document_manager.document_inspector')
         );
