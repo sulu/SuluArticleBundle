@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
-        "sulu/sulu": "^2.0",
+        "sulu/sulu": "dev-develop",
         "symfony/config": "^3.4",
         "symfony/dependency-injection": "^3.4",
         "symfony/force-lowest": "^3.4",
