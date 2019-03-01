@@ -16,9 +16,9 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkItem;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
+use Sulu\Bundle\PageBundle\Markup\Link\LinkConfiguration;
+use Sulu\Bundle\PageBundle\Markup\Link\LinkItem;
+use Sulu\Bundle\PageBundle\Markup\Link\LinkProviderInterface;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 

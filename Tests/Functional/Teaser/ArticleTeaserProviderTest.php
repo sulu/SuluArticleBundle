@@ -12,7 +12,7 @@
 namespace Functional\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\ContentBundle\Teaser\Provider\TeaserProviderInterface;
+use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 
 class ArticleTeaserProviderTest extends SuluTestCase

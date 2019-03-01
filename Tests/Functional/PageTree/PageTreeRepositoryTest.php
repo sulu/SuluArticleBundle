@@ -13,7 +13,7 @@ namespace Functional\PageTree;
 
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRepository;
-use Sulu\Bundle\ContentBundle\Document\PageDocument;
+use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 

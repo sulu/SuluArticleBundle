@@ -15,7 +15,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
-use Sulu\Bundle\ContentBundle\Document\PageDocument;
+use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 

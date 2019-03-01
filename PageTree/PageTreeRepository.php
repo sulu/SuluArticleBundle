@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\PageTree;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
-use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;

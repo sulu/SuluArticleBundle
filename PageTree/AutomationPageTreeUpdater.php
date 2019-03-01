@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\PageTree;
 use Doctrine\ORM\EntityManagerInterface;
 use Sulu\Bundle\AutomationBundle\Entity\Task;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
-use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**

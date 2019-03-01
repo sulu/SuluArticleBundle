@@ -11,7 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\PageTree;
 
-use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 
 /**
  * Interface for page-tree-mover.
