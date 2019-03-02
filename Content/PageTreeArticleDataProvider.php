@@ -26,14 +26,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     public function getConfiguration()
     {
         return $this->getConfigurationBuilder()
-            ->enableDatasource(
-                'content-datasource@sulucontent',
-                [
-                    'rootUrl' => '/admin/api/nodes?language={locale}&fields=title,order,published&webspace-nodes=all',
-                    'selectedUrl' => '/admin/api/nodes/{datasource}?tree=true&language={locale}&fields=title,order,published&webspace-nodes=all',
-                    'resultKey' => 'nodes',
-                ]
-            )
+            ->enableDatasource('articles', 'articles', 'table')
             ->getConfiguration();
     }
 
