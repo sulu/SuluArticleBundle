@@ -143,6 +143,39 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ]
             );
         }
+
+        if ($container->hasExtension('sulu_admin')) {
+            $container->prependExtensionConfig(
+                'sulu_admin',
+                [
+                    'lists' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/lists',
+                        ],
+                    ],
+                    'resources' => [
+                        'articles' => [
+                            'routes' => [
+                                'list' => 'get_articles',
+                                'detail' => 'get_article',
+                            ],
+                        ],
+                        'articles_seo' => [
+                            'routes' => [
+                                'list' => 'get_article-seos',
+                                'detail' => 'get_article-seo',
+                            ],
+                        ],
+                        'articles_excerpt' => [
+                            'routes' => [
+                                'list' => 'get_article-excerpts',
+                                'detail' => 'get_article-excerpt',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
     }
 
     /**

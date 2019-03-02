@@ -98,10 +98,14 @@ class ArticleAdmin extends Admin
             )
         );
 
-        $formToolbarActions = [
-            'sulu_admin.save',
+        $formToolbarActionsWithType = [
+            'sulu_admin.save_with_publishing',
             'sulu_admin.type',
             'sulu_admin.delete',
+        ];
+
+        $formToolbarActionsWithoutType = [
+            'sulu_admin.save_with_publishing',
         ];
 
         $listToolbarActions = [
@@ -122,16 +126,16 @@ class ArticleAdmin extends Admin
                 ->addToolbarActions($listToolbarActions)
                 ->getRoute(),
             $this->routeBuilderFactory->createResourceTabRouteBuilder(static::ADD_FORM_ROUTE, '/articles/:locale/add')
-                ->setResourceKey('snippets')
+                ->setResourceKey('articles')
                 ->addLocales($locales)
                 ->setBackRoute(static::LIST_ROUTE)
                 ->getRoute(),
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.add_form.details', '/details')
-                ->setResourceKey('snippets')
-                ->setFormKey('articles')
+                ->setResourceKey('articles')
+                ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
                 ->setEditRoute(static::EDIT_FORM_ROUTE)
-                ->addToolbarActions($formToolbarActions)
+                ->addToolbarActions($formToolbarActionsWithType)
                 ->setParent(static::ADD_FORM_ROUTE)
                 ->getRoute(),
             $this->routeBuilderFactory->createResourceTabRouteBuilder(static::EDIT_FORM_ROUTE, '/articles/:locale/:id')
@@ -141,10 +145,34 @@ class ArticleAdmin extends Admin
                 ->setTitleProperty('title')
                 ->getRoute(),
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.details', '/details')
-                ->setResourceKey('snippets')
-                ->setFormKey('snippet')
+                ->setResourceKey('articles')
+                ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
-                ->addToolbarActions($formToolbarActions)
+                ->addToolbarActions($formToolbarActionsWithType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
+                ->setResourceKey('articles_seo')
+                ->setFormKey('page_seo')
+                ->setTabTitle('sulu_page.seo')
+                ->addToolbarActions($formToolbarActionsWithoutType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
+                ->setResourceKey('articles_excerpt')
+                ->setFormKey('page_excerpt')
+                ->setBackRoute(static::LIST_ROUTE)
+                ->setTabTitle('sulu_page.excerpt')
+                ->addToolbarActions($formToolbarActionsWithoutType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
+                ->setResourceKey('articles')
+                ->setFormKey('article_settings')
+                ->setBackRoute(static::LIST_ROUTE)
+                ->setTabTitle('sulu_page.settings')
+                ->setTabPriority(512)
+                ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
         ];

@@ -82,6 +82,11 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
+    public function getExt()
+    {
+        return $this->document->getExtensionsData();
+    }
+
     /**
      * {@inheritdoc}
      */
