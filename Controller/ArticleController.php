@@ -116,18 +116,6 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Returns fields.
-     *
-     * @return Response
-     */
-    public function cgetFieldsAction()
-    {
-        $fieldDescriptors = $this->getFieldDescriptors();
-
-        return $this->handleView($this->view(array_values($fieldDescriptors)));
-    }
-
-    /**
      * Returns list of articles.
      *
      * @param Request $request
