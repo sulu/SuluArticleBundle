@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<form xmlns="http://schemas.sulu.io/template/template"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+>
+    <key>article_settings</key>
+
+    <properties>
+        <section name="changelog">
+            <meta>
+                <title>sulu_page.editing_information</title>
+            </meta>
+            <properties>
+                <property name="authored" type="datetime" colspan="6">
+                    <meta>
+                        <title>sulu_page.authored_date</title>
+                    </meta>
+                </property>
+                <property name="author" type="single_contact_selection" colspan="6">
+                    <meta>
+                        <title>sulu_page.author</title>
+                    </meta>
+                </property>
+                <property name="changelog" type="changelog_line">
+                    <meta>
+                        <title>sulu_page.changelog</title>
+                    </meta>
+                </property>
+            </properties>
+        </section>
+    </properties>
+</form>
