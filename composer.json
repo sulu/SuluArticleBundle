@@ -28,8 +28,7 @@
         "jackalope/jackalope-jackrabbit": "^1.2",
         "phpunit/phpunit": "^4.8 || ^5.0",
         "sulu/automation-bundle": "dev-develop",
-        "php-task/task-bundle": "^1.2",
-        "php-task/php-task": "^1.2",
+        "php-task/task-bundle": "2.0-dev",
         "doctrine/data-fixtures": "^1.0"
     },
     "conflict": {
