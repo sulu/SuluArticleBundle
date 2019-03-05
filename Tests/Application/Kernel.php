@@ -9,6 +9,8 @@
  * with this source code in the file LICENSE.
  */
 
+namespace Sulu\Bundle\ArticleBundle\Tests\Application;
+
 use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
@@ -18,7 +20,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 /**
  * AppKernel for functional tests.
  */
-class AppKernel extends SuluTestKernel
+class Kernel extends SuluTestKernel
 {
     /**
      * {@inheritdoc}

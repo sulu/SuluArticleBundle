@@ -49,12 +49,12 @@ install:
   - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
   - unzip elasticsearch.zip
   - ./elasticsearch-*/bin/elasticsearch -d
-  - ./Tests/app/console doctrine:database:create
-  - ./Tests/app/console doctrine:schema:update --force
-  - ./Tests/app/console sulu:document:initialize
   - wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
-  - ./Tests/app/console ongr:es:index:create -m default
-  - ./Tests/app/console ongr:es:index:create -m live
+  - ./Tests/Application/console doctrine:database:create
+  - ./Tests/Application/console doctrine:schema:update --force
+  - ./Tests/Application/console sulu:document:initialize
+  - ./Tests/Application/console ongr:es:index:create -m default
+  - ./Tests/Application/console ongr:es:index:create -m live
 
 script:
   - ./vendor/bin/phpunit $CODE_COVERAGE

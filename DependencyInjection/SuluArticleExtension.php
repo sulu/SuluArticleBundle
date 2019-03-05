@@ -206,6 +206,11 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                                 'type' => 'path_hierarchy',
                             ],
                         ],
+                        'analyzer' => [
+                            'pathAnalyzer' => [
+                                'tokenizer' => 'pathTokenizer',
+                            ],
+                        ],
                     ],
                     'managers' => [
                         'default' => [
