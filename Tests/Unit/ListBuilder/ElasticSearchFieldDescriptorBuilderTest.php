@@ -27,7 +27,6 @@ class ElasticSearchFieldDescriptorBuilderTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals('public.title', $fieldDescriptor->getTranslation());
         $this->assertFalse($fieldDescriptor->getSortable());
         $this->assertFalse($fieldDescriptor->getDisabled());
-        $this->assertFalse($fieldDescriptor->getEditable());
         $this->assertFalse($fieldDescriptor->getDefault());
         $this->assertEquals('string', $fieldDescriptor->getType());
     }
