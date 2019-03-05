@@ -20,20 +20,6 @@ doctrine:
                 alias: GedmoTree
                 is_bundle: false
 
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "default"
-                article_page: "default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/articles"
-                    type: "article"
-                article_page:
-                    path: "%kernel.root_dir%/Resources/articles"
-                    type: "article_page"
-
 # Sulu Routing
 sulu_route:
     mappings:
