@@ -94,8 +94,6 @@ final class ElasticSearchFieldDescriptorBuilder
             $this->visibility,
             $this->searchability,
             $this->type,
-            '',
-            '',
             $this->sortable
         );
     }
