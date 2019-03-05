@@ -42,6 +42,20 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'content' => [
                         'structure' => [
+                            'paths' => [
+                                'article' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article',
+                                ],
+                                'article_page' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article_page',
+                                ],
+                            ],
+                            'default_type' => [
+                                'article' => 'default',
+                                'article_page' => 'default',
+                            ],
                             'type_map' => [
                                 'article' => ArticleBridge::class,
                                 'article_page' => ArticlePageBridge::class,
@@ -178,6 +192,35 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                             ],
                         ],
                     ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('ongr_elasticsearch')) {
+            $container->prependExtensionConfig(
+                'ongr_elasticsearch',
+                [
+                    'analysis' => [
+                        'tokenizer' => [
+                            'pathTokenizer' => [
+                                'type' => 'path_hierarchy',
+                            ],
+                        ],
+                    ],
+                    'managers' => [
+                        'default' => [
+                            'index' => [
+                                'index_name' => 'su_articles',
+                            ],
+                            'mappings' => ['SuluArticleBundle'],
+                        ],
+                        'live' => [
+                            'index' => [
+                                'index_name' => 'su_articles_live',
+                            ],
+                            'mappings' => ['SuluArticleBundle'],
+                        ],
+                    ]
                 ]
             );
         }

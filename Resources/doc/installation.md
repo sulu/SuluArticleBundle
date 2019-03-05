@@ -2,9 +2,7 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0` or `^6.0`.
-
-For elasticsearch `^2.0` see the [1.0.x](https://github.com/sulu/SuluArticleBundle/tree/release/1.0) version of the bundle.
+The SuluArticleBundle requires a running elasticsearch `^5.0`.
 
 ## Install the bundle
 
@@ -17,10 +15,10 @@ composer require sulu/article-bundle
 The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
 
 ```php
-/* app/AbstractKernel.php */
+/* config/bundles.php */
 
-new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
-new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
+ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
 
 ### Configure SuluArticleBundle and sulu core
@@ -44,11 +42,7 @@ sulu_core:
     content:
         structure:
             default_type:
-                article: "article_default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/templates/articles"
-                    type: "article"
+                article: "default"
 ```
 
 ### Configure OngrElasticsearchBundle
@@ -142,34 +136,22 @@ More information about this topic can be found in the section [multi-webspaces](
 Add xml template for structure in configured folder:
 
 ```
-%kernel.root_dir%/Resources/templates/articles/article_default.xml
+%kernel.project_dir%/config/templates/articles/default.xml
 ```
 
 Example is located in Bundle
-[article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.xml).
+[default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.xml).
 
 Add template for article type in configured folder:
 
 ```
-%kernel.root_dir%/Resources/views/articles/article_default.html.twig
+%kernel.project_dir%/templates/articles/default.xml
 ```
 
 Example is located in Bundle
-[article_default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
+[default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.html.twig).
 
 ## Initialize bundle
-
-Create assets:
-
-```bash
-php bin/console assets:install
-```
-
-Create translations:
-
-```bash
-php bin/console sulu:translate:export
-```
 
 Create required phpcr nodes:
 
