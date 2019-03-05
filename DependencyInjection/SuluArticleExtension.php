@@ -220,7 +220,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                             ],
                             'mappings' => ['SuluArticleBundle'],
                         ],
-                    ]
+                    ],
                 ]
             );
         }
