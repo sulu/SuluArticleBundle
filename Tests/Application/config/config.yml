@@ -4,6 +4,7 @@ imports:
 # Doctrine Configuration
 doctrine:
     dbal:
+        url: ~
         driver:   "%database_driver%"
         host:     "%database_host%"
         port:     "%database_port%"

@@ -690,7 +690,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(['de', 'en'], $response['concreteLanguages']);
+        $this->assertEquals(['de', 'en'], $response['contentLocales']);
         $this->assertEquals($title, $response['title']);
     }
 
@@ -1221,7 +1221,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertEquals($article1['id'], $response['id']);
-        $this->assertEquals([$locale, $destLocale], $response['concreteLanguages']);
+        $this->assertEquals([$locale, $destLocale], $response['contentLocales']);
 
         // get all articles in dest locale (now only one should be a ghost)
         $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog&fields=title');
