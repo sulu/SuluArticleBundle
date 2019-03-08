@@ -148,6 +148,7 @@ class ArticleAdmin extends Admin
                 ->setResourceKey('articles')
                 ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
+                ->setTabPriority(1024)
                 ->addToolbarActions($formToolbarActionsWithType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),

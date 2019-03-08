@@ -12,16 +12,23 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use Sulu\Bundle\PageBundle\Content\Structure\ExcerptStructureExtension;
-use Sulu\Bundle\PageBundle\Controller\AbstractExtensionController;
+use Sulu\Component\Rest\RestController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RouteResource("article-excerpt")
  */
-class ExcerptController extends AbstractExtensionController
+class ExcerptController extends RestController
 {
-    protected function getExtensionName()
+    public function getAction(string $id)
     {
-        return ExcerptStructureExtension::EXCERPT_EXTENSION_NAME;
+        // TODO: Implement
+        return $this->handleView($this->view());
+    }
+
+    public function putAction(string $id)
+    {
+        // TODO: Implement
+        return $this->handleView($this->view());
     }
 }

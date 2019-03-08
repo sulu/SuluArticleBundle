@@ -12,16 +12,24 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use Sulu\Bundle\PageBundle\Content\Structure\SeoStructureExtension;
-use Sulu\Bundle\PageBundle\Controller\AbstractExtensionController;
+use FOS\RestBundle\View\View;
+use Sulu\Component\Rest\RestController;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @RouteResource("article-seo")
  */
-class SeoController extends AbstractExtensionController
+class SeoController extends RestController
 {
-    protected function getExtensionName()
+    public function getAction(string $id)
     {
-        return SeoStructureExtension::SEO_EXTENSION_NAME;
+        // TODO: Implement
+        return $this->handleView($this->view());
+    }
+
+    public function putAction(string $id)
+    {
+        // TODO: Implement
+        return $this->handleView($this->view());
     }
 }

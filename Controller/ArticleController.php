@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Context\Context;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use ONGR\ElasticsearchBundle\Mapping\Caser;
@@ -298,14 +298,14 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string $id
      * @param Request $request
+     * @param string $id
      *
      * @return Response
      *
-     * @Rest\Get(defaults={"id" = ""})
+     * @Get(defaults={"id" = ""})
      */
-    public function getAction($id = null, Request $request)
+    public function getAction(Request $request, $id = null)
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
