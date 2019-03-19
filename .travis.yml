@@ -16,10 +16,10 @@ cache:
 
 matrix:
   include:
-    - php: 5.5
+    - php: 5.6
       env:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction -vvv"
-        - ES_VERSION="5.3.0"
+        - ES_VERSION="5.6.14"
         - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - ENABLE_SWAP=true
     - php: 7.3
@@ -64,10 +64,13 @@ install:
     fi
   - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
   - unzip elasticsearch.zip
-  - ./elasticsearch-*/bin/elasticsearch -d
+  - cd ./elasticsearch-*
+  - bin/elasticsearch -d
+  - cd ..
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
   - ./Tests/app/console sulu:document:initialize
+  - wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
   - ./Tests/app/console ongr:es:index:create -m default
   - ./Tests/app/console ongr:es:index:create -m live
 
