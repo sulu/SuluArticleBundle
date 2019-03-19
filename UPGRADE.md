@@ -1,5 +1,12 @@
 # Upgrade
 
+## 1.1.0
+
+### Elasticsearch 2.0 and PHP 5.5 support dropped
+
+To support elasticsearch 6 we needed to drop support for Elasticsearch 2.0
+and PHP 5.5 they will be maintained in the `1.0.x` Version of the bundle.
+
 ## 1.0.0
 
 ### Localized webspace settings
