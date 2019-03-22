@@ -33,14 +33,14 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     protected $uuid;
 
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     protected $locale;
 
@@ -48,11 +48,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
+     *            "raw":{"type":"keyword"},
+     *            "value":{"type":"text"}
      *         }
      *     }
      * )
@@ -63,12 +63,12 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *         "analyzer": "pathAnalyzer",
      *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
+     *            "raw":{"type":"keyword"},
+     *            "value":{"type":"text"}
      *         }
      *     }
      * )
@@ -78,7 +78,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     protected $parentPageUuid;
 
@@ -86,10 +86,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
-     *     options={
-     *         "analyzer":"keyword"
-     *     }
+     *     type="keyword"
      * )
      */
     protected $type;
@@ -98,10 +95,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
-     *     options={
-     *         "analyzer":"keyword"
-     *     }
+     *     type="keyword"
      * )
      */
     protected $typeTranslation;
@@ -110,10 +104,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
-     *     options={
-     *         "analyzer":"keyword"
-     *     }
+     *     type="keyword"
      * )
      */
     protected $structureType;
@@ -122,11 +113,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
+     *            "raw":{"type":"keyword"},
+     *            "value":{"type":"text"}
      *         }
      *     }
      * )
@@ -137,11 +128,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
+     *            "raw":{"type":"keyword"},
+     *            "value":{"type":"text"}
      *         }
      *     }
      * )
@@ -187,11 +178,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *         "fields":{
-     *            "raw":{"type":"string", "index":"not_analyzed"},
-     *            "value":{"type":"string"}
+     *            "raw":{"type":"keyword"},
+     *            "value":{"type":"text"}
      *         }
      *     }
      * )
@@ -201,7 +192,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(type="text")
      */
     protected $teaserDescription = '';
 
@@ -236,21 +227,21 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(type="text")
      */
     protected $authorId;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(type="text")
      */
     protected $creatorContactId;
 
     /**
      * @var string
      *
-     * @Property(type="string")
+     * @Property(type="text")
      */
     protected $changerContactId;
 
@@ -281,14 +272,14 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     protected $mainWebspace;
 
     /**
      * @var string[]
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     protected $additionalWebspaces;
 
