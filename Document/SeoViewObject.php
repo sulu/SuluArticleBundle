@@ -25,11 +25,11 @@ class SeoViewObject
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
+     *            "raw"={"type"="keyword"},
+     *            "value"={"type"="text"}
      *        }
      *    }
      * )
@@ -40,11 +40,11 @@ class SeoViewObject
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
+     *            "raw"={"type"="keyword"},
+     *            "value"={"type"="text"}
      *        }
      *    }
      * )
@@ -55,11 +55,11 @@ class SeoViewObject
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
+     *            "raw"={"type"="keyword"},
+     *            "value"={"type"="text"}
      *        }
      *    }
      * )
@@ -70,11 +70,11 @@ class SeoViewObject
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"},
-     *            "value"={"type"="string"}
+     *            "raw"={"type"="keyword"},
+     *            "value"={"type"="text"}
      *        }
      *    }
      * )

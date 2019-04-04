@@ -32,28 +32,28 @@ class MediaViewObject
     /**
      * @var string
      *
-     * @Property(type="string", options={"index"="not_analyzed"})
+     * @Property(type="keyword")
      */
     public $title;
 
     /**
      * @var string
      *
-     * @Property(type="string", options={"index"="not_analyzed"})
+     * @Property(type="keyword")
      */
     public $copyright;
 
     /**
      * @var string
      *
-     * @Property(type="string", options={"index"="not_analyzed"})
+     * @Property(type="keyword")
      */
     protected $formats = '{}';
 
     /**
      * @var string
      *
-     * @Property(type="string", options={"index"="not_analyzed"})
+     * @Property(type="keyword")
      */
     public $url;
 

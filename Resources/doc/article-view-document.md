@@ -56,10 +56,10 @@ class ArticleViewDocument extends SuluArticleViewDocument
      * @var string
      *
      * @Property(
-     *     type="string",
+     *     type="text",
      *     options={
      *        "fields"={
-     *            "raw"={"type"="string", "index"="not_analyzed"}
+     *            "raw"={"type"="keyword"}
      *        }
      *    }
      * )

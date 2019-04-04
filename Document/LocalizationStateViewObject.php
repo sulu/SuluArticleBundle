@@ -24,14 +24,14 @@ class LocalizationStateViewObject
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     public $state;
 
     /**
      * @var string
      *
-     * @Property(type="string", options={"analyzer": "keyword"})
+     * @Property(type="keyword")
      */
     public $locale;
 
