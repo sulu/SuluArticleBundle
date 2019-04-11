@@ -14,8 +14,9 @@ define([
     'sulucontent/components/open-ghost-overlay/main',
     'services/suluarticle/article-manager',
     'services/suluarticle/article-router',
-    'services/suluarticle/list-helper'
-], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper) {
+    'services/suluarticle/list-helper',
+    'config'
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper, Config) {
 
     'use strict';
 
@@ -127,6 +128,11 @@ define([
 
                 // add tab item for each type
                 _.each(typeNames, function(type) {
+                    var permissions = Config.get('sulu_security.contexts')['sulu.modules.articles ' + type];
+                    if (permissions['view'] === false) {
+                        return;
+                    }
+
                     tabItems.push(
                         {
                             id: type,
