@@ -35,6 +35,8 @@ class ArticleAdmin extends Admin
 
     private $securityContext;
 
+    private $structureManager;
+
     /**
      * @param SecurityCheckerInterface $securityChecker
      * @param StructureManagerInterface $structureManager
@@ -47,29 +49,12 @@ class ArticleAdmin extends Admin
         StructureManagerInterface $structureManager,
         $title,
         array $securityContext
-    )
-    {
+    ) {
         $rootNavigationItem = new NavigationItem($title);
         $section = new NavigationItem('navigation.modules');
         $section->setPosition(20);
-        $types = [];
         $this->securityContext = $securityContext;
-
-        foreach ($structureManager->getStructures('article') as $key => $structure) {
-            $type = $this->getType($structure->getStructure());
-            if (!array_key_exists($type, $types)) {
-                $types[$type] = [
-                    'type' => $structure->getKey(),
-                ];
-            }
-            $this->securityContext[self::SECURITY_CONTEXT . ' ' . $type] = [
-                        PermissionTypes::VIEW,
-                        PermissionTypes::ADD,
-                        PermissionTypes::EDIT,
-                        PermissionTypes::DELETE,
-                        PermissionTypes::LIVE,
-                    ];
-        }
+        $this->structureManager = $structureManager;
 
         if ($securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
             $roles = new NavigationItem('sulu_article.title', $section);
@@ -83,7 +68,6 @@ class ArticleAdmin extends Admin
         }
 
         $this->setNavigation(new Navigation($rootNavigationItem));
-
     }
 
     /**
@@ -99,21 +83,36 @@ class ArticleAdmin extends Admin
      */
     public function getSecurityContexts()
     {
-        $contexts = [
-                'Sulu' => [
-                    'Global' => [
-                        self::SECURITY_CONTEXT => [
-                            PermissionTypes::VIEW,
-                            PermissionTypes::ADD,
-                            PermissionTypes::EDIT,
-                            PermissionTypes::DELETE,
-                            PermissionTypes::LIVE,
-                        ],
-                    ],
-                    'Article type access' => $this->securityContext,
-                ]
+        $types = [];
+        foreach ($this->structureManager->getStructures('article') as $key => $structure) {
+            $type = $this->getType($structure->getStructure());
+            if (!array_key_exists($type, $types)) {
+                $types[$type] = [
+                    'type' => $structure->getKey(),
+                ];
+            }
+            $this->securityContext[self::SECURITY_CONTEXT . '_' . $type] = [
+                PermissionTypes::VIEW,
+                PermissionTypes::ADD,
+                PermissionTypes::EDIT,
+                PermissionTypes::DELETE,
+                PermissionTypes::LIVE,
             ];
+        }
 
-        return $contexts;
+        return [
+            'Sulu' => [
+                'Global' => [
+                    self::SECURITY_CONTEXT => [
+                        PermissionTypes::VIEW,
+                        PermissionTypes::ADD,
+                        PermissionTypes::EDIT,
+                        PermissionTypes::DELETE,
+                        PermissionTypes::LIVE,
+                    ],
+                ],
+                'Article types' => $this->securityContext,
+            ]
+        ];
     }
 }
