@@ -41,19 +41,16 @@ class ArticleAdmin extends Admin
      * @param SecurityCheckerInterface $securityChecker
      * @param StructureManagerInterface $structureManager
      * @param string $title
-     * @param array $securityContext
      */
     public function __construct
     (
         SecurityCheckerInterface $securityChecker,
         StructureManagerInterface $structureManager,
-        $title,
-        array $securityContext
+        $title
     ) {
         $rootNavigationItem = new NavigationItem($title);
         $section = new NavigationItem('navigation.modules');
         $section->setPosition(20);
-        $this->securityContext = $securityContext;
         $this->structureManager = $structureManager;
 
         if ($securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
@@ -84,6 +81,7 @@ class ArticleAdmin extends Admin
     public function getSecurityContexts()
     {
         $types = [];
+        $securityContext = [];
         foreach ($this->structureManager->getStructures('article') as $key => $structure) {
             $type = $this->getType($structure->getStructure());
             if (!array_key_exists($type, $types)) {
@@ -91,7 +89,7 @@ class ArticleAdmin extends Admin
                     'type' => $structure->getKey(),
                 ];
             }
-            $this->securityContext[self::SECURITY_CONTEXT . '_' . $type] = [
+            $securityContext[self::SECURITY_CONTEXT . '_' . $type] = [
                 PermissionTypes::VIEW,
                 PermissionTypes::ADD,
                 PermissionTypes::EDIT,
@@ -111,7 +109,7 @@ class ArticleAdmin extends Admin
                         PermissionTypes::LIVE,
                     ],
                 ],
-                'Article types' => $this->securityContext,
+                'Article types' => $securityContext,
             ]
         ];
     }

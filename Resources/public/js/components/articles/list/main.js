@@ -16,7 +16,7 @@ define([
     'services/suluarticle/article-router',
     'services/suluarticle/list-helper',
     'config'
-], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper, Config) {
+], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper) {
 
     'use strict';
 
@@ -99,7 +99,6 @@ define([
                 tabItems,
                 tabPreselect = null,
                 preselectedType = this.options.type || this.storage.getWithDefault('type', null);
-
             if (1 === typeNames.length) {
                 button.callback = function() {
                     this.toAdd(typeNames[0]);
@@ -128,11 +127,6 @@ define([
 
                 // add tab item for each type
                 _.each(typeNames, function(type) {
-                    var permissions = Config.get('sulu_security.contexts')['sulu.modules.articles ' + type];
-                    if (permissions['view'] === false) {
-                        return;
-                    }
-
                     tabItems.push(
                         {
                             id: type,

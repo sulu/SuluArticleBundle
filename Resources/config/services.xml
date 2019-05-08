@@ -8,7 +8,6 @@
             <argument type="service" id="sulu_security.security_checker"/>
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%sulu_admin.name%</argument>
-            <argument type="collection"></argument>
 
             <tag name="sulu.admin"/>
             <tag name="sulu.context" context="admin"/>
