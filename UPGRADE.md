@@ -1,5 +1,11 @@
 # Upgrade
 
+## 1.0.1
+
+New security-contexts have been created per article type.
+This means permission for articles need to be re-set.
+
+
 ## 1.0.0
 
 ### Localized webspace settings
