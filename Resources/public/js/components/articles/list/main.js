@@ -14,7 +14,8 @@ define([
     'sulucontent/components/open-ghost-overlay/main',
     'services/suluarticle/article-manager',
     'services/suluarticle/article-router',
-    'services/suluarticle/list-helper'
+    'services/suluarticle/list-helper',
+    'config'
 ], function(_, storage, CopyLocale, OpenGhost, ArticleManager, ArticleRouter, listHelper) {
 
     'use strict';
@@ -98,7 +99,6 @@ define([
                 tabItems,
                 tabPreselect = null,
                 preselectedType = this.options.type || this.storage.getWithDefault('type', null);
-
             if (1 === typeNames.length) {
                 button.callback = function() {
                     this.toAdd(typeNames[0]);
