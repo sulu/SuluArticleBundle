@@ -116,11 +116,14 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $mustQuery[] = [
             'more_like_this' => [
-                'like' => null,
+                'like' => [
+                    [
+                        '_id' => $uuid . '-' . $locale,
+                    ],
+                ],
                 'fields' => ['title', 'teaser_description'],
                 'min_term_freq' => 1,
                 'min_doc_freq' => 2,
-                'ids' => [$uuid . '-' . $locale],
             ],
         ];
 

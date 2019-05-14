@@ -2,15 +2,12 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^2.2` or `^5.0`.
+The SuluArticleBundle requires a running elasticsearch `^5.0` or `^6.0`.
 
-There is an different installation and configuration depending on which version of ElasticSearch you are using.
-
-If you use version `^2.2` read: [Installation for ElasticSearch 2.2](installation-es2.md)
-else read: [Installation for ElasticSearch 5.0](installation-es5.md) 
+For elasticsearch `^2.0` see the [1.0.x](https://github.com/sulu/SuluArticleBundle/tree/release/1.0) version of the bundle.
 
 ## Install the bundle
- 
+
 ```bash
 composer require sulu/article-bundle
 ```
@@ -52,6 +49,32 @@ sulu_core:
                 article:
                     path: "%kernel.root_dir%/Resources/templates/articles"
                     type: "article"
+```
+
+### Configure OngrElasticsearchBundle
+
+```yml
+# app/config/config.yml
+
+ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
+    managers:
+        default:
+            index:
+                index_name: su_articles
+            mappings:
+                - SuluArticleBundle
+        live:
+            index:
+                index_name: su_articles_live
+            mappings:
+                - SuluArticleBundle
 ```
 
 ### Configure the routing

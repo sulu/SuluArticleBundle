@@ -51,6 +51,7 @@ class ContentProxyListener
         }
 
         $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
+        $structure->setUuid($document->getUuid());
         $structure->setLanguageCode($document->getLocale());
 
         list($content, $view) = $this->getProxies($document->getContentData(), $structure);
@@ -59,6 +60,7 @@ class ContentProxyListener
         $document->setView($view);
 
         foreach ($document->getPages() as $page) {
+            $structure->setUuid($page->uuid);
             list($page->content, $page->view) = $this->getProxies($page->contentData, $structure);
         }
     }
