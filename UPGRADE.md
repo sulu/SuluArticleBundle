@@ -1,5 +1,10 @@
 # Upgrade
 
+## 1.1.1
+
+New security-contexts have been created per article type.
+This means permission for articles need to be re-set.
+
 ## 1.1.0
 
 ### Elasticsearch 2.0 and PHP 5.5 support dropped
