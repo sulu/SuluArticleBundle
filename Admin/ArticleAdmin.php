@@ -152,14 +152,14 @@ class ArticleAdmin extends Admin
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
-                ->setResourceKey('articles_seo')
+                ->setResourceKey('articles')
                 ->setFormKey('page_seo')
                 ->setTabTitle('sulu_page.seo')
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
-                ->setResourceKey('articles_excerpt')
+                ->setResourceKey('articles')
                 ->setFormKey('page_excerpt')
                 ->setBackRoute(static::LIST_ROUTE)
                 ->setTabTitle('sulu_page.excerpt')
