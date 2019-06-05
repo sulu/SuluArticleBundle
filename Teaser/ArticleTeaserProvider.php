@@ -60,7 +60,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     public function getConfiguration()
     {
         return new TeaserConfiguration(
-            $this->translator->trans('sulu_article.title', [], 'admin'),
+            $this->translator->trans('sulu_article.article', [], 'admin'),
             'articles',
             'table',
             ['title'],

@@ -72,7 +72,7 @@ class ArticleAdmin extends Admin
         $rootNavigationItem = $this->getNavigationItemRoot();
 
         if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
-            $articleItem = new NavigationItem('sulu_article.title');
+            $articleItem = new NavigationItem('sulu_article.articles');
             $articleItem->setPosition(20);
             $articleItem->setIcon('su-newspaper');
             $articleItem->setMainRoute(static::LIST_ROUTE);
@@ -116,7 +116,7 @@ class ArticleAdmin extends Admin
             $this->routeBuilderFactory->createListRouteBuilder(static::LIST_ROUTE, '/articles/:locale')
                 ->setResourceKey('articles')
                 ->setListKey('articles')
-                ->setTitle('sulu_article.title')
+                ->setTitle('sulu_article.articles')
                 ->addListAdapters(['table'])
                 ->addLocales($locales)
                 ->setDefaultLocale($locales[0])

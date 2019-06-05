@@ -95,7 +95,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         // TODO implement tabs again?
 
         return LinkConfigurationBuilder::create()
-            ->setTitle($this->translator->trans('sulu_article.title', [], 'admin'))
+            ->setTitle($this->translator->trans('sulu_article.articles', [], 'admin'))
             ->setResourceKey('articles')
             ->setListAdapter('table')
             ->setDisplayProperties(['title'])
