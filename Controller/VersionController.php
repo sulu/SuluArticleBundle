@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -136,11 +137,11 @@ class VersionController extends FOSRestController implements
 
                 $data = $this->getDocumentManager()->find($uuid, $locale);
                 $view = $this->view($data, null !== $data ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
-                $view->setSerializationContext(
-                    SerializationContext::create()
-                        ->setSerializeNull(true)
-                        ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-                );
+
+                $context = new Context();
+                $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+                $context->setSerializeNull(true);
+                $view->setContext($context);
 
                 break;
             default:
