@@ -31,10 +31,6 @@
         "php-task/task-bundle": "2.0.x-dev",
         "doctrine/data-fixtures": "^1.0"
     },
-    "conflict": {
-        "php": "^7.2",
-        "ongr/elasticsearch-bundle": "^5.0.6"
-    },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
     },

@@ -11,10 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface;
-use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\AdminBundle\Navigation\Navigation;
 use Sulu\Bundle\AdminBundle\Navigation\NavigationItem;
 use Sulu\Component\Localization\Localization;
@@ -28,8 +26,6 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleAdmin extends Admin
 {
-    use StructureTagTrait;
-
     const STRUCTURE_TAG_TYPE = 'sulu_article.type';
 
     const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
@@ -194,7 +190,6 @@ class ArticleAdmin extends Admin
                         PermissionTypes::LIVE,
                     ],
                 ],
-                'Article types' => $securityContext,
             ]
         ];
     }
