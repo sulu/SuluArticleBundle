@@ -25,5 +25,3 @@ if ($debug) {
 $kernel = new Kernel($env, $debug);
 $application = new Application($kernel);
 $application->run($input);
-
-
