@@ -305,7 +305,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @Get(defaults={"id" = ""})
      */
-    public function getAction(Request $request, $id = null)
+    public function getAction(Request $request, $id)
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(

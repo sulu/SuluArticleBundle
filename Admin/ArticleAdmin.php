@@ -72,13 +72,12 @@ class ArticleAdmin extends Admin
         $rootNavigationItem = $this->getNavigationItemRoot();
 
         if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
-            $snippet = new NavigationItem('sulu_article.title');
-            $snippet->setPosition(20);
-            $snippet->setIcon('su-newspaper');
-            $snippet->setAction('article/articles');
-            $snippet->setMainRoute(static::LIST_ROUTE);
+            $articleItem = new NavigationItem('sulu_article.title');
+            $articleItem->setPosition(20);
+            $articleItem->setIcon('su-newspaper');
+            $articleItem->setMainRoute(static::LIST_ROUTE);
 
-            $rootNavigationItem->addChild($snippet);
+            $rootNavigationItem->addChild($articleItem);
         }
 
         return new Navigation($rootNavigationItem);
