@@ -74,7 +74,7 @@ class ArticleAdmin extends Admin
         if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
             $snippet = new NavigationItem('sulu_article.title');
             $snippet->setPosition(20);
-            $snippet->setIcon('fa-newspaper-o');
+            $snippet->setIcon('su-newspaper');
             $snippet->setAction('article/articles');
             $snippet->setMainRoute(static::LIST_ROUTE);
 
@@ -117,7 +117,7 @@ class ArticleAdmin extends Admin
             $this->routeBuilderFactory->createListRouteBuilder(static::LIST_ROUTE, '/articles/:locale')
                 ->setResourceKey('articles')
                 ->setListKey('articles')
-                ->setTitle('sulu_admin.title')
+                ->setTitle('sulu_article.title')
                 ->addListAdapters(['table'])
                 ->addLocales($locales)
                 ->setDefaultLocale($locales[0])

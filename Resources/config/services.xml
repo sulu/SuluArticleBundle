@@ -15,7 +15,9 @@
 
         <!-- view -->
         <service id="sulu_article.view_document.factory"
-                 class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory">
+            class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
+            public="true"
+        >
             <argument type="string">%sulu_article.documents%</argument>
         </service>
         <service id="sulu_article.elastic_search.article_indexer"
@@ -276,7 +278,7 @@
             <argument type="service" id="translator"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
 
-            <tag name="sulu.teaser.provider" alias="article"/>
+            <tag name="sulu.teaser.provider" alias="articles"/>
         </service>
 
         <!-- sitemap -->
@@ -305,6 +307,7 @@
             <argument type="service" id="es.manager.default"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
             <argument type="service" id="request_stack"/>
+            <argument type="service" id="translator"/>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_article.view_document.article.class%</argument>
             <argument>%kernel.environment%</argument>

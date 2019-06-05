@@ -59,98 +59,12 @@ class ArticleTeaserProvider implements TeaserProviderInterface
      */
     public function getConfiguration()
     {
-        $okDefaultText = $this->translator->trans('sulu-content.teaser.apply', [], 'backend');
-
         return new TeaserConfiguration(
-            'sulu_article.teaser',
-            'teaser-selection/list@suluarticle',
-            [
-                'url' => '/admin/api/articles?locale={locale}',
-                'resultKey' => 'articles',
-                'searchFields' => ['title', 'route_path', 'changer_full_name', 'creator_full_name', 'author_full_name'],
-            ],
-            [
-                [
-                    'title' => $this->translator->trans('sulu_article.authored', [], 'backend'),
-                    'cssClass' => 'authored-slide',
-                    'contentSpacing' => true,
-                    'okDefaultText' => $okDefaultText,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
-                        [
-                            'type' => 'cancel',
-                            'align' => 'left',
-                        ],
-                    ],
-                ],
-                [
-                    'title' => $this->translator->trans('sulu_article.contact-selection-overlay.title', [], 'backend'),
-                    'cssClass' => 'contact-slide',
-                    'contentSpacing' => true,
-                    'okDefaultText' => $okDefaultText,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
-                        [
-                            'type' => 'cancel',
-                            'align' => 'left',
-                        ],
-                    ],
-                ],
-                [
-                    'title' => $this->translator->trans('sulu_article.category-selection-overlay.title', [], 'backend'),
-                    'cssClass' => 'category-slide',
-                    'contentSpacing' => true,
-                    'okDefaultText' => $okDefaultText,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
-                        [
-                            'type' => 'cancel',
-                            'align' => 'left',
-                        ],
-                    ],
-                ],
-                [
-                    'title' => $this->translator->trans('sulu_article.tag-selection-overlay.title', [], 'backend'),
-                    'cssClass' => 'tag-slide',
-                    'contentSpacing' => true,
-                    'okDefaultText' => $okDefaultText,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
-                        [
-                            'type' => 'cancel',
-                            'align' => 'left',
-                        ],
-                    ],
-                ],
-                [
-                    'title' => $this->translator->trans('public.choose', [], 'backend'),
-                    'cssClass' => 'page-slide data-source-slide',
-                    'contentSpacing' => false,
-                    'okDefaultText' => $okDefaultText,
-                    'buttons' => [
-                        [
-                            'type' => 'ok',
-                            'align' => 'right',
-                        ],
-                        [
-                            'type' => 'cancel',
-                            'align' => 'left',
-                        ],
-                    ],
-                ],
-            ]
+            $this->translator->trans('sulu_article.title', [], 'admin'),
+            'articles',
+            'table',
+            ['title'],
+            $this->translator->trans('sulu_article.single_selection_overlay_title', [], 'admin')
         );
     }
 
@@ -174,7 +88,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             $excerpt = $item->getExcerpt();
             $result[] = new Teaser(
                 $item->getUuid(),
-                'article',
+                'articles',
                 $item->getLocale(),
                 ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
                 ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
