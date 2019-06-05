@@ -1,3 +1,6 @@
+sudo: false
+dist: trusty
+
 language: php
 
 services:
@@ -7,7 +10,7 @@ env:
   global:
     - JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre"
     - JACKRABBIT_VERSION=2.12.0
-    - SYMFONY__PHPCR__TRANSPORT=doctrinedbal
+    - PHPCR_TRANSPORT=doctrinedbal
     - SYMFONY__DATABASE__VERSION=5.5.39
     - ES_VERSION="6.5.4"
     - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
@@ -27,7 +30,7 @@ matrix:
     - php: 7.3
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
-        - SYMFONY__PHPCR__TRANSPORT=jackrabbit
+        - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
 
 before_install:
@@ -36,18 +39,18 @@ before_install:
   - composer self-update
 
 install:
-  - if [[ $PHPSTAN == 'true' ]]; then travis_retry composer require --dev phpstan/phpstan --no-update $COMPOSER_FLAGS ; fi
-  - travis_retry composer update $COMPOSER_FLAGS
+  - if [[ $PHPSTAN == 'true' ]]; then composer require --dev phpstan/phpstan --no-update $COMPOSER_FLAGS ; fi
+  - composer update $COMPOSER_FLAGS
   - composer info -i
   - java -version
   - |
-    if [[ $SYMFONY__PHPCR__TRANSPORT = jackrabbit ]]; then
+    if [[ $PHPCR_TRANSPORT = jackrabbit ]]; then
         if [ ! -f downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar ]; then
             cd downloads
             wget http://archive.apache.org/dist/jackrabbit/$JACKRABBIT_VERSION/jackrabbit-standalone-$JACKRABBIT_VERSION.jar
             cd -
         fi
-        java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar > /dev/null &
+        java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar &
     fi
   - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
   - unzip elasticsearch.zip
