@@ -66,6 +66,19 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             );
         }
 
+        if ($container->hasExtension('sulu_route')) {
+            $container->prependExtensionConfig(
+                'sulu_route',
+                [
+                    'mappings' => [
+                        'Sulu\Bundle\ArticleBundle\Document\ArticleDocument' => [
+                            'resource_key' => 'articles',
+                        ],
+                    ],
+                ]
+            );
+        }
+
         if ($container->hasExtension('jms_serializer')) {
             $container->prependExtensionConfig(
                 'jms_serializer',
