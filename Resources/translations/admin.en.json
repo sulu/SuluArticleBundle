@@ -2,5 +2,7 @@
     "sulu_article.articles": "Articles",
     "sulu_article.article": "Article",
     "sulu_article.no_article_selected": "No article selected",
-    "sulu_article.single_selection_overlay_title": "Choose article"
+    "sulu_article.single_selection_overlay_title": "Choose article",
+    "sulu_article.selection_overlay_title": "Choose articles",
+    "sulu_article.selection_label": "{count} articles selected"
 }

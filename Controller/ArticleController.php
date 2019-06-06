@@ -217,7 +217,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
             $fields = array_merge(
                 $restHelper->getFields() ?: [],
-                ['id', 'localizationState', 'publishedState', 'published']
+                ['id', 'localizationState', 'publishedState', 'published', 'title', 'routePath']
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,

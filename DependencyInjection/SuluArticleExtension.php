@@ -74,6 +74,9 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         'Sulu\Bundle\ArticleBundle\Document\ArticleDocument' => [
                             'resource_key' => 'articles',
                         ],
+                        'Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument' => [
+                            'resource_key' => 'articles',
+                        ],
                     ],
                 ]
             );
@@ -192,16 +195,38 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                                 'detail' => 'get_article',
                             ],
                         ],
-                        'articles_seo' => [
-                            'routes' => [
-                                'list' => 'get_article-seos',
-                                'detail' => 'get_article-seo',
+                    ],
+                    'field_type_options' => [
+                        'selection' => [
+                            'article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title', 'routePath'],
+                                        'icon' => 'su-newspaper',
+                                        'label' => 'sulu_article.selection_label',
+                                        'overlay_title' => 'sulu_article.selection_overlay_title',
+                                    ],
+                                ],
                             ],
                         ],
-                        'articles_excerpt' => [
-                            'routes' => [
-                                'list' => 'get_article-excerpts',
-                                'detail' => 'get_article-excerpt',
+                        'single_selection' => [
+                            'single_article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title'],
+                                        'empty_text' => 'sulu_article.no_article_selected',
+                                        'icon' => 'su-newspaper',
+                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
+                                    ],
+                                ],
                             ],
                         ],
                     ],

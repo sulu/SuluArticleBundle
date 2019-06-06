@@ -704,7 +704,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title');
+        $client->request('GET', '/api/articles?locale=de&type=blog');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
