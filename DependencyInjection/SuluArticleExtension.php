@@ -75,7 +75,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                             'resource_key' => 'articles',
                         ],
                         'Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument' => [
-                            'resource_key' => 'articles',
+                            'resource_key' => 'article_pages',
                         ],
                     ],
                 ]
