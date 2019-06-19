@@ -3,6 +3,25 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="sulu_article.reindex_command" class="Sulu\Bundle\ArticleBundle\Command\ReindexCommand">
+            <argument type="service" id="sulu_core.webspace.webspace_manager" />
+            <argument type="service" id="sulu_document_manager.property_encoder" />
+            <argument type="service" id="sulu_document_manager.document_manager" />
+            <argument type="service" id="sulu_article.elastic_search.article_indexer" />
+            <argument type="service" id="sulu_article.elastic_search.article_live_indexer" />
+            <argument>%sulu.context%</argument>
+            <tag name="console.command" />
+        </service>
+        <service
+            id="sulu_article.move_page_tree_command"
+            class="Sulu\Bundle\ArticleBundle\Command\MovePageTreeCommand"
+        >
+            <argument type="service" id="sulu_article.page_tree_route.mover" />
+            <argument type="service" id="sulu.content.resource_locator.strategy_pool" />
+            <argument type="service" id="sulu_document_manager.document_manager" />
+            <argument>%sulu_article.page_tree_enabled%</argument>
+            <tag name="console.command" />
+        </service>
         <!-- sulu-admin -->
         <service id="sulu_article.admin" class="Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin">
             <argument type="service" id="Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface"/>

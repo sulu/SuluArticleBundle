@@ -13,8 +13,11 @@ namespace Sulu\Bundle\ArticleBundle\Command;
 
 use PHPCR\Query\QueryResultInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\HttpKernel\SuluKernel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,14 +28,60 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * Reindixes articles.
  */
-class ReindexCommand extends ContainerAwareCommand
+class ReindexCommand extends Command
 {
+    /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var IndexerInterfacer
+     */
+    private $draftIndexer;
+
+    /**
+     * @var IndexerInterfacer
+     */
+    private $liveIndexer;
+
+    /**
+     * @var string
+     */
+    private $suluContext;
+
+    public function __construct(
+        WebspaceManagerInterface $webspaceManager,
+        PropertyEncoder $propertyEncoder,
+        DocumentManagerInterface $documentManager,
+        IndexerInterface $draftIndexer,
+        IndexerInterface $liveIndexer,
+        string $suluContext
+    ) {
+        parent::__construct('sulu:article:reindex');
+        $this->webspaceManager = $webspaceManager;
+        $this->propertyEncoder = $propertyEncoder;
+        $this->documentManager = $documentManager;
+        $this->draftIndexer = $draftIndexer;
+        $this->liveIndexer = $liveIndexer;
+        $this->suluContext = $suluContext;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName('sulu:article:reindex');
         $this->setDescription('Rebuild elastic-search index for articles');
         $this->setHelp('This command will load all articles and index them to elastic-search indexes.');
         $this->addOption('drop', null, InputOption::VALUE_NONE, 'Drop and recreate index before reindex');
@@ -44,18 +93,15 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $context = $this->getContainer()->getParameter('sulu.context');
         $startTime = microtime(true);
 
-        $id = 'sulu_article.elastic_search.article_indexer';
-        if (SuluKernel::CONTEXT_WEBSITE === $context) {
-            $id = 'sulu_article.elastic_search.article_live_indexer';
-        }
+        $indexer = SuluKernel::CONTEXT_WEBSITE === $this->suluContext
+            ? $this->liveIndexer
+            : $this->draftIndexer;
 
-        /** @var IndexerInterface $indexer */
-        $indexer = $this->getContainer()->get($id);
-
-        $output->writeln(sprintf('Reindex articles for the <comment>`%s`</comment> context' . PHP_EOL, $context));
+        $output->writeln(
+            sprintf('Reindex articles for the <comment>`%s`</comment> context' . PHP_EOL, $this->suluContext)
+        );
 
         if (!$this->dropIndex($indexer, $input, $output)) {
             // Drop was canceled by user.
@@ -66,8 +112,7 @@ class ReindexCommand extends ContainerAwareCommand
         $indexer->createIndex();
         $this->clearIndex($indexer, $input, $output);
 
-        $webspaceManager = $this->getContainer()->get('sulu_core.webspace.webspace_manager');
-        $locales = $webspaceManager->getAllLocalizations();
+        $locales = $this->webspaceManager->getAllLocalizations();
 
         foreach ($locales as $locale) {
             $output->writeln(sprintf('<info>Locale "</info>%s<info>"</info>' . PHP_EOL, $locale->getLocale()));
@@ -120,9 +165,11 @@ class ReindexCommand extends ContainerAwareCommand
 
         $indexer->dropIndex();
 
-        $context = $this->getContainer()->getParameter('sulu.context');
         $output->writeln(
-            sprintf('Dropped and recreated index for the <comment>`%s`</comment> context' . PHP_EOL, $context)
+            sprintf(
+                'Dropped and recreated index for the <comment>`%s`</comment> context' . PHP_EOL,
+                $this->suluContext
+            )
         );
 
         return true;
@@ -141,8 +188,7 @@ class ReindexCommand extends ContainerAwareCommand
             return;
         }
 
-        $context = $this->getContainer()->getParameter('sulu.context');
-        $output->writeln(sprintf('Cleared index for the <comment>`%s`</comment> context', $context));
+        $output->writeln(sprintf('Cleared index for the <comment>`%s`</comment> context', $this->suluContext));
         $indexer->clear();
     }
 
@@ -185,15 +231,12 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function getDocuments($locale)
     {
-        $propertyEncoder = $this->getContainer()->get('sulu_document_manager.property_encoder');
-        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-
         $sql2 = sprintf(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article" AND [%s] IS NOT NULL',
-            $propertyEncoder->localizedSystemName('template', $locale)
+            $this->propertyEncoder->localizedSystemName('template', $locale)
         );
 
-        return $documentManager->createQuery($sql2, $locale, ['load_ghost_content' => false])->execute();
+        return $this->documentManager->createQuery($sql2, $locale, ['load_ghost_content' => false])->execute();
     }
 
     /**
