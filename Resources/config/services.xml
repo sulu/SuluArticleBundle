@@ -316,8 +316,7 @@
             <argument type="service" id="jms_serializer"/>
             <argument type="string">%sulu_article.article_document.class%</argument>
 
-            <tag name="sulu_preview.object_provider" class="%sulu_article.article_document.class%"/>
-            <tag name="sulu_preview.object_provider" class="%sulu_article.article_page_document.class%"/>
+            <tag name="sulu_preview.object_provider" provider-key="articles"/>
         </service>
 
         <!-- link -->
