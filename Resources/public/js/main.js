@@ -73,10 +73,10 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
 
             function types (types) {
                 var typeList = {};
-                _.each(types, function(type) {
-                    var permissions = Config.get('sulu_security.contexts')['sulu.modules.articles_' + type.default];
-                    if (permissions['view'] !== false) {
-                        typeList[type.default] = type;
+                _.each(types, function(config, type) {
+                    var permissions = Config.get('sulu_security.contexts')['sulu.modules.articles_' + type];
+                    if (permissions && permissions['view'] !== false) {
+                        typeList[config.default] = config;
                     }
                 });
                 return typeList;
