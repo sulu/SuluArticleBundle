@@ -20,7 +20,7 @@
 
     <ul>
         {% for page in pages %}
-            <li><a href="{{ sulu_page_path(page.routePath) }}">{{ page.title|default('Page '~page.pageNumber) }}</a></li>
+            <li><a href="{{ sulu_content_path(page.routePath) }}">{{ page.title|default('Page '~page.pageNumber) }}</a></li>
         {% endfor %}
     </ul>
 {% endblock %}

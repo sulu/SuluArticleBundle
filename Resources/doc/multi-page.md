@@ -52,7 +52,7 @@ In the twig template you can use the array-variable `pages` to render a paginati
 <ul class="pagination">
     {% for page in pages %}
         <li>
-            <a href="sulu_page_path(page.routePath)">{{ page.pageNumber }}</a>
+            <a href="sulu_content_path(page.routePath)">{{ page.pageNumber }}</a>
         </li>
     {% endfor %}
 </ul>
