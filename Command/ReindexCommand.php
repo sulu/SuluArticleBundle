@@ -46,12 +46,12 @@ class ReindexCommand extends Command
     private $documentManager;
 
     /**
-     * @var IndexerInterfacer
+     * @var IndexerInterface
      */
     private $draftIndexer;
 
     /**
-     * @var IndexerInterfacer
+     * @var IndexerInterface
      */
     private $liveIndexer;
 

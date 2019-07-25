@@ -43,32 +43,10 @@ sulu_core:
         structure:
             default_type:
                 article: "default"
-```
 
-### Configure OngrElasticsearchBundle
-
-```yml
-# app/config/config.yml
-
-ongr_elasticsearch:
-    analysis:
-        tokenizer:
-            pathTokenizer:
-                type: path_hierarchy
-        analyzer:
-            pathAnalyzer:
-                tokenizer: pathTokenizer
-    managers:
-        default:
-            index:
-                index_name: su_articles
-            mappings:
-                - SuluArticleBundle
-        live:
-            index:
-                index_name: su_articles_live
-            mappings:
-                - SuluArticleBundle
+sulu_article:
+    index_name: su_articles
+    hosts: ['127.0.0.1:9200']
 ```
 
 ### Configure the routing

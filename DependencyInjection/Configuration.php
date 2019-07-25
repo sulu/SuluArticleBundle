@@ -29,6 +29,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('sulu_article')
             ->children()
+                ->scalarNode('index_name')->isRequired()->end()
+                ->arrayNode('hosts')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->arrayNode('default_main_webspace')
                     ->useAttributeAsKey('locale')
                     ->beforeNormalization()

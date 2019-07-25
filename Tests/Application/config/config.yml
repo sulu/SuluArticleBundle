@@ -34,17 +34,6 @@ sulu_route:
                 parent: "{object.getParent().getRoutePath()}"
 
 sulu_article:
+    index_name: "su_articles_tests"
+    hosts: ["%elasticsearch_host%"]
     default_main_webspace: 'sulu_io'
-
-ongr_elasticsearch:
-    managers:
-        default:
-            index:
-                index_name: su_articles_test
-                hosts:
-                    - "%elasticsearch_host%"
-        live:
-            index:
-                index_name: su_articles_test_live
-                hosts:
-                    - "%elasticsearch_host%"

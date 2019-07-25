@@ -11,10 +11,12 @@ sulu_document_manager:
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticleDocument:
+            resource_key: 'article'
             generator: "schema"
             options:
                 route_schema: "/articles/{object.getTitle()}"
         Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticlePageDocument:
+            resource_key: 'article'
             generator: "article_page"
             options:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"

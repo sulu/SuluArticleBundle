@@ -235,36 +235,49 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
 
         if ($container->hasExtension('ongr_elasticsearch')) {
+            $configs = $container->getExtensionConfig($this->getAlias());
+            $config = $this->processConfiguration(new Configuration(), $configs);
+
+            $indexName = $config['index_name'];
+            $hosts = $config['hosts'];
+
+            $ongrElasticSearchConfig = [
+                'analysis' => [
+                    'tokenizer' => [
+                        'pathTokenizer' => [
+                            'type' => 'path_hierarchy',
+                        ],
+                    ],
+                    'analyzer' => [
+                        'pathAnalyzer' => [
+                            'tokenizer' => 'pathTokenizer',
+                        ],
+                    ],
+                ],
+                'managers' => [
+                    'default' => [
+                        'index' => [
+                            'index_name' => $indexName,
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                    'live' => [
+                        'index' => [
+                            'index_name' => $indexName . 'live',
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                ],
+            ];
+
+            if (count($hosts) > 0) {
+                $ongrElasticSearchConfig['managers']['default']['index']['hosts'] = $hosts;
+                $ongrElasticSearchConfig['managers']['live']['index']['hosts'] = $hosts;
+            }
+
             $container->prependExtensionConfig(
                 'ongr_elasticsearch',
-                [
-                    'analysis' => [
-                        'tokenizer' => [
-                            'pathTokenizer' => [
-                                'type' => 'path_hierarchy',
-                            ],
-                        ],
-                        'analyzer' => [
-                            'pathAnalyzer' => [
-                                'tokenizer' => 'pathTokenizer',
-                            ],
-                        ],
-                    ],
-                    'managers' => [
-                        'default' => [
-                            'index' => [
-                                'index_name' => 'su_articles',
-                            ],
-                            'mappings' => ['SuluArticleBundle'],
-                        ],
-                        'live' => [
-                            'index' => [
-                                'index_name' => 'su_articles_live',
-                            ],
-                            'mappings' => ['SuluArticleBundle'],
-                        ],
-                    ],
-                ]
+                $ongrElasticSearchConfig
             );
         }
     }
