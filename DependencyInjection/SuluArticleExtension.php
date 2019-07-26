@@ -263,7 +263,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     ],
                     'live' => [
                         'index' => [
-                            'index_name' => $indexName . 'live',
+                            'index_name' => $indexName . '_live',
                         ],
                         'mappings' => ['SuluArticleBundle'],
                     ],
