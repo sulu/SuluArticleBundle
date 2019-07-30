@@ -21,13 +21,13 @@ use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
-use Sulu\Bundle\ContentBundle\Document\PageDocument;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Entity\Tag;
@@ -690,7 +690,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(['de', 'en'], $response['concreteLanguages']);
+        $this->assertEquals(['de', 'en'], $response['contentLocales']);
         $this->assertEquals($title, $response['title']);
     }
 
@@ -704,7 +704,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->flush();
 
         $client = $this->createAuthenticatedClient();
-        $client->request('GET', '/api/articles?locale=de&type=blog&fields=title');
+        $client->request('GET', '/api/articles?locale=de&type=blog');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -810,6 +810,28 @@ class ArticleControllerTest extends SuluTestCase
 
         $client = $this->createAuthenticatedClient();
         $client->request('GET', '/api/articles?locale=de&searchFields=title&search=awesome&type=blog&fields=title');
+
+        $this->assertHttpStatusCode(200, $client->getResponse());
+
+        $response = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article2['title'], $response['_embedded']['articles'][0]['title']);
+    }
+
+    public function testCGetSearchWithoutSearchFields()
+    {
+        $this->purgeIndex();
+
+        $this->testPost('Sulu');
+        $this->flush();
+        $article2 = $this->testPost('Sulu is awesome');
+        $this->flush();
+
+        $client = $this->createAuthenticatedClient();
+        $client->request('GET', '/api/articles?locale=de&search=awesome&type=blog&fields=title');
 
         $this->assertHttpStatusCode(200, $client->getResponse());
 
@@ -1221,7 +1243,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $this->assertEquals($article1['id'], $response['id']);
-        $this->assertEquals([$locale, $destLocale], $response['concreteLanguages']);
+        $this->assertEquals([$locale, $destLocale], $response['contentLocales']);
 
         // get all articles in dest locale (now only one should be a ghost)
         $client->request('GET', '/api/articles?locale=' . $destLocale . '&type=blog&fields=title');

@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Context\Context;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use ONGR\ElasticsearchBundle\Mapping\Caser;
@@ -115,18 +116,6 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Returns fields.
-     *
-     * @return Response
-     */
-    public function cgetFieldsAction()
-    {
-        $fieldDescriptors = $this->getFieldDescriptors();
-
-        return $this->handleView($this->view(array_values($fieldDescriptors)));
-    }
-
-    /**
      * Returns list of articles.
      *
      * @param Request $request
@@ -156,9 +145,13 @@ class ArticleController extends RestController implements ClassResourceInterface
             $limit = count($ids);
         }
 
-        if (!empty($searchPattern = $restHelper->getSearchPattern())
-            && 0 < count($searchFields = $restHelper->getSearchFields())
-        ) {
+        $searchFields = $restHelper->getSearchFields();
+
+        if (0 === count($searchFields)) {
+            $searchFields = ['title'];
+        }
+
+        if (!empty($searchPattern = $restHelper->getSearchPattern())) {
             $boolQuery = new BoolQuery();
             foreach ($searchFields as $searchField) {
                 $boolQuery->add(new MatchPhrasePrefixQuery($searchField, $searchPattern), BoolQuery::SHOULD);
@@ -228,7 +221,7 @@ class ArticleController extends RestController implements ClassResourceInterface
 
             $fields = array_merge(
                 $restHelper->getFields() ?: [],
-                ['id', 'localizationState', 'publishedState', 'published']
+                ['id', 'localizationState', 'publishedState', 'published', 'title', 'routePath']
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,
@@ -309,16 +302,18 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string $uuid
      * @param Request $request
+     * @param string $id
      *
      * @return Response
+     *
+     * @Get(defaults={"id" = ""})
      */
-    public function getAction($uuid, Request $request)
+    public function getAction(Request $request, $id)
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
-            $uuid,
+            $id,
             $locale
         );
 
@@ -362,18 +357,18 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Update articles.
      *
      * @param Request $request
-     * @param string  $uuid
+     * @param string  $id
      *
      * @return Response
      */
-    public function putAction(Request $request, $uuid)
+    public function putAction(Request $request, $id)
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
         $data = $request->request->all();
 
         $document = $this->getDocumentManager()->find(
-            $uuid,
+            $id,
             $locale,
             [
                 'load_ghost_content' => false,
@@ -437,14 +432,14 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Trigger a action for given article specified over get-action parameter.
      *
-     * @Post("/articles/{uuid}")
+     * @Post("/articles/{id}")
      *
      * @param string  $uuid
      * @param Request $request
      *
      * @return Response
      */
-    public function postTriggerAction($uuid, Request $request)
+    public function postTriggerAction($id, Request $request)
     {
         // extract parameter
         $action = $this->getRequestParameter($request, 'action', true);
@@ -458,15 +453,15 @@ class ArticleController extends RestController implements ClassResourceInterface
         try {
             switch ($action) {
                 case 'unpublish':
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                    $document = $this->getDocumentManager()->find($id, $locale);
                     $this->getDocumentManager()->unpublish($document, $locale);
                     $this->getDocumentManager()->flush();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->getDocumentManager()->find($id, $locale);
 
                     break;
                 case 'remove-draft':
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->getDocumentManager()->find($id, $locale);
                     $this->getDocumentManager()->removeDraft($data, $locale);
                     $this->getDocumentManager()->flush();
 
@@ -483,14 +478,14 @@ class ArticleController extends RestController implements ClassResourceInterface
                         );
                     }
 
-                    $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
+                    $this->getMapper()->copyLanguage($id, $userId, null, $locale, $destLocales);
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->getDocumentManager()->find($id, $locale);
 
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
+                    $document = $this->getDocumentManager()->find($id, $locale);
                     $copiedPath = $this->getDocumentManager()->copy($document, dirname($document->getPath()));
                     $this->getDocumentManager()->flush();
 
@@ -502,7 +497,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                     $this->getDocumentManager()->flush();
                     $this->getDocumentManager()->clear();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->getDocumentManager()->find($id, $locale);
 
                     break;
                 default:

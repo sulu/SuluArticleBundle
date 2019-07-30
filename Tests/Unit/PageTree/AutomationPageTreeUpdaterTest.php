@@ -18,7 +18,7 @@ use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Model\TaskInterface;
-use Sulu\Bundle\ContentBundle\Document\BasePageDocument;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

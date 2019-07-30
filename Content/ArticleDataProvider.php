@@ -118,7 +118,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             ->enableLimit()
             ->enablePagination()
             ->enablePresentAs()
-            ->setDeepLink('articles/{locale}/edit:{id}/details')
             ->enableSorting(
                 [
                     ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],

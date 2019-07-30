@@ -11,7 +11,10 @@
 
 namespace Sulu\Bundle\ArticleBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Sulu\Bundle\ArticleBundle\PageTree\PageTreeMoverInterface;
+use Sulu\Component\Content\Types\ResourceLocator\Strategy\ResourceLocatorStrategyPoolInterface;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,15 +22,47 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Move articles from given parent-page to another.
  */
-class MovePageTreeCommand extends ContainerAwareCommand
+class MovePageTreeCommand extends Command
 {
+    /**
+     * @var PageTreeMoverInterface
+     */
+    private $pageTreeMover;
+
+    /**
+     * @var ResourceLocatorStrategyPoolInterface
+     */
+    private $resourceLocatorStrategyPool;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var bool
+     */
+    private $pageTreeEnabled;
+
+    public function __construct(
+        PageTreeMoverInterface $pageTreeMover,
+        ResourceLocatorStrategyPoolInterface $resourceLocatorStrategyPool,
+        DocumentManagerInterface $documentManager,
+        bool $pageTreeEnabled
+    ) {
+        parent::__construct('sulu:article:page-tree:move');
+        $this->pageTreeMover = $pageTreeMover;
+        $this->resourceLocatorStrategyPool = $resourceLocatorStrategyPool;
+        $this->documentManager = $documentManager;
+        $this->pageTreeEnabled = $pageTreeEnabled;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName('sulu:article:page-tree:move')
-            ->addArgument('source-segment', InputArgument::REQUIRED)
+        $this->addArgument('source-segment', InputArgument::REQUIRED)
             ->addArgument('destination-segment', InputArgument::REQUIRED)
             ->addArgument('webspace-key', InputArgument::REQUIRED)
             ->addArgument('locale', InputArgument::REQUIRED);
@@ -43,17 +78,14 @@ class MovePageTreeCommand extends ContainerAwareCommand
         $webspaceKey = $input->getArgument('webspace-key');
         $locale = $input->getArgument('locale');
 
-        $mover = $this->getContainer()->get('sulu_article.page_tree_route.mover');
-        $strategyPool = $this->getContainer()->get('sulu.content.resource_locator.strategy_pool');
-        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $strategy = $strategyPool->getStrategyByWebspaceKey($webspaceKey);
+        $strategy = $this->resourceLocatorStrategyPool->getStrategyByWebspaceKey($webspaceKey);
 
         $destinationUuid = $strategy->loadByResourceLocator($destination, $webspaceKey, $locale);
-        $document = $documentManager->find($destinationUuid, $locale);
+        $document = $this->documentManager->find($destinationUuid, $locale);
 
-        $mover->move($source, $document);
+        $this->pageTreeMover->move($source, $document);
 
-        $documentManager->flush();
+        $this->documentManager->flush();
     }
 
     /**
@@ -61,6 +93,6 @@ class MovePageTreeCommand extends ContainerAwareCommand
      */
     public function isEnabled()
     {
-        return $this->getContainer()->getParameter('sulu_article.page_tree_enabled');
+        return $this->pageTreeEnabled;
     }
 }
