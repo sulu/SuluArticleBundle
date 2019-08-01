@@ -53,7 +53,7 @@
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
-            "dev-sulu-2.0": "2.0-dev"
+            "dev-develop": "2.0-dev"
         }
     }
 }
