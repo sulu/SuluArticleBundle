@@ -24,7 +24,7 @@ ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ### Configure SuluArticleBundle and sulu core
 
 ```yml
-# app/config/config.yml
+# config/packages/sulu_article.yaml
 
 sulu_route:
     mappings:
@@ -52,7 +52,7 @@ sulu_article:
 ### Configure the routing
 
 ```yml
-# app/config/admin/routing.yml
+# config/routes/sulu_article_admin.yaml
 
 sulu_article_api:
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
@@ -67,7 +67,10 @@ sulu_article:
 ### Configure multi webspace setup
 
 Simple configuration:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 'webspace1'
     default_additional_webspaces:
@@ -76,7 +79,10 @@ sulu_article:
 ```
 
 Localized configuration:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 
         de: 'webspaceA'
@@ -90,7 +96,10 @@ sulu_article:
 ```
 
 Localized configuration with a defined default:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 
         default: 'webspaceA'
@@ -118,7 +127,7 @@ Add xml template for structure in configured folder:
 ```
 
 Example is located in Bundle
-[default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.xml).
+[default.xml](default.xml).
 
 Add template for article type in configured folder:
 
@@ -127,7 +136,7 @@ Add template for article type in configured folder:
 ```
 
 Example is located in Bundle
-[default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.html.twig).
+[default.html.twig](default.html.twig).
 
 ## Initialize bundle
 
@@ -145,15 +154,19 @@ php bin/console ongr:es:index:create --manager=live
 ```
 
 ## Permissions:
+
 Make sure you've set the correct permissions in the Sulu backend for this bundle!
+
 `Settings > User Roles`
 
 ## Possible bundle configurations:
 
 ```yml
-# app/config/config.yml
+# config/packages/sulu_article.yaml
 
 sulu_article:
+    index_name: su_articles
+    hosts: ['127.0.0.1:9200']
     default_main_webspace: null
     default_additional_webspaces: []
     smart_content:
@@ -170,7 +183,6 @@ sulu_article:
         article_page:
             view:                 Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject
     types:
-
         # Prototype
         name:
             translation_key:      ~
