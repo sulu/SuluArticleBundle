@@ -11,11 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
-use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Navigation\Navigation;
 use Sulu\Bundle\AdminBundle\Navigation\NavigationItem;
+use Sulu\Component\Localization\Localization;
+use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -25,54 +26,152 @@ use Sulu\Component\Content\Compat\StructureManagerInterface;
  */
 class ArticleAdmin extends Admin
 {
-    use StructureTagTrait;
-
     const STRUCTURE_TAG_TYPE = 'sulu_article.type';
 
     const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
 
     const SECURITY_CONTEXT = 'sulu.modules.articles';
 
-    private $securityContext;
+    const LIST_ROUTE = 'sulu_article.list';
 
-    private $structureManager;
+    const ADD_FORM_ROUTE = 'sulu_article.add_form';
+
+    const EDIT_FORM_ROUTE = 'sulu_article.edit_form';
 
     /**
-     * @param SecurityCheckerInterface $securityChecker
-     * @param StructureManagerInterface $structureManager
-     * @param string $title
+     * @var RouteBuilderFactoryInterface
      */
-    public function __construct
-    (
+    private $routeBuilderFactory;
+
+    /**
+     * @var SecurityCheckerInterface
+     */
+    private $securityChecker;
+
+    /**
+     * @var LocalizationManagerInterface
+     */
+    private $localizationManager;
+
+    public function __construct(
+        RouteBuilderFactoryInterface $routeBuilderFactory,
         SecurityCheckerInterface $securityChecker,
-        StructureManagerInterface $structureManager,
-        $title
+        LocalizationManagerInterface $localizationManager
     ) {
-        $rootNavigationItem = new NavigationItem($title);
-        $section = new NavigationItem('navigation.modules');
-        $section->setPosition(20);
-        $this->structureManager = $structureManager;
+        $this->routeBuilderFactory = $routeBuilderFactory;
+        $this->securityChecker = $securityChecker;
+        $this->localizationManager = $localizationManager;
+    }
 
-        if ($securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
-            $roles = new NavigationItem('sulu_article.title', $section);
-            $roles->setPosition(9);
-            $roles->setAction('articles');
-            $roles->setIcon('newspaper-o');
+    public function getNavigation(): Navigation
+    {
+        $rootNavigationItem = $this->getNavigationItemRoot();
+
+        if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
+            $articleItem = new NavigationItem('sulu_article.articles');
+            $articleItem->setPosition(20);
+            $articleItem->setIcon('su-newspaper');
+            $articleItem->setMainRoute(static::LIST_ROUTE);
+
+            $rootNavigationItem->addChild($articleItem);
         }
 
-        if ($section->hasChildren()) {
-            $rootNavigationItem->addChild($section);
-        }
-
-        $this->setNavigation(new Navigation($rootNavigationItem));
+        return new Navigation($rootNavigationItem);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getJsBundleName()
+    public function getRoutes(): array
     {
-        return 'suluarticle';
+        $locales = array_values(
+            array_map(
+                function(Localization $localization) {
+                    return $localization->getLocale();
+                },
+                $this->localizationManager->getLocalizations()
+            )
+        );
+
+        $formToolbarActionsWithType = [
+            'sulu_admin.save_with_publishing',
+            'sulu_admin.type',
+            'sulu_admin.delete',
+        ];
+
+        $formToolbarActionsWithoutType = [
+            'sulu_admin.save_with_publishing',
+        ];
+
+        $listToolbarActions = [
+            'sulu_admin.add',
+            'sulu_admin.delete',
+        ];
+
+        return [
+            $this->routeBuilderFactory->createListRouteBuilder(static::LIST_ROUTE, '/articles/:locale')
+                ->setResourceKey('articles')
+                ->setListKey('articles')
+                ->setTitle('sulu_article.articles')
+                ->addListAdapters(['table'])
+                ->addLocales($locales)
+                ->setDefaultLocale($locales[0])
+                ->setAddRoute(static::ADD_FORM_ROUTE)
+                ->setEditRoute(static::EDIT_FORM_ROUTE)
+                ->addToolbarActions($listToolbarActions)
+                ->getRoute(),
+            $this->routeBuilderFactory->createResourceTabRouteBuilder(static::ADD_FORM_ROUTE, '/articles/:locale/add')
+                ->setResourceKey('articles')
+                ->addLocales($locales)
+                ->setBackRoute(static::LIST_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.add_form.details', '/details')
+                ->setResourceKey('articles')
+                ->setFormKey('article')
+                ->setTabTitle('sulu_admin.details')
+                ->setEditRoute(static::EDIT_FORM_ROUTE)
+                ->addToolbarActions($formToolbarActionsWithType)
+                ->setParent(static::ADD_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createResourceTabRouteBuilder(static::EDIT_FORM_ROUTE, '/articles/:locale/:id')
+                ->setResourceKey('articles')
+                ->addLocales($locales)
+                ->setBackRoute(static::LIST_ROUTE)
+                ->setTitleProperty('title')
+                ->getRoute(),
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.details', '/details')
+                ->setResourceKey('articles')
+                ->setFormKey('article')
+                ->setTabTitle('sulu_admin.details')
+                ->setTabPriority(1024)
+                ->addToolbarActions($formToolbarActionsWithType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
+                ->setResourceKey('articles')
+                ->setFormKey('page_seo')
+                ->setTabTitle('sulu_page.seo')
+                ->addToolbarActions($formToolbarActionsWithoutType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
+                ->setResourceKey('articles')
+                ->setFormKey('page_excerpt')
+                ->setBackRoute(static::LIST_ROUTE)
+                ->setTabTitle('sulu_page.excerpt')
+                ->addToolbarActions($formToolbarActionsWithoutType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
+                ->setResourceKey('articles')
+                ->setFormKey('article_settings')
+                ->setBackRoute(static::LIST_ROUTE)
+                ->setTabTitle('sulu_page.settings')
+                ->setTabPriority(512)
+                ->addToolbarActions($formToolbarActionsWithoutType)
+                ->setParent(static::EDIT_FORM_ROUTE)
+                ->getRoute(),
+        ];
     }
 
     /**
@@ -80,24 +179,6 @@ class ArticleAdmin extends Admin
      */
     public function getSecurityContexts()
     {
-        $types = [];
-        $securityContext = [];
-        foreach ($this->structureManager->getStructures('article') as $key => $structure) {
-            $type = $this->getType($structure->getStructure());
-            if (!array_key_exists($type, $types)) {
-                $types[$type] = [
-                    'type' => $structure->getKey(),
-                ];
-            }
-            $securityContext[self::SECURITY_CONTEXT . '_' . $type] = [
-                PermissionTypes::VIEW,
-                PermissionTypes::ADD,
-                PermissionTypes::EDIT,
-                PermissionTypes::DELETE,
-                PermissionTypes::LIVE,
-            ];
-        }
-
         return [
             'Sulu' => [
                 'Global' => [
@@ -109,7 +190,6 @@ class ArticleAdmin extends Admin
                         PermissionTypes::LIVE,
                     ],
                 ],
-                'Article types' => $securityContext,
             ]
         ];
     }

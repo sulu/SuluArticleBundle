@@ -484,7 +484,7 @@ class ArticleIndexer implements IndexerInterface
             return;
         }
 
-        foreach ($this->inspector->getShadowLocales($document) as $shadowLocale) {
+        foreach (array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
             try {
                 /** @var ArticleDocument $shadowDocument */
                 $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);

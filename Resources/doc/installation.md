@@ -2,9 +2,7 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0` or `^6.0`.
-
-For elasticsearch `^2.0` see the [1.0.x](https://github.com/sulu/SuluArticleBundle/tree/release/1.0) version of the bundle.
+The SuluArticleBundle requires a running elasticsearch `^5.0`.
 
 ## Install the bundle
 
@@ -17,16 +15,16 @@ composer require sulu/article-bundle
 The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
 
 ```php
-/* app/AbstractKernel.php */
+/* config/bundles.php */
 
-new Sulu\Bundle\ArticleBundle\SuluArticleBundle(),
-new ONGR\ElasticsearchBundle\ONGRElasticsearchBundle(),
+Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
+ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
 
 ### Configure SuluArticleBundle and sulu core
 
 ```yml
-# app/config/config.yml
+# config/packages/sulu_article.yaml
 
 sulu_route:
     mappings:
@@ -44,43 +42,17 @@ sulu_core:
     content:
         structure:
             default_type:
-                article: "article_default"
-            paths:
-                article:
-                    path: "%kernel.root_dir%/Resources/templates/articles"
-                    type: "article"
-```
+                article: "default"
 
-### Configure OngrElasticsearchBundle
-
-```yml
-# app/config/config.yml
-
-ongr_elasticsearch:
-    analysis:
-        tokenizer:
-            pathTokenizer:
-                type: path_hierarchy
-        analyzer:
-            pathAnalyzer:
-                tokenizer: pathTokenizer
-    managers:
-        default:
-            index:
-                index_name: su_articles
-            mappings:
-                - SuluArticleBundle
-        live:
-            index:
-                index_name: su_articles_live
-            mappings:
-                - SuluArticleBundle
+sulu_article:
+    index_name: su_articles
+    hosts: ['127.0.0.1:9200']
 ```
 
 ### Configure the routing
 
 ```yml
-# app/config/admin/routing.yml
+# config/routes/sulu_article_admin.yaml
 
 sulu_article_api:
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
@@ -95,7 +67,10 @@ sulu_article:
 ### Configure multi webspace setup
 
 Simple configuration:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 'webspace1'
     default_additional_webspaces:
@@ -104,7 +79,10 @@ sulu_article:
 ```
 
 Localized configuration:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 
         de: 'webspaceA'
@@ -118,7 +96,10 @@ sulu_article:
 ```
 
 Localized configuration with a defined default:
+
 ```yml
+# config/packages/sulu_article.yaml
+
 sulu_article:
     default_main_webspace: 
         default: 'webspaceA'
@@ -142,34 +123,22 @@ More information about this topic can be found in the section [multi-webspaces](
 Add xml template for structure in configured folder:
 
 ```
-%kernel.root_dir%/Resources/templates/articles/article_default.xml
+%kernel.project_dir%/config/templates/articles/default.xml
 ```
 
 Example is located in Bundle
-[article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.xml).
+[default.xml](default.xml).
 
 Add template for article type in configured folder:
 
 ```
-%kernel.root_dir%/Resources/views/articles/article_default.html.twig
+%kernel.project_dir%/templates/articles/default.xml
 ```
 
 Example is located in Bundle
-[article_default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
+[default.html.twig](default.html.twig).
 
 ## Initialize bundle
-
-Create assets:
-
-```bash
-php bin/console assets:install
-```
-
-Create translations:
-
-```bash
-php bin/console sulu:translate:export
-```
 
 Create required phpcr nodes:
 
@@ -185,15 +154,19 @@ php bin/console ongr:es:index:create --manager=live
 ```
 
 ## Permissions:
+
 Make sure you've set the correct permissions in the Sulu backend for this bundle!
+
 `Settings > User Roles`
 
 ## Possible bundle configurations:
 
 ```yml
-# app/config/config.yml
+# config/packages/sulu_article.yaml
 
 sulu_article:
+    index_name: su_articles
+    hosts: ['127.0.0.1:9200']
     default_main_webspace: null
     default_additional_webspaces: []
     smart_content:
@@ -210,7 +183,6 @@ sulu_article:
         article_page:
             view:                 Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject
     types:
-
         # Prototype
         name:
             translation_key:      ~

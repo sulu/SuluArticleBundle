@@ -42,10 +42,40 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'content' => [
                         'structure' => [
+                            'paths' => [
+                                'article' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article',
+                                ],
+                                'article_page' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article_page',
+                                ],
+                            ],
+                            'default_type' => [
+                                'article' => 'default',
+                                'article_page' => 'default',
+                            ],
                             'type_map' => [
                                 'article' => ArticleBridge::class,
                                 'article_page' => ArticlePageBridge::class,
                             ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_route')) {
+            $container->prependExtensionConfig(
+                'sulu_route',
+                [
+                    'mappings' => [
+                        'Sulu\Bundle\ArticleBundle\Document\ArticleDocument' => [
+                            'resource_key' => 'articles',
+                        ],
+                        'Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument' => [
+                            'resource_key' => 'article_pages',
                         ],
                     ],
                 ]
@@ -141,6 +171,113 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         ],
                     ],
                 ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_admin')) {
+            $container->prependExtensionConfig(
+                'sulu_admin',
+                [
+                    'lists' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/lists',
+                        ],
+                    ],
+                    'forms' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/forms',
+                        ],
+                    ],
+                    'resources' => [
+                        'articles' => [
+                            'routes' => [
+                                'list' => 'get_articles',
+                                'detail' => 'get_article',
+                            ],
+                        ],
+                    ],
+                    'field_type_options' => [
+                        'selection' => [
+                            'article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title', 'routePath'],
+                                        'icon' => 'su-newspaper',
+                                        'label' => 'sulu_article.selection_label',
+                                        'overlay_title' => 'sulu_article.selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'single_selection' => [
+                            'single_article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title'],
+                                        'empty_text' => 'sulu_article.no_article_selected',
+                                        'icon' => 'su-newspaper',
+                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('ongr_elasticsearch')) {
+            $configs = $container->getExtensionConfig($this->getAlias());
+            $config = $this->processConfiguration(new Configuration(), $configs);
+
+            $indexName = $config['index_name'];
+            $hosts = $config['hosts'];
+
+            $ongrElasticSearchConfig = [
+                'analysis' => [
+                    'tokenizer' => [
+                        'pathTokenizer' => [
+                            'type' => 'path_hierarchy',
+                        ],
+                    ],
+                    'analyzer' => [
+                        'pathAnalyzer' => [
+                            'tokenizer' => 'pathTokenizer',
+                        ],
+                    ],
+                ],
+                'managers' => [
+                    'default' => [
+                        'index' => [
+                            'index_name' => $indexName,
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                    'live' => [
+                        'index' => [
+                            'index_name' => $indexName . '_live',
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                ],
+            ];
+
+            if (count($hosts) > 0) {
+                $ongrElasticSearchConfig['managers']['default']['index']['hosts'] = $hosts;
+                $ongrElasticSearchConfig['managers']['live']['index']['hosts'] = $hosts;
+            }
+
+            $container->prependExtensionConfig(
+                'ongr_elasticsearch',
+                $ongrElasticSearchConfig
             );
         }
     }

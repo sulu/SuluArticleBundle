@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Form;
 
 use Sulu\Bundle\ArticleBundle\Document\Form\Listener\DataNormalizer;
-use Sulu\Bundle\ContentBundle\Form\Type\AbstractStructureBehaviorType;
+use Sulu\Bundle\PageBundle\Form\Type\AbstractStructureBehaviorType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;

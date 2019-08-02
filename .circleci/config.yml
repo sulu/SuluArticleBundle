@@ -51,13 +51,13 @@ jobs:
       - run:
           name: Command Create Test Database
           command: |
-            ./Tests/app/console doctrine:database:create
-            ./Tests/app/console doctrine:schema:update --force
-            ./Tests/app/console sulu:document:initialize
-            ./Tests/app/console ongr:es:index:create -m default
-            ./Tests/app/console ongr:es:index:create -m live
+            ./Tests/Application/console doctrine:database:create
+            ./Tests/Application/console doctrine:schema:update --force
+            ./Tests/Application/console sulu:document:initialize
+            ./Tests/Application/console ongr:es:index:create -m default
+            ./Tests/Application/console ongr:es:index:create -m live
       - run:
           name: List Bundles
           command:
-            ./Tests/app/console debug:config
+            ./Tests/Application/console debug:config
       - run: php -d memory_limit=2G ./vendor/bin/phpunit
