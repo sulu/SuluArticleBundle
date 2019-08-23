@@ -139,7 +139,7 @@ class ArticleAdmin extends Admin
                 ->setBackRoute(static::LIST_ROUTE)
                 ->setTitleProperty('title')
                 ->getRoute(),
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.details', '/details')
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
@@ -147,14 +147,14 @@ class ArticleAdmin extends Admin
                 ->addToolbarActions($formToolbarActionsWithType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
                 ->setResourceKey('articles')
                 ->setFormKey('page_seo')
                 ->setTabTitle('sulu_page.seo')
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
                 ->setResourceKey('articles')
                 ->setFormKey('page_excerpt')
                 ->setBackRoute(static::LIST_ROUTE)
@@ -162,7 +162,7 @@ class ArticleAdmin extends Admin
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
                 ->getRoute(),
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
+            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
                 ->setResourceKey('articles')
                 ->setFormKey('article_settings')
                 ->setBackRoute(static::LIST_ROUTE)
