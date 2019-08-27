@@ -152,7 +152,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         $searchPattern = $restHelper->getSearchPattern();
-        if (!empty($sarchPattern)) {
+        if (!empty($searchPattern)) {
             $boolQuery = new BoolQuery();
             foreach ($searchFields as $searchField) {
                 $boolQuery->add(new MatchPhrasePrefixQuery($searchField, $searchPattern), BoolQuery::SHOULD);
