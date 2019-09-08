@@ -64,6 +64,9 @@ class ArticleAdmin extends Admin
         $this->localizationManager = $localizationManager;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
     {
         if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
