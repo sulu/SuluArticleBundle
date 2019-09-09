@@ -1,7 +1,5 @@
 # Upgrade
 
-test
-
 ## dev-develop
 
 ### ElasticSearchFieldDescriptor constructor changed
