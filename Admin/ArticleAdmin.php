@@ -75,7 +75,7 @@ class ArticleAdmin extends Admin
             $articleItem->setIcon('su-newspaper');
             $articleItem->setMainRoute(static::LIST_ROUTE);
 
-            $navigationItemCollection->get(Admin::SETTINGS_NAVIGATION_ITEM)->addChild($articleItem);
+            $navigationItemCollection->add($articleItem);
         }
     }
 
