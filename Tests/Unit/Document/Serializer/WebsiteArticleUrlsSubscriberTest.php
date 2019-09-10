@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\SerializationContext;
 use PhpCollection\Map;
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepository;
@@ -26,7 +27,7 @@ use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebsiteArticleUrlsSubscriberTest extends TestCase
 {
     /**
      * @var RequestStack

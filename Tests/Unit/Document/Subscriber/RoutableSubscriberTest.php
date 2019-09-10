@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPCR\NodeInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
@@ -40,7 +41,7 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
-class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
+class RoutableSubscriberTest extends TestCase
 {
     /**
      * @var ChainRouteGeneratorInterface

@@ -11,11 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptorBuilder;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 
-class ElasticSearchFieldDescriptorBuilderTest extends \PHPUnit_Framework_TestCase
+class ElasticSearchFieldDescriptorBuilderTest extends TestCase
 {
     public function testStaticFactory()
     {

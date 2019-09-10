@@ -17,10 +17,12 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 
 /**
  * Extends serialization for articles.
@@ -44,15 +46,23 @@ class ArticleSubscriber implements EventSubscriberInterface
     private $structureMetadataFactory;
 
     /**
-     * @param StructureManagerInterface $structureManager
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
+     * @var WebspaceResolver
      */
+    private $webspaceResolver;
+
+    /**
+     * @var LocalizationManagerInterface
+     */
+    private $localizationManager;
+
     public function __construct(
         StructureManagerInterface $structureManager,
-        StructureMetadataFactoryInterface $structureMetadataFactory
+        StructureMetadataFactoryInterface $structureMetadataFactory,
+        WebspaceResolver $webspaceResolver
     ) {
         $this->structureManager = $structureManager;
         $this->structureMetadataFactory = $structureMetadataFactory;
+        $this->webspaceResolver = $webspaceResolver;
     }
 
     /**
@@ -65,6 +75,11 @@ class ArticleSubscriber implements EventSubscriberInterface
                 'event' => Events::POST_SERIALIZE,
                 'format' => 'json',
                 'method' => 'addTypeOnPostSerialize',
+            ],
+            [
+                'event' => Events::POST_SERIALIZE,
+                'format' => 'json',
+                'method' => 'addWebspaceSettingsOnPostSerialize',
             ],
             [
                 'event' => Events::POST_SERIALIZE,
@@ -96,6 +111,30 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $visitor->addData('articleType', $context->accept($this->getType($structure->getStructure())));
+    }
+
+    /**
+     * Append webspace-settings to result.
+     *
+     * @param ObjectEvent $event
+     */
+    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event)
+    {
+        $article = $event->getObject();
+        $visitor = $event->getVisitor();
+        $context = $event->getContext();
+
+        if (!($article instanceof ArticleDocument)) {
+            return;
+        }
+
+        $visitor->addData('customizeWebspaceSettings', $context->accept(null !== $article->getMainWebspace()));
+        if ($article->getMainWebspace()) {
+            return;
+        }
+
+        $visitor->setData('mainWebspace', $this->webspaceResolver->resolveMainWebspace($article));
+        $visitor->setData('additionalWebspace', $this->webspaceResolver->resolveAdditionalWebspaces($article));
     }
 
     /**

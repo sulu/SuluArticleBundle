@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteEnhancer;
@@ -19,7 +20,7 @@ use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 
-class ArticleRouteEnhancerTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteEnhancerTest extends TestCase
 {
     /**
      * @var Webspace

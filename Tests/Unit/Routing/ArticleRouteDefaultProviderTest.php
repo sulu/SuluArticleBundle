@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
@@ -26,7 +27,7 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzer;
 use Sulu\Component\Webspace\Webspace;
 
-class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteDefaultProviderTest extends TestCase
 {
     /**
      * @var DocumentManagerInterface

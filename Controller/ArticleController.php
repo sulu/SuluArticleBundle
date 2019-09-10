@@ -146,7 +146,6 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         $searchFields = $restHelper->getSearchFields();
-
         if (0 === count($searchFields)) {
             $searchFields = ['title'];
         }
@@ -576,6 +575,11 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         if (array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
+            $document->setAdditionalWebspaces(null);
+        }
+
+        if (array_key_exists('customizeWebspaceSettings', $data) && false === $data['customizeWebspaceSettings']) {
+            $document->setMainWebspace(null);
             $document->setAdditionalWebspaces(null);
         }
 

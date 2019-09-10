@@ -15,9 +15,15 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
+use Symfony\Component\BrowserKit\Client;
 
 class ArticleSitemapProviderTest extends SuluTestCase
 {
+    /**
+     * @var Client
+     */
+    private $client;
+
     /**
      * @var ArticleSitemapProvider
      */
@@ -29,6 +35,8 @@ class ArticleSitemapProviderTest extends SuluTestCase
     public function setUp()
     {
         parent::setUp();
+
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -78,16 +86,15 @@ class ArticleSitemapProviderTest extends SuluTestCase
             'additionalWebspaces' => $additionalWebspaces,
         ];
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $response);
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 }

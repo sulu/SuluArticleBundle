@@ -16,11 +16,12 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Repository\ArticleViewDocumentRepository;
 
-class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
+class ArticleViewDocumentRepositoryTest extends TestCase
 {
     /**
      * @var Manager

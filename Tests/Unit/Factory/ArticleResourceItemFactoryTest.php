@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\VirtualProxyInterface;
@@ -20,7 +21,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Component\DocumentManager\DocumentManager;
 
-class ArticleResourceItemFactoryTest extends \PHPUnit_Framework_TestCase
+class ArticleResourceItemFactoryTest extends TestCase
 {
     public function testGetResourceItem()
     {

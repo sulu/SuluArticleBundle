@@ -158,6 +158,12 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
             $path = rtrim($resourceSegment, '/') . '/' . $suffix;
             $node->setProperty($propertyName, $path);
             $article->setRoutePath($path);
+
+            $routeProperty = $article->getStructure()->getProperty($property->getName());
+            $routeValue = $routeProperty->getValue();
+            $routeValue['page']['path'] = $resourceSegment;
+            $routeValue['path'] = $path;
+            $routeProperty->setValue($routeValue);
         }
 
         $workflowStage = $article->getWorkflowStage();

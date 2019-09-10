@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use PHPCR\NodeInterface;
 use PHPCR\PathNotFoundException;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -32,7 +33,7 @@ use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
-class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
+class ArticleSubscriberTest extends TestCase
 {
     /**
      * @var IndexerInterface

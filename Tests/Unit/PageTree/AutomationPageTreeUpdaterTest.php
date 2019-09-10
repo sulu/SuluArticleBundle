@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\PageTree;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\PageTree\AutomationPageTreeUpdater;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
@@ -22,7 +23,7 @@ use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
+class AutomationPageTreeUpdaterTest extends TestCase
 {
     /**
      * @var TaskManagerInterface

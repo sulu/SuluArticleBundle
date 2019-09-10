@@ -14,9 +14,15 @@ namespace Functional\Markup;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Symfony\Component\BrowserKit\Client;
 
 class ArticleLinkProviderTest extends SuluTestCase
 {
+    /**
+     * @var Client
+     */
+    private $client;
+
     /**
      * @var ArticleLinkProvider
      */
@@ -28,6 +34,8 @@ class ArticleLinkProviderTest extends SuluTestCase
     public function setUp()
     {
         parent::setUp();
+
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -115,25 +123,23 @@ class ArticleLinkProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     private function createAndPublishArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 }

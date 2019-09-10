@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\PageTree;
 
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
 use Sulu\Bundle\PageBundle\Document\HomeDocument;
@@ -20,7 +21,7 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Task\Executor\RetryTaskHandlerInterface;
 
-class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
+class PageTreeRouteUpdateHandlerTest extends TestCase
 {
     /**
      * @var PageTreeUpdaterInterface
@@ -95,7 +96,7 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleUpdateException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $document = $this->prophesize(PageDocument::class);
 
@@ -113,7 +114,7 @@ class PageTreeRouteUpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleDocumentExceptionException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $document = $this->prophesize(PageDocument::class);
 
