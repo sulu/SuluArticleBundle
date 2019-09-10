@@ -16,9 +16,15 @@ use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRepository;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Symfony\Component\BrowserKit\Client;
 
 class PageTreeRepositoryTest extends SuluTestCase
 {
+    /**
+     * @var Client
+     */
+    private $client;
+
     /**
      * @var DocumentManagerInterface
      */
@@ -44,13 +50,9 @@ class PageTreeRepositoryTest extends SuluTestCase
         $this->initPhpcr();
         $this->purgeDatabase();
 
+        $this->client = $this->createAuthenticatedClient();
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->pageTreeRepository = new PageTreeRepository(
-            $this->documentManager,
-            $this->getContainer()->get('sulu_page.structure.factory'),
-            $this->getContainer()->get('sulu_document_manager.property_encoder'),
-            $this->getContainer()->get('sulu_document_manager.document_inspector')
-        );
+        $this->pageTreeRepository  = $this->getContainer()->get('sulu_article.page_tree_route.updater.request');
     }
 
     public function testUpdate()
@@ -182,10 +184,9 @@ class PageTreeRepositoryTest extends SuluTestCase
      */
     private function createArticle(array $routePathData, $title = 'Test Article')
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
-            '/api/articles?locale=' . $this->locale . '&action=publish',
+            '/api/articles?locale=' . $this->locale,
             [
                 'title' => $title,
                 'template' => 'page_tree_route',
@@ -194,7 +195,7 @@ class PageTreeRepositoryTest extends SuluTestCase
             ]
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**
@@ -217,8 +218,7 @@ class PageTreeRepositoryTest extends SuluTestCase
             throw new \Exception('Article array needs an ID!');
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles/' . $article['id'] . '/pages?locale=' . $locale,
             [
@@ -226,9 +226,9 @@ class PageTreeRepositoryTest extends SuluTestCase
                 'template' => $template,
             ]
         );
-        $this->assertHttpStatusCode(200, $client->getResponse());
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

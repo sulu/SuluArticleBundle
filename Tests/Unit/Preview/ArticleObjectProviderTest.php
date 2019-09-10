@@ -20,8 +20,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class ArticleObjectProviderTest extends \PHPUnit_Framework_TestCase
+class ArticleObjectProviderTest extends TestCase
 {
     /**
      * @var DocumentManagerInterface

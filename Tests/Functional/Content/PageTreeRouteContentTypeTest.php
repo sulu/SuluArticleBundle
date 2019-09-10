@@ -13,6 +13,7 @@ namespace Functional\Content;
 
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
@@ -24,7 +25,7 @@ use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\DocumentRegistry;
 
-class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
+class PageTreeRouteContentTypeTest extends TestCase
 {
     /**
      * @var DocumentManagerInterface

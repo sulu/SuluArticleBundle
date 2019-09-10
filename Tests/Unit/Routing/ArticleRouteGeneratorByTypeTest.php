@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByType;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
@@ -18,7 +19,7 @@ use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 
-class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteGeneratorByTypeTest extends TestCase
 {
     /**
      * @var RouteGeneratorInterface
@@ -71,7 +72,7 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNotConfigured()
     {
-        $this->setExpectedException(RouteSchemaNotFoundException::class);
+        $this->expectException(RouteSchemaNotFoundException::class);
 
         $metadata = new StructureMetadata();
         $metadata->setTags([

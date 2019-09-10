@@ -31,6 +31,13 @@
             <tag name="sulu.admin"/>
             <tag name="sulu.context" context="admin"/>
         </service>
+        <service
+                id="sulu_article.webspace_select_helper"
+                class="Sulu\Bundle\AudienceTargetingBundle\Admin\Helper\WebspaceSelect"
+                public="true"
+        >
+            <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+        </service>
 
         <!-- view -->
         <service id="sulu_article.view_document.factory"
@@ -177,6 +184,7 @@
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\ArticleSubscriber">
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument type="service" id="sulu_page.structure.factory"/>
+            <argument type="service" id="sulu_article.resolver.webspaces"/>
 
             <tag name="jms_serializer.event_subscriber" />
         </service>

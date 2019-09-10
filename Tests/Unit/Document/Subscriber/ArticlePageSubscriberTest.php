@@ -28,8 +28,9 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\NameResolver;
 use Symfony\Cmf\Api\Slugifier\SlugifierInterface;
+use PHPUnit\Framework\TestCase;
 
-class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
+class ArticlePageSubscriberTest extends TestCase
 {
     /**
      * @var StructureMetadataFactoryInterface

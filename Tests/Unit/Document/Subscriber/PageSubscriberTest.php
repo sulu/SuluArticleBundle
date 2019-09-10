@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use PHPCR\NodeInterface;
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\PageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\PageSubscriber;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
@@ -24,7 +25,7 @@ use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\PropertyEncoder;
 
-class PageSubscriberTest extends \PHPUnit_Framework_TestCase
+class PageSubscriberTest extends TestCase
 {
     /**
      * @var DocumentInspector

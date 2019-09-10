@@ -11,6 +11,7 @@
 
 namespace Functional\Document\Index;
 
+use Symfony\Component\BrowserKit\Client;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
@@ -21,6 +22,11 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 class ArticleIndexerTest extends SuluTestCase
 {
+    /**
+     * @var Client
+     */
+    private $client;
+
     /**
      * @var string
      */
@@ -48,6 +54,8 @@ class ArticleIndexerTest extends SuluTestCase
     {
         parent::setUp();
 
+        $this->client = $this->createAuthenticatedClient();
+
         $this->initPhpcr();
         $this->purgeDatabase();
 
@@ -66,6 +74,8 @@ class ArticleIndexerTest extends SuluTestCase
             'Test Article',
             'default_with_route'
         );
+
+        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
 
         $document = $this->documentManager->find($article['id'], $this->locale);
         $this->indexer->index($document);
@@ -245,14 +255,13 @@ class ArticleIndexerTest extends SuluTestCase
      */
     private function createArticle(array $data = [], $title = 'Test Article', $template = 'default')
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=' . $this->locale . '&action=publish',
             array_merge(['title' => $title, 'template' => $template], $data)
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**
@@ -283,16 +292,15 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData['template'] = $template;
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'PUT',
             '/api/articles/' . $uuid . '?locale=' . ($locale ? $locale : $this->locale) . '&action=publish',
             $requestData
         );
 
-        $this->assertEquals('200', $client->getResponse()->getStatusCode());
+        $this->assertEquals('200', $this->client->getResponse()->getStatusCode());
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**
@@ -311,15 +319,14 @@ class ArticleIndexerTest extends SuluTestCase
         $pageTitle = 'Test-Page',
         $template = 'default_pages'
     ) {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles/' . $article['id'] . '/pages?locale=' . $this->locale . '&action=publish',
             array_merge(['pageTitle' => $pageTitle, 'template' => $template], $data)
         );
-        $this->assertHttpStatusCode(200, $client->getResponse());
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

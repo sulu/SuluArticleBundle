@@ -4,5 +4,11 @@
     "sulu_article.no_article_selected": "No article selected",
     "sulu_article.single_selection_overlay_title": "Choose article",
     "sulu_article.selection_overlay_title": "Choose articles",
-    "sulu_article.selection_label": "{count} articles selected"
+    "sulu_article.selection_label": "{count} articles selected",
+    "sulu_article.webspace_settings": "Webspace Settings",
+    "sulu_article.customize_webspace_settings": "Customize",
+    "sulu_article.main_webspace": "Main webspace",
+    "sulu_article.additional_webspace": "Additional webspaces",
+    "sulu_article.shadow_article": "Shadow Article",
+    "sulu_article.enable_shadow_article": "Enable Shadow Article"
 }

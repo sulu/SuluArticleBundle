@@ -12,9 +12,10 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\Admin;
+use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface;
-use Sulu\Bundle\AdminBundle\Navigation\Navigation;
-use Sulu\Bundle\AdminBundle\Navigation\NavigationItem;
+use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
+use Sulu\Bundle\AdminBundle\Admin\Routing\RouteCollection;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -63,26 +64,25 @@ class ArticleAdmin extends Admin
         $this->localizationManager = $localizationManager;
     }
 
-    public function getNavigation(): Navigation
+    /**
+     * {@inheritdoc}
+     */
+    public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
     {
-        $rootNavigationItem = $this->getNavigationItemRoot();
-
         if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, 'view')) {
             $articleItem = new NavigationItem('sulu_article.articles');
             $articleItem->setPosition(20);
             $articleItem->setIcon('su-newspaper');
             $articleItem->setMainRoute(static::LIST_ROUTE);
 
-            $rootNavigationItem->addChild($articleItem);
+            $navigationItemCollection->add($articleItem);
         }
-
-        return new Navigation($rootNavigationItem);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoutes(): array
+    public function configureRoutes(RouteCollection $routeCollection): void
     {
         $locales = array_values(
             array_map(
@@ -108,7 +108,7 @@ class ArticleAdmin extends Admin
             'sulu_admin.delete',
         ];
 
-        return [
+        $routeCollection->add(
             $this->routeBuilderFactory->createListRouteBuilder(static::LIST_ROUTE, '/articles/:locale')
                 ->setResourceKey('articles')
                 ->setListKey('articles')
@@ -119,12 +119,14 @@ class ArticleAdmin extends Admin
                 ->setAddRoute(static::ADD_FORM_ROUTE)
                 ->setEditRoute(static::EDIT_FORM_ROUTE)
                 ->addToolbarActions($listToolbarActions)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createResourceTabRouteBuilder(static::ADD_FORM_ROUTE, '/articles/:locale/add')
                 ->setResourceKey('articles')
                 ->addLocales($locales)
                 ->setBackRoute(static::LIST_ROUTE)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.add_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
@@ -132,13 +134,15 @@ class ArticleAdmin extends Admin
                 ->setEditRoute(static::EDIT_FORM_ROUTE)
                 ->addToolbarActions($formToolbarActionsWithType)
                 ->setParent(static::ADD_FORM_ROUTE)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createResourceTabRouteBuilder(static::EDIT_FORM_ROUTE, '/articles/:locale/:id')
                 ->setResourceKey('articles')
                 ->addLocales($locales)
                 ->setBackRoute(static::LIST_ROUTE)
                 ->setTitleProperty('title')
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
@@ -146,14 +150,16 @@ class ArticleAdmin extends Admin
                 ->setTabPriority(1024)
                 ->addToolbarActions($formToolbarActionsWithType)
                 ->setParent(static::EDIT_FORM_ROUTE)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
                 ->setResourceKey('articles')
                 ->setFormKey('page_seo')
                 ->setTabTitle('sulu_page.seo')
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
                 ->setResourceKey('articles')
                 ->setFormKey('page_excerpt')
@@ -161,7 +167,8 @@ class ArticleAdmin extends Admin
                 ->setTabTitle('sulu_page.excerpt')
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
-                ->getRoute(),
+        );
+        $routeCollection->add(
             $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
                 ->setResourceKey('articles')
                 ->setFormKey('article_settings')
@@ -170,8 +177,7 @@ class ArticleAdmin extends Admin
                 ->setTabPriority(512)
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_ROUTE)
-                ->getRoute(),
-        ];
+        );
     }
 
     /**

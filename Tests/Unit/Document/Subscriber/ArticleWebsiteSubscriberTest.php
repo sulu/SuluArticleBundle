@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\SerializationContext;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\VirtualProxyInterface;
@@ -32,7 +33,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
+class ArticleWebsiteSubscriberTest extends TestCase
 {
     /**
      * @var StructureManagerInterface

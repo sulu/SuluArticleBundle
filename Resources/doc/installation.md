@@ -52,7 +52,7 @@ sulu_article:
 ### Configure the routing
 
 ```yml
-# config/routes/sulu_article_admin.yaml
+# config/routes/sulu_admin.yaml
 
 sulu_article_api:
     resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
@@ -132,7 +132,7 @@ Example is located in Bundle
 Add template for article type in configured folder:
 
 ```
-%kernel.project_dir%/templates/articles/default.xml
+%kernel.project_dir%/templates/articles/default.html.twig
 ```
 
 Example is located in Bundle

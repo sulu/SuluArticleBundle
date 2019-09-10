@@ -15,8 +15,9 @@ use Sulu\Bundle\ArticleBundle\Routing\ArticlePageRouteGenerator;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Generator\TokenProviderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use PHPUnit\Framework\TestCase;
 
-class ArticlePageRouteGeneratorTest extends \PHPUnit_Framework_TestCase
+class ArticlePageRouteGeneratorTest extends TestCase
 {
     /**
      * @var string

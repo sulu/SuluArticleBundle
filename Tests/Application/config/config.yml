@@ -11,6 +11,12 @@ doctrine:
         dbname:   "%database_name%"
         user:     "%database_user%"
         password: "%database_password%"
+
+        charset: '%env(DATABASE_CHARSET)%'
+        default_table_options:
+            charset: '%env(DATABASE_CHARSET)%'
+            collate: '%env(DATABASE_COLLATE)%'
+
     orm:
         mappings:
             gedmo_tree:

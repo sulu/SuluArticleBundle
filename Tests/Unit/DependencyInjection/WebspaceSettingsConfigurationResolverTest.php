@@ -11,9 +11,10 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\WebspaceSettingsConfigurationResolver;
 
-class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestCase
+class WebspaceSettingsConfigurationResolverTest extends TestCase
 {
     public function configuration()
     {
