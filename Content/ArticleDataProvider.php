@@ -271,9 +271,9 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
         $this->addPagination($search, $pageSize, $page, $limit);
 
-        if (array_key_exists('sortBy', $filters) && is_array($filters['sortBy'])) {
+        if (array_key_exists('sortBy', $filters)) {
             $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
-            $this->appendSortBy($filters['sortBy'], $sortMethod, $search);
+            $search->addSort(new FieldSort($filters['sortBy'], $sortMethod));
         }
 
         if ($webspaceKey) {
@@ -412,22 +412,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         }
 
         return $excluded;
-    }
-
-    /**
-     * Extension point to append order.
-     *
-     * @param array $sortBy
-     * @param string $sortMethod
-     * @param Search $search
-     *
-     * @return array parameters for query
-     */
-    private function appendSortBy($sortBy, $sortMethod, $search)
-    {
-        foreach ($sortBy as $column) {
-            $search->addSort(new FieldSort($column, $sortMethod));
-        }
     }
 
     /**
