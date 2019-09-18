@@ -37,3 +37,12 @@ sulu_article:
     index_name: "su_articles_tests"
     hosts: ["%elasticsearch_host%"]
     default_main_webspace: 'sulu_io'
+
+ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
