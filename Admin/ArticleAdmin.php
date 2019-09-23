@@ -16,6 +16,7 @@ use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
 use Sulu\Bundle\AdminBundle\Admin\Routing\RouteCollection;
+use Sulu\Bundle\AdminBundle\Admin\Routing\ToolbarAction;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -94,18 +95,18 @@ class ArticleAdmin extends Admin
         );
 
         $formToolbarActionsWithType = [
-            'sulu_admin.save_with_publishing',
-            'sulu_admin.type',
-            'sulu_admin.delete',
+            new ToolbarAction('sulu_admin.save_with_publishing'),
+            new ToolbarAction('sulu_admin.type'),
+            new ToolbarAction('sulu_admin.delete'),
         ];
 
         $formToolbarActionsWithoutType = [
-            'sulu_admin.save_with_publishing',
+            new ToolbarAction('sulu_admin.save_with_publishing'),
         ];
 
         $listToolbarActions = [
-            'sulu_admin.add',
-            'sulu_admin.delete',
+            new ToolbarAction('sulu_admin.add'),
+            new ToolbarAction('sulu_admin.delete'),
         ];
 
         $routeCollection->add(
@@ -143,7 +144,7 @@ class ArticleAdmin extends Admin
                 ->setTitleProperty('title')
         );
         $routeCollection->add(
-            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.details', '/details')
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
@@ -152,7 +153,7 @@ class ArticleAdmin extends Admin
                 ->setParent(static::EDIT_FORM_ROUTE)
         );
         $routeCollection->add(
-            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
                 ->setResourceKey('articles')
                 ->setFormKey('page_seo')
                 ->setTabTitle('sulu_page.seo')
@@ -160,7 +161,7 @@ class ArticleAdmin extends Admin
                 ->setParent(static::EDIT_FORM_ROUTE)
         );
         $routeCollection->add(
-            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
                 ->setResourceKey('articles')
                 ->setFormKey('page_excerpt')
                 ->setBackRoute(static::LIST_ROUTE)
@@ -169,7 +170,7 @@ class ArticleAdmin extends Admin
                 ->setParent(static::EDIT_FORM_ROUTE)
         );
         $routeCollection->add(
-            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
+            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
                 ->setResourceKey('articles')
                 ->setFormKey('article_settings')
                 ->setBackRoute(static::LIST_ROUTE)

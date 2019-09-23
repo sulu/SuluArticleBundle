@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
+use Sulu\Bundle\PreviewBundle\Preview\Preview;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,9 +37,9 @@ class WebsiteArticleController extends Controller
      *
      * @return Response
      */
-    public function indexAction(Request $request, ArticleInterface $object, $view, $pageNumber = 1)
+    public function indexAction(Request $request, ArticleInterface $object, $view, $pageNumber = 1, $preview = false, $partial = false)
     {
-        return $this->renderArticle($request, $object, $view, $pageNumber);
+        return $this->renderArticle($request, $object, $view, $pageNumber, $preview, $partial);
     }
 
     /**
@@ -52,7 +53,7 @@ class WebsiteArticleController extends Controller
      *
      * @return Response
      */
-    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $attributes = [])
+    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $preview, $partial, $attributes = [])
     {
         $object = $this->normalizeArticle($object);
 
@@ -61,12 +62,35 @@ class WebsiteArticleController extends Controller
 
         $content = $this->serializeArticle($object, $pageNumber);
 
+        $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
+
         try {
-            return $this->render(
-                $viewTemplate,
-                $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes)),
-                $this->createResponse($request)
-            );
+            if ($partial) {
+                return new Response(
+                    $this->renderBlock(
+                        $viewTemplate,
+                        'content',
+                        $data
+                    )
+                );
+            } else if ($preview) {
+                $parameters = [
+                    'previewParentTemplate' => $viewTemplate,
+                    'previewContentReplacer' => Preview::CONTENT_REPLACER,
+                ];
+
+                return $this->render(
+                    'SuluWebsiteBundle:Preview:preview.html.twig',
+                    array_merge($data, $parameters),
+                    $this->createResponse($request)
+                );
+            } else {
+                return $this->render(
+                    $viewTemplate,
+                    $data,
+                    $this->createResponse($request)
+                );
+            }
         } catch (\InvalidArgumentException $exception) {
             // template not found
             throw new HttpException(406, 'Error encountered when rendering content', $exception);
@@ -134,5 +158,30 @@ class WebsiteArticleController extends Controller
         }
 
         return $response;
+    }
+
+    protected function renderBlock($template, $block, $attributes = [])
+    {
+        $twig = $this->get('twig');
+        $attributes = $twig->mergeGlobals($attributes);
+
+        /** @var Template $template */
+        $template = $twig->loadTemplate($template);
+
+        $level = ob_get_level();
+        ob_start();
+
+        try {
+            $rendered = $template->renderBlock($block, $attributes);
+            ob_end_clean();
+
+            return $rendered;
+        } catch (\Exception $e) {
+            while (ob_get_level() > $level) {
+                ob_end_clean();
+            }
+
+            throw $e;
+        }
     }
 }
