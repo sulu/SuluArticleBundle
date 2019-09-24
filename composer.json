@@ -4,8 +4,8 @@
     "type": "sulu-bundle",
     "license": "MIT",
     "require": {
-        "php": "^7.1",
-        "sulu/sulu": "2.0.0-rc2",
+        "php": "^7.2",
+        "sulu/sulu": "^2.0.0-RC3",
         "symfony/config": "^3.4 || ^4.0",
         "symfony/dependency-injection": "^3.4 || ^4.0",
         "symfony/force-lowest": "^3.4 || ^4.0",
