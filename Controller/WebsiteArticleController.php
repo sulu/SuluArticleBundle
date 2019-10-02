@@ -124,9 +124,8 @@ class WebsiteArticleController extends Controller
      */
     protected function serializeArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->get('jms_serializer')->serialize(
+        return $this->get('sulu_core.array_serializer')->serialize(
             $object,
-            'array',
             SerializationContext::create()
                 ->setSerializeNull(true)
                 ->setGroups(['website', 'content'])

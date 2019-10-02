@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\SerializationContext;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -143,8 +144,13 @@ class ArticleWebsiteSubscriberTest extends TestCase
 
         $this->subscriber->resolveContentForArticleOnPostSerialize($event->reveal());
 
-        $visitor->addData('content', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
-        $visitor->addData('view', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'content' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'view' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
     }
 
     public function testResolveContentForArticleOnPostSerializePage2()
@@ -191,8 +197,13 @@ class ArticleWebsiteSubscriberTest extends TestCase
 
         $this->subscriber->resolveContentForArticleOnPostSerialize($event->reveal());
 
-        $visitor->addData('content', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
-        $visitor->addData('view', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'content' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'view' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
     }
 
     public function testResolveContentForArticleOnPostSerializeUnknownDocument()
@@ -236,7 +247,12 @@ class ArticleWebsiteSubscriberTest extends TestCase
 
         $this->subscriber->resolveContentForArticleOnPostSerialize($event->reveal());
 
-        $visitor->addData('content', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
-        $visitor->addData('view', Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'content' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
+
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'view' === $metadata->name;
+        }), Argument::type(VirtualProxyInterface::class))->shouldBeCalled();
     }
 }

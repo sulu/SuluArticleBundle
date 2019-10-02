@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
-        "sulu/sulu": "2.0.0-rc2",
+        "sulu/sulu": "^2.0",
         "symfony/config": "^3.4 || ^4.0",
         "symfony/dependency-injection": "^3.4 || ^4.0",
         "symfony/force-lowest": "^3.4 || ^4.0",
@@ -16,7 +16,8 @@
         "ongr/elasticsearch-dsl": "~5.0 || ~6.0",
         "elasticsearch/elasticsearch": "~5.0 || ~6.0",
         "jackalope/jackalope": "^1.3.3",
-        "jms/serializer-bundle": "^1.1 || ^2.0"
+        "jms/serializer": "^3.0",
+        "jms/serializer-bundle": "^3.0"
     },
     "require-dev": {
         "massive/build-bundle": "~0.3.0",

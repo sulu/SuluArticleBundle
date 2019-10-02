@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -59,22 +60,22 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         return [
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
+                'format' => 'json',
                 'method' => 'resolveContentOnPostSerialize',
             ],
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
+                'format' => 'json',
                 'method' => 'resolveContentForArticleOnPostSerialize',
             ],
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
+                'format' => 'json',
                 'method' => 'resolveContentForArticlePageOnPostSerialize',
             ],
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
+                'format' => 'json',
                 'method' => 'appendPageData',
             ],
         ];
@@ -91,12 +92,15 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!$article instanceof ArticleInterface || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticleInterface || !$context->hasAttribute('website')) {
             return;
         }
 
-        $visitor->addData('uuid', $context->accept($article->getArticleUuid()));
-        $visitor->addData('pageUuid', $context->accept($article->getPageUuid()));
+        $uuid = $article->getArticleUuid();
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'uuid', $uuid), $uuid);
+
+        $pageUuid = $article->getPageUuid();
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'pageUuid', $pageUuid), $pageUuid);
 
         $extensionData = $article->getExtensionsData()->toArray();
         $extension = [];
@@ -104,7 +108,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($data);
         }
 
-        $visitor->addData('extension', $extension);
+        $visitor->setData('extension', $extension);
     }
 
     /**
@@ -122,17 +126,19 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
             $article = $article->getParent();
         }
 
-        if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticleDocument || !$context->hasAttribute('website')) {
             return;
         }
 
         $pageNumber = 1;
-        if ($context->attributes->containsKey('pageNumber')) {
-            $pageNumber = $context->attributes->get('pageNumber')->get();
+        if ($context->hasAttribute('pageNumber')) {
+            $pageNumber = $context->getAttribute('pageNumber');
         }
 
-        $visitor->addData('page', $pageNumber);
-        $visitor->addData('pages', $context->accept($article->getPages()));
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'page', $pageNumber), $pageNumber);
+
+        $pages = $article->getPages();
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'pages', $pages), $pages);
     }
 
     /**
@@ -146,17 +152,17 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticleDocument || !$context->hasAttribute('website')) {
             return;
         }
 
-        if ($context->attributes->containsKey('pageNumber')) {
-            $article = $this->getArticleForPage($article, $context->attributes->get('pageNumber')->get());
+        if ($context->hasAttribute('pageNumber')) {
+            $article = $this->getArticleForPage($article, $context->getAttribute('pageNumber'));
         }
 
         $content = $this->resolve($article);
         foreach ($content as $name => $value) {
-            $visitor->addData($name, $value);
+            $visitor->setData($name, $value);
         }
     }
 
@@ -195,13 +201,13 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $visitor = $event->getVisitor();
         $context = $event->getContext();
 
-        if (!$article instanceof ArticlePageDocument || !$context->attributes->containsKey('website')) {
+        if (!$article instanceof ArticlePageDocument || !$context->hasAttribute('website')) {
             return;
         }
 
         $content = $this->resolve($article);
         foreach ($content as $name => $value) {
-            $visitor->addData($name, $value);
+            $visitor->setData($name, $value);
         }
     }
 

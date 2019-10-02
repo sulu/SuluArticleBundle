@@ -12,9 +12,11 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\SerializationContext;
 use PhpCollection\Map;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepository;
@@ -94,8 +96,9 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
             $this->routeRepository->findByEntity($entityClass, $entityId, $locale)->willReturn($route->reveal());
         }
 
-        $context->accept($expected)->willReturn($expected)->shouldBeCalled();
-        $visitor->addData('urls', $expected)->shouldBeCalled();
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'urls' === $metadata->name;
+        }), $expected)->shouldBeCalled();
 
         $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
     }

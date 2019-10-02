@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
@@ -71,7 +72,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         $context = $event->getContext();
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$article instanceof ArticleDocument || !$context->attributes->containsKey('website') || !$request) {
+        if (!$article instanceof ArticleDocument || !$context->hasAttribute('website') || !$request) {
             return;
         }
 
@@ -98,6 +99,6 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
             }
         }
 
-        $visitor->addData('urls', $context->accept($urls));
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'urls', $urls), $urls);
     }
 }
