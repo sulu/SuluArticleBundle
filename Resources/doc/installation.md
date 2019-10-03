@@ -47,6 +47,16 @@ sulu_core:
 sulu_article:
     index_name: su_articles
     hosts: ['127.0.0.1:9200']
+
+# config/packages/ongr_elasticsearch.yaml
+ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
 ```
 
 ### Configure the routing

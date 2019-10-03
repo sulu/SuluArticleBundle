@@ -242,18 +242,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             $hosts = $config['hosts'];
 
             $ongrElasticSearchConfig = [
-                'analysis' => [
-                    'tokenizer' => [
-                        'pathTokenizer' => [
-                            'type' => 'path_hierarchy',
-                        ],
-                    ],
-                    'analyzer' => [
-                        'pathAnalyzer' => [
-                            'tokenizer' => 'pathTokenizer',
-                        ],
-                    ],
-                ],
                 'managers' => [
                     'default' => [
                         'index' => [
