@@ -7,25 +7,25 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'services/husky/util'], function($, Util) {
+define(['jquery', 'services/husky/util', 'suluadmin/utils/templateHelper'], function($, Util, TemplateHelper) {
     'use strict';
 
     var templates = {
-        url: _.template(
+        url: TemplateHelper.transformTemplateData(_.template(
             '/admin/api/articles' +
-            '<% if (typeof id !== "undefined") { %>/<%= id %><% } %>' +
-            '<% if (typeof postfix !== "undefined") { %>/<%= postfix %><% } %>' +
-            '<% if (typeof version !== "undefined") { %>/<%= version %><% } %>' +
-            '?locale=<%= locale %>' +
-            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>' +
-            '<% if (typeof ids !== "undefined") { %>&ids=<%= ids.join(",") %><% } %>'
-        ),
-        pageUrl: _.template(
-            '/admin/api/articles/<%= articleId %>/pages' +
-            '<% if (typeof pageId !== "undefined" && !!pageId) { %>/<%= pageId %><% } %>' +
-            '?locale=<%= locale %>' +
-            '<% if (typeof action !== "undefined") { %>&action=<%= action %><% } %>'
-        )
+            '<% if (typeof data.id !== "undefined") { %>/<%= data.id %><% } %>' +
+            '<% if (typeof data.postfix !== "undefined") { %>/<%= data.postfix %><% } %>' +
+            '<% if (typeof data.version !== "undefined") { %>/<%= data.version %><% } %>' +
+            '?locale=<%= data.locale %>' +
+            '<% if (typeof data.action !== "undefined") { %>&action=<%= data.action %><% } %>' +
+            '<% if (typeof data.ids !== "undefined") { %>&ids=<%= data.ids.join(",") %><% } %>'
+        )),
+        pageUrl:TemplateHelper.transformTemplateData( _.template(
+            '/admin/api/articles/<%= data.articleId %>/pages' +
+            '<% if (typeof data.pageId !== "undefined" && !!data.pageId) { %>/<%= data.pageId %><% } %>' +
+            '?locale=<%= data.locale %>' +
+            '<% if (typeof data.action !== "undefined") { %>&action=<%= data.action %><% } %>'
+        ))
     };
 
     return {

@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore', 'services/husky/mediator'], function(_, Mediator) {
+define(['underscore', 'services/husky/mediator', 'suluadmin/utils/templateHelper'], function(_, Mediator, TemplateHelper) {
 
     'use strict';
 
@@ -16,11 +16,11 @@ define(['underscore', 'services/husky/mediator'], function(_, Mediator) {
         },
 
         routes = {
-            list: _.template('articles/<%= locale %>'),
-            add: _.template('articles/<%= locale %>/add'),
-            edit: _.template('articles/<%= locale %>/edit:<%= id %>/<%= tab %>'),
-            editPage: _.template('articles/<%= locale %>/edit:<%= id %>/page:<%= page %>/<%= tab %>'),
-            addPage: _.template('articles/<%= locale %>/edit:<%= id %>/add-page/<%= tab %>')
+            list: TemplateHelper.transformTemplateData(_.template('articles/<%= locale %>')),
+            add: TemplateHelper.transformTemplateData(_.template('articles/<%= locale %>/add')),
+            edit: TemplateHelper.transformTemplateData(_.template('articles/<%= locale %>/edit:<%= id %>/<%= tab %>')),
+            editPage: TemplateHelper.transformTemplateData(_.template('articles/<%= locale %>/edit:<%= id %>/page:<%= page %>/<%= tab %>')),
+            addPage: TemplateHelper.transformTemplateData(_.template('articles/<%= locale %>/edit:<%= id %>/add-page/<%= tab %>'))
         },
 
         goto = function(route, trigger, force) {
