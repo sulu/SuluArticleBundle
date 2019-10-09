@@ -155,7 +155,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             $this->articleDocumentClass,
             'json',
             DeserializationContext::create()
-                ->setSerializeNull(true)
                 ->setGroups(['preview'])
         );
 
