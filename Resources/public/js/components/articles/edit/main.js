@@ -21,7 +21,7 @@ define([
     'services/sulucontent/smart-content-manager',
     './adapter/article',
     './adapter/article-page',
-    'suluadmin/utils/templateHelper'
+    'suluarticle/utils/template-helper'
 ], function($, _, config, Util, ArticleManager, ArticleRouter, UserManager, SecurityChecker, CopyLocale, OpenGhost, SmartContentManager, Article, ArticlePage, TemplateHelper) {
 
     'use strict';
@@ -42,7 +42,7 @@ define([
             },
 
             templates: {
-                url: '/admin/api/articles<% if (!!id) { %>/<%= id %><% } %>?locale=<%= locale %>',
+                url: '/admin/api/articles<% if (!!data.id) { %>/<%= data.id %><% } %>?locale=<%= data.locale %>',
                 pageSwitcher: [
                     '<div class="page-changer">',
                     '   <span class="title"><%= label %></span>',

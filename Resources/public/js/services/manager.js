@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['jquery', 'services/husky/util', 'suluadmin/utils/templateHelper'], function($, Util, TemplateHelper) {
+define(['jquery', 'services/husky/util', 'suluarticle/utils/template-helper'], function($, Util, TemplateHelper) {
     'use strict';
 
     var templates = {
