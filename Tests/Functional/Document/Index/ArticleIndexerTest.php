@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Document\Index;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Document\Index;
 
 use Symfony\Component\BrowserKit\Client;
 use ONGR\ElasticsearchBundle\Service\Manager;
@@ -50,7 +50,7 @@ class ArticleIndexerTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

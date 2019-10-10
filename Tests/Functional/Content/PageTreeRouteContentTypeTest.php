@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Content;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
@@ -97,7 +97,7 @@ class PageTreeRouteContentTypeTest extends TestCase
      */
     private $uuid = '123-123-123';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->documentInspector = $this->prophesize(DocumentInspector::class);

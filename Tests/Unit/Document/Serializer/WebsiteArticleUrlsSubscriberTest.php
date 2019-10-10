@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use PhpCollection\Map;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -49,7 +50,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->requestStack = $this->prophesize(RequestStack::class);
         $this->routeRepository = $this->prophesize(RouteRepository::class);
@@ -71,15 +72,13 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     public function testAddUrlsOnPostSerialize()
     {
         $article = $this->prophesize(ArticleDocument::class);
-        $visitor = $this->prophesize(ArraySerializationVisitor::class);
+        $visitor = $this->prophesize(SerializationVisitorInterface::class);
+
         $context = $this->prophesize(SerializationContext::class);
+        $context->hasAttribute('website')->willReturn(true);
 
         $entityId = '123-123-123';
         $article->getUuid()->willReturn($entityId);
-
-        $contextAttributes = $this->prophesize(Map::class);
-        $contextAttributes->containsKey('website')->willReturn(true);
-        $context->reveal()->attributes = $contextAttributes->reveal();
 
         $event = $this->prophesize(ObjectEvent::class);
         $event->getObject()->willReturn($article->reveal());

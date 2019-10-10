@@ -83,7 +83,7 @@ class ArticleSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->indexer = $this->prophesize(IndexerInterface::class);
         $this->liveIndexer = $this->prophesize(IndexerInterface::class);

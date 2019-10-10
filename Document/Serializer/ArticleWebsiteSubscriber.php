@@ -102,13 +102,21 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         $pageUuid = $article->getPageUuid();
         $visitor->visitProperty(new StaticPropertyMetadata('', 'pageUuid', $pageUuid), $pageUuid);
 
+        // TODO extension data should not be serialized because medias should be available as entities
+        /*
         $extensionData = $article->getExtensionsData()->toArray();
         $extension = [];
         foreach ($extensionData as $name => $data) {
             $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($data);
         }
 
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'extension', $extension),
+            $extension
+        );
+
         $visitor->setData('extension', $extension);
+        */
     }
 
     /**
@@ -161,9 +169,12 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         }
 
         $content = $this->resolve($article);
+        // TODO extension data should not be serialized
+        /*
         foreach ($content as $name => $value) {
             $visitor->setData($name, $value);
         }
+        */
     }
 
     /**
@@ -206,6 +217,7 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
         }
 
         $content = $this->resolve($article);
+
         foreach ($content as $name => $value) {
             $visitor->setData($name, $value);
         }

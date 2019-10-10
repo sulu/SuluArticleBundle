@@ -65,7 +65,7 @@ class ArticleRouteEnhancerTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->webspace = $this->prophesize(Webspace::class);
         $this->webspace->getKey()->willReturn('webspace_key');

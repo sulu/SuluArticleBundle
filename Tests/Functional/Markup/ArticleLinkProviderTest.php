@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Markup;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
@@ -31,7 +31,7 @@ class ArticleLinkProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

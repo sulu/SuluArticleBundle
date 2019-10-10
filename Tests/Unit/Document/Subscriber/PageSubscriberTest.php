@@ -60,7 +60,7 @@ class PageSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);

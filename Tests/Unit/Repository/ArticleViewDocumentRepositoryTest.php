@@ -43,7 +43,7 @@ class ArticleViewDocumentRepositoryTest extends TestCase
      */
     private $articleViewDocumentRepository;
 
-    protected function setUp()
+    public function setUp(): void
     {
         $this->search = $this->prophesize(Search::class);
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true" bootstrap="Tests/test-bootstrap.php">
+<phpunit colors="true"
+         bootstrap="Tests/test-bootstrap.php"
+>
     <testsuites>
         <testsuite name="Sulu Article Bundle">
             <directory>./Tests</directory>

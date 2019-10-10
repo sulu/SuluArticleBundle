@@ -42,7 +42,7 @@ class ArticlePageRouteGeneratorTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->routeGenerator = $this->prophesize(RouteGeneratorInterface::class);
         $this->tokenProvider = $this->prophesize(TokenProviderInterface::class);

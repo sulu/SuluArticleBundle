@@ -103,7 +103,7 @@ class RoutableSubscriberTest extends TestCase
      */
     private $node;
 
-    protected function setUp()
+    public function setUp(): void
     {
         $this->chainGenerator = $this->prophesize(ChainRouteGeneratorInterface::class);
         $this->routeManager = $this->prophesize(RouteManagerInterface::class);

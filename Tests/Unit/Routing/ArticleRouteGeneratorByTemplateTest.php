@@ -31,7 +31,7 @@ class ArticleRouteGeneratorByTemplateTest extends TestCase
 
     private $config = ['test1' => '/test1/{entity.getTitle()', 'test2' => '/test2/{entity.getTitle()'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->generatorBySchema = $this->prophesize(RouteGeneratorInterface::class);
         $this->generatorByTemplate = new ArticleRouteGeneratorByTemplate($this->generatorBySchema->reveal());

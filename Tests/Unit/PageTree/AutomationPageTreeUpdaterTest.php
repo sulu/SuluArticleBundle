@@ -17,6 +17,7 @@ use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\PageTree\AutomationPageTreeUpdater;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
+use Sulu\Bundle\AutomationBundle\SuluAutomationBundle;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Model\TaskInterface;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
@@ -50,8 +51,12 @@ class AutomationPageTreeUpdaterTest extends TestCase
      */
     private $request;
 
-    protected function setUp()
+    public function setUp(): void
     {
+        if (!class_exists(SuluAutomationBundle::class)) {
+            $this->markTestSkipped('Versioning is not enabled');
+        }
+
         $this->taskManager = $this->prophesize(TaskManagerInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->requestStack = $this->prophesize(RequestStack::class);

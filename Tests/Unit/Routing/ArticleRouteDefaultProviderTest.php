@@ -79,7 +79,7 @@ class ArticleRouteDefaultProviderTest extends TestCase
      */
     private $locale = 'de';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);

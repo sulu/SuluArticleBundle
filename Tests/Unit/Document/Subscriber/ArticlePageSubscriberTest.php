@@ -85,7 +85,7 @@ class ArticlePageSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->factory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);

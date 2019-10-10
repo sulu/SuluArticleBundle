@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Teaser;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
@@ -20,7 +20,7 @@ class ArticleTeaserProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

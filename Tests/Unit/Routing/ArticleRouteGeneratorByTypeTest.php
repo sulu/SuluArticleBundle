@@ -41,7 +41,7 @@ class ArticleRouteGeneratorByTypeTest extends TestCase
      */
     private $config = ['type1' => '/test1/{entity.getTitle()', 'type2' => '/test2/{entity.getTitle()'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->generatorBySchema = $this->prophesize(RouteGeneratorInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);

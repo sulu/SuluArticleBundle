@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Sitemap;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Sitemap;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider;
@@ -32,7 +32,7 @@ class ArticleSitemapProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
