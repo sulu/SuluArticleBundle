@@ -7,7 +7,7 @@
  * with this source code in the file LICENSE.
  */
 
-define(['underscore', 'services/husky/translator'], function(_, translator) {
+define(['underscore', 'services/husky/translator', 'suluarticle/utils/template-helper'], function(_, translator, TemplateHelper) {
 
     'use strict';
 
@@ -43,9 +43,9 @@ define(['underscore', 'services/husky/translator'], function(_, translator) {
         ),
 
         templates = {
-            draftIcon: _.template('<span class="draft-icon" title="<%= title %>"/>'),
-            publishedIcon: _.template('<span class="published-icon" title="<%= title %>"/>'),
-            shadowIcon: _.template('<span class="fa-share" title="<%= title %>"></span>'),
+            draftIcon: TemplateHelper.transformTemplateData(_.template('<span class="draft-icon" title="<%= data.title %>"/>')),
+            publishedIcon: TemplateHelper.transformTemplateData(_.template('<span class="published-icon" title="<%= data.title %>"/>')),
+            shadowIcon: TemplateHelper.transformTemplateData(_.template('<span class="fa-share" title="<%= data.title %>"></span>')),
         };
 
     return {

@@ -7,13 +7,13 @@
  * with this source code in the file LICENSE.
  */
 
-define(['services/husky/mediator', 'suluarticle/services/base-router'], function(Mediator, BaseRouter) {
+define(['services/husky/mediator', 'suluarticle/services/base-router', 'suluarticle/utils/template-helper'], function(Mediator, BaseRouter, TemplateHelper) {
 
     'use strict';
 
     var routes = {
-            list: _.template('articles<% if (!!type) { %>:<%= type %><% } %>/<%= locale %>'),
-            add: _.template('articles/<%= locale %>/add:<%= type %>')
+            list: TemplateHelper.transformTemplateData(_.template('articles<% if (!!data.type) { %>:<%= data.type %><% } %>/<%= data.locale %>')),
+            add: TemplateHelper.transformTemplateData(_.template('articles/<%= data.locale %>/add:<%= data.type %>'))
         },
 
         goto = function(route, trigger, force) {

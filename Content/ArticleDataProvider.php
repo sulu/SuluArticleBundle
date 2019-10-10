@@ -124,7 +124,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                     ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],
                     ['column' => 'authored', 'title' => 'sulu_article.smart-content.authored'],
                     ['column' => 'created', 'title' => 'sulu_article.smart-content.created'],
-                    ['column' => 'title', 'title' => 'sulu_article.smart-content.title'],
+                    ['column' => 'title.raw', 'title' => 'sulu_article.smart-content.title'],
                     ['column' => 'author_full_name', 'title' => 'sulu_article.smart-content.author-full-name'],
                 ]
             );
