@@ -25,7 +25,7 @@
         <property name="locale" type="string" groups="preview"/>
         <property name="originalLocale" type="string" groups="preview"/>
         <property name="structure" type="Sulu\Component\Content\Document\Structure\Structure" groups="preview"/>
-        <property name="structureType" type="string" groups="preview"/>
+        <property name="structureType" type="string" groups="website,defaultArticle,smallArticle,preview"/>
 
         <property name="title" serialized-name="articleTitle" type="string" groups="website,preview"/>
         <property name="pageNumber" type="integer" groups="website,defaultArticlePage,smallArticlePage,preview"/>
