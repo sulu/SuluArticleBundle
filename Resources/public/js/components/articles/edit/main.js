@@ -563,10 +563,10 @@ define([
         },
 
         getUrl: function(action) {
-            var url = TemplateHelper.transformTemplateData(_.template(this.defaults.templates.url, {
+            var url = TemplateHelper.transformTemplateData(_.template(this.defaults.templates.url))({
                 id: this.options.id,
                 locale: this.options.locale
-            }));
+            });
 
             if (action) {
                 url += '&action=' + action;
