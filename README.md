@@ -1,6 +1,6 @@
 # SuluArticleBundle
 
-[![Build Status](https://travis-ci.org/sulu/SuluArticleBundle.svg)](https://travis-ci.org/sulu/SuluArticleBundle)
+[![Build Status](https://travis-ci.org/sulu/SuluArticleBundle.svg?branch=master)](https://travis-ci.org/sulu/SuluArticleBundle/branches)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/quality-score.png)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/)
 [![Code Coverage](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/coverage.png)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/)
 [![StyleCI](https://styleci.io/repos/61883398/shield)](https://styleci.io/repos/61883398)
@@ -20,16 +20,9 @@ Additional features included:
 * Composer
 * PHP `^5.5 || ^7.0`
 * Sulu `^1.6`
-* Elasticsearch `^2.2 || ^5.0`
+* Elasticsearch `^5.0 || ^6.0`
 
 For detailed requirements see [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/composer.json).
-
-## Conflicts
-
-Our dependency `ongr/elasticsearch-bundle`
-(see [ongr-io/ElasticsearchBundle#832](https://github.com/ongr-io/ElasticsearchBundle/issues/832) and 
-[ongr-io/ElasticsearchBundle#828](https://github.com/ongr-io/ElasticsearchBundle/issues/828)) isn't supporting
-Elasticsearch `^6.0`.
 
 ## Documentation
 

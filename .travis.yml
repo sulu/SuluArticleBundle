@@ -1,13 +1,16 @@
 language: php
 dist: trusty
 
+services:
+  - mysql
+
 env:
   global:
     - JAVA_HOME="/usr/lib/jvm/java-8-oracle/jre"
     - JACKRABBIT_VERSION=2.12.0
     - SYMFONY__PHPCR__TRANSPORT=doctrinedbal
     - SYMFONY__DATABASE__VERSION=5.5.39
-    - ES_VERSION="5.3.0"
+    - ES_VERSION="6.5.4"
     - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
 
 cache:
@@ -17,11 +20,11 @@ cache:
 
 matrix:
   include:
-    - php: 5.5
+    - php: 5.6
       env:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction -vvv"
-        - ES_VERSION="2.4.4"
-        - ES_DOWNLOAD_URL="https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ES_VERSION}.zip"
+        - ES_VERSION="5.6.14"
+        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - ENABLE_SWAP=true
     - php: 7.3
       env:
@@ -29,14 +32,7 @@ matrix:
         - SYMFONY__PHPCR__TRANSPORT=jackrabbit
         - PHPSTAN=true
 
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
-
 before_install:
-  - sudo update-java-alternatives -s java-8-oracle
-  - export JAVA_HOME=/usr/lib/jvm/java-8-oracle/jre
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - | # enable swap
@@ -63,12 +59,15 @@ install:
         fi
         java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar > /dev/null &
     fi
-  - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
-  - unzip elasticsearch.zip
-  - ./elasticsearch-*/bin/elasticsearch -d
+  - wget ${ES_DOWNLOAD_URL}
+  - unzip elasticsearch-*.zip
+  - cd ./elasticsearch-*
+  - bin/elasticsearch -d
+  - cd ..
   - ./Tests/app/console doctrine:database:create
   - ./Tests/app/console doctrine:schema:update --force
   - ./Tests/app/console sulu:document:initialize
+  - wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
   - ./Tests/app/console ongr:es:index:create -m default
   - ./Tests/app/console ongr:es:index:create -m live
 

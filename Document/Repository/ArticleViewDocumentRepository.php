@@ -128,7 +128,11 @@ class ArticleViewDocumentRepository
                     'fields' => $this->searchFields,
                     'min_term_freq' => 1,
                     'min_doc_freq' => 2,
-                    'ids' => [$this->getViewDocumentId($uuid, $locale)],
+                    'like' => [
+                        [
+                            '_id' => $this->getViewDocumentId($uuid, $locale),
+                        ],
+                    ],
                 ]
             )
         );
