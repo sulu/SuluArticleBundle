@@ -36,7 +36,8 @@ matrix:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
-        - CODE_COVERAGE="--coverage-clover=coverage.clover"
+        # Code coverage currently disabled takes a very long time
+        # - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi

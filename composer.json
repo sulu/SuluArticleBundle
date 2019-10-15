@@ -68,7 +68,10 @@
         "test": [
             "@phpunit"
         ],
-        "phpunit": "vendor/bin/phpunit",
+        "phpunit": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpunit"
+        ],
         "phpstan": [
             "vendor/bin/phpstan analyse -c phpstan.neon"
         ]
