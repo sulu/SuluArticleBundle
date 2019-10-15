@@ -15,7 +15,7 @@ jobs:
           - MYSQL_DATABASE=circle_test
     steps:
       - checkout
-      - run: 
+      - run:
           name: Install OS dependencies (mysql, gd)
           command: |
             sudo apt-get install -y libpng-dev
@@ -51,13 +51,9 @@ jobs:
       - run:
           name: Command Create Test Database
           command: |
-            ./Tests/Application/bin/adminconsole doctrine:database:create
-            ./Tests/Application/bin/adminconsole doctrine:schema:update --force
-            ./Tests/Application/bin/adminconsole sulu:document:initialize
-            ./Tests/Application/bin/adminconsole ongr:es:index:create -m default
-            ./Tests/Application/bin/adminconsole ongr:es:index:create -m live
+            composer bootstrap-test-env
       - run:
           name: List Bundles
           command:
             ./Tests/Application/bin/adminconsole debug:config
-      - run: php -d memory_limit=2G ./vendor/bin/phpunit
+      - run: composer test

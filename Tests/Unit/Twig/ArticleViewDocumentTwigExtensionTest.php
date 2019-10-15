@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -170,7 +170,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
         $ids = ['123-123-123', '321-321-321', '111-111-111'];
 
         return array_map(
-            function ($id) {
+            function($id) {
                 $articleDocument = new ArticleDocument();
                 $articleDocument->setUuid($id);
                 $articleDocument->setLocale('de');
@@ -190,7 +190,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     private function getArticleViewDocuments(array $articleDocuments)
     {
         return  array_map(
-            function ($articleDocument) {
+            function($articleDocument) {
                 $articleViewDocument = new ArticleViewDocument($articleDocument->getUuid());
                 $articleViewDocument->setLocale($articleDocument->getLocale());
                 $articleViewDocument->setStructureType($articleDocument->getStructureType());

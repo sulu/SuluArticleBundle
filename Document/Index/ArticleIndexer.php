@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -325,7 +325,7 @@ class ArticleIndexer implements IndexerInterface
                 continue;
             }
 
-            /** @var ArticlePageViewObject $page */
+            /* @var ArticlePageViewObject $page */
             $pages[] = $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();

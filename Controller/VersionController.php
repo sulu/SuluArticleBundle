@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -15,7 +15,6 @@ use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Component\Content\Document\Behavior\SecurityBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -53,7 +52,7 @@ class VersionController extends FOSRestController implements
             array_filter(
                 $document->getVersions(),
                 function($version) use ($locale) {
-                    /** @var Version $version */
+                    /* @var Version $version */
                     return $version->getLocale() === $locale;
                 }
             )
@@ -68,7 +67,7 @@ class VersionController extends FOSRestController implements
         $userIds = array_unique(
             array_map(
                 function($version) {
-                    /** @var Version $version */
+                    /* @var Version $version */
                     return $version->getAuthor();
                 },
                 $versions

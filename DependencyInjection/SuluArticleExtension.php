@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -314,7 +314,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         );
 
         $loader->load('page_tree_move.xml');
-        if ($config['content_types']['page_tree_route']['page_route_cascade'] !== 'off') {
+        if ('off' !== $config['content_types']['page_tree_route']['page_route_cascade']) {
             $loader->load('page_tree_update.xml');
         }
 

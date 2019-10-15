@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -123,7 +123,7 @@ class RoutableSubscriberTest extends TestCase
         $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->conflictResolver->resolve(Argument::type(RouteInterface::class))->will(
-            function (array $arguments) {
+            function(array $arguments) {
                 return $arguments[0];
             }
         );

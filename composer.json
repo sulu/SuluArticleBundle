@@ -20,8 +20,8 @@
     "require": {
         "php": "^7.2",
         "elasticsearch/elasticsearch": "~5.0 || ~6.0",
-        "jms/serializer": "^3.0",
-        "jms/serializer-bundle": "^3.0",
+        "jms/serializer": "^3.3",
+        "jms/serializer-bundle": "^3.3",
         "ongr/elasticsearch-bundle": "^5.2",
         "ongr/elasticsearch-dsl": "~5.0 || ~6.0",
         "sulu/sulu": "^2.0",
@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "doctrine/data-fixtures": "^1.1",
-        "jackalope/jackalope-doctrine-dbal": "^1.3",
+        "jackalope/jackalope-doctrine-dbal": "^1.3.4",
         "jackalope/jackalope-jackrabbit": "^1.3",
         "massive/build-bundle": "^0.3 || ^0.4",
         "php-ffmpeg/php-ffmpeg": "^0.13 || ^0.14",
@@ -56,11 +56,11 @@
         }
     },
     "scripts": {
-        "bootstrap-test-env": [
+        "bootstrap-test-environment": [
             "Tests/Application/bin/adminconsole doctrine:database:create --if-not-exists --env test",
             "Tests/Application/bin/adminconsole doctrine:schema:update --force --env test",
-            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=default",
-            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=live"
+            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=default --if-not-exists --env test",
+            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=live --if-not-exists --env test"
         ],
         "lint": [
             "@phpstan"

@@ -36,6 +36,7 @@ matrix:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
+        - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
@@ -60,15 +61,11 @@ install:
   - unzip elasticsearch.zip
   - ./elasticsearch-*/bin/elasticsearch -d
   - wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
-  - ./Tests/Application/bin/adminconsole doctrine:database:create
-  - ./Tests/Application/bin/adminconsole doctrine:schema:update --force
-  - ./Tests/Application/bin/adminconsole sulu:document:initialize
-  - ./Tests/Application/bin/adminconsole ongr:es:index:create -m default
-  - ./Tests/Application/bin/adminconsole ongr:es:index:create -m live
+  - composer bootstrap-test-env
 
 script:
   - ./vendor/bin/phpunit $CODE_COVERAGE
-  - if [[ $PHPSTAN == 'true' ]]; then ./vendor/bin/phpstan analyse -c phpstan.neon ; fi
+  - if [[ $PHPSTAN == 'true' ]]; then composer phpstan ; fi
 
 after_script:
   - if [[ -n $CODE_COVERAGE ]]; then wget https://scrutinizer-ci.com/ocular.phar ; fi

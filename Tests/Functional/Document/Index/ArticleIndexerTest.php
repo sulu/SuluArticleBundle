@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Document\Index;
 
-use Symfony\Component\BrowserKit\Client;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
@@ -19,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Symfony\Component\BrowserKit\Client;
 
 class ArticleIndexerTest extends SuluTestCase
 {
