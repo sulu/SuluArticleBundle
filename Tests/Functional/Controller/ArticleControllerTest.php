@@ -1480,9 +1480,6 @@ class ArticleControllerTest extends SuluTestCase
 
     public function testOrderPages()
     {
-        // TODO see Document.ArticleDocument.xml
-        $this->markTestSkipped('TODO see Document.ArticleDocument.xml');
-
         $article = $this->post();
         $pages = [
             $this->postPage($article, 'Page 1'),
@@ -1506,7 +1503,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = $this->publish($article['id']);
 
-        $responsePages = $response['_embedded']['pages'];
+        $responsePages = $response['children'];
         for ($i = 0; $i < count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);

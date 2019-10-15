@@ -147,10 +147,6 @@ class PageTreeRepositoryTest extends SuluTestCase
         $result = $this->documentManager->find($article['id'], $this->locale);
         $this->assertEquals('/test-2/article-1', $result->getRoutePath());
 
-        $this->markTestIncomplete(
-            'Cant test children currently: See Document.ArticleDocument.xml'
-        );
-
         $children = array_values(iterator_to_array($result->getChildren()));
 
         $this->assertEquals('/test-2/article-1/page-2', $children[0]->getRoutePath());

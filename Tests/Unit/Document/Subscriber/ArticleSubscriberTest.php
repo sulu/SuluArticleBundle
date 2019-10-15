@@ -366,9 +366,20 @@ class ArticleSubscriberTest extends TestCase
             $child->getLocale()->willReturn($this->locale);
             $child->getShadowLocale()->willReturn(null);
             $child->isShadowLocaleEnabled()->willReturn(false);
-            $child->getStructureType()->willReturn('my-test');
+            $child->getStructureType()->willReturn('my-other-test');
+            $child->setStructureType('my-test')->shouldBeCalled();
 
             $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $this->documentManager->persist(
+                $child->reveal(),
+                $this->locale,
+                [
+                    'clear_missing_content' => false,
+                    'auto_name' => false,
+                    'auto_rename' => false,
+                ]
+            )->shouldBeCalled();
 
             $children[] = $child;
         }

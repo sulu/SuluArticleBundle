@@ -158,9 +158,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
                 ->setGroups(['preview'])
         );
 
-        return $article; // TODO Remove this see Document.ArticleDocument.xml
-
-        /* TODO see Document.ArticleDocument.xml
         foreach ($article->getChildren() as $child) {
             $child->setParent($article);
         }
@@ -174,6 +171,5 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
         $object = $children[$result['pageNumber'] - 2];
 
         return $object;
-        */
     }
 }

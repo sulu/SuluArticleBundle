@@ -54,7 +54,7 @@ class AutomationPageTreeUpdaterTest extends TestCase
     public function setUp(): void
     {
         if (!class_exists(SuluAutomationBundle::class)) {
-            $this->markTestSkipped('Versioning is not enabled');
+            $this->markTestSkipped('SuluAutomationBundle is needed for this tests');
         }
 
         $this->taskManager = $this->prophesize(TaskManagerInterface::class);

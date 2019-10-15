@@ -136,15 +136,14 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($this->getRoute($title, 2), $response['route']);
         $this->assertEquals(2, $response['pageNumber']);
 
-        $this->assertEquals($article['id'], $response['_embedded']['article']['id']);
+        $this->assertEquals($article['id'], $response['parent']['id']);
 
         $article = $this->getArticle($article['id']);
 
-        // TODO pages serialization need to be implemented
-        $this->markTestSkipped('TODO pages serialization need to be implemented');
+        $pages = $article['children'];
 
-        $this->assertCount(1, $article['_embedded']['pages']);
-        $this->assertEquals($response['id'], reset($article['_embedded']['pages'])['id']);
+        $this->assertCount(1, $pages);
+        $this->assertEquals($response['id'], reset($pages)['id']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(1, $articleViewDocument->getPages());
@@ -171,12 +170,11 @@ class ArticlePageControllerTest extends SuluTestCase
 
         $article = $this->getArticle($article['id']);
 
-        // TODO pages serialization need to be implemented
-        $this->markTestSkipped('TODO pages serialization need to be implemented');
+        $pages = array_values($article['children']);
 
-        $this->assertCount(2, $article['_embedded']['pages']);
-        $this->assertEquals($response1['id'], $article['_embedded']['pages'][0]['id']);
-        $this->assertEquals($response2['id'], $article['_embedded']['pages'][1]['id']);
+        $this->assertCount(2, $pages);
+        $this->assertEquals($response1['id'], $pages[0]['id']);
+        $this->assertEquals($response2['id'], $pages[1]['id']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(2, $articleViewDocument->getPages());
@@ -286,10 +284,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
         $article = $this->getArticle($article['id']);
 
-        // TODO pages serialization need to be implemented
-        $this->markTestSkipped('TODO pages serialization need to be implemented');
-
-        $this->assertCount(0, $article['_embedded']['pages']);
+        $this->assertCount(0, $article['children']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(0, $articleViewDocument->getPages());

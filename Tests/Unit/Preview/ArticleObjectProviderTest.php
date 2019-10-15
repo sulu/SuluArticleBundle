@@ -166,9 +166,6 @@ class ArticleObjectProviderTest extends TestCase
 
     public function testDeserializePage()
     {
-        // TODO see Document.ArticleDocument.xml
-        $this->markTestSkipped('TODO see Document.ArticleDocument.xml');
-
         $article = $this->prophesize(ArticleDocument::class);
 
         $object = $this->prophesize(ArticlePageDocument::class);

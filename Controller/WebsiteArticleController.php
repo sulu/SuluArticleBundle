@@ -60,7 +60,7 @@ class WebsiteArticleController extends Controller
         $requestFormat = $request->getRequestFormat();
         $viewTemplate = $view . '.' . $requestFormat . '.twig';
 
-        $content = $this->serializeArticle($object, $pageNumber);
+        $content = $this->resolveArticle($object, $pageNumber);
 
         $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
 
@@ -122,16 +122,9 @@ class WebsiteArticleController extends Controller
      *
      * @return array
      */
-    protected function serializeArticle(ArticleInterface $object, $pageNumber)
+    protected function resolveArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->get('sulu_core.array_serializer')->serialize(
-            $object,
-            SerializationContext::create()
-                ->setSerializeNull(true)
-                ->setGroups(['website', 'content'])
-                ->setAttribute('website', true)
-                ->setAttribute('pageNumber', $pageNumber)
-        );
+        return $this->get('sulu_article.article_content_resolver')->resolve($object, $pageNumber);
     }
 
     /**

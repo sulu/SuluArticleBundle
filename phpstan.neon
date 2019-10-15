@@ -1,6 +1,11 @@
 parameters:
+    paths:
+        - .
+    level: 1
     excludes_analyse:
         - %currentWorkingDirectory%/vendor/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
-
+        # TODO enable when automation bundle is ready again
+        - %currentWorkingDirectory%/PageTree/AutomationPageTreeUpdater.php
+        - %currentWorkingDirectory%/PageTree/PageTreeRouteUpdateHandler.php

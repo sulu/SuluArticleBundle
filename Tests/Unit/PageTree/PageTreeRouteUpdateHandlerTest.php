@@ -47,7 +47,7 @@ class PageTreeRouteUpdateHandlerTest extends TestCase
     public function setUp(): void
     {
         if (!class_exists(SuluAutomationBundle::class)) {
-            $this->markTestSkipped('Versioning is not enabled');
+            $this->markTestSkipped('SuluAutomationBundle is needed for this tests');
         }
 
         $this->routeUpdater = $this->prophesize(PageTreeUpdaterInterface::class);
