@@ -24,5 +24,6 @@ return PhpCsFixer\Config::create()
         'ordered_imports' => true,
         'phpdoc_align' => ['align' => 'left'],
         'phpdoc_types_order' => false,
+        'phpdoc_to_comment' => false,
     ])
     ->setFinder($finder);
