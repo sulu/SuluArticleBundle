@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -32,7 +32,7 @@ class ArticleSelectionContentTypeTest extends TestCase
     {
         $ids = ['123-123-123', '321-321-321'];
         $articles = array_map(
-            function ($id) {
+            function($id) {
                 return new ArticleViewDocument($id);
             },
             array_reverse($ids)
@@ -53,11 +53,11 @@ class ArticleSelectionContentTypeTest extends TestCase
         $repository->createSearch()->willReturn($search->reveal());
         $search->addQuery(
             Argument::that(
-                function (IdsQuery $query) use ($ids) {
+                function(IdsQuery $query) use ($ids) {
                     return $query->toArray() === [
                             'ids' => [
                                 'values' => array_map(
-                                    function ($id) {
+                                    function($id) {
                                         return $id . '-de';
                                     },
                                     $ids

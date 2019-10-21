@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true" bootstrap="Tests/bootstrap.php">
+<phpunit colors="true"
+         bootstrap="Tests/test-bootstrap.php"
+>
     <testsuites>
         <testsuite name="Sulu Article Bundle">
             <directory>./Tests</directory>
@@ -19,5 +21,7 @@
 
     <php>
         <env name="KERNEL_CLASS" value="Sulu\Bundle\ArticleBundle\Tests\Application\Kernel"/>
+        <env name="APP_ENV" value="test" force="true"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
     </php>
 </phpunit>

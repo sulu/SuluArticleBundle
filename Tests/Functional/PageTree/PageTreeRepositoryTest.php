@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\PageTree;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\PageTree;
 
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRepository;
@@ -43,7 +43,7 @@ class PageTreeRepositoryTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -52,7 +52,7 @@ class PageTreeRepositoryTest extends SuluTestCase
 
         $this->client = $this->createAuthenticatedClient();
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->pageTreeRepository  = $this->getContainer()->get('sulu_article.page_tree_route.updater.request');
+        $this->pageTreeRepository = $this->getContainer()->get('sulu_article.page_tree_route.updater.request');
     }
 
     public function testUpdate()

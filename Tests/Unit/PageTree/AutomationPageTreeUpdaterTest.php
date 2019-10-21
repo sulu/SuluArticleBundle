@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -17,6 +17,7 @@ use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\PageTree\AutomationPageTreeUpdater;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
+use Sulu\Bundle\AutomationBundle\SuluAutomationBundle;
 use Sulu\Bundle\AutomationBundle\Tasks\Manager\TaskManagerInterface;
 use Sulu\Bundle\AutomationBundle\Tasks\Model\TaskInterface;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
@@ -50,8 +51,12 @@ class AutomationPageTreeUpdaterTest extends TestCase
      */
     private $request;
 
-    protected function setUp()
+    public function setUp(): void
     {
+        if (!class_exists(SuluAutomationBundle::class)) {
+            $this->markTestSkipped('SuluAutomationBundle is needed for this tests');
+        }
+
         $this->taskManager = $this->prophesize(TaskManagerInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
         $this->requestStack = $this->prophesize(RequestStack::class);
@@ -75,7 +80,7 @@ class AutomationPageTreeUpdaterTest extends TestCase
 
         $this->taskManager->create(
             Argument::that(
-                function (TaskInterface $task) {
+                function(TaskInterface $task) {
                     return BasePageDocument::class === $task->getEntityClass()
                         && '123-123-123' === $task->getEntityId()
                         && 'de' === $task->getLocale()

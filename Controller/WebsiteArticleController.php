@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
-use JMS\Serializer\SerializationContext;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -60,7 +59,7 @@ class WebsiteArticleController extends Controller
         $requestFormat = $request->getRequestFormat();
         $viewTemplate = $view . '.' . $requestFormat . '.twig';
 
-        $content = $this->serializeArticle($object, $pageNumber);
+        $content = $this->resolveArticle($object, $pageNumber);
 
         $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
 
@@ -73,7 +72,7 @@ class WebsiteArticleController extends Controller
                         $data
                     )
                 );
-            } else if ($preview) {
+            } elseif ($preview) {
                 $parameters = [
                     'previewParentTemplate' => $viewTemplate,
                     'previewContentReplacer' => Preview::CONTENT_REPLACER,
@@ -122,17 +121,9 @@ class WebsiteArticleController extends Controller
      *
      * @return array
      */
-    protected function serializeArticle(ArticleInterface $object, $pageNumber)
+    protected function resolveArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->get('jms_serializer')->serialize(
-            $object,
-            'array',
-            SerializationContext::create()
-                ->setSerializeNull(true)
-                ->setGroups(['website', 'content'])
-                ->setAttribute('website', true)
-                ->setAttribute('pageNumber', $pageNumber)
-        );
+        return $this->get('sulu_article.article_content_resolver')->resolve($object, $pageNumber);
     }
 
     /**

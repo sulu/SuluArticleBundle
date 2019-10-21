@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -83,7 +83,7 @@ class ArticleSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->indexer = $this->prophesize(IndexerInterface::class);
         $this->liveIndexer = $this->prophesize(IndexerInterface::class);
@@ -366,9 +366,20 @@ class ArticleSubscriberTest extends TestCase
             $child->getLocale()->willReturn($this->locale);
             $child->getShadowLocale()->willReturn(null);
             $child->isShadowLocaleEnabled()->willReturn(false);
-            $child->getStructureType()->willReturn('my-test');
+            $child->getStructureType()->willReturn('my-other-test');
+            $child->setStructureType('my-test')->shouldBeCalled();
 
             $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $this->documentManager->persist(
+                $child->reveal(),
+                $this->locale,
+                [
+                    'clear_missing_content' => false,
+                    'auto_name' => false,
+                    'auto_rename' => false,
+                ]
+            )->shouldBeCalled();
 
             $children[] = $child;
         }

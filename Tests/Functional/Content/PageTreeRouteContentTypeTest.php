@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Content;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use PHPCR\NodeInterface;
 use PHPCR\PropertyType;
@@ -97,7 +97,7 @@ class PageTreeRouteContentTypeTest extends TestCase
      */
     private $uuid = '123-123-123';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
@@ -258,7 +258,7 @@ class PageTreeRouteContentTypeTest extends TestCase
         $route->getPath()->willReturn('/test-article');
 
         $route->setPath('/test-page/test-article')->shouldBeCalled()->will(
-            function () use ($route) {
+            function() use ($route) {
                 $route->getPath()->willReturn('/test-page/test-article');
             }
         );
@@ -308,7 +308,7 @@ class PageTreeRouteContentTypeTest extends TestCase
         $route->getPath()->willReturn('/test-article');
 
         $route->setPath('/test-article')->shouldBeCalled()->will(
-            function () use ($route) {
+            function() use ($route) {
                 $route->getPath()->willReturn('/test-article');
             }
         );

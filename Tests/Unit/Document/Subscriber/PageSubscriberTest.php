@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -60,7 +60,7 @@ class PageSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
         $this->propertyEncoder = $this->prophesize(PropertyEncoder::class);
@@ -194,7 +194,7 @@ class PageSubscriberTest extends TestCase
         $parentNode = $this->prophesize(NodeInterface::class);
         $parentNode->getNodes()->willReturn(
             array_map(
-                function ($item) {
+                function($item) {
                     return $item->reveal();
                 },
                 $nodes

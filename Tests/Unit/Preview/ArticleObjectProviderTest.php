@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -14,13 +14,13 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Preview;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider;
 use Sulu\Component\Content\Document\Structure\Structure;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use PHPUnit\Framework\TestCase;
 
 class ArticleObjectProviderTest extends TestCase
 {
@@ -39,7 +39,7 @@ class ArticleObjectProviderTest extends TestCase
      */
     private $provider;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -97,9 +97,9 @@ class ArticleObjectProviderTest extends TestCase
             $object->reveal(),
             'json',
             Argument::that(
-                function (SerializationContext $context) {
+                function(SerializationContext $context) {
                     return $context->shouldSerializeNull()
-                           && $context->attributes->get('groups')->get() === ['preview'];
+                           && $context->getAttribute('groups') === ['preview'];
                 }
             )
         )->shouldBeCalled()->willReturn('{"title": "test"}');
@@ -125,9 +125,9 @@ class ArticleObjectProviderTest extends TestCase
             $article->reveal(),
             'json',
             Argument::that(
-                function (SerializationContext $context) {
+                function(SerializationContext $context) {
                     return $context->shouldSerializeNull()
-                           && $context->attributes->get('groups')->get() === ['preview'];
+                           && $context->getAttribute('groups') === ['preview'];
                 }
             )
         )->shouldBeCalled()->willReturn('{"title": "test"}');
@@ -147,9 +147,8 @@ class ArticleObjectProviderTest extends TestCase
             ArticleDocument::class,
             'json',
             Argument::that(
-                function (DeserializationContext $context) {
-                    return $context->shouldSerializeNull()
-                           && $context->attributes->get('groups')->get() === ['preview'];
+                function(DeserializationContext $context) {
+                    return $context->getAttribute('groups') === ['preview'];
                 }
             )
         )->shouldBeCalled()->willReturn($object->reveal());
@@ -177,9 +176,8 @@ class ArticleObjectProviderTest extends TestCase
             ArticleDocument::class,
             'json',
             Argument::that(
-                function (DeserializationContext $context) {
-                    return $context->shouldSerializeNull()
-                           && $context->attributes->get('groups')->get() === ['preview'];
+                function(DeserializationContext $context) {
+                    return $context->getAttribute('groups') === ['preview'];
                 }
             )
         )->shouldBeCalled()->willReturn($article->reveal());

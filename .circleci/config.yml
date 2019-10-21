@@ -15,7 +15,7 @@ jobs:
           - MYSQL_DATABASE=circle_test
     steps:
       - checkout
-      - run: 
+      - run:
           name: Install OS dependencies (mysql, gd)
           command: |
             sudo apt-get install -y libpng-dev
@@ -27,6 +27,7 @@ jobs:
             curl -L -o elasticsearch.zip https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip
             unzip elasticsearch.zip
           parallel: true
+      - run: echo -e "memory_limit=2G" | sudo tee /usr/local/etc/php/php.ini > /dev/null
       - run: sudo composer self-update
       - restore_cache:
           keys:
@@ -51,13 +52,9 @@ jobs:
       - run:
           name: Command Create Test Database
           command: |
-            ./Tests/Application/console doctrine:database:create
-            ./Tests/Application/console doctrine:schema:update --force
-            ./Tests/Application/console sulu:document:initialize
-            ./Tests/Application/console ongr:es:index:create -m default
-            ./Tests/Application/console ongr:es:index:create -m live
+            composer bootstrap-test-env
       - run:
           name: List Bundles
           command:
-            ./Tests/Application/console debug:config
-      - run: php -d memory_limit=2G ./vendor/bin/phpunit
+            ./Tests/Application/bin/adminconsole debug:config
+      - run: composer test

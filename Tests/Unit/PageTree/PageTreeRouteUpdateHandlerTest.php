@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeRouteUpdateHandler;
 use Sulu\Bundle\ArticleBundle\PageTree\PageTreeUpdaterInterface;
+use Sulu\Bundle\AutomationBundle\SuluAutomationBundle;
 use Sulu\Bundle\PageBundle\Document\HomeDocument;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -43,8 +44,12 @@ class PageTreeRouteUpdateHandlerTest extends TestCase
      */
     private $handler;
 
-    protected function setUp()
+    public function setUp(): void
     {
+        if (!class_exists(SuluAutomationBundle::class)) {
+            $this->markTestSkipped('SuluAutomationBundle is needed for this tests');
+        }
+
         $this->routeUpdater = $this->prophesize(PageTreeUpdaterInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);

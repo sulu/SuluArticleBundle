@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -16,11 +16,13 @@ use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * AppKernel for functional tests.
  */
-class Kernel extends SuluTestKernel
+class Kernel extends SuluTestKernel implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}
@@ -58,5 +60,15 @@ class Kernel extends SuluTestKernel
         }
 
         $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
+    }
+
+    public function process(ContainerBuilder $container)
+    {
+        // Make some services which were inlined in optimization
+        $container->getDefinition('sulu_article.content.page_tree_data_provider')
+            ->setPublic(true);
+
+        $container->getDefinition('sulu_article.elastic_search.article_indexer')
+            ->setPublic(true);
     }
 }

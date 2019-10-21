@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Controller;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
@@ -30,7 +30,7 @@ class VersionControllerTest extends SuluTestCase
      */
     protected $locale = 'de';
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!$this->getContainer()->getParameter('sulu_document_manager.versioning.enabled')) {
             $this->markTestSkipped('Versioning is not enabled');

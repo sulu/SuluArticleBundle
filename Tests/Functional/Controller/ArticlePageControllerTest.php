@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Controller;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
 use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
@@ -29,7 +29,7 @@ class ArticlePageControllerTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -136,11 +136,14 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals($this->getRoute($title, 2), $response['route']);
         $this->assertEquals(2, $response['pageNumber']);
 
-        $this->assertEquals($article['id'], $response['_embedded']['article']['id']);
+        $this->assertEquals($article['id'], $response['parent']['id']);
 
         $article = $this->getArticle($article['id']);
-        $this->assertCount(1, $article['_embedded']['pages']);
-        $this->assertEquals($response['id'], reset($article['_embedded']['pages'])['id']);
+
+        $pages = $article['children'];
+
+        $this->assertCount(1, $pages);
+        $this->assertEquals($response['id'], reset($pages)['id']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(1, $articleViewDocument->getPages());
@@ -166,9 +169,12 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals(3, $response2['pageNumber']);
 
         $article = $this->getArticle($article['id']);
-        $this->assertCount(2, $article['_embedded']['pages']);
-        $this->assertEquals($response1['id'], $article['_embedded']['pages'][0]['id']);
-        $this->assertEquals($response2['id'], $article['_embedded']['pages'][1]['id']);
+
+        $pages = array_values($article['children']);
+
+        $this->assertCount(2, $pages);
+        $this->assertEquals($response1['id'], $pages[0]['id']);
+        $this->assertEquals($response2['id'], $pages[1]['id']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(2, $articleViewDocument->getPages());
@@ -277,7 +283,8 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(204, $client->getResponse());
 
         $article = $this->getArticle($article['id']);
-        $this->assertCount(0, $article['_embedded']['pages']);
+
+        $this->assertCount(0, $article['children']);
 
         $articleViewDocument = $this->findViewDocument($article['id'], 'de');
         $this->assertCount(0, $articleViewDocument->getPages());

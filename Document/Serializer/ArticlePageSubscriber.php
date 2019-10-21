@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 
 /**
@@ -50,6 +51,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $visitor->addData('title', $context->accept($articlePage->getParent()->getTitle()));
+        $title = $articlePage->getParent()->getTitle();
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'title', $title), $title);
     }
 }

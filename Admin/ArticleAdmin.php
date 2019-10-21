@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -12,16 +12,15 @@
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
 use Sulu\Bundle\AdminBundle\Admin\Admin;
-use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
-use Sulu\Bundle\AdminBundle\Admin\Routing\RouteBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
-use Sulu\Bundle\AdminBundle\Admin\Routing\RouteCollection;
-use Sulu\Bundle\AdminBundle\Admin\Routing\ToolbarAction;
+use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
+use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
+use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
+use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
-use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
  * Integrates article-bundle into sulu-admin.
@@ -34,16 +33,16 @@ class ArticleAdmin extends Admin
 
     const SECURITY_CONTEXT = 'sulu.modules.articles';
 
-    const LIST_ROUTE = 'sulu_article.list';
+    const LIST_VIEW = 'sulu_article.list';
 
-    const ADD_FORM_ROUTE = 'sulu_article.add_form';
+    const ADD_FORM_VIEW = 'sulu_article.add_form';
 
-    const EDIT_FORM_ROUTE = 'sulu_article.edit_form';
+    const EDIT_FORM_VIEW = 'sulu_article.edit_form';
 
     /**
-     * @var RouteBuilderFactoryInterface
+     * @var ViewBuilderFactoryInterface
      */
-    private $routeBuilderFactory;
+    private $viewBuilderFactory;
 
     /**
      * @var SecurityCheckerInterface
@@ -56,11 +55,11 @@ class ArticleAdmin extends Admin
     private $localizationManager;
 
     public function __construct(
-        RouteBuilderFactoryInterface $routeBuilderFactory,
+        ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
         LocalizationManagerInterface $localizationManager
     ) {
-        $this->routeBuilderFactory = $routeBuilderFactory;
+        $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
         $this->localizationManager = $localizationManager;
     }
@@ -74,7 +73,7 @@ class ArticleAdmin extends Admin
             $articleItem = new NavigationItem('sulu_article.articles');
             $articleItem->setPosition(20);
             $articleItem->setIcon('su-newspaper');
-            $articleItem->setMainRoute(static::LIST_ROUTE);
+            $articleItem->setView(static::LIST_VIEW);
 
             $navigationItemCollection->add($articleItem);
         }
@@ -83,7 +82,7 @@ class ArticleAdmin extends Admin
     /**
      * {@inheritdoc}
      */
-    public function configureRoutes(RouteCollection $routeCollection): void
+    public function configureViews(ViewCollection $viewCollection): void
     {
         $locales = array_values(
             array_map(
@@ -109,75 +108,75 @@ class ArticleAdmin extends Admin
             new ToolbarAction('sulu_admin.delete'),
         ];
 
-        $routeCollection->add(
-            $this->routeBuilderFactory->createListRouteBuilder(static::LIST_ROUTE, '/articles/:locale')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW, '/articles/:locale')
                 ->setResourceKey('articles')
                 ->setListKey('articles')
                 ->setTitle('sulu_article.articles')
                 ->addListAdapters(['table'])
                 ->addLocales($locales)
                 ->setDefaultLocale($locales[0])
-                ->setAddRoute(static::ADD_FORM_ROUTE)
-                ->setEditRoute(static::EDIT_FORM_ROUTE)
+                ->setAddView(static::ADD_FORM_VIEW)
+                ->setEditView(static::EDIT_FORM_VIEW)
                 ->addToolbarActions($listToolbarActions)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createResourceTabRouteBuilder(static::ADD_FORM_ROUTE, '/articles/:locale/add')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createResourceTabViewBuilder(static::ADD_FORM_VIEW, '/articles/:locale/add')
                 ->setResourceKey('articles')
                 ->addLocales($locales)
-                ->setBackRoute(static::LIST_ROUTE)
+                ->setBackView(static::LIST_VIEW)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createFormRouteBuilder('sulu_article.add_form.details', '/details')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createFormViewBuilder('sulu_article.add_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
-                ->setEditRoute(static::EDIT_FORM_ROUTE)
+                ->setEditView(static::EDIT_FORM_VIEW)
                 ->addToolbarActions($formToolbarActionsWithType)
-                ->setParent(static::ADD_FORM_ROUTE)
+                ->setParent(static::ADD_FORM_VIEW)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createResourceTabRouteBuilder(static::EDIT_FORM_ROUTE, '/articles/:locale/:id')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_FORM_VIEW, '/articles/:locale/:id')
                 ->setResourceKey('articles')
                 ->addLocales($locales)
-                ->setBackRoute(static::LIST_ROUTE)
+                ->setBackView(static::LIST_VIEW)
                 ->setTitleProperty('title')
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.details', '/details')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createPreviewFormViewBuilder('sulu_article.edit_form.details', '/details')
                 ->setResourceKey('articles')
                 ->setFormKey('article')
                 ->setTabTitle('sulu_admin.details')
                 ->setTabPriority(1024)
                 ->addToolbarActions($formToolbarActionsWithType)
-                ->setParent(static::EDIT_FORM_ROUTE)
+                ->setParent(static::EDIT_FORM_VIEW)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.seo', '/seo')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createPreviewFormViewBuilder('sulu_article.edit_form.seo', '/seo')
                 ->setResourceKey('articles')
                 ->setFormKey('page_seo')
                 ->setTabTitle('sulu_page.seo')
                 ->addToolbarActions($formToolbarActionsWithoutType)
-                ->setParent(static::EDIT_FORM_ROUTE)
+                ->setParent(static::EDIT_FORM_VIEW)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.excerpt', '/excerpt')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createPreviewFormViewBuilder('sulu_article.edit_form.excerpt', '/excerpt')
                 ->setResourceKey('articles')
                 ->setFormKey('page_excerpt')
-                ->setBackRoute(static::LIST_ROUTE)
+                ->setBackView(static::LIST_VIEW)
                 ->setTabTitle('sulu_page.excerpt')
                 ->addToolbarActions($formToolbarActionsWithoutType)
-                ->setParent(static::EDIT_FORM_ROUTE)
+                ->setParent(static::EDIT_FORM_VIEW)
         );
-        $routeCollection->add(
-            $this->routeBuilderFactory->createPreviewFormRouteBuilder('sulu_article.edit_form.settings', '/settings')
+        $viewCollection->add(
+            $this->viewBuilderFactory->createPreviewFormViewBuilder('sulu_article.edit_form.settings', '/settings')
                 ->setResourceKey('articles')
                 ->setFormKey('article_settings')
-                ->setBackRoute(static::LIST_ROUTE)
+                ->setBackView(static::LIST_VIEW)
                 ->setTabTitle('sulu_page.settings')
                 ->setTabPriority(512)
                 ->addToolbarActions($formToolbarActionsWithoutType)
-                ->setParent(static::EDIT_FORM_ROUTE)
+                ->setParent(static::EDIT_FORM_VIEW)
         );
     }
 
@@ -197,7 +196,7 @@ class ArticleAdmin extends Admin
                         PermissionTypes::LIVE,
                     ],
                 ],
-            ]
+            ],
         ];
     }
 }

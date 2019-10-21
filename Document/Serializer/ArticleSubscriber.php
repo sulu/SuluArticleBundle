@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
@@ -110,7 +111,9 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $visitor->addData('articleType', $context->accept($this->getType($structure->getStructure())));
+
+        $articleType = $this->getType($structure->getStructure());
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'articleType', $articleType), $articleType);
     }
 
     /**
@@ -128,13 +131,23 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $visitor->addData('customizeWebspaceSettings', $context->accept(null !== $article->getMainWebspace()));
+        $customizeWebspaceSettings = (null !== $article->getMainWebspace());
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'customizeWebspaceSettings', $customizeWebspaceSettings),
+            $customizeWebspaceSettings
+        );
         if ($article->getMainWebspace()) {
             return;
         }
 
-        $visitor->setData('mainWebspace', $this->webspaceResolver->resolveMainWebspace($article));
-        $visitor->setData('additionalWebspace', $this->webspaceResolver->resolveAdditionalWebspaces($article));
+        $mainWebspace = $this->webspaceResolver->resolveMainWebspace($article);
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'mainWebspace', $mainWebspace), $mainWebspace);
+
+        $additionalWebspace = $this->webspaceResolver->resolveAdditionalWebspaces($article);
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'additionalWebspace', $additionalWebspace),
+            $additionalWebspace
+        );
     }
 
     /**
@@ -152,8 +165,18 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $visitor->addData('broken', !$structure || $structure->getKey() !== $article->getStructureType());
-        $visitor->addData('originalStructureType', $article->getStructureType());
+
+        $broken = (!$structure || $structure->getKey() !== $article->getStructureType());
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'broken', $broken),
+            $broken
+        );
+
+        $originalStructureType = $article->getStructureType();
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'originalStructureType', $originalStructureType),
+            $originalStructureType
+        );
     }
 
     /**
@@ -173,7 +196,11 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $property = $this->getPageTitleProperty($article);
         if ($property) {
-            $visitor->addData('_pageTitlePropertyName', $context->accept($property->getName()));
+            $propertyName = $property->getName();
+            $visitor->visitProperty(
+                new StaticPropertyMetadata('', '_pageTitlePropertyName', $propertyName),
+                $propertyName
+            );
         }
     }
 

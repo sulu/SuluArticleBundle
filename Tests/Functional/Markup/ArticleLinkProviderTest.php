@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Markup;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
@@ -31,7 +31,7 @@ class ArticleLinkProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles
@@ -81,7 +81,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles
@@ -110,7 +110,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles

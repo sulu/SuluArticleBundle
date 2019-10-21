@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Ferrandini\Urlizer;
 use PHPCR\NodeInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -28,7 +29,6 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\NameResolver;
 use Symfony\Cmf\Api\Slugifier\SlugifierInterface;
-use PHPUnit\Framework\TestCase;
 
 class ArticlePageSubscriberTest extends TestCase
 {
@@ -85,7 +85,7 @@ class ArticlePageSubscriberTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->factory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
@@ -100,12 +100,12 @@ class ArticlePageSubscriberTest extends TestCase
         $this->factory->getStructureMetadata('article_page', 'default')->willReturn($this->metadata->reveal());
 
         $this->slugifier->slugify(Argument::type('string'))->will(
-            function ($arguments) {
+            function($arguments) {
                 return Urlizer::urlize($arguments[0]);
             }
         );
         $this->nameResolver->resolveName(Argument::type(NodeInterface::class), Argument::type('string'))->will(
-            function ($arguments) {
+            function($arguments) {
                 return $arguments[1];
             }
         );

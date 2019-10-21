@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Controller;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
 use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
@@ -33,7 +33,6 @@ use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Entity\Tag;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
-use Sulu\Component\DocumentManager\DocumentManager;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\BrowserKit\Client;
 
@@ -69,7 +68,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -95,7 +94,6 @@ class ArticleControllerTest extends SuluTestCase
         $authored = '2016-01-01',
         $action = null
     ) {
-
         $requestData = [
             'title' => $title,
             'template' => $template,
@@ -330,7 +328,7 @@ class ArticleControllerTest extends SuluTestCase
         // check response
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals($mainWebspace !== null, $response['customizeWebspaceSettings']);
+        $this->assertEquals(null !== $mainWebspace, $response['customizeWebspaceSettings']);
         $this->assertEquals($mainWebspace ?: 'sulu_io', $response['mainWebspace']);
         $this->assertEquals($additionalWebspaces, $response['additionalWebspaces']);
 
@@ -452,7 +450,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -470,7 +468,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -536,7 +534,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(3, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -555,7 +553,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(3, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
@@ -715,7 +713,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -744,8 +742,8 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $this->assertContains($article2['id'], $response['_embedded']['articles'][0]['id']);
-        $this->assertContains($article1['id'], $response['_embedded']['articles'][1]['id']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+        $this->assertEquals($article1['id'], $response['_embedded']['articles'][1]['id']);
     }
 
     public function testCGetAuthoredRange()
@@ -767,8 +765,8 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
-        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
-        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
+        $this->assertEquals($response['_embedded']['articles'][0]['title'], $article['title']);
+        $this->assertEquals($response['_embedded']['articles'][0]['id'], $article['id']);
     }
 
     public function testCGetWorkflowStage()
@@ -787,8 +785,8 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
-        $this->assertContains($response['_embedded']['articles'][0]['title'], $article['title']);
-        $this->assertContains($response['_embedded']['articles'][0]['id'], $article['id']);
+        $this->assertEquals($response['_embedded']['articles'][0]['title'], $article['title']);
+        $this->assertEquals($response['_embedded']['articles'][0]['id'], $article['id']);
     }
 
     public function testCGetSearch()
@@ -911,7 +909,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(1, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -929,7 +927,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(1, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -1164,7 +1162,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -1181,7 +1179,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
@@ -1209,7 +1207,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function ($item) {
+            function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
@@ -1503,7 +1501,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = $this->publish($article['id']);
 
-        $responsePages = $response['_embedded']['pages'];
+        $responsePages = $response['children'];
         for ($i = 0; $i < count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);

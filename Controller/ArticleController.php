@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -225,7 +225,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,
-                function (FieldDescriptorInterface $fieldDescriptor) use ($fields) {
+                function(FieldDescriptorInterface $fieldDescriptor) use ($fields) {
                     return in_array($fieldDescriptor->getName(), $fields);
                 }
             );
@@ -357,7 +357,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Update articles.
      *
      * @param Request $request
-     * @param string  $id
+     * @param string $id
      *
      * @return Response
      */
@@ -434,7 +434,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @Post("/articles/{id}")
      *
-     * @param string  $uuid
+     * @param string $uuid
      * @param Request $request
      *
      * @return Response
@@ -546,7 +546,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given Formation.
      *
-     * @param array  $data
+     * @param array $data
      * @param object $document
      * @param string $locale
      *

@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -41,7 +41,7 @@ class ArticleRouteGeneratorByTypeTest extends TestCase
      */
     private $config = ['type1' => '/test1/{entity.getTitle()', 'type2' => '/test2/{entity.getTitle()'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->generatorBySchema = $this->prophesize(RouteGeneratorInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);

@@ -3,13 +3,13 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Content;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
@@ -25,7 +25,7 @@ class ArticleDataProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
