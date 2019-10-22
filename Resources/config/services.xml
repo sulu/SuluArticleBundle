@@ -313,7 +313,7 @@
             <argument type="service" id="sulu_article.view_document.factory"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
 
-            <tag name="sulu.sitemap.provider" alias="articles"/>
+            <tag name="sulu.sitemap.provider"/>
         </service>
 
         <!-- preview -->

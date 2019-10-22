@@ -3,8 +3,8 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/webspace/webspace http://schemas.sulu.io/webspace/webspace-1.1.xsd">
 
-    <name>Test2</name>
-    <key>test-2</key>
+    <name>Sulu Blog CMF</name>
+    <key>sulu_io_blog</key>
 
     <localizations>
         <localization language="de" default="true"/>
@@ -30,23 +30,23 @@
 
     <portals>
         <portal>
-            <name>Test2</name>
-            <key>test-2</key>
+            <name>Sulu CMF AT</name>
+            <key>sulucmf_at</key>
 
             <environments>
                 <environment type="prod">
                     <urls>
-                        <url language="de">test-2.localhost</url>
+                        <url language="de">sulu_io.localhost/blog</url>
                     </urls>
                 </environment>
                 <environment type="dev">
                     <urls>
-                        <url language="de">test-2.localhost</url>
+                        <url language="de">sulu_io.localhost/blog</url>
                     </urls>
                 </environment>
                 <environment type="test">
                     <urls>
-                        <url language="de">test-2.localhost</url>
+                        <url language="de">sulu_io.localhost/blog</url>
                     </urls>
                 </environment>
             </environments>

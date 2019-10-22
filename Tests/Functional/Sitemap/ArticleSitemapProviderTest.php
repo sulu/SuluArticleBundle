@@ -54,23 +54,26 @@ class ArticleSitemapProviderTest extends SuluTestCase
         $article1 = $this->createArticle('1', 'default', 'sulu_io', []);
         $article2 = $this->createArticle('2', 'simple', 'test', ['sulu_io']);
         $article3 = $this->createArticle('3', 'default', 'test', ['test-2']);
+        $article4 = $this->createArticle('4', 'default', 'sulu_io_blog', []);
 
         /** @var SitemapUrl[] $result */
-        $result = $this->articleSitemapProvider->build(0, 'sulucmf_at');
+        $result = $this->articleSitemapProvider->build(0, 'http', 'sulu_io.localhost');
+
+        $this->assertCount(3, $result);
+        $this->assertEquals('http://sulu_io.localhost' . $article1['route'], $result[0]->getLoc());
+        $this->assertEquals('http://sulu_io.localhost/blog' . $article4['route'], $result[1]->getLoc());
+        $this->assertEquals('http://sulu_io.localhost' . $article2['route'], $result[2]->getLoc());
+
+        /** @var SitemapUrl[] $result */
+        $result = $this->articleSitemapProvider->build(0, 'http', 'test.localhost');
         $this->assertCount(2, $result);
-        $this->assertEquals($article1['route'], $result[0]->getLoc());
-        $this->assertEquals($article2['route'], $result[1]->getLoc());
+        $this->assertEquals('http://test.localhost' . $article2['route'], $result[0]->getLoc());
+        $this->assertEquals('http://test.localhost' . $article3['route'], $result[1]->getLoc());
 
         /** @var SitemapUrl[] $result */
-        $result = $this->articleSitemapProvider->build(0, 'test');
-        $this->assertCount(2, $result);
-        $this->assertEquals($article2['route'], $result[0]->getLoc());
-        $this->assertEquals($article3['route'], $result[1]->getLoc());
-
-        /** @var SitemapUrl[] $result */
-        $result = $this->articleSitemapProvider->build(0, 'test-2');
+        $result = $this->articleSitemapProvider->build(0, 'http', 'test-2.localhost');
         $this->assertCount(1, $result);
-        $this->assertEquals($article3['route'], $result[0]->getLoc());
+        $this->assertEquals('http://test-2.localhost' . $article3['route'], $result[0]->getLoc());
     }
 
     private function createArticle(
