@@ -133,20 +133,20 @@ More information about this topic can be found in the section [multi-webspaces](
 Add xml template for structure in configured folder:
 
 ```
-%kernel.project_dir%/config/templates/articles/default.xml
+%kernel.project_dir%/config/templates/articles/article.xml
 ```
 
 Example is located in Bundle
-[default.xml](default.xml).
+[article.xml](article.xml).
 
 Add template for article type in configured folder:
 
 ```
-%kernel.project_dir%/templates/articles/default.html.twig
+%kernel.project_dir%/templates/articles/article.html.twig
 ```
 
 Example is located in Bundle
-[default.html.twig](default.html.twig).
+[article.html.twig](article.html.twig).
 
 ## Initialize bundle
 

@@ -31,7 +31,7 @@
             <tag name="sulu_article.article_title"/>
         </property>
 
-        <property name="routePath" type="resource_locator">
+        <property name="routePath" type="route">
             <meta>
                 <title lang="en">Resourcelocator</title>
                 <title lang="de">Adresse</title>

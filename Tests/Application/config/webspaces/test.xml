@@ -36,17 +36,17 @@
             <environments>
                 <environment type="prod">
                     <urls>
-                        <url language="de">{host}</url>
+                        <url language="de">test.localhost</url>
                     </urls>
                 </environment>
                 <environment type="dev">
                     <urls>
-                        <url language="de">{host}</url>
+                        <url language="de">test.localhost</url>
                     </urls>
                 </environment>
                 <environment type="test">
                     <urls>
-                        <url language="de">{host}</url>
+                        <url language="de">test.localhost</url>
                     </urls>
                 </environment>
             </environments>
