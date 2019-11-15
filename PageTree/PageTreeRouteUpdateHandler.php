@@ -40,11 +40,6 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
      */
     private $entityManager;
 
-    /**
-     * @param PageTreeUpdaterInterface $routeUpdater
-     * @param DocumentManagerInterface $documentManager
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         PageTreeUpdaterInterface $routeUpdater,
         DocumentManagerInterface $documentManager,
@@ -58,7 +53,7 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     /**
      * {@inheritdoc}
      */
-    public function configureOptionsResolver(OptionsResolver $optionsResolver)
+    public function configureOptionsResolver(OptionsResolver $optionsResolver): OptionsResolver
     {
         return $optionsResolver->setRequired(['id', 'locale'])
             ->setAllowedTypes('id', 'string')
@@ -68,7 +63,7 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     /**
      * {@inheritdoc}
      */
-    public function supports($entityClass)
+    public function supports($entityClass): bool
     {
         return is_subclass_of($entityClass, BasePageDocument::class);
     }
@@ -76,7 +71,7 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration()
+    public function getConfiguration(): TaskHandlerConfiguration
     {
         return TaskHandlerConfiguration::create('sulu_article.update_route');
     }
