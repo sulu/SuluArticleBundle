@@ -76,8 +76,7 @@ class AutomationPageTreeUpdaterTest extends TestCase
         $document->getUuid()->willReturn('123-123-123');
         $document->getLocale()->willReturn('de');
 
-        $this->updater->update($document->reveal());
-
+        $task = $this->prophesize(TaskInterface::class);
         $this->taskManager->create(
             Argument::that(
                 function(TaskInterface $task) {
@@ -90,7 +89,10 @@ class AutomationPageTreeUpdaterTest extends TestCase
                         && 'http' === $task->getScheme();
                 }
             )
-        )->shouldBeCalled();
+        )->shouldBeCalled()->willReturn($task->reveal());
+
         $this->entityManager->flush()->shouldBeCalled();
+
+        $this->updater->update($document->reveal());
     }
 }
