@@ -17,6 +17,8 @@ use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
+use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -54,14 +56,21 @@ class ArticleAdmin extends Admin
      */
     private $localizationManager;
 
+    /**
+     * @var string[]
+     */
+    private $kernelBundles;
+
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
-        LocalizationManagerInterface $localizationManager
+        LocalizationManagerInterface $localizationManager,
+        array $kernelBundles
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
         $this->localizationManager = $localizationManager;
+        $this->kernelBundles = $kernelBundles;
     }
 
     /**
@@ -178,6 +187,14 @@ class ArticleAdmin extends Admin
                 ->addToolbarActions($formToolbarActionsWithoutType)
                 ->setParent(static::EDIT_FORM_VIEW)
         );
+
+        if (isset($this->kernelBundles['SuluAutomationBundle'])) {
+            $viewCollection->add(
+                (new AutomationViewBuilder('sulu_article.edit_form.automation', '/automation'))
+                    ->setEntityClass(BasePageDocument::class)
+                    ->setParent(static::EDIT_FORM_VIEW)
+            );
+        }
     }
 
     /**
