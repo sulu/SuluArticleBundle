@@ -196,7 +196,7 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
      *
      * @param StructureMetadata $metadata
      *
-     * @return PropertyMetadata
+     * @return PropertyMetadata|null
      */
     private function getRoutePathPropertyName(StructureMetadata $metadata)
     {
@@ -205,7 +205,7 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
         }
 
         if (!$metadata->hasProperty(self::ROUTE_PROPERTY)) {
-            return;
+            return null;
         }
 
         return $metadata->getProperty(self::ROUTE_PROPERTY);

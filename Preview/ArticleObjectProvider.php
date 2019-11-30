@@ -43,7 +43,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     /**
      * @param DocumentManagerInterface $documentManager
      * @param SerializerInterface $serializer
-     * @param $articleDocumentClass
+     * @param string $articleDocumentClass
      */
     public function __construct(
         DocumentManagerInterface $documentManager,
@@ -143,8 +143,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param ArticleDocument $object
      */
     public function deserialize($serializedObject, $objectClass)
     {
@@ -168,6 +166,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
 
         $children = array_values($article->getChildren());
 
+        /* @var ArticleDocument $object */
         $object = $children[$result['pageNumber'] - 2];
 
         return $object;

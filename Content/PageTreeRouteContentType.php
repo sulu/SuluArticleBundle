@@ -189,19 +189,19 @@ class PageTreeRouteContentType extends SimpleContentType
      * @param string $propertyName
      * @param NodeInterface $node
      *
-     * @return array
+     * @return array|null
      */
     private function readPage($propertyName, NodeInterface $node)
     {
         $pagePropertyName = $propertyName . '-page';
         if (!$node->hasProperty($pagePropertyName)) {
-            return;
+            return null;
         }
 
         try {
             $pageUuid = $node->getPropertyValue($pagePropertyName, PropertyType::STRING);
         } catch (ItemNotFoundException $exception) {
-            return;
+            return null;
         }
 
         return [

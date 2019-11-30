@@ -434,7 +434,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @Post("/articles/{id}")
      *
-     * @param string $uuid
+     * @param string $id
      * @param Request $request
      *
      * @return Response

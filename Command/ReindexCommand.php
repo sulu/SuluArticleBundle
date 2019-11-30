@@ -106,7 +106,7 @@ class ReindexCommand extends Command
         if (!$this->dropIndex($indexer, $input, $output)) {
             // Drop was canceled by user.
 
-            return;
+            return 0;
         }
 
         $indexer->createIndex();

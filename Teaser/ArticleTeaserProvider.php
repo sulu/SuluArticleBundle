@@ -45,7 +45,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     /**
      * @param Manager $searchManager
      * @param TranslatorInterface $translator
-     * @param $articleDocumentClass
+     * @param string $articleDocumentClass
      */
     public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
     {

@@ -36,7 +36,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         if (!$datasource) {
-            return;
+            return null;
         }
 
         $document = $this->documentManager->find($datasource, $options['locale']);
@@ -50,7 +50,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     protected function createSearch(Search $search, array $filters, $locale)
     {
         if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
-            return;
+            return null;
         }
 
         $search = parent::createSearch($search, $filters, $locale);

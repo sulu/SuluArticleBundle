@@ -102,7 +102,7 @@ class WebsiteArticleController extends Controller
      *
      * @param ArticleInterface $object
      *
-     * @return ArticleDocument
+     * @return ArticleDocument|ArticleInterface
      */
     protected function normalizeArticle(ArticleInterface $object)
     {
@@ -156,7 +156,6 @@ class WebsiteArticleController extends Controller
         $twig = $this->get('twig');
         $attributes = $twig->mergeGlobals($attributes);
 
-        /** @var Template $template */
         $template = $twig->loadTemplate($template);
 
         $level = ob_get_level();

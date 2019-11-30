@@ -333,13 +333,13 @@ class RoutableSubscriber implements EventSubscriberInterface
      * @param RoutablePageBehavior $document
      * @param string $locale
      *
-     * @return RouteInterface
+     * @return RouteInterface|null
      */
     private function reallocateExistingRoute(RoutablePageBehavior $document, $locale)
     {
         $newRoute = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
         if (!$newRoute) {
-            return;
+            return null;
         }
 
         $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);

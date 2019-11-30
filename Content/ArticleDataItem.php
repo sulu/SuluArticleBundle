@@ -83,6 +83,6 @@ class ArticleDataItem implements ItemInterface
      */
     public function getImage()
     {
-        return;
+        return '';
     }
 }

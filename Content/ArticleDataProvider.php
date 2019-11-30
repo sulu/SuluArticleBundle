@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Content;
 
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -202,7 +203,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
-        return;
+        return null;
     }
 
     /**
@@ -259,7 +260,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param string $locale
      * @param null|string $webspaceKey
      *
-     * @return \Countable
+     * @return DocumentIterator|\ArrayIterator
      */
     private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale, $webspaceKey)
     {
@@ -298,7 +299,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * @param array $filters
      * @param string $locale
      *
-     * @return Search
+     * @return Search|null
      */
     protected function createSearch(Search $search, array $filters, $locale)
     {

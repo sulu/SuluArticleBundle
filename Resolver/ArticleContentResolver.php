@@ -88,7 +88,7 @@ class ArticleContentResolver implements ArticleContentResolverInterface
      * @param ArticleDocument $article
      * @param int $pageNumber
      *
-     * @return ArticleDocument
+     * @return ArticleDocument|ArticlePageDocument
      */
     private function getArticleForPage(ArticleDocument $article, $pageNumber)
     {
