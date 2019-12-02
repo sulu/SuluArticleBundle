@@ -146,6 +146,7 @@ class ArticleGhostIndexer extends ArticleIndexer
             );
 
             if ($article) {
+                $this->dispatchIndexEvent($ghostDocument, $article);
                 $this->manager->persist($article);
             }
         }
