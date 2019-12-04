@@ -76,9 +76,10 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                 _.each(types, function(config, type) {
                     var permissions = Config.get('sulu_security.contexts')['sulu.modules.articles_' + type];
                     if (permissions && permissions['view'] !== false) {
-                        typeList[config.default] = config;
+                        typeList[type] = config;
                     }
                 });
+
                 return typeList;
             }
 
