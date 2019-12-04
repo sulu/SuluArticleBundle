@@ -88,7 +88,7 @@ class ArticleJsConfig implements JsConfigInterface
             $type = $this->getType($structure->getStructure());
             if (!array_key_exists($type, $config['types'])) {
                 $config['types'][$type] = [
-                    'default' => $type,
+                    'default' => $structure->getKey(),
                     'title' => $this->getTitle($type),
                 ];
             }
