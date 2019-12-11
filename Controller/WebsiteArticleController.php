@@ -79,7 +79,7 @@ class WebsiteArticleController extends Controller
                 ];
 
                 return $this->render(
-                    'SuluWebsiteBundle:Preview:preview.html.twig',
+                    '@SuluWebsite/Preview/preview.html.twig',
                     array_merge($data, $parameters),
                     $this->createResponse($request)
                 );
