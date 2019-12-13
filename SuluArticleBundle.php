@@ -29,7 +29,6 @@ class SuluArticleBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new PageTreeCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -1024);
         $container->addCompilerPass(new ConverterCompilerPass());
         $container->addCompilerPass(new StructureValidatorCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new RouteEnhancerCompilerPass());

@@ -291,31 +291,12 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             $config['content_types']['article']['template']
         );
 
-        $container->setParameter(
-            'sulu_article.content-type.page_tree_route.template',
-            $config['content_types']['page_tree_route']['template']
-        );
-
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
 
         $bundles = $container->getParameter('kernel.bundles');
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
-        } elseif ('task' === $config['content_types']['page_tree_route']['page_route_cascade']) {
-            throw new InvalidConfigurationException(
-                'You need to install the SuluAutomationBundle to use task cascading!'
-            );
-        }
-
-        $container->setAlias(
-            'sulu_article.page_tree_route.updater',
-            'sulu_article.page_tree_route.updater.' . $config['content_types']['page_tree_route']['page_route_cascade']
-        );
-
-        $loader->load('page_tree_move.xml');
-        if ('off' !== $config['content_types']['page_tree_route']['page_route_cascade']) {
-            $loader->load('page_tree_update.xml');
         }
 
         $this->appendDefaultAuthor($config, $container);
