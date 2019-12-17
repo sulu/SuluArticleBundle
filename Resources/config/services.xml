@@ -121,7 +121,6 @@
         </service>
         <service id="sulu_article.subscriber.webspace"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\WebspaceSubscriber">
-            <argument type="service" id="sulu_page.structure.factory"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
