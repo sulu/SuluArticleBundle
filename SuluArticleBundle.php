@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle;
 
 use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
-use Sulu\Bundle\ArticleBundle\DependencyInjection\PageTreeCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\RouteEnhancerCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\StructureValidatorCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;

@@ -19,13 +19,10 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Exception\RouteIsNotUniqueException;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
-use Sulu\Component\Content\Document\LocalizationState;
-use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
@@ -346,8 +343,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     private function updateChildRoutes(ChildrenBehavior $document)
     {
-        $locale = $this->documentInspector->getLocale($document);
-
         foreach ($document->getChildren() as $childDocument) {
             if (!$childDocument instanceof RoutablePageBehavior) {
                 continue;
