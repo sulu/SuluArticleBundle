@@ -353,9 +353,17 @@
             <argument type="service" id="es.manager.live"/>
             <argument type="service" id="sulu_article.reference_store.article"/>
             <argument>%sulu_article.view_document.article.class%</argument>
-            <argument>%sulu_article.content-type.article.template%</argument>
 
             <tag name="sulu.content.type" alias="article_selection"/>
+        </service>
+
+        <service id="sulu_article.content_types.single_article_selection"
+                 class="Sulu\Bundle\ArticleBundle\Content\SingleArticleSelectionContentType">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="sulu_article.reference_store.article"/>
+            <argument>%sulu_article.view_document.article.class%</argument>
+
+            <tag name="sulu.content.type" alias="single_article_selection"/>
         </service>
 
         <service id="sulu_article.content_types.page_tree_route"
