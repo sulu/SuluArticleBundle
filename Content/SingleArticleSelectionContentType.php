@@ -50,7 +50,7 @@ class SingleArticleSelectionContentType extends SimpleContentType implements Pre
         ReferenceStoreInterface $referenceStore,
         $articleDocumentClass
     ) {
-        parent::__construct('Article', []);
+        parent::__construct('Article');
 
         $this->searchManager = $searchManager;
         $this->referenceStore = $referenceStore;
