@@ -168,7 +168,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                 foreach ($types as $type) {
                     $query->add(new TermQuery('type', $type));
                 }
-            } else if ($types[0]) {
+            } elseif ($types[0]) {
                 $search->addQuery(new TermQuery('type', $types[0]));
             }
         }
