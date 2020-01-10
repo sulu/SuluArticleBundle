@@ -74,8 +74,7 @@ class ArticleSelectionContentTypeTest extends TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
@@ -99,8 +98,7 @@ class ArticleSelectionContentTypeTest extends TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
@@ -122,27 +120,11 @@ class ArticleSelectionContentTypeTest extends TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
 
         $this->assertCount(0, $result);
-    }
-
-    public function testGetTemplate()
-    {
-        $manager = $this->prophesize(Manager::class);
-        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
-
-        $contentType = new ArticleSelectionContentType(
-            $manager->reveal(),
-            $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
-        );
-
-        $this->assertEquals('test.html.twig', $contentType->getTemplate());
     }
 }
