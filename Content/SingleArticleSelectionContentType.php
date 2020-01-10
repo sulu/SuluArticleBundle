@@ -40,15 +40,10 @@ class SingleArticleSelectionContentType extends SimpleContentType implements Pre
      */
     private $articleDocumentClass;
 
-    /**
-     * @param Manager $searchManager
-     * @param ReferenceStoreInterface $referenceStore
-     * @param string $articleDocumentClass
-     */
     public function __construct(
         Manager $searchManager,
         ReferenceStoreInterface $referenceStore,
-        $articleDocumentClass
+        string $articleDocumentClass
     ) {
         parent::__construct('Article');
 
@@ -57,9 +52,6 @@ class SingleArticleSelectionContentType extends SimpleContentType implements Pre
         $this->articleDocumentClass = $articleDocumentClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContentData(PropertyInterface $property)
     {
         $uuid = $property->getValue();
@@ -74,9 +66,6 @@ class SingleArticleSelectionContentType extends SimpleContentType implements Pre
         return $repository->find($this->getViewDocumentId($uuid, $locale)) ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preResolve(PropertyInterface $property)
     {
         $uuid = $property->getValue();

@@ -2,6 +2,14 @@
 
 ## dev-develop
 
+### ArticleSelectionContentType constructor changed
+
+The last parameter `template` has been removed from the ArticleSelectionContentType constructor.
+
+### The article type filter changed
+
+The filter for article types has changed from `?type=blog` to `?types=blog`
+
 ### ElasticSearchFieldDescriptor constructor changed
 
 The ElasticSearchFieldDescriptor changed see FieldDescriptor update in the UPGRADE.md of sulu/sulu.
