@@ -120,11 +120,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             ->enablePresentAs()
             ->enableSorting(
                 [
-                    ['column' => 'published', 'title' => 'sulu_article.smart-content.published'],
-                    ['column' => 'authored', 'title' => 'sulu_article.smart-content.authored'],
-                    ['column' => 'created', 'title' => 'sulu_article.smart-content.created'],
-                    ['column' => 'title', 'title' => 'sulu_article.smart-content.title'],
-                    ['column' => 'author_full_name', 'title' => 'sulu_article.smart-content.author-full-name'],
+                    ['column' => 'published', 'title' => 'sulu_admin.published'],
+                    ['column' => 'authored', 'title' => 'sulu_admin.authored'],
+                    ['column' => 'created', 'title' => 'sulu_admin.created'],
+                    ['column' => 'title.raw', 'title' => 'sulu_admin.title'],
+                    ['column' => 'author_full_name.raw', 'title' => 'sulu_admin.author'],
                 ]
             );
     }

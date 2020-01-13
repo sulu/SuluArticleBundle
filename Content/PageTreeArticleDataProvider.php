@@ -26,7 +26,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     public function getConfiguration()
     {
         return $this->getConfigurationBuilder()
-            ->enableDatasource('articles', 'articles', 'table')
+            ->enableDatasource('pages', 'pages', 'column_list')
             ->getConfiguration();
     }
 
