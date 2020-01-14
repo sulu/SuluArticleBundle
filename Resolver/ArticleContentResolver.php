@@ -62,6 +62,7 @@ class ArticleContentResolver implements ArticleContentResolverInterface
                 ->setSerializeNull(true)
                 ->setGroups(['website', 'content'])
                 ->setAttribute('pageNumber', $pageNumber)
+                ->setAttribute('urls', true)
         );
 
         if ($article instanceof ArticlePageDocument) {

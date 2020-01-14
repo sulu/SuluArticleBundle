@@ -73,7 +73,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $visitor = $this->prophesize(SerializationVisitorInterface::class);
 
         $context = $this->prophesize(SerializationContext::class);
-        $context->hasAttribute('website')->willReturn(true);
+        $context->hasAttribute('urls')->willReturn(true);
 
         $entityId = '123-123-123';
         $article->getUuid()->willReturn($entityId);

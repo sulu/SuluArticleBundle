@@ -54,7 +54,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         return [
             [
                 'event' => Events::POST_SERIALIZE,
-                'format' => 'array',
+                'format' => 'json',
                 'method' => 'addUrlsOnPostSerialize',
             ],
         ];
@@ -72,7 +72,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         $context = $event->getContext();
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$article instanceof ArticleDocument || !$context->hasAttribute('website') || !$request) {
+        if (!$article instanceof ArticleDocument || !$context->hasAttribute('urls') || !$request) {
             return;
         }
 
