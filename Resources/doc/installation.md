@@ -133,7 +133,7 @@ More information about this topic can be found in the section [multi-webspaces](
 Add xml template for structure in configured folder:
 
 ```
-%kernel.project_dir%/config/templates/articles/article.xml
+%kernel.project_dir%/config/templates/articles/default.xml
 ```
 
 Example is located in Bundle
@@ -142,7 +142,7 @@ Example is located in Bundle
 Add template for article type in configured folder:
 
 ```
-%kernel.project_dir%/templates/articles/article.html.twig
+%kernel.project_dir%/templates/articles/default.html.twig
 ```
 
 Example is located in Bundle
