@@ -4,6 +4,6 @@
         xsi:schemaLocation="http://friendsofsymfony.github.com/schema/rest https://raw.github.com/FriendsOfSymfony/FOSRestBundle/master/Resources/config/schema/routing/rest_routing-1.0.xsd">
 
     <import id="sulu_article.article" type="rest" resource="sulu_article.article_controller"/>
-    <import id="sulu_article.article_page" type="rest" resource="@SuluArticleBundle/Controller/ArticlePageController.php"/>
+    <import id="sulu_article.article_page" type="rest" resource="sulu_article.article_page_controller"/>
     <import id="sulu_article.article.versioning" type="rest" parent="sulu_article.article" resource="@SuluArticleBundle/Controller/VersionController.php"/>
 </routes>

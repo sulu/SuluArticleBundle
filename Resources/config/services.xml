@@ -60,6 +60,19 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
+        <service id="sulu_article.article_page_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\ArticlePageController"
+                 public="true">
+            <argument type="service" id="fos_rest.view_handler"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.metadata_factory.base"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="sulu_hash.request_hash_checker"/>
+            <argument type="service" id="security.token_storage"/>
+
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
         <!-- view -->
         <service id="sulu_article.view_document.factory"
             class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
