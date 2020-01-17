@@ -224,7 +224,7 @@ class ArticleResourceItem implements ResourceItemInterface
 
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAuthorId()
     {
@@ -232,7 +232,7 @@ class ArticleResourceItem implements ResourceItemInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAuthorFullName()
     {
