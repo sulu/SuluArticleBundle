@@ -5,5 +5,5 @@
 
     <import id="sulu_article.article" type="rest" resource="sulu_article.article_controller"/>
     <import id="sulu_article.article_page" type="rest" resource="sulu_article.article_page_controller"/>
-    <import id="sulu_article.article.versioning" type="rest" parent="sulu_article.article" resource="@SuluArticleBundle/Controller/VersionController.php"/>
+    <import id="sulu_article.article.versioning" type="rest" parent="sulu_article.article" resource="sulu_article.version_controller"/>
 </routes>

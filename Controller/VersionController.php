@@ -13,27 +13,52 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\View\ViewHandlerInterface;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Component\Content\Document\Behavior\SecurityBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Version;
+use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
+use Sulu\Component\Rest\ListBuilder\ListRestHelperInterface;
 use Sulu\Component\Rest\RequestParametersTrait;
+use Sulu\Component\Security\Authentication\UserRepositoryInterface;
 use Sulu\Component\Security\SecuredControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Handles the versions of articles.
  */
-class VersionController extends FOSRestController implements
-    ClassResourceInterface,
-    SecuredControllerInterface
+class VersionController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
 {
     use RequestParametersTrait;
+
+    /** @var DocumentManagerInterface */
+    private $documentManager;
+
+    /** @var ListRestHelperInterface */
+    private $restHelper;
+
+    /** @var UserRepositoryInterface */
+    private $userRepository;
+
+    public function __construct(
+        ViewHandlerInterface $viewHandler,
+        DocumentManagerInterface $documentManager,
+        ListRestHelperInterface $restHelper,
+        UserRepositoryInterface $userRepository,
+        ?TokenStorageInterface $tokenStorage = null
+    ) {
+        parent::__construct($viewHandler, $tokenStorage);
+
+        $this->documentManager = $documentManager;
+        $this->restHelper = $restHelper;
+        $this->userRepository = $userRepository;
+    }
 
     /**
      * Returns the versions for the article with the given UUID.
@@ -47,7 +72,7 @@ class VersionController extends FOSRestController implements
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        $document = $this->get('sulu_document_manager.document_manager')->find($uuid, $request->query->get('locale'));
+        $document = $this->documentManager->find($uuid, $request->query->get('locale'));
         $versions = array_reverse(
             array_filter(
                 $document->getVersions(),
@@ -59,10 +84,9 @@ class VersionController extends FOSRestController implements
         );
         $total = count($versions);
 
-        $listRestHelper = $this->get('sulu_core.list_rest_helper');
-        $limit = $listRestHelper->getLimit();
+        $limit = $this->restHelper->getLimit();
 
-        $versions = array_slice($versions, $listRestHelper->getOffset(), $limit);
+        $versions = array_slice($versions, $this->restHelper->getOffset(), $limit);
 
         $userIds = array_unique(
             array_map(
@@ -74,7 +98,7 @@ class VersionController extends FOSRestController implements
             )
         );
 
-        $users = $this->get('sulu_security.user_repository')->findUsersById($userIds);
+        $users = $this->userRepository->findUsersById($userIds);
         $fullNamesByIds = [];
         foreach ($users as $user) {
             $fullNamesByIds[$user->getId()] = $user->getContact()->getFullName();
@@ -99,7 +123,7 @@ class VersionController extends FOSRestController implements
                 'uuid' => $uuid,
                 'locale' => $locale,
             ],
-            $listRestHelper->getPage(),
+            $this->restHelper->getPage(),
             $limit,
             $total
         );
@@ -125,16 +149,16 @@ class VersionController extends FOSRestController implements
 
         switch ($action) {
             case 'restore':
-                $document = $this->getDocumentManager()->find($uuid, $locale);
+                $document = $this->documentManager->find($uuid, $locale);
 
-                $this->getDocumentManager()->restore(
+                $this->documentManager->restore(
                     $document,
                     $locale,
                     str_replace('_', '.', $version)
                 );
-                $this->getDocumentManager()->flush();
+                $this->documentManager->flush();
 
-                $data = $this->getDocumentManager()->find($uuid, $locale);
+                $data = $this->documentManager->find($uuid, $locale);
                 $view = $this->view($data, null !== $data ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
 
                 $context = new Context();
@@ -148,14 +172,6 @@ class VersionController extends FOSRestController implements
         }
 
         return $this->handleView($view);
-    }
-
-    /**
-     * @return DocumentManagerInterface
-     */
-    protected function getDocumentManager()
-    {
-        return $this->get('sulu_document_manager.document_manager');
     }
 
     /**
