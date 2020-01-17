@@ -221,4 +221,21 @@ class ArticleResourceItem implements ResourceItemInterface
     {
         return $this->getUuid();
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAuthorId()
+    {
+        return $this->article->getAuthorId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAuthorFullName()
+    {
+        return $this->article->getAuthorFullName();
+    }
 }
