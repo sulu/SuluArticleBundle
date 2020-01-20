@@ -85,6 +85,15 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
+        <service id="sulu_article.website.article_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController"
+                 public="true">
+            <argument type="service" id="sulu_article.article_content_resolver"/>
+            <argument type="service" id="sulu_website.resolver.template_attribute"/>
+
+            <tag name="sulu.context" context="website"/>
+        </service>
+
         <!-- view -->
         <service id="sulu_article.view_document.factory"
             class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
@@ -451,6 +460,8 @@
         </service>
 
         <service id="sulu_article.builder.index" class="Sulu\Bundle\ArticleBundle\Builder\ArticleIndexBuilder">
+            <argument type="service" id="es.manager.live"/>
+            <argument type="service" id="es.manager.default"/>
             <tag name="massive_build.builder" />
         </service>
 

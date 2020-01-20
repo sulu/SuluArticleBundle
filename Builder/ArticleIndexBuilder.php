@@ -19,6 +19,18 @@ use Sulu\Bundle\CoreBundle\Build\SuluBuilder;
  */
 class ArticleIndexBuilder extends SuluBuilder
 {
+    /** @var Manager */
+    private $liveManager;
+
+    /** @var Manager */
+    private $defaultManager;
+
+    public function __construct(Manager $liveManager, Manager $defaultManager)
+    {
+        $this->liveManager = $liveManager;
+        $this->defaultManager = $defaultManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -40,8 +52,8 @@ class ArticleIndexBuilder extends SuluBuilder
      */
     public function build()
     {
-        $this->buildForManager($this->container->get('es.manager.live'), $this->input->getOption('destroy'));
-        $this->buildForManager($this->container->get('es.manager.default'), $this->input->getOption('destroy'));
+        $this->buildForManager($this->liveManager, $this->input->getOption('destroy'));
+        $this->buildForManager($this->defaultManager, $this->input->getOption('destroy'));
     }
 
     /**

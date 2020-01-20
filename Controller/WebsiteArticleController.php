@@ -14,8 +14,10 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
 use Sulu\Bundle\PreviewBundle\Preview\Preview;
+use Sulu\Bundle\WebsiteBundle\Resolver\TemplateAttributeResolverInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +28,20 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class WebsiteArticleController extends Controller
 {
+    /** @var ArticleContentResolverInterface */
+    private $articleContentResolver;
+
+    /** @var TemplateAttributeResolverInterface */
+    private $templateAttributeResolver;
+
+    public function __construct(
+        ArticleContentResolverInterface $articleContentResolver,
+        TemplateAttributeResolverInterface $templateAttributeResolver
+    ) {
+        $this->articleContentResolver = $articleContentResolver;
+        $this->templateAttributeResolver = $templateAttributeResolver;
+    }
+
     /**
      * Article index action.
      *
@@ -57,7 +73,7 @@ class WebsiteArticleController extends Controller
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
+        $data = $this->templateAttributeResolver->resolve(array_merge($content, $attributes));
 
         try {
             if ($partial) {
@@ -116,7 +132,7 @@ class WebsiteArticleController extends Controller
      */
     protected function resolveArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->get('sulu_article.article_content_resolver')->resolve($object, $pageNumber);
+        return $this->articleContentResolver->resolve($object, $pageNumber);
     }
 
     /**
