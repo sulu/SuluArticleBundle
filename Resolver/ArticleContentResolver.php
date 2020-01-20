@@ -16,7 +16,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
 use Sulu\Component\Serializer\ArraySerializerInterface;
 
@@ -107,16 +109,23 @@ class ArticleContentResolver implements ArticleContentResolverInterface
     /**
      * Returns content and view of article.
      */
-    private function resolveContent(ArticleInterface $article): array
+    private function resolveContent(ArticleDocument $article): array
     {
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $structure->setDocument($article);
 
         $data = $article->getStructure()->toArray();
 
         $extension = [];
-        foreach ($article->getExtensionsData()->toArray() as $name => $extensionData) {
-            $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($extensionData);
+
+        $extensionData = $article->getExtensionsData();
+        if ($extensionData instanceof ExtensionContainer) {
+            $extensionData = $extensionData->toArray();
+        }
+
+        foreach ($extensionData as $name => $value) {
+            $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($value);
         }
 
         $content = $this->contentProxyFactory->createContentProxy($structure, $data);

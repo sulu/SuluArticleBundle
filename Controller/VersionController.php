@@ -96,10 +96,11 @@ class VersionController extends AbstractRestController implements ClassResourceI
         $users = $this->userRepository->findUsersById($userIds);
         $fullNamesByIds = [];
         foreach ($users as $user) {
-            $fullNamesByIds[$user->getId()] = $user->getContact()->getFullName();
+            $fullNamesByIds[$user->getId()] = $user->getFullName();
         }
 
         $versionData = [];
+        /** @var Version $version */
         foreach ($versions as $version) {
             $versionData[] = [
                 'id' => str_replace('.', '_', $version->getId()),

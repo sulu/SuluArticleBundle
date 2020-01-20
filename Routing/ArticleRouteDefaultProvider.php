@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -90,6 +91,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         $pageNumber = $object->getPageNumber();
         if ($object instanceof ArticlePageDocument) {
             // the article contains the seo/excerpt data and the controller handles the page-number automatically
+            /** @var ArticleDocument $object */
             $object = $object->getParent();
         }
 
@@ -97,6 +99,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         // this parameter should not be used
         // but the sulu-collector for the profiler needs it to determine data from request
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->wrapStructure('article', $metadata);
         $structure->setDocument($object);
 

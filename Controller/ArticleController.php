@@ -18,6 +18,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\ViewHandlerInterface;
 use ONGR\ElasticsearchBundle\Mapping\Caser;
 use ONGR\ElasticsearchBundle\Service\Manager;
+use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchQuery;
@@ -187,7 +188,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        /** @var Manager $manager */
+        /** @var Repository $repository */
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch();
 

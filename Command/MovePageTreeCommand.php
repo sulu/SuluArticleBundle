@@ -86,6 +86,8 @@ class MovePageTreeCommand extends Command
         $this->pageTreeMover->move($source, $document);
 
         $this->documentManager->flush();
+
+        return 0;
     }
 
     /**

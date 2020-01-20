@@ -10,8 +10,9 @@ includes:
 parameters:
     paths:
         - .
-    level: 1
+    level: 2
     excludes_analyse:
+        - %currentWorkingDirectory%/DependencyInjection/Configuration.php
         - %currentWorkingDirectory%/vendor/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
@@ -21,3 +22,4 @@ parameters:
 
     ignoreErrors:
         - '#Thrown exceptions in a catch block must bundle the previous exception#'
+        - '#Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch()#'

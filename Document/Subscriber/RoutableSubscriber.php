@@ -24,11 +24,13 @@ use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
+use Sulu\Component\DocumentManager\Behavior\Mapping\PathBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Event\CopyEvent;
@@ -210,7 +212,7 @@ class RoutableSubscriber implements EventSubscriberInterface
         }
 
         $parentDocument = $document->getParent();
-        if (!$parentDocument instanceof ChildrenBehavior) {
+        if (!$parentDocument instanceof ChildrenBehavior || !$parentDocument instanceof StructureBehavior) {
             return;
         }
 
@@ -243,6 +245,10 @@ class RoutableSubscriber implements EventSubscriberInterface
         try {
             $route = $this->createOrUpdateRoute($document, $event->getLocale());
         } catch (RouteIsNotUniqueException $exception) {
+            if (!$document instanceof PathBehavior) {
+                return;
+            }
+
             throw new ResourceLocatorAlreadyExistsException($exception->getRoute()->getPath(), $document->getPath());
         }
 

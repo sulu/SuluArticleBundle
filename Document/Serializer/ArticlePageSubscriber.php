@@ -15,6 +15,7 @@ use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 
 /**
@@ -42,6 +43,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public function addTitleOnPostSerialize(ObjectEvent $event): void
     {
         $articlePage = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!$articlePage instanceof ArticlePageDocument) {
