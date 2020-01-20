@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Elasticsearch;
 use ONGR\ElasticsearchBundle\Mapping\MetadataCollector;
 use ONGR\ElasticsearchBundle\Result\Converter;
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Extends converter of "ongr/elasticsearch-bundle" to throw event when converting array to document.
@@ -41,10 +41,7 @@ class EventAwareConverter extends Converter
     public function convertToDocument($rawData, Manager $manager)
     {
         $document = parent::convertToDocument($rawData, $manager);
-        $this->dispatcher->dispatch(
-            self::EVENT_POST_CONVERT_TO_DOCUMENT,
-            new PostConvertToDocumentEvent($rawData, $document, $manager)
-        );
+        $this->dispatcher->dispatch(new PostConvertToDocumentEvent($rawData, $document, $manager), static::EVENT_POST_CONVERT_TO_DOCUMENT);
 
         return $document;
     }

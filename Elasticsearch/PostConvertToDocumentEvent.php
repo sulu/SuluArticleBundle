@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Elasticsearch;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event args for "es.post_convert_to_document".
