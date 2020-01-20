@@ -72,7 +72,6 @@ class ArticlePageController extends AbstractRestController implements ClassResou
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      *
@@ -110,7 +109,6 @@ class ArticlePageController extends AbstractRestController implements ClassResou
      * Create article-page.
      *
      * @param string $articleUuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -140,7 +138,6 @@ class ArticlePageController extends AbstractRestController implements ClassResou
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -179,7 +176,6 @@ class ArticlePageController extends AbstractRestController implements ClassResou
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */

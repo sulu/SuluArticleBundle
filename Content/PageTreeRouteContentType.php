@@ -62,11 +62,6 @@ class PageTreeRouteContentType extends SimpleContentType
 
     /**
      * @param string $template
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $documentInspector
-     * @param DocumentRegistry $documentRegistry
-     * @param ChainRouteGeneratorInterface $chainRouteGenerator
-     * @param ConflictResolverInterface $conflictResolver
      */
     public function __construct(
         $template,
@@ -187,7 +182,6 @@ class PageTreeRouteContentType extends SimpleContentType
      * Read page-information from given node.
      *
      * @param string $propertyName
-     * @param NodeInterface $node
      *
      * @return array
      */
@@ -215,7 +209,6 @@ class PageTreeRouteContentType extends SimpleContentType
      * Returns value of array or default.
      *
      * @param string $name
-     * @param array $value
      * @param mixed $default
      *
      * @return mixed
@@ -232,7 +225,6 @@ class PageTreeRouteContentType extends SimpleContentType
     /**
      * Generate a new suffix for document.
      *
-     * @param NodeInterface $node
      * @param string $locale
      * @param string $pagePath
      *

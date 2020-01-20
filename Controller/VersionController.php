@@ -63,7 +63,6 @@ class VersionController extends AbstractRestController implements ClassResourceI
     /**
      * Returns the versions for the article with the given UUID.
      *
-     * @param Request $request
      * @param string $uuid
      *
      * @return Response
@@ -132,7 +131,6 @@ class VersionController extends AbstractRestController implements ClassResourceI
     }
 
     /**
-     * @param Request $request
      * @param string $uuid
      * @param int $version
      *

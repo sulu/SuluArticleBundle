@@ -85,7 +85,6 @@ class ArticleContentResolver implements ArticleContentResolverInterface
     /**
      * Returns article page by page-number.
      *
-     * @param ArticleDocument $article
      * @param int $pageNumber
      *
      * @return ArticleDocument
@@ -108,8 +107,6 @@ class ArticleContentResolver implements ArticleContentResolverInterface
 
     /**
      * Returns content and view of article.
-     *
-     * @param ArticleInterface $article
      *
      * @return array
      */

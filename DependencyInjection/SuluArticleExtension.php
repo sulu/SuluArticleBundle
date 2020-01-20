@@ -303,9 +303,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         } elseif ('task' === $config['content_types']['page_tree_route']['page_route_cascade']) {
-            throw new InvalidConfigurationException(
-                'You need to install the SuluAutomationBundle to use task cascading!'
-            );
+            throw new InvalidConfigurationException('You need to install the SuluAutomationBundle to use task cascading!');
         }
 
         $container->setAlias(
@@ -340,9 +338,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Append configuration for article "set_default_author".
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
      */
     private function appendDefaultAuthor(array $config, ContainerBuilder $container)
     {
@@ -359,8 +354,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Append configuration for article-page (cloned from article).
-     *
-     * @param ContainerBuilder $container
      */
     private function appendArticlePageConfig(ContainerBuilder $container)
     {
@@ -376,7 +369,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     /**
      * Clone given path configuration and use given type.
      *
-     * @param array $config
      * @param string $type
      *
      * @return array

@@ -138,7 +138,6 @@ class ArticleLinkProvider implements LinkProviderInterface
     }
 
     /**
-     * @param ArticleViewDocumentInterface $document
      * @param string $locale
      * @param string $scheme
      *

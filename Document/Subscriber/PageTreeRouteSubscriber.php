@@ -64,14 +64,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
      */
     protected $routeUpdater;
 
-    /**
-     * @param DocumentManagerInterface $documentManager
-     * @param PropertyEncoder $propertyEncoder
-     * @param DocumentInspector $documentInspector
-     * @param StructureMetadataFactoryInterface $metadataFactory
-     * @param SessionInterface $liveSession
-     * @param PageTreeUpdaterInterface $routeUpdater
-     */
     public function __construct(
         DocumentManagerInterface $documentManager,
         PropertyEncoder $propertyEncoder,
@@ -103,8 +95,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Update route-paths of articles which are linked to the given page-document.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handlePublish(AbstractMappingEvent $event)
     {
@@ -118,8 +108,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Update route-paths of articles which are linked to the given page-document.
-     *
-     * @param MoveEvent $event
      */
     public function handleMove(MoveEvent $event)
     {
@@ -135,8 +123,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Returns true if the resource-segment was changed in the draft page.
-     *
-     * @param PageDocument $document
      *
      * @return bool
      */
@@ -158,8 +144,6 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Returns the live node for given document.
-     *
-     * @param PathBehavior $document
      *
      * @return NodeInterface
      */

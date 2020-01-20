@@ -20,16 +20,17 @@
     "require": {
         "php": "^7.2",
         "elasticsearch/elasticsearch": "~5.0 || ~6.0",
+        "friendsofphp/php-cs-fixer": "^2.16",
         "jms/serializer": "^3.3",
         "jms/serializer-bundle": "^3.3",
         "ongr/elasticsearch-bundle": "^5.2",
         "ongr/elasticsearch-dsl": "~5.0 || ~6.0",
         "sulu/sulu": "^2.0.3",
+        "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
         "symfony/config": "^4.3",
         "symfony/dependency-injection": "^4.3",
         "symfony/http-foundation": "^4.3",
-        "symfony/http-kernel": "^4.3",
-        "symfony-cmf/slugifier-api": "^1.0 || ^2.0"
+        "symfony/http-kernel": "^4.3"
     },
     "require-dev": {
         "doctrine/data-fixtures": "^1.1",
@@ -64,7 +65,12 @@
             "Tests/Application/bin/adminconsole ongr:es:index:create --manager=live --if-not-exists --env test"
         ],
         "lint": [
-            "@phpstan"
+            "@lint-composer",
+            "@phpstan",
+            "@php-cs"
+        ],
+        "lint-composer": [
+            "@composer validate"
         ],
         "test": [
             "@phpunit"
@@ -75,6 +81,12 @@
         ],
         "phpstan": [
             "vendor/bin/phpstan analyse -c phpstan.neon"
+        ],
+        "php-cs": [
+            "@php vendor/bin/php-cs-fixer fix --verbose --diff --dry-run"
+        ],
+        "php-cs-fix": [
+            "@php vendor/bin/php-cs-fixer fix"
         ]
     },
     "config": {

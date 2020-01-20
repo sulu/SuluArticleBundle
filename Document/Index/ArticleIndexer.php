@@ -112,21 +112,6 @@ class ArticleIndexer implements IndexerInterface
      */
     protected $typeConfiguration;
 
-    /**
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
-     * @param UserManager $userManager
-     * @param ContactRepository $contactRepository
-     * @param DocumentFactoryInterface $documentFactory
-     * @param Manager $manager
-     * @param ExcerptFactory $excerptFactory
-     * @param SeoFactory $seoFactory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface $translator
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $inspector
-     * @param WebspaceResolver $webspaceResolver
-     * @param array $typeConfiguration
-     */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
@@ -183,17 +168,12 @@ class ArticleIndexer implements IndexerInterface
         return $this->translator->trans($typeTranslationKey, [], 'backend');
     }
 
-    /**
-     * @param ArticleDocument $document
-     * @param ArticleViewDocumentInterface $article
-     */
     protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
         $this->eventDispatcher->dispatch(new IndexEvent($document, $article), IndexEvent::NAME);
     }
 
     /**
-     * @param ArticleDocument $document
      * @param string $locale
      * @param string $localizationState
      *
@@ -278,7 +258,6 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Returns view-document from index or create a new one.
      *
-     * @param ArticleDocument $document
      * @param string $locale
      * @param string $localizationState
      *
@@ -311,9 +290,6 @@ class ArticleIndexer implements IndexerInterface
 
     /**
      * Maps pages from document to view-document.
-     *
-     * @param ArticleDocument $document
-     * @param ArticleViewDocumentInterface $article
      */
     private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
@@ -338,9 +314,6 @@ class ArticleIndexer implements IndexerInterface
 
     /**
      * Set parent-page-uuid to view-document.
-     *
-     * @param ArticleDocument $document
-     * @param ArticleViewDocumentInterface $article
      */
     private function setParentPageUuid(
         ArticleDocument $document,
@@ -455,9 +428,6 @@ class ArticleIndexer implements IndexerInterface
         $this->createOrUpdateShadows($document);
     }
 
-    /**
-     * @param ArticleDocument $document
-     */
     protected function indexShadow(ArticleDocument $document)
     {
         $shadowDocument = $this->documentManager->find(
@@ -474,9 +444,6 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->persist($article);
     }
 
-    /**
-     * @param ArticleDocument $document
-     */
     protected function createOrUpdateShadows(ArticleDocument $document)
     {
         if ($document->isShadowLocaleEnabled()) {

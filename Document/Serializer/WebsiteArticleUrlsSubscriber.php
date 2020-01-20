@@ -36,10 +36,6 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
      */
     private $routeRepository;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param RouteRepositoryInterface $routeRepository
-     */
     public function __construct(RequestStack $requestStack, RouteRepositoryInterface $routeRepository)
     {
         $this->requestStack = $requestStack;
@@ -62,8 +58,6 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
 
     /**
      * Loops thru current webspace locales and generates routes for them.
-     *
-     * @param ObjectEvent $event
      */
     public function addUrlsOnPostSerialize(ObjectEvent $event)
     {

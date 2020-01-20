@@ -134,10 +134,6 @@ class ReindexCommand extends Command
     /**
      * Drop index if requested.
      *
-     * @param IndexerInterface $indexer
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return bool
      */
     protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
@@ -177,10 +173,6 @@ class ReindexCommand extends Command
 
     /**
      * Clear article-content of index.
-     *
-     * @param IndexerInterface $indexer
-     * @param InputInterface $input
-     * @param OutputInterface $output
      */
     protected function clearIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
     {
@@ -196,8 +188,6 @@ class ReindexCommand extends Command
      * Index documents for given locale.
      *
      * @param string $locale
-     * @param IndexerInterface $indexer
-     * @param OutputInterface $output
      */
     protected function indexDocuments($locale, IndexerInterface $indexer, OutputInterface $output)
     {

@@ -27,8 +27,6 @@ class TagCollectionFactory
 
     /**
      * TagIndexerFactory constructor.
-     *
-     * @param TagManagerInterface $tagManager
      */
     public function __construct(TagManagerInterface $tagManager)
     {

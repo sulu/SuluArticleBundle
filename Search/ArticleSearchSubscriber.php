@@ -31,9 +31,6 @@ class ArticleSearchSubscriber implements EventSubscriberInterface
      */
     private $webspaceResolver;
 
-    /**
-     * @param Factory $factory
-     */
     public function __construct(Factory $factory, WebspaceResolver $webspaceResolver)
     {
         $this->factory = $factory;
@@ -50,9 +47,6 @@ class ArticleSearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PreIndexEvent $event
-     */
     public function handlePreIndex(PreIndexEvent $event)
     {
         $subject = $event->getSubject();

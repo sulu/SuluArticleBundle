@@ -51,9 +51,6 @@ class ContentProxyFactory
     /**
      * Create content-proxy for given structure.
      *
-     * @param StructureInterface $structure
-     * @param array $data
-     *
      * @return array
      */
     public function createContentProxy(StructureInterface $structure, array $data)
@@ -78,9 +75,6 @@ class ContentProxyFactory
     /**
      * Resolve content from given data with the structure.
      *
-     * @param StructureInterface $structure
-     * @param array $data
-     *
      * @return array
      */
     private function resolveContent(StructureInterface $structure, array $data)
@@ -102,9 +96,6 @@ class ContentProxyFactory
 
     /**
      * Create view-proxy for given structure.
-     *
-     * @param StructureInterface $structure
-     * @param array $data
      *
      * @return array
      */
@@ -129,9 +120,6 @@ class ContentProxyFactory
 
     /**
      * Resolve view from given data with the structure.
-     *
-     * @param StructureInterface $structure
-     * @param array $data
      *
      * @return array
      */

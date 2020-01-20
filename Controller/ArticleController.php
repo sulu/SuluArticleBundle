@@ -183,8 +183,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Returns list of articles.
      *
-     * @param Request $request
-     *
      * @return Response
      */
     public function cgetAction(Request $request)
@@ -374,7 +372,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Returns single article.
      *
-     * @param Request $request
      * @param string $id
      *
      * @return Response
@@ -401,8 +398,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Create article.
      *
-     * @param Request $request
-     *
      * @return Response
      */
     public function postAction(Request $request)
@@ -428,7 +423,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Update articles.
      *
-     * @param Request $request
      * @param string $id
      *
      * @return Response
@@ -465,8 +459,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Deletes multiple documents.
-     *
-     * @param Request $request
      *
      * @return Response
      */
@@ -507,7 +499,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      * @Post("/articles/{id}")
      *
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -593,7 +584,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Ordering given pages.
      *
-     * @param array $pages
      * @param string $locale
      */
     private function orderPages(array $pages, $locale)
