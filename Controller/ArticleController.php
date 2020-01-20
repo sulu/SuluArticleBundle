@@ -60,7 +60,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      *
      * @return ElasticSearchFieldDescriptor[]
      */
-    protected function getFieldDescriptors()
+    protected function getFieldDescriptors(): array
     {
         return [
             'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
@@ -293,14 +293,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Returns query to filter by given range.
-     *
-     * @param string $field
-     * @param string $from
-     * @param string $to
-     *
-     * @return RangeQuery
      */
-    private function getRangeQuery($field, $from, $to)
+    private function getRangeQuery(string $field, string $from, string $to): RangeQuery
     {
         return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
@@ -522,12 +516,10 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given Formation.
      *
-     * @param object $document
-     *
      * @throws InvalidFormException
      * @throws MissingParameterException
      */
-    private function persistDocument(array $data, $document, string $locale): void
+    private function persistDocument(array $data, object $document, string $locale): void
     {
         $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
         $form = $this->createForm(
@@ -579,10 +571,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
-     *
-     * @param object $document
      */
-    private function handleActionParameter(?string $actionParameter, $document, string $locale): void
+    private function handleActionParameter(string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':

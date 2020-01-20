@@ -75,7 +75,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Set the page-number to existing pages.
      */
-    public function handleHydrate(HydrateEvent $event)
+    public function handleHydrate(HydrateEvent $event): void
     {
         $document = $event->getDocument();
         $node = $event->getNode();
@@ -91,7 +91,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Set the page-number to new pages.
      */
-    public function handlePersist(PersistEvent $event)
+    public function handlePersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
         $node = $event->getNode();
@@ -122,7 +122,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Adjust the page-numbers of siblings when reordering a page.
      */
-    public function handleReorder(ReorderEvent $event)
+    public function handleReorder(ReorderEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof PageBehavior) {
@@ -147,7 +147,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Copy page-number to live workspace.
      */
-    public function handlePublishPageNumber(PublishEvent $event)
+    public function handlePublishPageNumber(PublishEvent $event): void
     {
         $document = $event->getDocument();
         $node = $event->getNode();
@@ -162,7 +162,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Adjust the page-numbers of siblings when removing a page.
      */
-    public function handleRemove(RemoveEvent $event)
+    public function handleRemove(RemoveEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof PageBehavior) {
@@ -183,7 +183,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * Adjust the page-numbers of siblings when restoring a page.
      */
-    public function handleRestore(RestoreEvent $event)
+    public function handleRestore(RestoreEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ChildrenBehavior) {

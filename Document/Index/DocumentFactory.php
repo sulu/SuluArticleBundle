@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+
 /**
  * Factory for creating article-documents.
  */
@@ -21,10 +23,7 @@ class DocumentFactory implements DocumentFactoryInterface
      */
     private $documents;
 
-    /**
-     * @param array $documents
-     */
-    public function __construct($documents)
+    public function __construct(array $documents)
     {
         $this->documents = $documents;
     }
@@ -32,7 +31,7 @@ class DocumentFactory implements DocumentFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getClass($type)
+    public function getClass(string $type): string
     {
         return $this->documents[$type]['view'];
     }
@@ -40,7 +39,7 @@ class DocumentFactory implements DocumentFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($type)
+    public function create(string $type): ArticleViewDocumentInterface
     {
         $class = $this->getClass($type);
 

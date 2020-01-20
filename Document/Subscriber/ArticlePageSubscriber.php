@@ -101,7 +101,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Hydrate parent to avoid proxiing it.
      */
-    public function setParentOnHydrate(HydrateEvent $event)
+    public function setParentOnHydrate(HydrateEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument || $document->getParent()) {
@@ -119,7 +119,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Check for missing persist options.
      */
-    public function checkOptions(PersistEvent $event)
+    public function checkOptions(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument) {
@@ -136,7 +136,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Set page-title from structure to document.
      */
-    public function setTitleOnPersist(PersistEvent $event)
+    public function setTitleOnPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument) {
@@ -151,7 +151,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      *
      * @param PersistEvent|RemoveEvent $event
      */
-    public function setWorkflowStageOnArticle($event)
+    public function setWorkflowStageOnArticle($event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument
@@ -171,7 +171,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Set node to event on persist.
      */
-    public function setNodeOnPersist(PersistEvent $event)
+    public function setNodeOnPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument || $event->hasNode()) {
@@ -191,7 +191,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Set page-title on persist event.
      */
-    public function setPageTitleOnPersist(PersistEvent $event)
+    public function setPageTitleOnPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleInterface) {
@@ -203,14 +203,12 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Returns page-title for node.
-     *
-     * @return string
      */
-    private function getPageTitle(ArticleInterface $document)
+    private function getPageTitle(ArticleInterface $document): string
     {
         $pageTitleProperty = $this->getPageTitleProperty($document);
         if (!$pageTitleProperty) {
-            return;
+            return null;
         }
 
         $stagedData = $document->getStructure()->getStagedData();
@@ -219,7 +217,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         }
 
         if (!$document->getStructure()->hasProperty($pageTitleProperty->getName())) {
-            return;
+            return null;
         }
 
         return $document->getStructure()->getProperty($pageTitleProperty->getName())->getValue();
@@ -227,10 +225,8 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Find page-title property.
-     *
-     * @return PropertyMetadata
      */
-    private function getPageTitleProperty(ArticleInterface $document)
+    private function getPageTitleProperty(ArticleInterface $document): PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article_page',
@@ -251,7 +247,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Set structure-type to parent document.
      */
-    public function setStructureTypeToParent(PersistEvent $event)
+    public function setStructureTypeToParent(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument
@@ -268,7 +264,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Extend metadata for article-page.
      */
-    public function handleMetadataLoad(MetadataLoadEvent $event)
+    public function handleMetadataLoad(MetadataLoadEvent $event): void
     {
         if (ArticlePageDocument::class !== $event->getMetadata()->getClass()
             && !is_subclass_of($event->getMetadata()->getClass(), ArticlePageDocument::class)

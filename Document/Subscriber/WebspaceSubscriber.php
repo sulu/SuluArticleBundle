@@ -70,7 +70,7 @@ class WebspaceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function loadProperties(AbstractMappingEvent $event)
+    public function loadProperties(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof WebspaceBehavior) {
@@ -95,7 +95,7 @@ class WebspaceSubscriber implements EventSubscriberInterface
         $document->setAdditionalWebspaces($additionalWebspaces);
     }
 
-    public function saveProperties(AbstractMappingEvent $event)
+    public function saveProperties(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleInterface || !$document instanceof WebspaceBehavior) {
@@ -131,24 +131,16 @@ class WebspaceSubscriber implements EventSubscriberInterface
 
     /**
      * Returns encoded "mainWebspace" property-name.
-     *
-     * @param string $locale
-     *
-     * @return string
      */
-    private function getMainWebspacePropertyName($locale)
+    private function getMainWebspacePropertyName(string $locale): string
     {
         return $this->propertyEncoder->localizedSystemName(self::MAIN_WEBSPACE_PROPERTY, $locale);
     }
 
     /**
      * Returns encoded "additionalWebspaces" property-name.
-     *
-     * @param string $locale
-     *
-     * @return string
      */
-    private function getAdditionalWebspacesPropertyName($locale)
+    private function getAdditionalWebspacesPropertyName(string $locale): string
     {
         return $this->propertyEncoder->localizedSystemName(self::ADDITIONAL_WEBSPACES_PROPERTY, $locale);
     }

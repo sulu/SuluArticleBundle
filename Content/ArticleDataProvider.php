@@ -70,18 +70,14 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected $defaultLimit;
 
-    /**
-     * @param string $articleDocumentClass
-     * @param int $defaultLimit
-     */
     public function __construct(
         Manager $searchManager,
         DocumentManagerInterface $documentManager,
         LazyLoadingValueHolderFactory $proxyFactory,
         ReferenceStoreInterface $referenceStore,
         ArticleResourceItemFactory $articleResourceItemFactory,
-        $articleDocumentClass,
-        $defaultLimit
+        string $articleDocumentClass,
+        int $defaultLimit
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
@@ -102,10 +98,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Create new configuration-builder.
-     *
-     * @return BuilderInterface
      */
-    protected function getConfigurationBuilder()
+    protected function getConfigurationBuilder(): BuilderInterface
     {
         return Builder::create()
             ->enableTags()
@@ -200,10 +194,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         return;
     }
 
-    /**
-     * @return string|null
-     */
-    private function getWebspaceKey(array $propertyParameter, array $options)
+    private function getWebspaceKey(array $propertyParameter, array $options): ?string
     {
         if (array_key_exists('ignoreWebspaces', $propertyParameter)) {
             $value = $propertyParameter['ignoreWebspaces']->getValue();
@@ -223,14 +214,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Returns flag "hasNextPage".
      * It combines the limit/query-count with the page and page-size.
-     *
-     * @param int $limit
-     * @param int $page
-     * @param int $pageSize
-     *
-     * @return bool
      */
-    private function hasNextPage(\Countable $queryResult, $limit, $page, $pageSize)
+    private function hasNextPage(\Countable $queryResult, int $limit, int $page, int $pageSize): bool
     {
         $count = $queryResult->count();
         if ($limit && $limit < $count) {
@@ -242,16 +227,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Creates search for filters and returns search-result.
-     *
-     * @param int $limit
-     * @param int $page
-     * @param int $pageSize
-     * @param string $locale
-     * @param null|string $webspaceKey
-     *
-     * @return \Countable
      */
-    private function getSearchResult(array $filters, $limit, $page, $pageSize, $locale, $webspaceKey)
+    private function getSearchResult(array $filters, int $limit, int $page, int $pageSize, int $locale, ?string $webspaceKey): \Countable
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
@@ -283,12 +260,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Initialize search with neccesary queries.
-     *
-     * @param string $locale
-     *
-     * @return Search
      */
-    protected function createSearch(Search $search, array $filters, $locale)
+    protected function createSearch(Search $search, array $filters, string $locale): Search
     {
         if (0 < count($filters['excluded'])) {
             foreach ($filters['excluded'] as $uuid) {
@@ -340,12 +313,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Returns array with all types defined in property parameter.
-     *
-     * @param array $propertyParameter
-     *
-     * @return array
      */
-    private function getTypesProperty($propertyParameter)
+    private function getTypesProperty(array $propertyParameter): array
     {
         $filterTypes = [];
 
@@ -362,12 +331,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Returns array with all structure types (template keys) defined in property parameter.
-     *
-     * @param array $propertyParameter
-     *
-     * @return array
      */
-    private function getStructureTypesProperty($propertyParameter)
+    private function getStructureTypesProperty(array $propertyParameter): array
     {
         $filterStrTypes = [];
 
@@ -386,10 +351,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * Returns excluded articles.
      *
      * @param PropertyParameter[] $propertyParameter
-     *
-     * @return array
      */
-    private function getExcludedFilter(array $filters, array $propertyParameter)
+    private function getExcludedFilter(array $filters, array $propertyParameter): array
     {
         $excluded = array_key_exists('excluded', $filters) ? $filters['excluded'] : [];
         if (array_key_exists('exclude_duplicates', $propertyParameter)
@@ -403,12 +366,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Add the pagination to given query.
-     *
-     * @param int $pageSize
-     * @param int $page
-     * @param int $limit
      */
-    private function addPagination(Search $search, $pageSize, $page, $limit)
+    private function addPagination(Search $search, int $pageSize, int $page, int $limit): void
     {
         $offset = 0;
         if ($pageSize) {
@@ -434,14 +393,15 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Add a boolean-query if filter exists.
-     *
-     * @param string $filterName
-     * @param string $field
-     * @param string $operator
-     * @param int $queriesCount
      */
-    private function addBoolQuery($filterName, array $filters, $field, $operator, BoolQuery $query, &$queriesCount)
-    {
+    private function addBoolQuery(
+        string $filterName,
+        array $filters,
+        string $field,
+        string $operator,
+        BoolQuery $query,
+        int &$queriesCount
+    ): void {
         if (0 !== count($tags = $this->getFilter($filters, $filterName, []))) {
             ++$queriesCount;
             $query->add($this->getBoolQuery($field, $tags, $operator));
@@ -450,13 +410,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Returns boolean query for given fields and values.
-     *
-     * @param string $field
-     * @param string $operator
-     *
-     * @return BoolQuery
      */
-    private function getBoolQuery($field, array $values, $operator)
+    private function getBoolQuery(string $field, array $values, string $operator): BoolQuery
     {
         $type = ('or' === strtolower($operator) ? BoolQuery::SHOULD : BoolQuery::MUST);
 
@@ -471,12 +426,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Returns filter value.
      *
-     * @param string $name
      * @param mixed $default
      *
      * @return mixed
      */
-    private function getFilter(array $filters, $name, $default = null)
+    private function getFilter(array $filters, string $name, $default = null)
     {
         if ($this->hasFilter($filters, $name)) {
             return $filters[$name];
@@ -487,25 +441,16 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     /**
      * Returns true if filter-value exists.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
-    private function hasFilter(array $filters, $name)
+    private function hasFilter(array $filters, string $name): bool
     {
         return array_key_exists($name, $filters) && null !== $filters[$name];
     }
 
     /**
      * Returns Proxy document for uuid.
-     *
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return object
      */
-    private function getResource($uuid, $locale)
+    private function getResource(string $uuid, string $locale): object
     {
         return $this->proxyFactory->createProxy(
             ArticleDocument::class,

@@ -59,7 +59,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
     /**
      * Loops thru current webspace locales and generates routes for them.
      */
-    public function addUrlsOnPostSerialize(ObjectEvent $event)
+    public function addUrlsOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();

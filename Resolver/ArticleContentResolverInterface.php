@@ -15,5 +15,8 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 
 interface ArticleContentResolverInterface
 {
+    /**
+     * @return mixed
+     */
     public function resolve(ArticleInterface $article, int $pageNumber = 1);
 }

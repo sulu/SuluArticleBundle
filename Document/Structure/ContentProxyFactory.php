@@ -50,10 +50,8 @@ class ContentProxyFactory
 
     /**
      * Create content-proxy for given structure.
-     *
-     * @return array
      */
-    public function createContentProxy(StructureInterface $structure, array $data)
+    public function createContentProxy(StructureInterface $structure, array $data): array
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
@@ -74,10 +72,8 @@ class ContentProxyFactory
 
     /**
      * Resolve content from given data with the structure.
-     *
-     * @return array
      */
-    private function resolveContent(StructureInterface $structure, array $data)
+    private function resolveContent(StructureInterface $structure, array $data): array
     {
         $structure->setWebspaceKey($this->getWebspaceKey());
 
@@ -96,10 +92,8 @@ class ContentProxyFactory
 
     /**
      * Create view-proxy for given structure.
-     *
-     * @return array
      */
-    public function createViewProxy(StructureInterface $structure, array $data)
+    public function createViewProxy(StructureInterface $structure, array $data): array
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
@@ -120,10 +114,8 @@ class ContentProxyFactory
 
     /**
      * Resolve view from given data with the structure.
-     *
-     * @return array
      */
-    private function resolveView(StructureInterface $structure, array $data)
+    private function resolveView(StructureInterface $structure, array $data): array
     {
         $structure->setWebspaceKey($this->getWebspaceKey());
 
@@ -140,10 +132,7 @@ class ContentProxyFactory
         return $view;
     }
 
-    /**
-     * @return string
-     */
-    private function getWebspaceKey()
+    private function getWebspaceKey(): string
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request) {

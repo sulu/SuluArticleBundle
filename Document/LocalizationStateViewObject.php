@@ -35,11 +35,7 @@ class LocalizationStateViewObject
      */
     public $locale;
 
-    /**
-     * @param string $state
-     * @param string $locale
-     */
-    public function __construct($state = null, $locale = null)
+    public function __construct(string $state = null, string $locale = null)
     {
         $this->state = $state;
         $this->locale = $locale;

@@ -37,12 +37,8 @@ class VersionController extends FOSRestController implements
 
     /**
      * Returns the versions for the article with the given UUID.
-     *
-     * @param string $uuid
-     *
-     * @return Response
      */
-    public function cgetAction(Request $request, $uuid)
+    public function cgetAction(Request $request, string $uuid): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
@@ -107,16 +103,11 @@ class VersionController extends FOSRestController implements
     }
 
     /**
-     * @param string $uuid
-     * @param int $version
-     *
      * @Post("/articles/{uuid}/versions/{version}")
-     *
-     * @return Response
      *
      * @throws RestException
      */
-    public function postTriggerAction(Request $request, $uuid, $version)
+    public function postTriggerAction(Request $request, string $uuid, int $version): Response
     {
         $action = $this->getRequestParameter($request, 'action', true);
         $locale = $this->getLocale($request);
@@ -172,16 +163,13 @@ class VersionController extends FOSRestController implements
         return $this->getRequestParameter($request, 'locale', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSecuredClass()
+    public function getSecuredClass(): string
     {
         return SecurityBehavior::class;
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed
      */
     public function getSecuredObjectId(Request $request)
     {

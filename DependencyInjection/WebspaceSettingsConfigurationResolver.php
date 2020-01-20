@@ -33,12 +33,7 @@ class WebspaceSettingsConfigurationResolver
         $this->defaultAdditionalWebspaces = $defaultAdditionalWebspaces;
     }
 
-    /**
-     * @param string $searchedLocale
-     *
-     * @return string
-     */
-    public function getDefaultMainWebspaceForLocale($searchedLocale)
+    public function getDefaultMainWebspaceForLocale(string $searchedLocale): string
     {
         if (array_key_exists($searchedLocale, $this->defaultMainWebspace)) {
             return $this->defaultMainWebspace[$searchedLocale];
@@ -51,12 +46,7 @@ class WebspaceSettingsConfigurationResolver
         throw new InvalidConfigurationException('No configured default main webspace for locale "' . $searchedLocale . '" not found.');
     }
 
-    /**
-     * @param string $searchedLocale
-     *
-     * @return array
-     */
-    public function getDefaultAdditionalWebspacesForLocale($searchedLocale)
+    public function getDefaultAdditionalWebspacesForLocale(string $searchedLocale): array
     {
         if (array_key_exists($searchedLocale, $this->defaultAdditionalWebspaces)) {
             return $this->defaultAdditionalWebspaces[$searchedLocale];

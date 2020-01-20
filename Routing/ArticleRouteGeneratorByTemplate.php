@@ -28,9 +28,6 @@ class ArticleRouteGeneratorByTemplate implements RouteGeneratorInterface
      */
     private $routeGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(RouteGeneratorInterface $routeGenerator)
     {
         $this->routeGenerator = $routeGenerator;

@@ -42,10 +42,8 @@ class ArticleResourceItemFactory
 
     /**
      * Creates and returns article source item with proxy document.
-     *
-     * @return ArticleResourceItem
      */
-    public function createResourceItem(ArticleViewDocumentInterface $articleViewDocument)
+    public function createResourceItem(ArticleViewDocumentInterface $articleViewDocument): ArticleResourceItem
     {
         return new ArticleResourceItem(
             $articleViewDocument,
@@ -55,13 +53,8 @@ class ArticleResourceItemFactory
 
     /**
      * Returns Proxy document for uuid.
-     *
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return object
      */
-    private function getResource($uuid, $locale)
+    private function getResource(string $uuid, string $locale): object
     {
         return $this->proxyFactory->createProxy(
             ArticleDocument::class,

@@ -20,12 +20,8 @@ class SeoFactory
 {
     /**
      * Create a seo view object by given data.
-     *
-     * @param array $data
-     *
-     * @return SeoViewObject
      */
-    public function create($data)
+    public function create(array $data): SeoViewObject
     {
         $seo = new SeoViewObject();
 

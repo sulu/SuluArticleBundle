@@ -37,10 +37,8 @@ class TagCollectionFactory
      * Create tag collection.
      *
      * @param string[] $tagNames
-     *
-     * @return Collection
      */
-    public function create($tagNames)
+    public function create(array $tagNames): Collection
     {
         $collection = new Collection();
 
@@ -48,7 +46,7 @@ class TagCollectionFactory
             $tagEntity = $this->tagManager->findByName($tagName);
 
             if (!$tagEntity) {
-                return;
+                return null;
             }
 
             $tag = new TagViewObject();

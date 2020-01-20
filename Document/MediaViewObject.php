@@ -75,10 +75,8 @@ class MediaViewObject
 
     /**
      * Get formats.
-     *
-     * @return string
      */
-    public function getFormats()
+    public function getFormats(): string
     {
         return $this->formats;
     }
@@ -87,10 +85,8 @@ class MediaViewObject
      * Set formats.
      *
      * @param string[] $formats
-     *
-     * @return $this
      */
-    public function setFormats($formats)
+    public function setFormats(array $formats): self
     {
         if (is_array($formats)) {
             $formats = json_encode($formats);
@@ -103,10 +99,8 @@ class MediaViewObject
 
     /**
      * Get thumbnails.
-     *
-     * @return array
      */
-    public function getThumbnails()
+    public function getThumbnails(): array
     {
         return json_decode($this->formats, true);
     }
