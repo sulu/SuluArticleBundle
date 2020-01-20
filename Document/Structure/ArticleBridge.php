@@ -30,7 +30,7 @@ class ArticleBridge extends StructureBridge
 
     public function getView(): string
     {
-        return $this->structure->view;
+        return $this->structure->getView();
     }
 
     /**

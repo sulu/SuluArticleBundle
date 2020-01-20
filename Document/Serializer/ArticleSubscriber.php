@@ -15,11 +15,13 @@ use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
@@ -101,12 +103,14 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function addTypeOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!($article instanceof ArticleDocument)) {
             return;
         }
 
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
 
         $articleType = $this->getType($structure->getStructure());
@@ -119,6 +123,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!($article instanceof ArticleDocument)) {
@@ -150,6 +155,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!($article instanceof ArticleViewDocumentInterface)) {
@@ -177,6 +183,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!$article instanceof ArticleInterface) {

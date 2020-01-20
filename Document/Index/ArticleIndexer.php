@@ -31,6 +31,7 @@ use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
@@ -189,11 +190,11 @@ class ArticleIndexer implements IndexerInterface
         }
         if ($document->getChanger() && $changer = $this->userManager->getUserById($document->getChanger())) {
             $article->setChangerFullName($changer->getFullName());
-            $article->setChangerContactId($changer->getContact()->getId());
+            $article->setChangerContactId($changer->getId());
         }
         if ($document->getCreator() && $creator = $this->userManager->getUserById($document->getCreator())) {
             $article->setCreatorFullName($creator->getFullName());
-            $article->setCreatorContactId($creator->getContact()->getId());
+            $article->setCreatorContactId($creator->getId());
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
@@ -207,7 +208,12 @@ class ArticleIndexer implements IndexerInterface
             )
         );
 
-        $extensions = $document->getExtensionsData()->toArray();
+        $extensions = $document->getExtensionsData();
+
+        if ($extensions instanceof ExtensionContainer) {
+            $extensions = $extensions->toArray();
+        }
+
         if (array_key_exists('excerpt', $extensions)) {
             $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
         }
@@ -281,13 +287,15 @@ class ArticleIndexer implements IndexerInterface
                 continue;
             }
 
-            /* @var ArticlePageViewObject $page */
-            $pages[] = $page = $this->documentFactory->create('article_page');
+            /** @var ArticlePageViewObject $page */
+            $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();
             $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
             $page->contentData = json_encode($child->getStructure()->toArray());
+
+            $pages[] = $page;
         }
 
         $article->setPages(new Collection($pages));

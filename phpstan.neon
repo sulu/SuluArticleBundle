@@ -10,11 +10,14 @@ includes:
 parameters:
     paths:
         - .
-    level: 1
+    level: 2
     excludes_analyse:
+        - %currentWorkingDirectory%/DependencyInjection/Configuration.php
         - %currentWorkingDirectory%/vendor/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
         # TODO enable when automation bundle is ready again
         - %currentWorkingDirectory%/PageTree/AutomationPageTreeUpdater.php
         - %currentWorkingDirectory%/PageTree/PageTreeRouteUpdateHandler.php
+    ignoreErrors:
+        - '#Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch()#'

@@ -69,7 +69,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
 
         do {
             $bulk = $this->getBulk($repository, $webspaceKeys, $from, $size);
-            /** @var SitemapUrl[] $alternatives */
+            /** @var SitemapUrl[] $sitemapUrlListByUuid */
             $sitemapUrlListByUuid = [];
 
             /** @var ArticleViewDocumentInterface $item */

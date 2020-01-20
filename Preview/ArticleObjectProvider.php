@@ -140,7 +140,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     /**
      * {@inheritdoc}
      *
-     * @param ArticleDocument $object
+     * @param ArticleDocument $serializedObject
      */
     public function deserialize($serializedObject, $objectClass)
     {

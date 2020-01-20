@@ -72,10 +72,11 @@ class VersionController extends FOSRestController implements
         $users = $this->get('sulu_security.user_repository')->findUsersById($userIds);
         $fullNamesByIds = [];
         foreach ($users as $user) {
-            $fullNamesByIds[$user->getId()] = $user->getContact()->getFullName();
+            $fullNamesByIds[$user->getId()] = $user->getFullName();
         }
 
         $versionData = [];
+        /** @var Version $version */
         foreach ($versions as $version) {
             $versionData[] = [
                 'id' => str_replace('.', '_', $version->getId()),

@@ -21,6 +21,7 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
@@ -308,7 +309,9 @@ class ArticleAdmin extends Admin
     {
         $types = [];
         $securityContext = [];
-        foreach ($this->structureManager->getStructures('article') as $key => $structure) {
+
+        /** @var StructureBridge $structure */
+        foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure());
             if (!array_key_exists($type, $types)) {
                 $types[$type] = [
@@ -343,6 +346,8 @@ class ArticleAdmin extends Admin
     private function getTypes(): array
     {
         $types = [];
+
+        /** @var StructureBridge $structure */
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure(), null);
             $typeKey = $type ?: 'default';

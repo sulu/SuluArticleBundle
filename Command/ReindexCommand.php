@@ -106,7 +106,7 @@ class ReindexCommand extends Command
         if (!$this->dropIndex($indexer, $input, $output)) {
             // Drop was canceled by user.
 
-            return;
+            return 0;
         }
 
         $indexer->createIndex();
@@ -129,6 +129,8 @@ class ReindexCommand extends Command
                 $this->humanBytes(memory_get_peak_usage())
             )
         );
+
+        return 0;
     }
 
     /**
