@@ -21,20 +21,16 @@ trait StructureTagTrait
 {
     /**
      * Returns type for given structure-metadata.
-     *
-     * @return string
      */
-    protected function getType(StructureMetadata $metadata)
+    protected function getType(StructureMetadata $metadata): string
     {
         return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_TYPE, 'type', 'default');
     }
 
     /**
      * Returns multipage-configuration for given structure-metadata.
-     *
-     * @return string
      */
-    protected function getMultipage(StructureMetadata $metadata)
+    protected function getMultipage(StructureMetadata $metadata): string
     {
         return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_MULTIPAGE, 'enabled', false);
     }
@@ -42,13 +38,11 @@ trait StructureTagTrait
     /**
      * Returns attribute for given tag in metadata.
      *
-     * @param string $tag
-     * @param string $attribute
      * @param mixed $default
      *
      * @return mixed
      */
-    private function getTagAttribute(StructureMetadata $metadata, $tag, $attribute, $default)
+    private function getTagAttribute(StructureMetadata $metadata, string $tag, string $attribute, $default)
     {
         if (!$metadata->hasTag($tag)) {
             return $default;

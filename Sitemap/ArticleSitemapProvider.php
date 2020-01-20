@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Sitemap;
 
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
@@ -102,8 +103,12 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $result;
     }
 
-    protected function buildUrl(ArticleViewDocumentInterface $articleView, $scheme, $host, $webspaceKey)
-    {
+    protected function buildUrl(
+        ArticleViewDocumentInterface $articleView,
+        string $scheme,
+        string $host,
+        string $webspaceKey
+    ): SitemapUrl {
         return new SitemapUrl(
             $this->findUrl($articleView, $scheme, $host, $webspaceKey),
             $articleView->getLocale(),
@@ -111,11 +116,12 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         );
     }
 
-    /**
-     * @return string
-     */
-    private function findUrl(ArticleViewDocumentInterface $articleView, $scheme, $host, $webspaceKey)
-    {
+    private function findUrl(
+        ArticleViewDocumentInterface $articleView,
+        string $scheme,
+        string $host,
+        string $webspaceKey
+    ): string {
         return $this->webspaceManager->findUrlByResourceLocator(
             $articleView->getRoutePath(),
             null,
@@ -133,7 +139,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
      *
      * @return SitemapUrl[]
      */
-    private function setAlternatives(array $sitemapUrlList, SitemapUrl $sitemapUrl)
+    private function setAlternatives(array $sitemapUrlList, SitemapUrl $sitemapUrl): array
     {
         foreach ($sitemapUrlList as $sitemapUrlFromList) {
             // Add current as alternative to exist.
@@ -152,7 +158,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $sitemapUrlList;
     }
 
-    private function getBulk(Repository $repository, $webspaceKeys, $from, $size)
+    private function getBulk(Repository $repository, array $webspaceKeys, int $from, int $size): DocumentIterator
     {
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'))
@@ -213,6 +219,9 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $webspaceKeys;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAlias()
     {
         return 'articles';

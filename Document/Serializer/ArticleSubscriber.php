@@ -98,11 +98,10 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append type to result.
      */
-    public function addTypeOnPostSerialize(ObjectEvent $event)
+    public function addTypeOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!($article instanceof ArticleDocument)) {
             return;
@@ -117,11 +116,10 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append webspace-settings to result.
      */
-    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event)
+    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!($article instanceof ArticleDocument)) {
             return;
@@ -149,7 +147,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append broken-indicator to result.
      */
-    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
+    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();
@@ -176,11 +174,10 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append page-title-property to result.
      */
-    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event)
+    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!$article instanceof ArticleInterface) {
             return;
@@ -198,10 +195,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Find page-title property.
-     *
-     * @return PropertyMetadata
      */
-    private function getPageTitleProperty(ArticleInterface $document)
+    private function getPageTitleProperty(ArticleInterface $document): PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article',

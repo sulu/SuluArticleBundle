@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document;
 
 use Sulu\Bundle\ArticleBundle\Document\Behavior\DateShardingBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutableBehavior;
+use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
@@ -232,9 +233,11 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setUuid($uuid)
+    public function setUuid(string $uuid): RoutablePageBehavior
     {
         $this->uuid = $uuid;
+
+        return $this;
     }
 
     /**
@@ -306,16 +309,18 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function removeRoute()
+    public function removeRoute(): RoutablePageBehavior
     {
         $this->route = null;
         $this->routePath = null;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoutePath()
+    public function getRoutePath(): string
     {
         return $this->routePath;
     }
@@ -323,15 +328,17 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setRoutePath($routePath)
+    public function setRoutePath(string $routePath): RoutablePageBehavior
     {
         $this->routePath = $routePath;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getClass()
+    public function getClass(): string
     {
         return get_class($this);
     }
@@ -371,7 +378,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructureType()
+    public function getStructureType(): string
     {
         return $this->structureType;
     }
@@ -387,7 +394,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructure()
+    public function getStructure(): StructureInterface
     {
         return $this->structure;
     }
@@ -541,7 +548,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getArticleUuid()
+    public function getArticleUuid(): string
     {
         return $this->getUuid();
     }
@@ -549,7 +556,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageUuid()
+    public function getPageUuid(): string
     {
         return $this->getUuid();
     }
@@ -557,7 +564,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageNumber()
+    public function getPageNumber(): int
     {
         return 1;
     }
@@ -565,7 +572,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageTitle()
+    public function getPageTitle(): string
     {
         return $this->pageTitle;
     }
@@ -643,7 +650,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getMainWebspace()
+    public function getMainWebspace(): ?string
     {
         return $this->mainWebspace;
     }
@@ -651,15 +658,17 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setMainWebspace($mainWebspace)
+    public function setMainWebspace(?string $mainWebspace): WebspaceBehavior
     {
         $this->mainWebspace = $mainWebspace;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAdditionalWebspaces()
+    public function getAdditionalWebspaces(): ?array
     {
         return $this->additionalWebspaces;
     }
@@ -667,8 +676,10 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setAdditionalWebspaces($additionalWebspaces)
+    public function setAdditionalWebspaces(?array $additionalWebspaces): WebspaceBehavior
     {
         $this->additionalWebspaces = $additionalWebspaces;
+
+        return $this;
     }
 }

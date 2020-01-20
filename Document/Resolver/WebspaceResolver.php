@@ -35,10 +35,7 @@ class WebspaceResolver
         $this->webspaceSettingsConfigurationResolver = $webspaceSettingsConfigurationResolver;
     }
 
-    /**
-     * @return null|string
-     */
-    public function resolveMainWebspace(WebspaceBehavior $document)
+    public function resolveMainWebspace(WebspaceBehavior $document): ?string
     {
         if (!$this->hasMoreThanOneWebspace()) {
             $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
@@ -54,9 +51,9 @@ class WebspaceResolver
     }
 
     /**
-     * @return null|string[]
+     * @return string[]|null
      */
-    public function resolveAdditionalWebspaces(WebspaceBehavior $document)
+    public function resolveAdditionalWebspaces(WebspaceBehavior $document): ?array
     {
         if (!$this->hasMoreThanOneWebspace()) {
             return [];
@@ -71,10 +68,8 @@ class WebspaceResolver
 
     /**
      * Check if system has more than one webspace.
-     *
-     * @return bool
      */
-    private function hasMoreThanOneWebspace()
+    private function hasMoreThanOneWebspace(): bool
     {
         return count($this->webspaceManager->getWebspaceCollection()->getWebspaces()) > 1;
     }

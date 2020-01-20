@@ -48,13 +48,8 @@ class ExcerptFactory
 
     /**
      * Create a excerpt object by given data.
-     *
-     * @param array $data
-     * @param string $locale
-     *
-     * @return ExcerptViewObject
      */
-    public function create($data, $locale)
+    public function create(array $data, string $locale): ExcerptViewObject
     {
         $excerpt = new ExcerptViewObject();
 

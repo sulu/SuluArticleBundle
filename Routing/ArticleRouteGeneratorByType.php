@@ -34,9 +34,6 @@ class ArticleRouteGeneratorByType implements RouteGeneratorInterface
      */
     private $structureMetadataFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         RouteGeneratorInterface $routeGenerator,
         StructureMetadataFactoryInterface $structureMetadataFactory

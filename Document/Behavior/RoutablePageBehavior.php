@@ -23,34 +23,26 @@ interface RoutablePageBehavior extends RoutableInterface, UuidBehavior, LocaleBe
 {
     /**
      * Returns route-path.
-     *
-     * @return string
      */
-    public function getRoutePath();
+    public function getRoutePath(): string;
 
     /**
      * Remove route.
      */
-    public function removeRoute();
+    public function removeRoute(): self;
 
     /**
      * Set route-path.
-     *
-     * @param string $routePath
      */
-    public function setRoutePath($routePath);
+    public function setRoutePath(string $routePath): self;
 
     /**
      * Set uuid.
-     *
-     * @param string $uuid
      */
-    public function setUuid($uuid);
+    public function setUuid(string $uuid): self;
 
     /**
      * Returns class of document without proxies.
-     *
-     * @return string
      */
-    public function getClass();
+    public function getClass(): string;
 }

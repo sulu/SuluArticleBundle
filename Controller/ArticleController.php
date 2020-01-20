@@ -125,7 +125,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      *
      * @return ElasticSearchFieldDescriptor[]
      */
-    protected function getFieldDescriptors()
+    protected function getFieldDescriptors(): array
     {
         return [
             'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
@@ -182,10 +182,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Returns list of articles.
-     *
-     * @return Response
      */
-    public function cgetAction(Request $request)
+    public function cgetAction(Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
@@ -357,14 +355,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Returns query to filter by given range.
-     *
-     * @param string $field
-     * @param string $from
-     * @param string $to
-     *
-     * @return RangeQuery
      */
-    private function getRangeQuery($field, $from, $to)
+    private function getRangeQuery(string $field, string $from, string $to): RangeQuery
     {
         return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
@@ -372,13 +364,9 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Returns single article.
      *
-     * @param string $id
-     *
-     * @return Response
-     *
      * @Get(defaults={"id" = ""})
      */
-    public function getAction(Request $request, $id)
+    public function getAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->documentManager->find(
@@ -397,10 +385,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Create article.
-     *
-     * @return Response
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): Response
     {
         $action = $request->get('action');
         $document = $this->documentManager->create(self::DOCUMENT_TYPE);
@@ -422,12 +408,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Update articles.
-     *
-     * @param string $id
-     *
-     * @return Response
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
@@ -459,10 +441,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Deletes multiple documents.
-     *
-     * @return Response
      */
-    public function cdeleteAction(Request $request)
+    public function cdeleteAction(Request $request): Response
     {
         $ids = array_filter(explode(',', $request->get('ids', '')));
 
@@ -478,12 +458,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Deletes multiple documents.
-     *
-     * @param string $id
-     *
-     * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(string $id): Response
     {
         $documentManager = $this->documentManager;
         $document = $documentManager->find($id);
@@ -497,12 +473,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      * Trigger a action for given article specified over get-action parameter.
      *
      * @Post("/articles/{id}")
-     *
-     * @param string $uuid
-     *
-     * @return Response
      */
-    public function postTriggerAction($id, Request $request)
+    public function postTriggerAction(string $id, Request $request): Response
     {
         // extract parameter
         $action = $this->getRequestParameter($request, 'action', true);
@@ -583,10 +555,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Ordering given pages.
-     *
-     * @param string $locale
      */
-    private function orderPages(array $pages, $locale)
+    private function orderPages(array $pages, string $locale): void
     {
         $documentManager = $this->documentManager;
 
@@ -607,14 +577,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Persists the document using the given Formation.
      *
-     * @param array $data
-     * @param object $document
-     * @param string $locale
-     *
      * @throws InvalidFormException
      * @throws MissingParameterException
      */
-    private function persistDocument($data, $document, $locale)
+    private function persistDocument(array $data, object $document, string $locale): void
     {
         $formType = $this->metadataFactory->getMetadataForAlias('article')->getFormType();
 
@@ -657,12 +623,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
     /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
-     *
-     * @param string $actionParameter
-     * @param object $document
-     * @param string $locale
      */
-    private function handleActionParameter($actionParameter, $document, $locale)
+    private function handleActionParameter(string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
@@ -672,12 +634,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         }
     }
 
-    /**
-     * @param string $sortBy
-     *
-     * @return null|string
-     */
-    private function getSortFieldName($sortBy)
+    private function getSortFieldName(string $sortBy): ?string
     {
         $sortBy = Caser::snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();

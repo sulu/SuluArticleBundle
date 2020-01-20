@@ -85,7 +85,7 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
-    public function build()
+    public function build(): ElasticSearchFieldDescriptor
     {
         return new ElasticSearchFieldDescriptor(
             $this->name,

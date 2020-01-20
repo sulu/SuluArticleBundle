@@ -39,11 +39,10 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Append title to result.
      */
-    public function addTitleOnPostSerialize(ObjectEvent $event)
+    public function addTitleOnPostSerialize(ObjectEvent $event): void
     {
         $articlePage = $event->getObject();
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!$articlePage instanceof ArticlePageDocument) {
             return;

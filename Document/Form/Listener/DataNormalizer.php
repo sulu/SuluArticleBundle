@@ -21,9 +21,6 @@ class DataNormalizer
 {
     /**
      * Normalize incoming data from the legacy node controller.
-     *
-     * @param mixed $data
-     * @param mixed $state Translates to the workflow state
      */
     public static function normalize(FormEvent $event)
     {
@@ -39,7 +36,10 @@ class DataNormalizer
         $event->setData($data);
     }
 
-    private static function getAndUnsetValue(&$data, $key)
+    /**
+     * @return mixed|null
+     */
+    private static function getAndUnsetValue(array &$data, string $key)
     {
         $value = null;
 

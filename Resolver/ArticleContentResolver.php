@@ -54,6 +54,9 @@ class ArticleContentResolver implements ArticleContentResolverInterface
         $this->contentProxyFactory = $contentProxyFactory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function resolve(ArticleInterface $article, int $pageNumber = 1)
     {
         $data = $this->serializer->serialize(
@@ -84,12 +87,8 @@ class ArticleContentResolver implements ArticleContentResolverInterface
 
     /**
      * Returns article page by page-number.
-     *
-     * @param int $pageNumber
-     *
-     * @return ArticleDocument
      */
-    private function getArticleForPage(ArticleDocument $article, $pageNumber)
+    private function getArticleForPage(ArticleDocument $article, int $pageNumber): ArticleDocument
     {
         $children = $article->getChildren();
         if (null === $children || 1 === $pageNumber) {
@@ -107,10 +106,8 @@ class ArticleContentResolver implements ArticleContentResolverInterface
 
     /**
      * Returns content and view of article.
-     *
-     * @return array
      */
-    private function resolveContent(ArticleInterface $article)
+    private function resolveContent(ArticleInterface $article): array
     {
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $structure->setDocument($article);

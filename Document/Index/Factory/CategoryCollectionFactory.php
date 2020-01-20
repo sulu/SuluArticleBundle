@@ -38,11 +38,8 @@ class CategoryCollectionFactory
      * Create category collection.
      *
      * @param int[] $categoryIds
-     * @param string $locale
-     *
-     * @return Collection
      */
-    public function create($categoryIds, $locale)
+    public function create(array $categoryIds, string $locale): Collection
     {
         if (empty($categoryIds)) {
             return new Collection();

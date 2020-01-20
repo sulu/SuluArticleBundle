@@ -96,7 +96,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
     /**
      * Update route-paths of articles which are linked to the given page-document.
      */
-    public function handlePublish(AbstractMappingEvent $event)
+    public function handlePublish(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof PageDocument || !$this->hasChangedResourceSegment($document)) {
@@ -109,7 +109,7 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
     /**
      * Update route-paths of articles which are linked to the given page-document.
      */
-    public function handleMove(MoveEvent $event)
+    public function handleMove(MoveEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof PageDocument) {
@@ -123,10 +123,8 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Returns true if the resource-segment was changed in the draft page.
-     *
-     * @return bool
      */
-    private function hasChangedResourceSegment(PageDocument $document)
+    private function hasChangedResourceSegment(PageDocument $document): bool
     {
         $metadata = $this->metadataFactory->getStructureMetadata('page', $document->getStructureType());
 
@@ -144,10 +142,8 @@ class PageTreeRouteSubscriber implements EventSubscriberInterface
 
     /**
      * Returns the live node for given document.
-     *
-     * @return NodeInterface
      */
-    private function getLiveNode(PathBehavior $document)
+    private function getLiveNode(PathBehavior $document): NodeInterface
     {
         return $this->liveSession->getNode($document->getPath());
     }

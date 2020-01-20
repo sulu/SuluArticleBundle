@@ -148,6 +148,7 @@ class PageTreeRouteContentType extends SimpleContentType
             $node->setProperty($pagePropertyName . '-path', $page['path']);
             $node->setProperty($pagePropertyName . '-webspace', $this->documentInspector->getWebspace($document));
         } catch (DocumentNotFoundException $exception) {
+            // @ignoreException
             // given document was not found
         }
     }

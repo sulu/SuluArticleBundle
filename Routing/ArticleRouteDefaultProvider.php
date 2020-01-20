@@ -154,12 +154,8 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
     /**
      * Get cache life time.
-     *
-     * @param StructureMetadata $metadata
-     *
-     * @return int|null
      */
-    private function getCacheLifetime($metadata)
+    private function getCacheLifetime(StructureMetadata $metadata): ?int
     {
         $cacheLifetime = $metadata->getCacheLifetime();
 

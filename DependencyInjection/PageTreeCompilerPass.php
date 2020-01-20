@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class PageTreeCompilerPass implements CompilerPassInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         $structureFactory = $container->get('sulu_page.structure.factory');
@@ -37,10 +40,8 @@ class PageTreeCompilerPass implements CompilerPassInterface
 
     /**
      * @param PropertyMetadata[] $properties
-     *
-     * @return bool
      */
-    protected function hasPageTree(array $properties)
+    protected function hasPageTree(array $properties): bool
     {
         foreach ($properties as $property) {
             if (PageTreeRouteContentType::NAME === $property->getType()) {

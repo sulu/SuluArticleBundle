@@ -81,7 +81,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     /**
      * {@inheritdoc}
      */
-    public function index(ArticleDocument $document)
+    public function index(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
             $this->indexShadow($document);
@@ -96,7 +96,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         $this->manager->persist($article);
     }
 
-    private function createOrUpdateGhosts(ArticleDocument $document)
+    private function createOrUpdateGhosts(ArticleDocument $document): void
     {
         $documentLocale = $document->getLocale();
         /** @var Localization $localization */

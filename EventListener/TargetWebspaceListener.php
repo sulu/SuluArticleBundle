@@ -33,7 +33,7 @@ class TargetWebspaceListener
     /**
      * Add the proxies for content and view to view-documents.
      */
-    public function onPostConvertToDocument(PostConvertToDocumentEvent $event)
+    public function onPostConvertToDocument(PostConvertToDocumentEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleViewDocumentInterface) {
@@ -43,10 +43,7 @@ class TargetWebspaceListener
         $document->setTargetWebspace($this->getTargetWebspace($document));
     }
 
-    /**
-     * @return null|string
-     */
-    private function getTargetWebspace(ArticleViewDocumentInterface $document)
+    private function getTargetWebspace(ArticleViewDocumentInterface $document): ?string
     {
         if (!$this->requestAnalyzer->getWebspace()) {
             return null;

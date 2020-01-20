@@ -140,7 +140,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Load route.
      */
-    public function handleHydrate(AbstractMappingEvent $event)
+    public function handleHydrate(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutablePageBehavior) {
@@ -165,7 +165,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Generate route and save route-path.
      */
-    public function handlePersist(AbstractMappingEvent $event)
+    public function handlePersist(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutablePageBehavior) {
@@ -202,7 +202,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Regenerate routes for siblings on reorder.
      */
-    public function handleReorder(ReorderEvent $event)
+    public function handleReorder(ReorderEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutablePageBehavior || !$document instanceof ParentBehavior) {
@@ -231,7 +231,7 @@ class RoutableSubscriber implements EventSubscriberInterface
      *
      * @throws ResourceLocatorAlreadyExistsException
      */
-    public function handlePublish(PublishEvent $event)
+    public function handlePublish(PublishEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutableBehavior) {
@@ -273,12 +273,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Create or update for given document.
-     *
-     * @param string $locale
-     *
-     * @return RouteInterface
      */
-    private function createOrUpdatePageRoute(RoutablePageBehavior $document, $locale)
+    private function createOrUpdatePageRoute(RoutablePageBehavior $document, string $locale): RouteInterface
     {
         $route = $this->reallocateExistingRoute($document, $locale);
         if ($route) {
@@ -309,16 +305,12 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Reallocates existing route to given document.
-     *
-     * @param string $locale
-     *
-     * @return RouteInterface
      */
-    private function reallocateExistingRoute(RoutablePageBehavior $document, $locale)
+    private function reallocateExistingRoute(RoutablePageBehavior $document, string $locale): RouteInterface
     {
         $newRoute = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
         if (!$newRoute) {
-            return;
+            return null;
         }
 
         $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
@@ -349,12 +341,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Create or update for given document.
-     *
-     * @param string $locale
-     *
-     * @return RouteInterface
      */
-    private function createOrUpdateRoute(RoutableBehavior $document, $locale)
+    private function createOrUpdateRoute(RoutableBehavior $document, string $locale): RouteInterface
     {
         $route = $document->getRoute();
 
@@ -373,10 +361,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Removes old-routes where the node does not exists anymore.
-     *
-     * @param string $locale
      */
-    private function removeOldChildRoutes(SessionInterface $session, array $oldRoutes, $locale)
+    private function removeOldChildRoutes(SessionInterface $session, array $oldRoutes, string $locale): void
     {
         foreach ($oldRoutes as $oldRoute) {
             $oldRouteEntity = $this->routeRepository->findByPath($oldRoute, $locale);
@@ -391,11 +377,9 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Generates child routes.
      *
-     * @param string $locale
-     *
      * @return string[]
      */
-    private function generateChildRoutes(ChildrenBehavior $document, $locale)
+    private function generateChildRoutes(ChildrenBehavior $document, string $locale): array
     {
         $routes = [];
         foreach ($document->getChildren() as $child) {
@@ -421,7 +405,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Removes route.
      */
-    public function handleRemove(RemoveEvent $event)
+    public function handleRemove(RemoveEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutableBehavior) {
@@ -454,7 +438,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Update routes for copied article.
      */
-    public function handleCopy(CopyEvent $event)
+    public function handleCopy(CopyEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof RoutableBehavior) {
@@ -486,10 +470,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Iterate over children and remove routes.
-     *
-     * @param string $locale
      */
-    private function removeChildRoutes(ChildrenBehavior $document, $locale)
+    private function removeChildRoutes(ChildrenBehavior $document, string $locale): void
     {
         foreach ($document->getChildren() as $child) {
             if ($child instanceof RoutablePageBehavior) {
@@ -504,10 +486,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Removes route if exists.
-     *
-     * @param string $locale
      */
-    private function removeChildRoute(RoutablePageBehavior $document, $locale)
+    private function removeChildRoute(RoutablePageBehavior $document, string $locale): void
     {
         $route = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
         if ($route) {
@@ -517,13 +497,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Returns encoded "routePath" property-name.
-     *
-     * @param string $structureType
-     * @param string $locale
-     *
-     * @return string
      */
-    private function getRoutePathPropertyName($structureType, $locale)
+    private function getRoutePathPropertyName(string $structureType, string $locale): string
     {
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
 
@@ -536,25 +511,16 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Returns encoded property-name.
-     *
-     * @param string $locale
-     * @param string $field
-     *
-     * @return string
      */
-    private function getPropertyName($locale, $field)
+    private function getPropertyName(string $locale, string $field): string
     {
         return $this->propertyEncoder->localizedSystemName($field, $locale);
     }
 
     /**
      * Returns true if given uuid exists.
-     *
-     * @param string $uuid
-     *
-     * @return bool
      */
-    private function nodeExists(SessionInterface $session, $uuid)
+    private function nodeExists(SessionInterface $session, string $uuid): bool
     {
         try {
             $session->getNodeByIdentifier($uuid);

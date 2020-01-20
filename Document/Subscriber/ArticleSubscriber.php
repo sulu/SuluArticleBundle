@@ -135,7 +135,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Schedule article document for index.
      */
-    public function handleScheduleIndex(AbstractMappingEvent $event)
+    public function handleScheduleIndex(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -155,7 +155,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Schedule article document for live index.
      */
-    public function handleScheduleIndexLive(AbstractMappingEvent $event)
+    public function handleScheduleIndexLive(AbstractMappingEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -175,7 +175,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Syncs children between live and draft.
      */
-    public function synchronizeChildren(PublishEvent $event)
+    public function synchronizeChildren(PublishEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -199,7 +199,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      *
      * @return NodeInterface[]
      */
-    private function getChildren(NodeInterface $node)
+    private function getChildren(NodeInterface $node): array
     {
         $result = [];
         foreach ($node->getNodes() as $child) {
@@ -212,7 +212,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Publish pages when article will be published.
      */
-    public function publishChildren(PublishEvent $event)
+    public function publishChildren(PublishEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -230,7 +230,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Persist page-data for reordering children.
      */
-    public function persistPageDataOnReorder(ReorderEvent $event)
+    public function persistPageDataOnReorder(ReorderEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument) {
@@ -256,7 +256,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      *
      * @param PersistEvent|PublishEvent $event
      */
-    public function persistPageData($event)
+    public function persistPageData($event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -268,10 +268,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Set page-data for given document on given node.
-     *
-     * @param string $locale
      */
-    private function setPageData(ArticleDocument $document, NodeInterface $node, $locale)
+    private function setPageData(ArticleDocument $document, NodeInterface $node, string $locale): void
     {
         $pages = [
             [
@@ -307,7 +305,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Hydrate page-data.
      */
-    public function hydratePageData(HydrateEvent $event)
+    public function hydratePageData(HydrateEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -329,10 +327,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Load `routePath` from current locale into `pageData`.
-     *
-     * @return array
      */
-    private function loadPageDataForShadow(NodeInterface $node, ArticleDocument $document, array $originalPages)
+    private function loadPageDataForShadow(NodeInterface $node, ArticleDocument $document, array $originalPages): array
     {
         $pages = $node->getPropertyValueWithDefault(
             $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $document->getLocale()),
@@ -375,13 +371,14 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Index all scheduled article documents with default indexer.
      */
-    public function handleFlush(FlushEvent $event)
+    public function handleFlush(FlushEvent $event): void
     {
         if (count($this->documents) < 1) {
             return;
         }
 
         foreach ($this->documents as $documentData) {
+            /** @var ArticleDocument|null $document */
             $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
             $this->documentManager->refresh($document);
 
@@ -394,13 +391,14 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Index all scheduled article documents with live indexer.
      */
-    public function handleFlushLive(FlushEvent $event)
+    public function handleFlushLive(FlushEvent $event): void
     {
         if (count($this->liveDocuments) < 1) {
             return;
         }
 
         foreach ($this->liveDocuments as $documentData) {
+            /** @var ArticleDocument|null $document */
             $document = $this->documentManager->find($documentData['uuid'], $documentData['locale']);
             $this->documentManager->refresh($document);
 
@@ -413,7 +411,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Removes document from live index and unpublish document in default index.
      */
-    public function handleUnpublish(UnpublishEvent $event)
+    public function handleUnpublish(UnpublishEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -430,7 +428,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Reindex article if a page was removed.
      */
-    public function handleRemovePage(RemoveEvent $event)
+    public function handleRemovePage(RemoveEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticlePageDocument) {
@@ -447,7 +445,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Removes article-document.
      */
-    public function handleRemove(RemoveEvent $event)
+    public function handleRemove(RemoveEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -463,7 +461,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      *
      * @param RemoveEvent|UnpublishEvent $event
      */
-    public function handleRemoveLive($event)
+    public function handleRemoveLive($event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -477,7 +475,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Schedule document to index.
      */
-    public function handleCopy(CopyEvent $event)
+    public function handleCopy(CopyEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -494,7 +492,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Schedule all children.
      */
-    public function handleChildrenPersist(PersistEvent $event)
+    public function handleChildrenPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleDocument) {
@@ -546,7 +544,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Extend metadata for article-page.
      */
-    public function handleMetadataLoad(MetadataLoadEvent $event)
+    public function handleMetadataLoad(MetadataLoadEvent $event): void
     {
         if (ArticleDocument::class !== $event->getMetadata()->getClass()) {
             return;

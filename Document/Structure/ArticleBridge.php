@@ -28,14 +28,14 @@ class ArticleBridge extends StructureBridge
      */
     private $uuid;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getView()
+    public function getView(): string
     {
         return $this->structure->view;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getUuid()
     {
         // is set for structure loaded with document from document-manager
@@ -47,14 +47,15 @@ class ArticleBridge extends StructureBridge
         return $this->uuid;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Will be called by SuluCollector to collect profiler data.
      */
     public function getNavContexts()
@@ -62,18 +63,18 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
-    public function getEnabledShadowLanguages()
+    public function getEnabledShadowLanguages(): array
     {
         return $this->inspector->getShadowLocales($this->getDocument());
     }
 
-    public function getConcreteLanguages()
+    public function getConcreteLanguages(): array
     {
         return $this->inspector->getConcreteLocales($this->getDocument());
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed
      *
      * Will be called by SuluCollector to collect profiler data.
      */
@@ -82,6 +83,9 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getExt()
     {
         return $this->document->getExtensionsData();

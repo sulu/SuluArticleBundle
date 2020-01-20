@@ -23,15 +23,9 @@ use Sulu\Component\Content\Metadata\StructureMetadata;
  */
 trait PageTreeTrait
 {
-    /**
-     * @return StructureMetadataFactoryInterface
-     */
-    abstract protected function getStructureMetadataFactory();
+    abstract protected function getStructureMetadataFactory(): StructureMetadataFactoryInterface;
 
-    /**
-     * @return null|string
-     */
-    protected function getParentPageUuidFromPageTree(ArticleInterface $document)
+    protected function getParentPageUuidFromPageTree(ArticleInterface $document): ?string
     {
         $structureMetadata = $this->getStructureMetadataFactory()->getStructureMetadata(
             'article',
@@ -58,10 +52,8 @@ trait PageTreeTrait
 
     /**
      * Returns property-metadata for route-path property.
-     *
-     * @return null|PropertyMetadata
      */
-    private function getRoutePathProperty(StructureMetadata $metadata)
+    private function getRoutePathProperty(StructureMetadata $metadata): ?PropertyMetadata
     {
         if ($metadata->hasTag(RoutableSubscriber::TAG_NAME)) {
             return $metadata->getPropertyByTagName(RoutableSubscriber::TAG_NAME);

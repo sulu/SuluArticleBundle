@@ -16,24 +16,12 @@ namespace Sulu\Bundle\ArticleBundle\Metadata;
  */
 trait ArticleViewDocumentIdTrait
 {
-    /**
-     * @param string $uuid
-     * @param string $locale
-     *
-     * @return string
-     */
-    protected function getViewDocumentId($uuid, $locale)
+    protected function getViewDocumentId(string $uuid, string $locale): string
     {
         return $uuid . '-' . $locale;
     }
 
-    /**
-     * @param array $uuids
-     * @param string $locale
-     *
-     * @return array
-     */
-    protected function getViewDocumentIds($uuids, $locale)
+    protected function getViewDocumentIds(array $uuids, string $locale): array
     {
         $ids = [];
 

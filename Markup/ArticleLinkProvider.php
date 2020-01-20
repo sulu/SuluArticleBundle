@@ -16,6 +16,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfiguration;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfigurationBuilder;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkItem;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkProviderInterface;
@@ -90,6 +91,9 @@ class ArticleLinkProvider implements LinkProviderInterface
         $this->environment = $environment;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getConfiguration()
     {
         // TODO implement tabs again?
@@ -137,13 +141,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         return $result;
     }
 
-    /**
-     * @param string $locale
-     * @param string $scheme
-     *
-     * @return LinkItem
-     */
-    protected function createLinkItem(ArticleViewDocumentInterface $document, $locale, $scheme)
+    protected function createLinkItem(ArticleViewDocumentInterface $document, string $locale, string $scheme): LinkItem
     {
         $url = $this->webspaceManager->findUrlByResourceLocator(
             $document->getRoutePath(),

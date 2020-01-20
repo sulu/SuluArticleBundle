@@ -27,10 +27,9 @@ class RouteSchemaNotFoundException extends \Exception
     private $available;
 
     /**
-     * @param string $requested
      * @param string[] $available
      */
-    public function __construct($requested, array $available)
+    public function __construct(string $requested, array $available)
     {
         parent::__construct(
             sprintf('Route-schema for "%s" not configured. Available: ["%s"]', $requested, implode('","', $available))
@@ -42,10 +41,8 @@ class RouteSchemaNotFoundException extends \Exception
 
     /**
      * Returns requested.
-     *
-     * @return string
      */
-    public function getRequested()
+    public function getRequested(): string
     {
         return $this->requested;
     }
@@ -55,7 +52,7 @@ class RouteSchemaNotFoundException extends \Exception
      *
      * @return string[]
      */
-    public function getAvailable()
+    public function getAvailable(): array
     {
         return $this->available;
     }

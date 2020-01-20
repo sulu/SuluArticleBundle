@@ -42,10 +42,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
      */
     private $articleDocumentClass;
 
-    /**
-     * @param $articleDocumentClass
-     */
-    public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
+    public function __construct(Manager $searchManager, TranslatorInterface $translator, string $articleDocumentClass)
     {
         $this->searchManager = $searchManager;
         $this->translator = $translator;
@@ -102,10 +99,8 @@ class ArticleTeaserProvider implements TeaserProviderInterface
 
     /**
      * Returns attributes for teaser.
-     *
-     * @return array
      */
-    protected function getAttributes(ArticleViewDocument $viewDocument)
+    protected function getAttributes(ArticleViewDocument $viewDocument): array
     {
         return [
             'structureType' => $viewDocument->getStructureType(),

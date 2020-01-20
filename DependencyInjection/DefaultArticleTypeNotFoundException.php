@@ -26,7 +26,7 @@ class DefaultArticleTypeNotFoundException extends \Exception
      */
     private $structureType;
 
-    public function __construct($type, $structureType, \Exception $previous)
+    public function __construct(string $type, string $structureType, \Exception $previous)
     {
         parent::__construct(sprintf('Default "%s" template "%s" was not found.', $type, $structureType), 0, $previous);
 
@@ -36,20 +36,16 @@ class DefaultArticleTypeNotFoundException extends \Exception
 
     /**
      * Returns type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
      * Returns structure-type.
-     *
-     * @return string
      */
-    public function getStructureType()
+    public function getStructureType(): string
     {
         return $this->structureType;
     }

@@ -70,14 +70,9 @@ class ArticlePageController extends AbstractRestController implements ClassResou
     /**
      * Returns single article-page.
      *
-     * @param string $articleUuid
-     * @param string $uuid
-     *
-     * @return Response
-     *
      * @throws ArticlePageNotFoundException
      */
-    public function getAction($articleUuid, $uuid, Request $request)
+    public function getAction(string $articleUuid, string $uuid, Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->documentManager->find(
@@ -107,12 +102,8 @@ class ArticlePageController extends AbstractRestController implements ClassResou
 
     /**
      * Create article-page.
-     *
-     * @param string $articleUuid
-     *
-     * @return Response
      */
-    public function postAction($articleUuid, Request $request)
+    public function postAction(string $articleUuid, Request $request): Response
     {
         $action = $request->get('action');
         $document = $this->documentManager->create(self::DOCUMENT_TYPE);
@@ -135,13 +126,8 @@ class ArticlePageController extends AbstractRestController implements ClassResou
 
     /**
      * Update article-page.
-     *
-     * @param string $articleUuid
-     * @param string $uuid
-     *
-     * @return Response
      */
-    public function putAction($articleUuid, $uuid, Request $request)
+    public function putAction(string $articleUuid, string $uuid, Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
@@ -173,13 +159,8 @@ class ArticlePageController extends AbstractRestController implements ClassResou
 
     /**
      * Delete article-page.
-     *
-     * @param string $articleUuid
-     * @param string $uuid
-     *
-     * @return Response
      */
-    public function deleteAction($articleUuid, $uuid, Request $request)
+    public function deleteAction(string $articleUuid, string $uuid, Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
@@ -202,16 +183,11 @@ class ArticlePageController extends AbstractRestController implements ClassResou
     /**
      * Persists the document using the given information.
      *
-     * @param array $data
-     * @param object $document
-     * @param string $locale
-     * @param string $articleUuid
-     *
      * @throws InvalidFormException
      * @throws MissingParameterException
      * @throws ParameterNotAllowedException
      */
-    private function persistDocument($data, $document, $locale, $articleUuid)
+    private function persistDocument(array $data, object $document, string $locale, string $articleUuid): void
     {
         if (array_key_exists('title', $data)) {
             throw new ParameterNotAllowedException('title', get_class($document));
@@ -255,12 +231,8 @@ class ArticlePageController extends AbstractRestController implements ClassResou
 
     /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
-     *
-     * @param string $actionParameter
-     * @param object $document
-     * @param string $locale
      */
-    private function handleActionParameter($actionParameter, $document, $locale)
+    private function handleActionParameter(string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
