@@ -31,8 +31,6 @@ interface ArticleInterface
 
     /**
      * Returns page-number.
-     *
-     * @return int
      */
     public function getPageNumber(): int;
 

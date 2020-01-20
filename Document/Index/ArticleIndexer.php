@@ -311,7 +311,8 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Set parent-page-uuid to view-document.
      */
-    private function setParentPageUuid(ArticleDocument $document, ArticleViewDocumentInterface $article): void {
+    private function setParentPageUuid(ArticleDocument $document, ArticleViewDocumentInterface $article): void
+    {
         $parentPageUuid = $this->getParentPageUuidFromPageTree($document);
 
         if (!$parentPageUuid) {
