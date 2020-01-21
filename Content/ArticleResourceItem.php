@@ -222,7 +222,6 @@ class ArticleResourceItem implements ResourceItemInterface
         return $this->getUuid();
     }
 
-
     /**
      * {@inheritdoc}
      */
