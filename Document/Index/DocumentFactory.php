@@ -39,7 +39,7 @@ class DocumentFactory implements DocumentFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create(string $type): ArticleViewDocumentInterface
+    public function create(string $type)
     {
         $class = $this->getClass($type);
 

@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Structure;
 
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use ProxyManager\Proxy\VirtualProxyInterface;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
@@ -50,8 +51,10 @@ class ContentProxyFactory
 
     /**
      * Create content-proxy for given structure.
+     *
+     * @return VirtualProxyInterface
      */
-    public function createContentProxy(StructureInterface $structure, array $data): array
+    public function createContentProxy(StructureInterface $structure, array $data)
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
@@ -92,8 +95,10 @@ class ContentProxyFactory
 
     /**
      * Create view-proxy for given structure.
+     *
+     * @return VirtualProxyInterface
      */
-    public function createViewProxy(StructureInterface $structure, array $data): array
+    public function createViewProxy(StructureInterface $structure, array $data)
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
@@ -132,7 +137,7 @@ class ContentProxyFactory
         return $view;
     }
 
-    private function getWebspaceKey(): string
+    private function getWebspaceKey(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
         if (!$request) {

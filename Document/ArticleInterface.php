@@ -39,12 +39,12 @@ interface ArticleInterface
     /**
      * Returns page-title.
      */
-    public function getPageTitle(): string;
+    public function getPageTitle(): ?string;
 
     /**
      * Returns structure-type.
      */
-    public function getStructureType(): string;
+    public function getStructureType(): ?string;
 
     /**
      * Returns structure.

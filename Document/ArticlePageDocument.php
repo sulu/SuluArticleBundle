@@ -162,7 +162,7 @@ class ArticlePageDocument implements
      *
      * @return string
      */
-    public function getPageTitle(): string
+    public function getPageTitle(): ?string
     {
         return $this->pageTitle;
     }
@@ -246,7 +246,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructureType(): string
+    public function getStructureType(): ?string
     {
         return $this->structureType;
     }
@@ -309,7 +309,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutePath(): string
+    public function getRoutePath(): ?string
     {
         return $this->routePath;
     }

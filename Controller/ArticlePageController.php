@@ -227,7 +227,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
     /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
      */
-    private function handleActionParameter(string $actionParameter, object $document, string $locale): void
+    private function handleActionParameter(?string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
