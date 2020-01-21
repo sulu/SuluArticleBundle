@@ -205,7 +205,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Returns page-title for node.
      */
-    private function getPageTitle(ArticleInterface $document): string
+    private function getPageTitle(ArticleInterface $document): ?string
     {
         $pageTitleProperty = $this->getPageTitleProperty($document);
         if (!$pageTitleProperty) {
@@ -227,7 +227,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Find page-title property.
      */
-    private function getPageTitleProperty(ArticleInterface $document): PropertyMetadata
+    private function getPageTitleProperty(ArticleInterface $document): ?PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article_page',

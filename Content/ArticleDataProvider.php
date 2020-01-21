@@ -215,7 +215,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * Returns flag "hasNextPage".
      * It combines the limit/query-count with the page and page-size.
      */
-    private function hasNextPage(\Countable $queryResult, int $limit, int $page, int $pageSize): bool
+    private function hasNextPage(\Countable $queryResult, ?int $limit, int $page, ?int $pageSize): bool
     {
         $count = $queryResult->count();
         if ($limit && $limit < $count) {
@@ -228,7 +228,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Creates search for filters and returns search-result.
      */
-    private function getSearchResult(array $filters, int $limit, int $page, int $pageSize, int $locale, ?string $webspaceKey): \Countable
+    private function getSearchResult(array $filters, ?int $limit, int $page, ?int $pageSize, ?string $locale, ?string $webspaceKey): \Countable
     {
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $this->createSearch($repository->createSearch(), $filters, $locale);
@@ -367,7 +367,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Add the pagination to given query.
      */
-    private function addPagination(Search $search, int $pageSize, int $page, int $limit): void
+    private function addPagination(Search $search, ?int $pageSize, int $page, ?int $limit): void
     {
         $offset = 0;
         if ($pageSize) {

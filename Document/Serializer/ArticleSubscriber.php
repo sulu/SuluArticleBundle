@@ -203,7 +203,7 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Find page-title property.
      */
-    private function getPageTitleProperty(ArticleInterface $document): PropertyMetadata
+    private function getPageTitleProperty(ArticleInterface $document): ?PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article',

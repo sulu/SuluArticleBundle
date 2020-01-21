@@ -25,6 +25,8 @@ interface DocumentFactoryInterface
 
     /**
      * Create a new indexable article-document.
+     *
+     * @return ArticleViewDocumentInterface
      */
-    public function create(string $type): ArticleViewDocumentInterface;
+    public function create(string $type);
 }

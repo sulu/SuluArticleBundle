@@ -24,7 +24,7 @@ interface RoutablePageBehavior extends RoutableInterface, UuidBehavior, LocaleBe
     /**
      * Returns route-path.
      */
-    public function getRoutePath(): string;
+    public function getRoutePath(): ?string;
 
     /**
      * Remove route.
@@ -34,7 +34,7 @@ interface RoutablePageBehavior extends RoutableInterface, UuidBehavior, LocaleBe
     /**
      * Set route-path.
      */
-    public function setRoutePath(string $routePath): self;
+    public function setRoutePath(?string $routePath): self;
 
     /**
      * Set uuid.

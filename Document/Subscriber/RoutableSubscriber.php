@@ -312,7 +312,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Reallocates existing route to given document.
      */
-    private function reallocateExistingRoute(RoutablePageBehavior $document, string $locale): RouteInterface
+    private function reallocateExistingRoute(RoutablePageBehavior $document, string $locale): ?RouteInterface
     {
         $newRoute = $this->routeRepository->findByPath($document->getRoutePath(), $locale);
         if (!$newRoute) {

@@ -320,7 +320,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutePath(): string
+    public function getRoutePath(): ?string
     {
         return $this->routePath;
     }
@@ -328,7 +328,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setRoutePath(string $routePath): RoutablePageBehavior
+    public function setRoutePath(?string $routePath): RoutablePageBehavior
     {
         $this->routePath = $routePath;
 
@@ -378,7 +378,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructureType(): string
+    public function getStructureType(): ?string
     {
         return $this->structureType;
     }
@@ -572,7 +572,7 @@ class ArticleDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageTitle(): string
+    public function getPageTitle(): ?string
     {
         return $this->pageTitle;
     }
