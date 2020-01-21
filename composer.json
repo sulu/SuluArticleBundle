@@ -88,10 +88,10 @@
             "vendor/bin/phpstan analyse -c phpstan.neon"
         ],
         "php-cs": [
-            "@php vendor/bin/php-cs-fixer fix --verbose --diff --dry-run"
+            "@php vendor/bin/php-cs-fixer fix --verbose --diff --dry-run --allow-risky=yes"
         ],
         "php-cs-fix": [
-            "@php vendor/bin/php-cs-fixer fix"
+            "@php vendor/bin/php-cs-fixer fix --allow-risky=yes"
         ]
     },
     "config": {

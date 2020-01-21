@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of Sulu.
  *
@@ -10,8 +12,6 @@
  */
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
-
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 
 /**
  * Factory for creating article-documents.
