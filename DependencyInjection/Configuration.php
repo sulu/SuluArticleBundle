@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -33,7 +33,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('locale')
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function ($v) {
+                        ->then(function($v) {
                             return ['default' => $v];
                         })
                     ->end()
@@ -41,10 +41,10 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('default_additional_webspaces')
                     ->beforeNormalization()
-                        ->ifTrue(function ($v) {
+                        ->ifTrue(function($v) {
                             return count(array_filter(array_keys($v), 'is_string')) <= 0;
                         })
-                        ->then(function ($v) {
+                        ->then(function($v) {
                             return ['default' => $v];
                         })
                     ->end()
