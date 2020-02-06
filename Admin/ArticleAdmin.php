@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -11,14 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
-use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\AdminBundle\Navigation\Navigation;
 use Sulu\Bundle\AdminBundle\Navigation\NavigationItem;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
-use Sulu\Component\Content\Compat\StructureManagerInterface;
 
 /**
  * Integrates article-bundle into sulu-admin.
@@ -42,8 +41,7 @@ class ArticleAdmin extends Admin
      * @param StructureManagerInterface $structureManager
      * @param string $title
      */
-    public function __construct
-    (
+    public function __construct(
         SecurityCheckerInterface $securityChecker,
         StructureManagerInterface $structureManager,
         $title
@@ -110,7 +108,7 @@ class ArticleAdmin extends Admin
                     ],
                 ],
                 'Article types' => $securityContext,
-            ]
+            ],
         ];
     }
 }

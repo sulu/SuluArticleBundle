@@ -9,6 +9,10 @@
 /auth.json
 /vendor
 
+# php-cs
+.php_cs
+.php_cs.cache
+
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~
 

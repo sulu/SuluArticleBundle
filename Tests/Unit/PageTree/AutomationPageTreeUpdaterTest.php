@@ -3,7 +3,7 @@
 /*
  * This file is part of Sulu.
  *
- * (c) MASSIVE ART WebServices GmbH
+ * (c) Sulu GmbH
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -74,7 +74,7 @@ class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->create(
             Argument::that(
-                function (TaskInterface $task) {
+                function(TaskInterface $task) {
                     return BasePageDocument::class === $task->getEntityClass()
                         && '123-123-123' === $task->getEntityId()
                         && 'de' === $task->getLocale()
