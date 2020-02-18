@@ -11,9 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Behavior;
 
+use Sulu\Component\Route\Document\Behavior\RoutableBehavior as BaseRoutableBehavior;
+
 /**
  * This behavior has to be attached to documents which should have a sulu-route but managed by their parent.
  */
-interface RoutablePageBehavior extends \Sulu\Component\Route\Document\Behavior\RoutableBehavior
+interface RoutablePageBehavior extends BaseRoutableBehavior
 {
 }
