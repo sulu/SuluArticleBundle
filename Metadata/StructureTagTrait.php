@@ -22,13 +22,11 @@ trait StructureTagTrait
     /**
      * Returns type for given structure-metadata.
      *
-     * @param StructureMetadata $metadata
-     *
      * @return string
      */
-    protected function getType(StructureMetadata $metadata)
+    protected function getType(StructureMetadata $metadata, ?string $default = 'default')
     {
-        return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_TYPE, 'type', 'default');
+        return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_TYPE, 'type', $default);
     }
 
     /**
