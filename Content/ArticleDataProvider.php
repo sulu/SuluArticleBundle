@@ -71,11 +71,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     protected $defaultLimit;
 
     /**
-     * @param Manager $searchManager
-     * @param DocumentManagerInterface $documentManager
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     * @param ReferenceStoreInterface $referenceStore
-     * @param ArticleResourceItemFactory $articleResourceItemFactory
      * @param string $articleDocumentClass
      * @param int $defaultLimit
      */
@@ -207,9 +202,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     }
 
     /**
-     * @param array $propertyParameter
-     * @param array $options
-     *
      * @return string|null
      */
     private function getWebspaceKey(array $propertyParameter, array $options)
@@ -233,7 +225,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * Returns flag "hasNextPage".
      * It combines the limit/query-count with the page and page-size.
      *
-     * @param \Countable $queryResult
      * @param int $limit
      * @param int $page
      * @param int $pageSize
@@ -253,7 +244,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Creates search for filters and returns search-result.
      *
-     * @param array $filters
      * @param int $limit
      * @param int $page
      * @param int $pageSize
@@ -295,8 +285,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Initialize search with neccesary queries.
      *
-     * @param Search $search
-     * @param array $filters
      * @param string $locale
      *
      * @return Search
@@ -398,7 +386,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Returns excluded articles.
      *
-     * @param array $filters
      * @param PropertyParameter[] $propertyParameter
      *
      * @return array
@@ -434,7 +421,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Add the pagination to given query.
      *
-     * @param Search $search
      * @param int $pageSize
      * @param int $page
      * @param int $limit
@@ -467,10 +453,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * Add a boolean-query if filter exists.
      *
      * @param string $filterName
-     * @param array $filters
      * @param string $field
      * @param string $operator
-     * @param BoolQuery $query
      * @param int $queriesCount
      */
     private function addBoolQuery($filterName, array $filters, $field, $operator, BoolQuery $query, &$queriesCount)
@@ -485,7 +469,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      * Returns boolean query for given fields and values.
      *
      * @param string $field
-     * @param array $values
      * @param string $operator
      *
      * @return BoolQuery
@@ -505,7 +488,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Returns filter value.
      *
-     * @param array $filters
      * @param string $name
      * @param mixed $default
      *
@@ -523,7 +505,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     /**
      * Returns true if filter-value exists.
      *
-     * @param array $filters
      * @param string $name
      *
      * @return bool

@@ -106,7 +106,6 @@ class ArticleSitemapProvider implements SitemapProviderInterface
      * Set alternatives to sitemap url.
      *
      * @param SitemapUrl[] $sitemapUrlList
-     * @param SitemapUrl $sitemapUrl
      *
      * @return SitemapUrl[]
      */

@@ -47,11 +47,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $documentManager;
 
-    /**
-     * @param DocumentInspector $documentInspector
-     * @param PropertyEncoder $propertyEncoder
-     * @param DocumentManagerInterface $documentManager
-     */
     public function __construct(
         DocumentInspector $documentInspector,
         PropertyEncoder $propertyEncoder,
@@ -79,8 +74,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Set the page-number to existing pages.
-     *
-     * @param HydrateEvent $event
      */
     public function handleHydrate(HydrateEvent $event)
     {
@@ -97,8 +90,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Set the page-number to new pages.
-     *
-     * @param PersistEvent $event
      */
     public function handlePersist(PersistEvent $event)
     {
@@ -130,8 +121,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Adjust the page-numbers of siblings when reordering a page.
-     *
-     * @param ReorderEvent $event
      */
     public function handleReorder(ReorderEvent $event)
     {
@@ -157,8 +146,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Copy page-number to live workspace.
-     *
-     * @param PublishEvent $event
      */
     public function handlePublishPageNumber(PublishEvent $event)
     {
@@ -174,8 +161,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Adjust the page-numbers of siblings when removing a page.
-     *
-     * @param RemoveEvent $event
      */
     public function handleRemove(RemoveEvent $event)
     {
@@ -197,8 +182,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Adjust the page-numbers of siblings when restoring a page.
-     *
-     * @param RestoreEvent $event
      */
     public function handleRestore(RestoreEvent $event)
     {

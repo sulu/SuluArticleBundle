@@ -50,13 +50,6 @@ class ArticleJsConfig implements JsConfigInterface
      */
     private $parameter;
 
-    /**
-     * @param WebspaceManager $webspaceManager
-     * @param StructureManagerInterface $structureManager
-     * @param WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
-     * @param array $typeConfiguration
-     * @param array $parameter
-     */
     public function __construct(
         WebspaceManager $webspaceManager,
         StructureManagerInterface $structureManager,

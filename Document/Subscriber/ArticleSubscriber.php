@@ -83,13 +83,6 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     private $children = [];
 
-    /**
-     * @param IndexerInterface $indexer
-     * @param IndexerInterface $liveIndexer
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $documentInspector
-     * @param PropertyEncoder $propertyEncoder
-     */
     public function __construct(
         IndexerInterface $indexer,
         IndexerInterface $liveIndexer,
@@ -141,8 +134,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Schedule article document for index.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handleScheduleIndex(AbstractMappingEvent $event)
     {
@@ -163,8 +154,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Schedule article document for live index.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handleScheduleIndexLive(AbstractMappingEvent $event)
     {
@@ -185,8 +174,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Syncs children between live and draft.
-     *
-     * @param PublishEvent $event
      */
     public function synchronizeChildren(PublishEvent $event)
     {
@@ -210,8 +197,6 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Returns children of given node.
      *
-     * @param NodeInterface $node
-     *
      * @return NodeInterface[]
      */
     private function getChildren(NodeInterface $node)
@@ -226,8 +211,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Publish pages when article will be published.
-     *
-     * @param PublishEvent $event
      */
     public function publishChildren(PublishEvent $event)
     {
@@ -246,8 +229,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Persist page-data for reordering children.
-     *
-     * @param ReorderEvent $event
      */
     public function persistPageDataOnReorder(ReorderEvent $event)
     {
@@ -288,8 +269,6 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Set page-data for given document on given node.
      *
-     * @param ArticleDocument $document
-     * @param NodeInterface $node
      * @param string $locale
      */
     private function setPageData(ArticleDocument $document, NodeInterface $node, $locale)
@@ -327,8 +306,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Hydrate page-data.
-     *
-     * @param HydrateEvent $event
      */
     public function hydratePageData(HydrateEvent $event)
     {
@@ -353,10 +330,6 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Load `routePath` from current locale into `pageData`.
      *
-     * @param NodeInterface $node
-     * @param ArticleDocument $document
-     * @param array $originalPages
-     *
      * @return array
      */
     private function loadPageDataForShadow(NodeInterface $node, ArticleDocument $document, array $originalPages)
@@ -376,8 +349,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Remove draft from children.
-     *
-     * @param RemoveDraftEvent $event
      */
     public function removeDraftChildren(RemoveDraftEvent $event)
     {
@@ -403,8 +374,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Index all scheduled article documents with default indexer.
-     *
-     * @param FlushEvent $event
      */
     public function handleFlush(FlushEvent $event)
     {
@@ -424,8 +393,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Index all scheduled article documents with live indexer.
-     *
-     * @param FlushEvent $event
      */
     public function handleFlushLive(FlushEvent $event)
     {
@@ -445,8 +412,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Removes document from live index and unpublish document in default index.
-     *
-     * @param UnpublishEvent $event
      */
     public function handleUnpublish(UnpublishEvent $event)
     {
@@ -464,8 +429,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Reindex article if a page was removed.
-     *
-     * @param RemoveEvent $event
      */
     public function handleRemovePage(RemoveEvent $event)
     {
@@ -483,8 +446,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Removes article-document.
-     *
-     * @param RemoveEvent $event
      */
     public function handleRemove(RemoveEvent $event)
     {
@@ -515,8 +476,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Schedule document to index.
-     *
-     * @param CopyEvent $event
      */
     public function handleCopy(CopyEvent $event)
     {
@@ -534,8 +493,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Schedule all children.
-     *
-     * @param PersistEvent $event
      */
     public function handleChildrenPersist(PersistEvent $event)
     {
@@ -588,8 +545,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Extend metadata for article-page.
-     *
-     * @param MetadataLoadEvent $event
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {

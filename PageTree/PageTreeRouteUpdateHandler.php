@@ -40,11 +40,6 @@ class PageTreeRouteUpdateHandler implements AutomationTaskHandlerInterface, Lock
      */
     private $entityManager;
 
-    /**
-     * @param PageTreeUpdaterInterface $routeUpdater
-     * @param DocumentManagerInterface $documentManager
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         PageTreeUpdaterInterface $routeUpdater,
         DocumentManagerInterface $documentManager,

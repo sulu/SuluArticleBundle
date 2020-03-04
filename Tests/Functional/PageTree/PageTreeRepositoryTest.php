@@ -155,7 +155,6 @@ class PageTreeRepositoryTest extends SuluTestCase
     /**
      * Returns property value for given page.
      *
-     * @param PageDocument $page
      * @param string $suffix
      *
      * @return array
@@ -175,7 +174,6 @@ class PageTreeRepositoryTest extends SuluTestCase
     /**
      * Create a new article.
      *
-     * @param array $routePathData
      * @param string $title
      *
      * @return array
@@ -200,7 +198,6 @@ class PageTreeRepositoryTest extends SuluTestCase
     /**
      * Create article page.
      *
-     * @param array $article
      * @param string $pageTitle
      * @param string $template
      * @param string $locale

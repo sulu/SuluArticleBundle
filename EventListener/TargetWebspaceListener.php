@@ -32,8 +32,6 @@ class TargetWebspaceListener
 
     /**
      * Add the proxies for content and view to view-documents.
-     *
-     * @param PostConvertToDocumentEvent $event
      */
     public function onPostConvertToDocument(PostConvertToDocumentEvent $event)
     {
@@ -46,8 +44,6 @@ class TargetWebspaceListener
     }
 
     /**
-     * @param ArticleViewDocumentInterface $document
-     *
      * @return null|string
      */
     private function getTargetWebspace(ArticleViewDocumentInterface $document)

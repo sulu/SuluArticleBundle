@@ -73,7 +73,6 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dataProvider
      *
      * @param string $uuid
-     * @param array $types
      * @param string $locale
      * @param int $limit
      * @param string $webspaceKey
@@ -158,7 +157,6 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
      * @dataProvider dataProvider
      *
      * @param string $excludeUuid
-     * @param array $types
      * @param string $locale
      * @param int $limit
      * @param string $webspaceKey

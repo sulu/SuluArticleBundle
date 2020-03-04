@@ -60,8 +60,6 @@ class ArticleResourceItemFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ArticleDocument $articleDocument
-     *
      * @return ArticleViewDocument
      */
     private function getArticleViewDocument(ArticleDocument $articleDocument)

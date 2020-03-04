@@ -65,11 +65,6 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $environment;
 
     /**
-     * @param Manager $liveManager
-     * @param Manager $defaultManager
-     * @param WebspaceManagerInterface $webspaceManager
-     * @param RequestStack $requestStack
-     * @param array $types
      * @param string $articleViewClass
      * @param string $environment
      */
@@ -147,7 +142,6 @@ class ArticleLinkProvider implements LinkProviderInterface
     }
 
     /**
-     * @param ArticleViewDocumentInterface $document
      * @param string $locale
      * @param string $scheme
      *

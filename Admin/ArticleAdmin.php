@@ -37,8 +37,6 @@ class ArticleAdmin extends Admin
     private $structureManager;
 
     /**
-     * @param SecurityCheckerInterface $securityChecker
-     * @param StructureManagerInterface $structureManager
      * @param string $title
      */
     public function __construct(
