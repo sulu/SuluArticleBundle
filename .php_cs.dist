@@ -10,7 +10,6 @@ with this source code in the file LICENSE.
 EOF;
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['var/cache'])
     ->in(__DIR__);
 
 return PhpCsFixer\Config::create()
@@ -21,11 +20,9 @@ return PhpCsFixer\Config::create()
         'concat_space' => ['spacing' => 'one'],
         'function_declaration' => ['closure_function_spacing' => 'none'],
         'header_comment' => ['header' => $header],
-        'no_superfluous_phpdoc_tags' => false,
         'ordered_imports' => true,
         'phpdoc_align' => ['align' => 'left'],
         'phpdoc_types_order' => false,
         'phpdoc_to_comment' => false,
-        'single_line_throw' => false,
     ])
     ->setFinder($finder);
