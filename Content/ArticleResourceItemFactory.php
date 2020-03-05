@@ -32,10 +32,6 @@ class ArticleResourceItemFactory
      */
     protected $proxyFactory;
 
-    /**
-     * @param DocumentManagerInterface $documentManager
-     * @param LazyLoadingValueHolderFactory $proxyFactory
-     */
     public function __construct(
         DocumentManagerInterface $documentManager,
         LazyLoadingValueHolderFactory $proxyFactory
@@ -46,8 +42,6 @@ class ArticleResourceItemFactory
 
     /**
      * Creates and returns article source item with proxy document.
-     *
-     * @param ArticleViewDocumentInterface $articleViewDocument
      *
      * @return ArticleResourceItem
      */

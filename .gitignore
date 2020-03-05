@@ -2,6 +2,11 @@
 /Tests/app/config/parameters.yml
 /app/phpunit.xml
 /phpunit.xml
+.phpunit.result.cache
+
+# PHPCS
+.php_cs.cache
+/php-cs-fixer.phar
 
 # composer
 /composer.phar

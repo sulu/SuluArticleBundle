@@ -83,8 +83,6 @@ class WebspaceSettingsConfigurationResolverTest extends \PHPUnit_Framework_TestC
     }
 
     /**
-     * @param array $defaultMainWebspaceConfig
-     * @param array $defaultAdditionalWebspaceConfig
      * @param string $expectedResult
      * @param string[] $expectedResultAdditionalWebspaces
      *

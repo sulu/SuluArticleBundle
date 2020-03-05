@@ -41,8 +41,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     private $articleDocumentClass;
 
     /**
-     * @param DocumentManagerInterface $documentManager
-     * @param SerializerInterface $serializer
      * @param $articleDocumentClass
      */
     public function __construct(

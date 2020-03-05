@@ -125,8 +125,6 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns list of articles.
      *
-     * @param Request $request
-     *
      * @return Response
      */
     public function cgetAction(Request $request)
@@ -306,7 +304,6 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Returns single article.
      *
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -329,8 +326,6 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Create article.
-     *
-     * @param Request $request
      *
      * @return Response
      */
@@ -357,7 +352,6 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Update articles.
      *
-     * @param Request $request
      * @param string $uuid
      *
      * @return Response
@@ -394,8 +388,6 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Deletes multiple documents.
-     *
-     * @param Request $request
      *
      * @return Response
      */
@@ -436,7 +428,6 @@ class ArticleController extends RestController implements ClassResourceInterface
      * @Post("/articles/{uuid}")
      *
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -522,7 +513,6 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Ordering given pages.
      *
-     * @param array $pages
      * @param string $locale
      */
     private function orderPages(array $pages, $locale)

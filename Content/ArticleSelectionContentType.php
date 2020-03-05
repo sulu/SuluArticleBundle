@@ -48,8 +48,6 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
     private $template;
 
     /**
-     * @param Manager $searchManager
-     * @param ReferenceStoreInterface $referenceStore
      * @param string $articleDocumentClass
      * @param string $template
      */

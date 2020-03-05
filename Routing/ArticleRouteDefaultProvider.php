@@ -60,14 +60,6 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     private $requestAnalyzer;
 
-    /**
-     * @param DocumentManagerInterface $documentManager
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
-     * @param CacheLifetimeResolverInterface $cacheLifetimeResolver
-     * @param StructureManagerInterface $structureManager
-     * @param WebspaceResolver $webspaceResolver
-     * @param RequestAnalyzer $requestAnalyzer
-     */
     public function __construct(
         DocumentManagerInterface $documentManager,
         StructureMetadataFactoryInterface $structureMetadataFactory,
@@ -180,9 +172,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             || !isset($cacheLifetime['value'])
             || !$this->cacheLifetimeResolver->supports($cacheLifetime['type'], $cacheLifetime['value'])
         ) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid cachelifetime in article route default provider: %s', var_export($cacheLifetime, true))
-            );
+            throw new \InvalidArgumentException(sprintf('Invalid cachelifetime in article route default provider: %s', var_export($cacheLifetime, true)));
         }
 
         return $this->cacheLifetimeResolver->resolve($cacheLifetime['type'], $cacheLifetime['value']);

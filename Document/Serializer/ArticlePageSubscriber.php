@@ -37,8 +37,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Append title to result.
-     *
-     * @param ObjectEvent $event
      */
     public function addTitleOnPostSerialize(ObjectEvent $event)
     {

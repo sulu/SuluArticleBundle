@@ -27,8 +27,6 @@ class TemplateController extends Controller
     /**
      * Returns template for given article type.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function getAction(Request $request)
@@ -59,8 +57,6 @@ class TemplateController extends Controller
 
     /**
      * Renders template for settings tab in edit form.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return Response
      */

@@ -26,8 +26,6 @@ class MediaFactory
 
     /**
      * MediaCollectionFactory constructor.
-     *
-     * @param MediaManagerInterface $mediaManager
      */
     public function __construct(MediaManagerInterface $mediaManager)
     {

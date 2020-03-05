@@ -38,7 +38,6 @@ class VersionController extends FOSRestController implements
     /**
      * Returns the versions for the article with the given UUID.
      *
-     * @param Request $request
      * @param string $uuid
      *
      * @return Response
@@ -108,7 +107,6 @@ class VersionController extends FOSRestController implements
     }
 
     /**
-     * @param Request $request
      * @param string $uuid
      * @param int $version
      *

@@ -82,8 +82,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
     /**
      * Resolve content on serialization.
-     *
-     * @param ObjectEvent $event
      */
     public function resolveContentOnPostSerialize(ObjectEvent $event)
     {
@@ -109,8 +107,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
     /**
      * Append page data.
-     *
-     * @param ObjectEvent $event
      */
     public function appendPageData(ObjectEvent $event)
     {
@@ -137,8 +133,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
     /**
      * Resolve content on serialization.
-     *
-     * @param ObjectEvent $event
      */
     public function resolveContentForArticleOnPostSerialize(ObjectEvent $event)
     {
@@ -163,7 +157,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
     /**
      * Returns article page by page-number.
      *
-     * @param ArticleDocument $article
      * @param int $pageNumber
      *
      * @return ArticleDocument
@@ -186,8 +179,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
     /**
      * Resolve content on serialization.
-     *
-     * @param ObjectEvent $event
      */
     public function resolveContentForArticlePageOnPostSerialize(ObjectEvent $event)
     {
@@ -207,8 +198,6 @@ class ArticleWebsiteSubscriber implements EventSubscriberInterface
 
     /**
      * Returns content and view of article.
-     *
-     * @param ArticleInterface $article
      *
      * @return array
      */

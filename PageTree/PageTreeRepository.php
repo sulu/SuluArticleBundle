@@ -52,12 +52,6 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
      */
     protected $documentInspector;
 
-    /**
-     * @param DocumentManagerInterface $documentManager
-     * @param StructureMetadataFactoryInterface $metadataFactory
-     * @param PropertyEncoder $propertyEncoder
-     * @param DocumentInspector $documentInspector
-     */
     public function __construct(
         DocumentManagerInterface $documentManager,
         StructureMetadataFactoryInterface $metadataFactory,
@@ -137,9 +131,6 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
 
     /**
      * Update route of given article.
-     *
-     * @param ArticleDocument $article
-     * @param BasePageDocument $document
      */
     private function updateArticle(ArticleDocument $article, BasePageDocument $document)
     {
@@ -187,8 +178,6 @@ class PageTreeRepository implements PageTreeUpdaterInterface, PageTreeMoverInter
 
     /**
      * Returns "routePath" property.
-     *
-     * @param StructureMetadata $metadata
      *
      * @return PropertyMetadata
      */
