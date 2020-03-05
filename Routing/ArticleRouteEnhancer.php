@@ -37,8 +37,6 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
     private $environment;
 
     /**
-     * @param WebspaceManagerInterface $webspaceManager
-     * @param WebspaceResolver $webspaceResolver
      * @param string $environment
      */
     public function __construct(
@@ -76,9 +74,6 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
 
     /**
      * Checks if the enhancer should add an canonical tag to the route attributes.
-     *
-     * @param array $defaults
-     * @param Request $request
      *
      * @return bool
      */

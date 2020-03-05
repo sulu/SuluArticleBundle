@@ -51,7 +51,6 @@ class ArticleIndexBuilder extends SuluBuilder
      * If index exists and destroy flag is true - drop and create index.
      * Else do nothing.
      *
-     * @param Manager $manager
      * @param bool $destroy
      */
     private function buildForManager(Manager $manager, $destroy)

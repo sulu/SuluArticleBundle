@@ -29,8 +29,6 @@ class WebsiteArticleController extends Controller
     /**
      * Article index action.
      *
-     * @param Request $request
-     * @param ArticleInterface $object
      * @param string $view
      * @param int $pageNumber
      *
@@ -44,8 +42,6 @@ class WebsiteArticleController extends Controller
     /**
      * Render article with given view.
      *
-     * @param Request $request
-     * @param ArticleInterface $object
      * @param string $view
      * @param int $pageNumber
      * @param array $attributes
@@ -100,8 +96,6 @@ class WebsiteArticleController extends Controller
      * Returns all the times the article-document.
      * This is necessary because the preview system passes an article-page here.
      *
-     * @param ArticleInterface $object
-     *
      * @return ArticleDocument
      */
     protected function normalizeArticle(ArticleInterface $object)
@@ -116,7 +110,6 @@ class WebsiteArticleController extends Controller
     /**
      * Serialize given article with page-number.
      *
-     * @param ArticleInterface $object
      * @param int $pageNumber
      *
      * @return array
@@ -128,8 +121,6 @@ class WebsiteArticleController extends Controller
 
     /**
      * Create response.
-     *
-     * @param Request $request
      *
      * @return Response
      */

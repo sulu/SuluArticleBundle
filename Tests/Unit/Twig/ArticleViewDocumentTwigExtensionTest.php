@@ -183,8 +183,6 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     }
 
     /**
-     * @param array $articleDocuments
-     *
      * @return array
      */
     private function getArticleViewDocuments(array $articleDocuments)
@@ -202,9 +200,6 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     }
 
     /**
-     * @param array $articleDocuments
-     * @param array $articleViewDocuments
-     *
      * @return array
      */
     private function getArticleResourceItems(array $articleDocuments, array $articleViewDocuments)
@@ -219,8 +214,6 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     }
 
     /**
-     * @param array $articleViewDocuments
-     *
      * @return DocumentIterator
      */
     private function getDocumentIterator(array $articleViewDocuments)

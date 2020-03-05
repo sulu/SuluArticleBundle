@@ -56,8 +56,6 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
 
     /**
      * Upgrade all nodes in given session.
-     *
-     * @param SessionInterface $session
      */
     private function upgrade(SessionInterface $session)
     {
@@ -97,8 +95,6 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
 
     /**
      * Downgrades all nodes in given session.
-     *
-     * @param SessionInterface $session
      */
     private function downgrade(SessionInterface $session)
     {

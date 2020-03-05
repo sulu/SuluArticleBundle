@@ -30,10 +30,6 @@ class IndexEvent extends Event
      */
     private $viewDocument;
 
-    /**
-     * @param ArticleDocument $document
-     * @param ArticleViewDocumentInterface $viewDocument
-     */
     public function __construct(ArticleDocument $document, ArticleViewDocumentInterface $viewDocument)
     {
         $this->document = $document;

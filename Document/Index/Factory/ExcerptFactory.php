@@ -35,10 +35,6 @@ class ExcerptFactory
 
     /**
      * ExcerptIndexerFactory constructor.
-     *
-     * @param CategoryCollectionFactory $categoryCollectionFactory
-     * @param TagCollectionFactory $tagCollectionFactory
-     * @param MediaCollectionFactory $mediaCollectionFactory
      */
     public function __construct(
         CategoryCollectionFactory $categoryCollectionFactory,

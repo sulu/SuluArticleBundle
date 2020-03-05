@@ -70,9 +70,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param AbstractMappingEvent $event
-     */
     public function loadProperties(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
@@ -98,9 +95,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         $document->setAdditionalWebspaces($additionalWebspaces);
     }
 
-    /**
-     * @param AbstractMappingEvent $event
-     */
     public function saveProperties(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();

@@ -43,8 +43,6 @@ class ArticleTeaserProvider implements TeaserProviderInterface
     private $articleDocumentClass;
 
     /**
-     * @param Manager $searchManager
-     * @param TranslatorInterface $translator
      * @param $articleDocumentClass
      */
     public function __construct(Manager $searchManager, TranslatorInterface $translator, $articleDocumentClass)
@@ -104,8 +102,6 @@ class ArticleTeaserProvider implements TeaserProviderInterface
 
     /**
      * Returns attributes for teaser.
-     *
-     * @param ArticleViewDocument $viewDocument
      *
      * @return array
      */

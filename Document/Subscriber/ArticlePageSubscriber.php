@@ -62,13 +62,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
      */
     private $resolver;
 
-    /**
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $documentInspector
-     * @param SlugifierInterface $slugifier
-     * @param NameResolver $resolver
-     */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         DocumentManagerInterface $documentManager,
@@ -107,8 +100,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Hydrate parent to avoid proxiing it.
-     *
-     * @param HydrateEvent $event
      */
     public function setParentOnHydrate(HydrateEvent $event)
     {
@@ -127,8 +118,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Check for missing persist options.
-     *
-     * @param PersistEvent $event
      */
     public function checkOptions(PersistEvent $event)
     {
@@ -146,8 +135,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Set page-title from structure to document.
-     *
-     * @param PersistEvent $event
      */
     public function setTitleOnPersist(PersistEvent $event)
     {
@@ -183,8 +170,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Set node to event on persist.
-     *
-     * @param PersistEvent $event
      */
     public function setNodeOnPersist(PersistEvent $event)
     {
@@ -205,8 +190,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Set page-title on persist event.
-     *
-     * @param PersistEvent $event
      */
     public function setPageTitleOnPersist(PersistEvent $event)
     {
@@ -220,8 +203,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Returns page-title for node.
-     *
-     * @param ArticleInterface $document
      *
      * @return string
      */
@@ -247,8 +228,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Find page-title property.
      *
-     * @param ArticleInterface $document
-     *
      * @return PropertyMetadata
      */
     private function getPageTitleProperty(ArticleInterface $document)
@@ -271,8 +250,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Set structure-type to parent document.
-     *
-     * @param PersistEvent $event
      */
     public function setStructureTypeToParent(PersistEvent $event)
     {
@@ -290,8 +267,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
 
     /**
      * Extend metadata for article-page.
-     *
-     * @param MetadataLoadEvent $event
      */
     public function handleMetadataLoad(MetadataLoadEvent $event)
     {

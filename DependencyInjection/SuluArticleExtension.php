@@ -320,9 +320,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Append configuration for article "set_default_author".
-     *
-     * @param array $config
-     * @param ContainerBuilder $container
      */
     private function appendDefaultAuthor(array $config, ContainerBuilder $container)
     {
@@ -339,8 +336,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Append configuration for article-page (cloned from article).
-     *
-     * @param ContainerBuilder $container
      */
     private function appendArticlePageConfig(ContainerBuilder $container)
     {
@@ -356,7 +351,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     /**
      * Clone given path configuration and use given type.
      *
-     * @param array $config
      * @param string $type
      *
      * @return array

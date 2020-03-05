@@ -247,7 +247,6 @@ class ArticleIndexerTest extends SuluTestCase
     /**
      * Create a new article.
      *
-     * @param array $data
      * @param string $title
      * @param string $template
      *
@@ -269,7 +268,6 @@ class ArticleIndexerTest extends SuluTestCase
      *
      * @param string $uuid
      * @param string $locale
-     * @param array $data
      * @param string $title
      * @param string $template
      *
@@ -306,8 +304,6 @@ class ArticleIndexerTest extends SuluTestCase
     /**
      * Create article page.
      *
-     * @param array $article
-     * @param array $data
      * @param string $pageTitle
      * @param string $template
      *
