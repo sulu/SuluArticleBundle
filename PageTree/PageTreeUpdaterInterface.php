@@ -20,8 +20,6 @@ interface PageTreeUpdaterInterface
 {
     /**
      * Updates routes of linked articles.
-     *
-     * @param BasePageDocument $document
      */
     public function update(BasePageDocument $document);
 }

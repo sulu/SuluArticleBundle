@@ -60,8 +60,6 @@ class MediaViewObject
     /**
      * Set data.
      *
-     * @param Media $media
-     *
      * @return $this
      */
     public function setData(Media $media)

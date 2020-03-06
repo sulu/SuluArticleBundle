@@ -97,8 +97,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Append type to result.
-     *
-     * @param ObjectEvent $event
      */
     public function addTypeOnPostSerialize(ObjectEvent $event)
     {
@@ -118,8 +116,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Append webspace-settings to result.
-     *
-     * @param ObjectEvent $event
      */
     public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event)
     {
@@ -152,8 +148,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Append broken-indicator to result.
-     *
-     * @param ObjectEvent $event
      */
     public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
     {
@@ -181,8 +175,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Append page-title-property to result.
-     *
-     * @param ObjectEvent $event
      */
     public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event)
     {
@@ -206,8 +198,6 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Find page-title property.
-     *
-     * @param ArticleInterface $document
      *
      * @return PropertyMetadata
      */

@@ -40,8 +40,6 @@ class ContentProxyListener
 
     /**
      * Add the proxies for content and view to view-documents.
-     *
-     * @param PostConvertToDocumentEvent $event
      */
     public function onPostConvertToDocument(PostConvertToDocumentEvent $event)
     {
@@ -69,7 +67,6 @@ class ContentProxyListener
      * Create content and view proxy for given content-data.
      *
      * @param string $contentData
-     * @param StructureInterface $structure
      *
      * @return array
      */

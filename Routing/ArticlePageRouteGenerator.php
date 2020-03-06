@@ -33,10 +33,6 @@ class ArticlePageRouteGenerator implements RouteGeneratorInterface
      */
     private $tokenProvider;
 
-    /**
-     * @param RouteGeneratorInterface $routeGenerator
-     * @param TokenProviderInterface $tokenProvider
-     */
     public function __construct(RouteGeneratorInterface $routeGenerator, TokenProviderInterface $tokenProvider)
     {
         $this->routeGenerator = $routeGenerator;

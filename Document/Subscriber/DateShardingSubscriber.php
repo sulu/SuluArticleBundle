@@ -33,10 +33,6 @@ class DateShardingSubscriber implements EventSubscriberInterface
      */
     private $nodeManager;
 
-    /**
-     * @param PathBuilder $pathBuilder
-     * @param NodeManager $nodeManager
-     */
     public function __construct(PathBuilder $pathBuilder, NodeManager $nodeManager)
     {
         $this->pathBuilder = $pathBuilder;
@@ -59,8 +55,6 @@ class DateShardingSubscriber implements EventSubscriberInterface
      * Set parent-node if no parent exists.
      *
      * The format of parent node is: /%base%/%articles%/
-     *
-     * @param PersistEvent $event
      */
     public function handleSetParentNode(PersistEvent $event)
     {

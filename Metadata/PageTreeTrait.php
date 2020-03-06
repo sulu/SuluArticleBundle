@@ -29,8 +29,6 @@ trait PageTreeTrait
     abstract protected function getStructureMetadataFactory();
 
     /**
-     * @param ArticleInterface $document
-     *
      * @return null|string
      */
     protected function getParentPageUuidFromPageTree(ArticleInterface $document)
@@ -60,8 +58,6 @@ trait PageTreeTrait
 
     /**
      * Returns property-metadata for route-path property.
-     *
-     * @param StructureMetadata $metadata
      *
      * @return null|PropertyMetadata
      */

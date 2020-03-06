@@ -94,17 +94,6 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private $conflictResolver;
 
-    /**
-     * @param ChainRouteGeneratorInterface $chainRouteGenerator
-     * @param RouteManagerInterface $routeManager
-     * @param RouteRepositoryInterface $routeRepository
-     * @param EntityManagerInterface $entityManager
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $documentInspector
-     * @param PropertyEncoder $propertyEncoder
-     * @param StructureMetadataFactoryInterface $metadataFactory
-     * @param ConflictResolverInterface $conflictResolver
-     */
     public function __construct(
         ChainRouteGeneratorInterface $chainRouteGenerator,
         RouteManagerInterface $routeManager,
@@ -150,8 +139,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Load route.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handleHydrate(AbstractMappingEvent $event)
     {
@@ -177,8 +164,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Generate route and save route-path.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handlePersist(AbstractMappingEvent $event)
     {
@@ -216,8 +201,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Regenerate routes for siblings on reorder.
-     *
-     * @param ReorderEvent $event
      */
     public function handleReorder(ReorderEvent $event)
     {
@@ -245,8 +228,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Handle publish event and generate route and the child-routes.
-     *
-     * @param PublishEvent $event
      *
      * @throws ResourceLocatorAlreadyExistsException
      */
@@ -293,7 +274,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Create or update for given document.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      *
      * @return RouteInterface
@@ -330,7 +310,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Reallocates existing route to given document.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      *
      * @return RouteInterface
@@ -371,7 +350,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Create or update for given document.
      *
-     * @param RoutableBehavior $document
      * @param string $locale
      *
      * @return RouteInterface
@@ -396,8 +374,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Removes old-routes where the node does not exists anymore.
      *
-     * @param SessionInterface $session
-     * @param array $oldRoutes
      * @param string $locale
      */
     private function removeOldChildRoutes(SessionInterface $session, array $oldRoutes, $locale)
@@ -415,7 +391,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Generates child routes.
      *
-     * @param ChildrenBehavior $document
      * @param string $locale
      *
      * @return string[]
@@ -445,8 +420,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Removes route.
-     *
-     * @param RemoveEvent $event
      */
     public function handleRemove(RemoveEvent $event)
     {
@@ -480,8 +453,6 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Update routes for copied article.
-     *
-     * @param CopyEvent $event
      */
     public function handleCopy(CopyEvent $event)
     {
@@ -516,7 +487,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Iterate over children and remove routes.
      *
-     * @param ChildrenBehavior $document
      * @param string $locale
      */
     private function removeChildRoutes(ChildrenBehavior $document, $locale)
@@ -535,7 +505,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Removes route if exists.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      */
     private function removeChildRoute(RoutablePageBehavior $document, $locale)
@@ -581,7 +550,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Returns true if given uuid exists.
      *
-     * @param SessionInterface $session
      * @param string $uuid
      *
      * @return bool
