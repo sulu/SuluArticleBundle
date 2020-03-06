@@ -17,8 +17,10 @@ use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
+use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -29,6 +31,8 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
  */
 class ArticleAdmin extends Admin
 {
+    use StructureTagTrait;
+
     const STRUCTURE_TAG_TYPE = 'sulu_article.type';
 
     const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
@@ -57,6 +61,11 @@ class ArticleAdmin extends Admin
     private $localizationManager;
 
     /**
+     * @var StructureManagerInterface
+     */
+    private $structureManager;
+
+    /**
      * @var string[]
      */
     private $kernelBundles;
@@ -65,11 +74,13 @@ class ArticleAdmin extends Admin
         ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
         LocalizationManagerInterface $localizationManager,
+        StructureManagerInterface $structureManager,
         array $kernelBundles
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
         $this->localizationManager = $localizationManager;
+        $this->structureManager = $structureManager;
         $this->kernelBundles = $kernelBundles;
     }
 
@@ -202,6 +213,24 @@ class ArticleAdmin extends Admin
      */
     public function getSecurityContexts()
     {
+        $types = [];
+        $securityContext = [];
+        foreach ($this->structureManager->getStructures('article') as $key => $structure) {
+            $type = $this->getType($structure->getStructure());
+            if (!array_key_exists($type, $types)) {
+                $types[$type] = [
+                    'type' => $structure->getKey(),
+                ];
+            }
+            $securityContext[self::SECURITY_CONTEXT . '_' . $type] = [
+                PermissionTypes::VIEW,
+                PermissionTypes::ADD,
+                PermissionTypes::EDIT,
+                PermissionTypes::DELETE,
+                PermissionTypes::LIVE,
+            ];
+        }
+
         return [
             'Sulu' => [
                 'Global' => [
@@ -213,6 +242,7 @@ class ArticleAdmin extends Admin
                         PermissionTypes::LIVE,
                     ],
                 ],
+                'Article types' => $securityContext,
             ],
         ];
     }
