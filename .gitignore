@@ -4,6 +4,7 @@
 
 # PHPCS
 .php_cs.cache
+/php-cs-fixer.phar
 
 # composer
 /composer.phar
