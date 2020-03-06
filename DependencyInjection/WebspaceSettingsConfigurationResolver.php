@@ -25,10 +25,6 @@ class WebspaceSettingsConfigurationResolver
      */
     private $defaultAdditionalWebspaces;
 
-    /**
-     * @param array $defaultMainWebspace
-     * @param array $defaultAdditionalWebspaces
-     */
     public function __construct(
         array $defaultMainWebspace,
         array $defaultAdditionalWebspaces

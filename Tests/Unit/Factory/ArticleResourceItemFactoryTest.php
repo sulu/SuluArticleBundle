@@ -61,8 +61,6 @@ class ArticleResourceItemFactoryTest extends TestCase
     }
 
     /**
-     * @param ArticleDocument $articleDocument
-     *
      * @return ArticleViewDocument
      */
     private function getArticleViewDocument(ArticleDocument $articleDocument)

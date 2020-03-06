@@ -84,8 +84,6 @@ class WebspaceSettingsConfigurationResolverTest extends TestCase
     }
 
     /**
-     * @param array $defaultMainWebspaceConfig
-     * @param array $defaultAdditionalWebspaceConfig
      * @param string $expectedResult
      * @param string[] $expectedResultAdditionalWebspaces
      *

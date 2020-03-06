@@ -36,8 +36,6 @@ interface IndexerInterface
 
     /**
      * Indexes given document.
-     *
-     * @param ArticleDocument $document
      */
     public function index(ArticleDocument $document);
 

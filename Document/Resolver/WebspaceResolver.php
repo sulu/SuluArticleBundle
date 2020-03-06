@@ -27,10 +27,6 @@ class WebspaceResolver
      */
     private $webspaceSettingsConfigurationResolver;
 
-    /**
-     * @param WebspaceManagerInterface $webspaceManager
-     * @param WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
-     */
     public function __construct(
         WebspaceManagerInterface $webspaceManager,
         WebspaceSettingsConfigurationResolver $webspaceSettingsConfigurationResolver
@@ -40,8 +36,6 @@ class WebspaceResolver
     }
 
     /**
-     * @param WebspaceBehavior $document
-     *
      * @return null|string
      */
     public function resolveMainWebspace(WebspaceBehavior $document)
@@ -60,8 +54,6 @@ class WebspaceResolver
     }
 
     /**
-     * @param WebspaceBehavior $document
-     *
      * @return null|string[]
      */
     public function resolveAdditionalWebspaces(WebspaceBehavior $document)

@@ -32,10 +32,6 @@ class ArticleResourceItem implements ResourceItemInterface
      */
     private $resource;
 
-    /**
-     * @param ArticleViewDocumentInterface $article
-     * @param ArticleDocument $resource
-     */
     public function __construct(ArticleViewDocumentInterface $article, ArticleDocument $resource)
     {
         $this->article = $article;
