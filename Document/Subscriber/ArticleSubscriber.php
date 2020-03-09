@@ -146,7 +146,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             $document = $document->getParent();
         }
 
-        $this->documents[$document->getUuid()] = [
+        $this->documents[$document->getUuid() . '_' . $document->getLocale()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
@@ -166,7 +166,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             $document = $document->getParent();
         }
 
-        $this->liveDocuments[$document->getUuid()] = [
+        $this->liveDocuments[$document->getUuid() . '_' . $document->getLocale()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
@@ -245,7 +245,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         $document->setWorkflowStage(WorkflowStage::TEST);
         $this->documentManager->persist($document, $this->documentInspector->getLocale($document));
 
-        $this->documents[$document->getUuid()] = [
+        $this->documents[$document->getUuid() . '_' . $document->getLocale()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
@@ -438,7 +438,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $document = $document->getParent();
-        $this->documents[$document->getUuid()] = [
+        $this->documents[$document->getUuid() . '_' . $document->getLocale()] = [
             'uuid' => $document->getUuid(),
             'locale' => $document->getLocale(),
         ];
@@ -485,7 +485,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $uuid = $event->getCopiedNode()->getIdentifier();
-        $this->documents[$uuid] = [
+        $this->documents[$uuid . '_' . $document->getLocale()] = [
             'uuid' => $uuid,
             'locale' => $document->getLocale(),
         ];
