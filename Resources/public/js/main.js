@@ -143,7 +143,7 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
                 app.sandbox.mvc.routes.push({
                     route: 'articles::type/:locale',
                     callback: function(type, locale) {
-                        return '<div data-aura-component="articles/list@suluarticle" data-aura-locale="' + locale + '" data-aura-config=\'' + JSON.stringify(config) + '\' data-aura-type="' + type + '"/>';
+                        return '<div data-aura-component="articles/list@suluarticle" data-aura-locale="' + locale + '" data-aura-language="' + locale + '" data-aura-config=\'' + JSON.stringify(config) + '\' data-aura-type="' + type + '"/>';
                     }
                 });
 
@@ -165,14 +165,14 @@ define(['underscore', 'config', 'css!suluarticlecss/main'], function(_, Config) 
             app.sandbox.mvc.routes.push({
                 route: 'articles/:locale/edit::id/page::page/:content',
                 callback: function(locale, id, page, content) {
-                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="' + page + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-language="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-page="' + page + '" data-aura-config=\'' + JSON.stringify(config) + '\'/>';
                 }
             });
 
             app.sandbox.mvc.routes.push({
                 route: 'articles/:locale/edit::id/:content',
                 callback: function(locale, id, content) {
-                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-config=\'' + JSON.stringify(config) +  '\'/>';
+                    return '<div data-aura-component="articles/edit@suluarticle" data-aura-locale="' + locale + '" data-aura-language="' + locale + '" data-aura-id="' + id + '" data-aura-content="' + content + '" data-aura-config=\'' + JSON.stringify(config) +  '\'/>';
                 }
             });
         }
