@@ -24,11 +24,13 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
  * Twig extension to retrieve article resource items from the article view document repository.
  */
-class ArticleViewDocumentTwigExtension extends \Twig_Extension
+class ArticleViewDocumentTwigExtension extends AbstractExtension
 {
     use StructureTagTrait;
 
@@ -79,8 +81,8 @@ class ArticleViewDocumentTwigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('sulu_article_load_recent', [$this, 'loadRecent']),
-            new \Twig_SimpleFunction('sulu_article_load_similar', [$this, 'loadSimilar']),
+            new TwigFunction('sulu_article_load_recent', [$this, 'loadRecent']),
+            new TwigFunction('sulu_article_load_similar', [$this, 'loadSimilar']),
         ];
     }
 

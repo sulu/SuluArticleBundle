@@ -29,7 +29,8 @@
         "symfony/dependency-injection": "^4.3",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3",
-        "symfony-cmf/slugifier-api": "^1.0 || ^2.0"
+        "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
+        "twig/twig": "^1.41 || ^2.0 || ^3.0"
     },
     "require-dev": {
         "doctrine/data-fixtures": "^1.1",
