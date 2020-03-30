@@ -90,6 +90,9 @@ class ArticleLinkProvider implements LinkProviderInterface
         $this->environment = $environment;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getConfiguration()
     {
         // TODO implement tabs again?

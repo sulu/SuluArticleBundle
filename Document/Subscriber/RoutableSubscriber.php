@@ -167,6 +167,8 @@ class RoutableSubscriber implements EventSubscriberInterface
 
     /**
      * Handle publish event and generate route and the child-routes.
+     *
+     * @throws ResourceLocatorAlreadyExistsException
      */
     public function handlePublish(PublishEvent $event)
     {
