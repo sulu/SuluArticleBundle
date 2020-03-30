@@ -49,6 +49,14 @@ class ContentProxyListener
         }
 
         $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
+
+        if (!$structure) {
+            throw new \RuntimeException(sprintf(
+                'Could not find article structure from type "%s".',
+                $document->getStructureType()
+            ));
+        }
+
         $structure->setUuid($document->getUuid());
         $structure->setLanguageCode($document->getLocale());
 
