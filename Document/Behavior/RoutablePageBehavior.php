@@ -15,11 +15,12 @@ use Sulu\Bundle\RouteBundle\Model\RoutableInterface;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\LocaleBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\UuidBehavior;
+use Sulu\Component\Route\Document\Behavior\RoutableBehavior;
 
 /**
  * This behavior has to be attached to documents which should have a sulu-route but managed by their parent.
  */
-interface RoutablePageBehavior extends RoutableInterface, UuidBehavior, LocaleBehavior, StructureBehavior
+interface RoutablePageBehavior extends RoutableInterface, UuidBehavior, LocaleBehavior, StructureBehavior, RoutableBehavior
 {
     /**
      * Returns route-path.
