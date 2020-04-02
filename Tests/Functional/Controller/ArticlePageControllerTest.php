@@ -355,7 +355,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('Sulu ist toll', $response['title']);
         $this->assertTrue($response['shadowOn']);
         $this->assertEquals('de', $response['shadowBaseLanguage']);
-        $this->assertEquals('/page-2', $response['route']);
+        $this->assertEquals('/articles/sulu-is-great/page-2', $response['route']);
 
         $articleViewDocument = $this->findViewDocument($articleEN['id'], 'en');
         $this->assertEquals('en', $articleViewDocument->getLocale());
@@ -367,9 +367,9 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('Sulu ist toll - Page 2', $articleViewDocument->getPages()[0]->title);
         $this->assertEquals('Sulu ist toll - Page 3', $articleViewDocument->getPages()[1]->title);
         $this->assertEquals('Sulu ist toll - Page 4', $articleViewDocument->getPages()[2]->title);
-        $this->assertEquals('/page-2', $articleViewDocument->getPages()[0]->routePath);
-        $this->assertEquals('/page-3', $articleViewDocument->getPages()[1]->routePath);
-        $this->assertEquals('/page-4', $articleViewDocument->getPages()[2]->routePath);
+        $this->assertEquals('/articles/sulu-is-great/page-2', $articleViewDocument->getPages()[0]->routePath);
+        $this->assertEquals('/articles/sulu-is-great/page-3', $articleViewDocument->getPages()[1]->routePath);
+        $this->assertEquals('/articles/sulu-is-great/page-4', $articleViewDocument->getPages()[2]->routePath);
     }
 
     public function testHandleShadowArticlePageForDE($title = 'Sulu is great')

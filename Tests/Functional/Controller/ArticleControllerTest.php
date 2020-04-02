@@ -1500,10 +1500,13 @@ class ArticleControllerTest extends SuluTestCase
         $response = $this->publish($article['id']);
 
         $responsePages = $response['children'];
-
         for ($i = 0; $i < count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);
+            $this->assertEquals(
+                $article['route'] . '/page-' . $responsePages[$i]['pageNumber'],
+                $responsePages[$i]['route']
+            );
 
             $route = $this->findRoute($responsePages[$i]['route'], 'de');
             $this->assertTrue(is_subclass_of($route->getEntityClass(), ArticlePageDocument::class) || ArticlePageDocument::class === $route->getEntityClass());
