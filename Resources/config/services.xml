@@ -41,6 +41,26 @@
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
         </service>
 
+        <!-- controller -->
+        <service id="sulu_article.article_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\ArticleController"
+                 public="true">
+            <argument type="service" id="fos_rest.view_handler"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu.content.mapper"/>
+            <argument type="service" id="sulu_document_manager.metadata_factory.base"/>
+            <argument type="service" id="sulu_core.list_rest_helper"/>
+            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="sulu_hash.request_hash_checker"/>
+            <argument type="service" id="sulu_security.security_checker"/>
+            <argument>%sulu_article.display_tab_all%</argument>
+            <argument type="service" id="security.token_storage"/>
+
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
         <!-- view -->
         <service id="sulu_article.view_document.factory"
             class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
