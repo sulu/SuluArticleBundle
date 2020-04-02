@@ -86,6 +86,20 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
+        <service id="sulu_article.website_article_controller" class="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController">
+            <argument type="service" id="sulu_website.resolver.template_attribute"/>
+            <argument type="service" id="sulu_article.article_content_resolver"/>
+
+            <tag name="container.service_subscriber" />
+            <tag name="controller.service_arguments" />
+            <tag name="sulu.context" context="website" />
+
+            <call method="setContainer">
+                <argument type="service" id="Psr\Container\ContainerInterface" />
+            </call>
+        </service>
+        <service id="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" alias="sulu_article.website_article_controller"/>
+
         <!-- view -->
         <service id="sulu_article.view_document.factory"
             class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
@@ -265,6 +279,8 @@
             <argument type="service" id="sulu_page.extension.manager"/>
             <argument type="service" id="sulu_article.content_proxy_factory"/>
         </service>
+        <service id="Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface" alias="sulu_article.article_content_resolver"/>
+
         <service id="sulu_article.serializer.urls"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber">
             <argument type="service" id="request_stack"/>

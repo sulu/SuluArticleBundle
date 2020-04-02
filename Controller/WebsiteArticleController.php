@@ -14,18 +14,39 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
 use Sulu\Bundle\PreviewBundle\Preview\Preview;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sulu\Bundle\WebsiteBundle\Resolver\TemplateAttributeResolverInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Twig\Environment;
 
 /**
  * Handles articles.
  */
-class WebsiteArticleController extends Controller
+class WebsiteArticleController extends AbstractController
 {
+    /**
+     * @var TemplateAttributeResolverInterface
+     */
+    private $templateAttributeResolver;
+
+    /**
+     * @var ArticleContentResolverInterface
+     */
+    private $articleContentResolver;
+
+    public function __construct(
+        TemplateAttributeResolverInterface $templateAttributeResolver,
+        ArticleContentResolverInterface $articleContentResolver
+    ) {
+        $this->templateAttributeResolver = $templateAttributeResolver;
+        $this->articleContentResolver = $articleContentResolver;
+    }
+
     /**
      * Article index action.
      *
@@ -57,7 +78,7 @@ class WebsiteArticleController extends Controller
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
+        $data = $this->templateAttributeResolver->resolve(array_merge($content, $attributes));
 
         try {
             if ($partial) {
@@ -119,7 +140,7 @@ class WebsiteArticleController extends Controller
      */
     protected function resolveArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->get('sulu_article.article_content_resolver')->resolve($object, $pageNumber);
+        return $this->articleContentResolver->resolve($object, $pageNumber);
     }
 
     /**
@@ -156,10 +177,10 @@ class WebsiteArticleController extends Controller
 
     protected function renderBlock($template, $block, $attributes = [])
     {
-        $twig = $this->get('twig');
+        /** @var Environment $twig */
+        $twig = $this->container->get('twig');
         $attributes = $twig->mergeGlobals($attributes);
 
-        /** @var Template $template */
         $template = $twig->loadTemplate($template);
 
         $level = ob_get_level();
@@ -177,5 +198,12 @@ class WebsiteArticleController extends Controller
 
             throw $e;
         }
+    }
+
+    public static function getSubscribedServices()
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'twig' => Environment::class,
+        ]);
     }
 }
