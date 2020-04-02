@@ -86,19 +86,18 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
-        <service id="sulu_article.website_article_controller" class="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController">
+        <service id="sulu_article.website_article_controller" class="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" public="true">
             <argument type="service" id="sulu_website.resolver.template_attribute"/>
             <argument type="service" id="sulu_article.article_content_resolver"/>
 
             <tag name="container.service_subscriber" />
             <tag name="controller.service_arguments" />
-            <tag name="sulu.context" context="website" />
 
             <call method="setContainer">
                 <argument type="service" id="Psr\Container\ContainerInterface" />
             </call>
         </service>
-        <service id="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" alias="sulu_article.website_article_controller"/>
+        <service id="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" alias="sulu_article.website_article_controller" public="true"/>
 
         <!-- view -->
         <service id="sulu_article.view_document.factory"
