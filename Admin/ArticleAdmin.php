@@ -200,6 +200,11 @@ class ArticleAdmin extends Admin
                 );
             }
 
+            if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::VIEW)
+                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::VIEW)) {
+                $listToolbarActions[] = new ToolbarAction('sulu_admin.export');
+            }
+
             $metadataRequestParameters = [
                 'tags[sulu_article.type]' => false,
             ];
@@ -311,6 +316,7 @@ class ArticleAdmin extends Admin
                 ];
             }
             $securityContext[static::SECURITY_CONTEXT . '_' . $type] = [
+                PermissionTypes::VIEW,
                 PermissionTypes::ADD,
                 PermissionTypes::EDIT,
                 PermissionTypes::DELETE,
