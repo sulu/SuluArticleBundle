@@ -23,11 +23,31 @@ Another way is to create a custom controller.
 
     <key>article-overview</key>
 
-    <view>templates/pages/article-overview</view>
-    <controller>AppBundle:ArticleOverview:index</controller>
-    <cacheLifetime>3600</cacheLifetime>
+    <view>pages/article-overview</view>
+    <controller>App\Controller\Website\ArticleOverviewController::indexAction</controller>
+    <cacheLifetime>86400</cacheLifetime>
 
     <properties>
+        <property name="title" type="text_line" mandatory="true">
+            <meta>
+                <title lang="en">Title</title>
+                <title lang="de">Titel</title>
+            </meta>
+            <params>
+                <param name="headline" value="true"/>
+            </params>
+
+            <tag name="sulu.rlp.part"/>
+        </property>
+
+        <property name="url" type="resource_locator" mandatory="true">
+            <meta>
+                <title lang="en">Resourcelocator</title>
+                <title lang="de">Adresse</title>
+            </meta>
+
+            <tag name="sulu.rlp"/>
+        </property>
     </properties>
 </template>
 ```
@@ -38,10 +58,12 @@ See [here](http://docs.ongr.io/ElasticsearchDSL/HowTo/HowToSearch) for more info
 ```php
 <?php
 
-namespace AppBundle\Controller;
+namespace App\Controller\Website;
 
-use AppBundle\Document\ArticleViewDocument;
+use ONGR\ElasticsearchBundle\Service\Manager;
+use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\WebsiteBundle\Controller\WebsiteController;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,25 +73,40 @@ class ArticleOverviewController extends WebsiteController
 {
     const PAGE_SIZE = 12;
 
+    /**
+     * @var Manager
+     */
+    private $esManagerLive;
+
+    public function __construct(Manager $esManagerLive)
+    {
+        $this->esManagerLive = $esManagerLive;
+    }
+
     public function indexAction(Request $request, StructureInterface $structure, $preview = false, $partial = false)
     {
-        $page = $request->get('page', 1);
+        $page = $request->query->getInt('page', 1);
         if ($page < 1) {
             throw new NotFoundHttpException();
         }
 
-        $articles = $this->loadArticles($structure->getUuid(), $page, self::PAGE_SIZE, $request->getLocale());
-        $pages = ceil($articles->count() / self::PAGE_SIZE);
+        $articles = $this->loadArticles($page, self::PAGE_SIZE, $request->getLocale());
+
+        $pages = (int) ceil($articles->count() / self::PAGE_SIZE) ?: 1;
 
         return $this->renderStructure(
             $structure,
-            ['page' => $page + 1, 'pages' => $pages + 1, 'articles' => $articles],
+            [
+                'page' => $page,
+                'pages' => $pages,
+                'articles' => $articles
+            ],
             $preview,
             $partial
         );
     }
 
-    private function loadArticles($page, $pageSize)
+    private function loadArticles($page, $pageSize, $locale)
     {
         $repository = $this->getRepository();
         $search = $repository->createSearch()
@@ -80,21 +117,36 @@ class ArticleOverviewController extends WebsiteController
         return $repository->findDocuments($search);
     }
 
+    /**
+     * @return Repository
+     */
     private function getRepository()
     {
-        return $this->get('es.manager.live')->getRepository(ArticleViewDocument::class);
+        return $this->esManagerLive->getRepository(ArticleViewDocument::class);
     }
 }
+```
+
+That the `$esManagerLive` is correctly set you need to add the following to your `config/services.yaml`
+
+```yaml
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $esManagerLive: '@es.manager.live'
 ```
 
 In the twig template you can use the [ArticleViewDocument](article-view-document.md) to render for example a list of
 articles.
 
 ```twig
-{% extends "master.html.twig" %}
+{% extends "base.html.twig" %}
 
 {% block content %}
-    <h1 property="title">{{ content.title }}</h1>
+    <h1>{{ content.title }}</h1>
 
     <ul>
         {% for article in articles %}
@@ -102,12 +154,12 @@ articles.
         {% endfor %}
     </ul>
 
-    <nav>
+    <nav aria-label="pagination">
         {% if page > 1 %}
             <a href="?page={{ page - 1 }}">Previous</a>
         {% endif %}
 
-        {% for i in [1..pages] %}
+        {% for i in 1..pages %}
             <a href="?page={{ i }}">{{ i }}</a>
         {% endfor %}
 
@@ -123,10 +175,10 @@ articles.
 As an addition to the example above you can use the [page_tree_route](routing.md#page-tree-integration) to link articles
 to a specific page.
 
-This can be handled in th controller by changing the `loadArticles($uuid, $page, $pageSize)`.
+This can be handled in th controller by changing the `loadArticles($page, $pageSize, $structure->getUuid()`.
 
 ```php
-private function loadArticles($uuid, $page, $pageSize)
+private function loadArticles($page, $pageSize, $uuid)
 {
     $repository = $this->getRepository();
     $search = $repository->createSearch()

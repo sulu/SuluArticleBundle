@@ -29,8 +29,6 @@ class WebsiteArticleController extends Controller
     /**
      * Article index action.
      *
-     * @param Request $request
-     * @param ArticleInterface $object
      * @param string $view
      * @param int $pageNumber
      *
@@ -44,8 +42,6 @@ class WebsiteArticleController extends Controller
     /**
      * Render article with given view.
      *
-     * @param Request $request
-     * @param ArticleInterface $object
      * @param string $view
      * @param int $pageNumber
      * @param array $attributes
@@ -65,13 +61,16 @@ class WebsiteArticleController extends Controller
 
         try {
             if ($partial) {
-                return new Response(
+                $response = $this->createResponse($request);
+                $response->setContent(
                     $this->renderBlock(
                         $viewTemplate,
                         'content',
                         $data
                     )
                 );
+
+                return $response;
             } elseif ($preview) {
                 $parameters = [
                     'previewParentTemplate' => $viewTemplate,
@@ -100,8 +99,6 @@ class WebsiteArticleController extends Controller
      * Returns all the times the article-document.
      * This is necessary because the preview system passes an article-page here.
      *
-     * @param ArticleInterface $object
-     *
      * @return ArticleDocument
      */
     protected function normalizeArticle(ArticleInterface $object)
@@ -116,7 +113,6 @@ class WebsiteArticleController extends Controller
     /**
      * Serialize given article with page-number.
      *
-     * @param ArticleInterface $object
      * @param int $pageNumber
      *
      * @return array
@@ -128,8 +124,6 @@ class WebsiteArticleController extends Controller
 
     /**
      * Create response.
-     *
-     * @param Request $request
      *
      * @return Response
      */
@@ -146,6 +140,15 @@ class WebsiteArticleController extends Controller
             );
             $response->setMaxAge($this->getParameter('sulu_http_cache.cache.max_age'));
             $response->setSharedMaxAge($this->getParameter('sulu_http_cache.cache.shared_max_age'));
+        }
+
+        // we need to set the content type ourselves here
+        // else symfony will use the accept header of the client and the page could be cached with false content-type
+        // see following symfony issue: https://github.com/symfony/symfony/issues/35694
+        $mimeType = $request->getMimeType($request->getRequestFormat());
+
+        if ($mimeType) {
+            $response->headers->set('Content-Type', $mimeType);
         }
 
         return $response;

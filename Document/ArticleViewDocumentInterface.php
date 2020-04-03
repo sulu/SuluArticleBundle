@@ -237,8 +237,6 @@ interface ArticleViewDocumentInterface
     /**
      * Set excerpt.
      *
-     * @param ExcerptViewObject $excerpt
-     *
      * @return $this
      */
     public function setExcerpt(ExcerptViewObject $excerpt);
@@ -252,8 +250,6 @@ interface ArticleViewDocumentInterface
 
     /**
      * Set seo.
-     *
-     * @param SeoViewObject $seo
      *
      * @return $this
      */
@@ -365,8 +361,6 @@ interface ArticleViewDocumentInterface
     /**
      * Set localization state.
      *
-     * @param LocalizationStateViewObject $localizationState
-     *
      * @return $this
      */
     public function setLocalizationState(LocalizationStateViewObject $localizationState);
@@ -461,8 +455,6 @@ interface ArticleViewDocumentInterface
     /**
      * Set content.
      *
-     * @param \ArrayObject $content
-     *
      * @return \ArrayObject
      */
     public function setContent(\ArrayObject $content);
@@ -476,8 +468,6 @@ interface ArticleViewDocumentInterface
 
     /**
      * Set view.
-     *
-     * @param \ArrayObject $view
      *
      * @return $this
      */

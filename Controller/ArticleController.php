@@ -117,12 +117,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Returns list of articles.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
-    public function cgetAction(Request $request)
+    public function cgetAction(Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
@@ -312,14 +308,9 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param Request $request
-     * @param string $id
-     *
-     * @return Response
-     *
      * @Get(defaults={"id" = ""})
      */
-    public function getAction(Request $request, $id)
+    public function getAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $document = $this->getDocumentManager()->find(
@@ -338,12 +329,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Create article.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): Response
     {
         $action = $request->get('action');
         $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
@@ -365,13 +352,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Update articles.
-     *
-     * @param Request $request
-     * @param string $id
-     *
-     * @return Response
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
@@ -403,12 +385,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Deletes multiple documents.
-     *
-     * @param Request $request
-     *
-     * @return Response
      */
-    public function cdeleteAction(Request $request)
+    public function cdeleteAction(Request $request): Response
     {
         $ids = array_filter(explode(',', $request->get('ids', '')));
 
@@ -424,12 +402,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Deletes multiple documents.
-     *
-     * @param string $id
-     *
-     * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(string $id): Response
     {
         $documentManager = $this->getDocumentManager();
         $document = $documentManager->find($id);
@@ -443,13 +417,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      * Trigger a action for given article specified over get-action parameter.
      *
      * @Post("/articles/{id}")
-     *
-     * @param string $uuid
-     * @param Request $request
-     *
-     * @return Response
      */
-    public function postTriggerAction($id, Request $request)
+    public function postTriggerAction(string $id, Request $request): Response
     {
         // extract parameter
         $action = $this->getRequestParameter($request, 'action', true);
@@ -531,11 +500,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Ordering given pages.
-     *
-     * @param array $pages
-     * @param string $locale
      */
-    private function orderPages(array $pages, $locale)
+    private function orderPages(array $pages, string $locale): void
     {
         $documentManager = $this->getDocumentManager();
 
@@ -556,14 +522,12 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given Formation.
      *
-     * @param array $data
      * @param object $document
-     * @param string $locale
      *
      * @throws InvalidFormException
      * @throws MissingParameterException
      */
-    private function persistDocument($data, $document, $locale)
+    private function persistDocument(array $data, $document, string $locale): void
     {
         $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
         $form = $this->createForm(
@@ -603,20 +567,12 @@ class ArticleController extends RestController implements ClassResourceInterface
         );
     }
 
-    /**
-     * Returns document-manager.
-     *
-     * @return DocumentManagerInterface
-     */
-    protected function getDocumentManager()
+    protected function getDocumentManager(): DocumentManagerInterface
     {
         return $this->get('sulu_document_manager.document_manager');
     }
 
-    /**
-     * @return ContentMapperInterface
-     */
-    protected function getMapper()
+    protected function getMapper(): ContentMapperInterface
     {
         return $this->get('sulu.content.mapper');
     }
@@ -624,11 +580,9 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
      *
-     * @param string $actionParameter
      * @param object $document
-     * @param string $locale
      */
-    private function handleActionParameter($actionParameter, $document, $locale)
+    private function handleActionParameter(?string $actionParameter, $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
@@ -638,12 +592,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
     }
 
-    /**
-     * @param string $sortBy
-     *
-     * @return null|string
-     */
-    private function getSortFieldName($sortBy)
+    private function getSortFieldName(string $sortBy): ?string
     {
         $sortBy = Caser::snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();
@@ -655,10 +604,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         return null;
     }
 
-    /**
-     * @return BaseMetadataFactory
-     */
-    protected function getMetadataFactory()
+    protected function getMetadataFactory(): BaseMetadataFactory
     {
         return $this->get('sulu_document_manager.metadata_factory.base');
     }

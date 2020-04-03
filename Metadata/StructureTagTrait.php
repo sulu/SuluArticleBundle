@@ -32,8 +32,6 @@ trait StructureTagTrait
     /**
      * Returns multipage-configuration for given structure-metadata.
      *
-     * @param StructureMetadata $metadata
-     *
      * @return string
      */
     protected function getMultipage(StructureMetadata $metadata)
@@ -44,7 +42,6 @@ trait StructureTagTrait
     /**
      * Returns attribute for given tag in metadata.
      *
-     * @param StructureMetadata $metadata
      * @param string $tag
      * @param string $attribute
      * @param mixed $default

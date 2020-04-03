@@ -57,9 +57,7 @@ class ArticleViewDocumentRepository
     protected $searchFields;
 
     /**
-     * @param Manager $searchManager
      * @param string $articleDocumentClass
-     * @param array $searchFields
      */
     public function __construct(
         Manager $searchManager,
@@ -77,7 +75,6 @@ class ArticleViewDocumentRepository
      *
      * @param null|string $excludeUuid
      * @param int $limit
-     * @param null|array $types
      * @param null|string $locale
      * @param null|string $webspaceKey
      *
@@ -106,7 +103,6 @@ class ArticleViewDocumentRepository
      *
      * @param string $uuid
      * @param int $limit
-     * @param null|array $types
      * @param null|string $locale
      * @param null|string $webspaceKey
      *
@@ -144,15 +140,13 @@ class ArticleViewDocumentRepository
      * Creates search with default queries (size, locale, types, webspace).
      *
      * @param int $limit
-     * @param null|array $types
      * @param null|string $locale
      * @param null|string $webspaceKey
      *
      * @return Search
      */
     private function createSearch(
-        $limit, array
-        $types = null,
+        $limit, array $types = null,
         $locale = null,
         $webspaceKey = null
     ) {

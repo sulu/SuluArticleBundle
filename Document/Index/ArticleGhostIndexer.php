@@ -42,22 +42,6 @@ class ArticleGhostIndexer extends ArticleIndexer
      */
     protected $documentManager;
 
-    /**
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
-     * @param UserManager $userManager
-     * @param ContactRepository $contactRepository
-     * @param DocumentFactoryInterface $documentFactory
-     * @param Manager $manager
-     * @param ExcerptFactory $excerptFactory
-     * @param SeoFactory $seoFactory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface $translator
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $inspector
-     * @param WebspaceResolver $webspaceResolver
-     * @param array $typeConfiguration
-     * @param WebspaceManagerInterface $webspaceManager
-     */
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
@@ -112,9 +96,6 @@ class ArticleGhostIndexer extends ArticleIndexer
         $this->manager->persist($article);
     }
 
-    /**
-     * @param ArticleDocument $document
-     */
     private function createOrUpdateGhosts(ArticleDocument $document)
     {
         $documentLocale = $document->getLocale();

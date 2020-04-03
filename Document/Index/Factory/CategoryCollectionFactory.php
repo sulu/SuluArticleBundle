@@ -28,8 +28,6 @@ class CategoryCollectionFactory
 
     /**
      * CategoryCollectionFactory constructor.
-     *
-     * @param EntityRepository $categoryRepository
      */
     public function __construct(EntityRepository $categoryRepository)
     {

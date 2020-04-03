@@ -45,7 +45,6 @@ class ArticleDataItem implements ItemInterface
     /**
      * @param string $id
      * @param string $title
-     * @param ArticleViewDocumentInterface $resource
      */
     public function __construct($id, $title, ArticleViewDocumentInterface $resource)
     {

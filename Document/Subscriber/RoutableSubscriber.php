@@ -19,13 +19,10 @@ use Sulu\Bundle\ArticleBundle\Document\Behavior\RoutablePageBehavior;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Exception\RouteIsNotUniqueException;
 use Sulu\Bundle\RouteBundle\Generator\ChainRouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Manager\ConflictResolverInterface;
 use Sulu\Bundle\RouteBundle\Manager\RouteManagerInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
-use Sulu\Component\Content\Document\LocalizationState;
-use Sulu\Component\Content\Exception\ResourceLocatorAlreadyExistsException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ChildrenBehavior;
 use Sulu\Component\DocumentManager\Behavior\Mapping\ParentBehavior;
@@ -94,17 +91,6 @@ class RoutableSubscriber implements EventSubscriberInterface
      */
     private $conflictResolver;
 
-    /**
-     * @param ChainRouteGeneratorInterface $chainRouteGenerator
-     * @param RouteManagerInterface $routeManager
-     * @param RouteRepositoryInterface $routeRepository
-     * @param EntityManagerInterface $entityManager
-     * @param DocumentManagerInterface $documentManager
-     * @param DocumentInspector $documentInspector
-     * @param PropertyEncoder $propertyEncoder
-     * @param StructureMetadataFactoryInterface $metadataFactory
-     * @param ConflictResolverInterface $conflictResolver
-     */
     public function __construct(
         ChainRouteGeneratorInterface $chainRouteGenerator,
         RouteManagerInterface $routeManager,
@@ -133,91 +119,36 @@ class RoutableSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::HYDRATE => ['handleHydrate'],
             Events::PERSIST => [
                 // low priority because all other subscriber should be finished
-                ['handlePersist', -2000],
+                ['handlePersist', -2048],
             ],
             Events::REMOVE => [
                 // high priority to ensure nodes are not deleted until we iterate over children
-                ['handleRemove', 1024],
+                ['handleRemove', 2048],
             ],
-            Events::PUBLISH => ['handlePublish', -2000],
-            Events::REORDER => ['handleReorder', -1000],
-            Events::COPY => ['handleCopy', -2000],
+            Events::PUBLISH => ['handlePublish', -2048],
+            Events::REORDER => ['handleReorder', -1024],
+            Events::COPY => ['handleCopy', -2048],
         ];
     }
 
     /**
-     * Load route.
-     *
-     * @param AbstractMappingEvent $event
-     */
-    public function handleHydrate(AbstractMappingEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof RoutablePageBehavior) {
-            return;
-        }
-
-        $locale = $document->getLocale();
-        if (LocalizationState::SHADOW === $this->documentInspector->getLocalizationState($document)) {
-            $locale = $document->getOriginalLocale();
-        }
-
-        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $locale);
-        $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
-        $document->setRoutePath($routePath);
-
-        $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
-        if ($route) {
-            $document->setRoute($route);
-        }
-    }
-
-    /**
      * Generate route and save route-path.
-     *
-     * @param AbstractMappingEvent $event
      */
     public function handlePersist(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
-        if (!$document instanceof RoutablePageBehavior) {
+
+        if (!$document instanceof RoutablePageBehavior || !$document instanceof ChildrenBehavior) {
             return;
         }
 
-        $document->setUuid($event->getNode()->getIdentifier());
-
-        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale());
-        $routePath = $event->getNode()->getPropertyValueWithDefault($propertyName, null);
-
-        $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($document, $routePath));
-        $document->setRoutePath($route->getPath());
-
-        $event->getNode()->setProperty($propertyName, $route->getPath());
-
-        if (!$document instanceof ChildrenBehavior) {
-            return;
-        }
-
-        foreach ($document->getChildren() as $child) {
-            if (!$child instanceof RoutablePageBehavior) {
-                continue;
-            }
-
-            $route = $this->chainRouteGenerator->generate($child);
-            $child->setRoutePath($route->getPath());
-
-            $node = $this->documentInspector->getNode($child);
-            $node->setProperty($propertyName, $route->getPath());
-        }
+        $this->updateChildRoutes($document);
     }
 
     /**
      * Regenerate routes for siblings on reorder.
-     *
-     * @param ReorderEvent $event
      */
     public function handleReorder(ReorderEvent $event)
     {
@@ -231,22 +162,11 @@ class RoutableSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $locale = $this->documentInspector->getLocale($parentDocument);
-        $propertyName = $this->getRoutePathPropertyName($parentDocument->getStructureType(), $locale);
-        foreach ($parentDocument->getChildren() as $childDocument) {
-            $node = $this->documentInspector->getNode($childDocument);
-
-            $route = $this->chainRouteGenerator->generate($childDocument);
-            $childDocument->setRoutePath($route->getPath());
-
-            $node->setProperty($propertyName, $route->getPath());
-        }
+        $this->updateChildRoutes($parentDocument);
     }
 
     /**
      * Handle publish event and generate route and the child-routes.
-     *
-     * @param PublishEvent $event
      *
      * @throws ResourceLocatorAlreadyExistsException
      */
@@ -256,22 +176,6 @@ class RoutableSubscriber implements EventSubscriberInterface
         if (!$document instanceof RoutableBehavior) {
             return;
         }
-
-        $node = $this->documentInspector->getNode($document);
-
-        try {
-            $route = $this->createOrUpdateRoute($document, $event->getLocale());
-        } catch (RouteIsNotUniqueException $exception) {
-            throw new ResourceLocatorAlreadyExistsException($exception->getRoute()->getPath(), $document->getPath());
-        }
-
-        $document->setRoutePath($route->getPath());
-        $this->entityManager->persist($route);
-
-        $node->setProperty(
-            $this->getRoutePathPropertyName($document->getStructureType(), $event->getLocale()),
-            $route->getPath()
-        );
 
         $propertyName = $this->getPropertyName($event->getLocale(), self::ROUTES_PROPERTY);
 
@@ -291,9 +195,46 @@ class RoutableSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Removes route.
+     */
+    public function handleRemove(RemoveEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutableBehavior || !$document instanceof ChildrenBehavior) {
+            return;
+        }
+
+        $locales = $this->documentInspector->getLocales($document);
+        foreach ($locales as $locale) {
+            $this->removeChildRoutes($document, $locale);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Update routes for copied article.
+     */
+    public function handleCopy(CopyEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof RoutableBehavior) {
+            return;
+        }
+
+        $locales = $this->documentInspector->getLocales($document);
+        foreach ($locales as $locale) {
+            $localizedDocument = $this->documentManager->find($event->getCopiedPath(), $locale);
+
+            if ($localizedDocument instanceof ChildrenBehavior) {
+                $this->generateChildRoutes($localizedDocument, $locale);
+            }
+        }
+    }
+
+    /**
      * Create or update for given document.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      *
      * @return RouteInterface
@@ -330,7 +271,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Reallocates existing route to given document.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      *
      * @return RouteInterface
@@ -368,54 +308,32 @@ class RoutableSubscriber implements EventSubscriberInterface
         return $newRoute;
     }
 
-    /**
-     * Create or update for given document.
-     *
-     * @param RoutableBehavior $document
-     * @param string $locale
-     *
-     * @return RouteInterface
-     */
-    private function createOrUpdateRoute(RoutableBehavior $document, $locale)
+    private function updateRoute(RoutablePageBehavior $document)
     {
-        $route = $document->getRoute();
+        $locale = $this->documentInspector->getLocale($document);
+        $propertyName = $this->getRoutePathPropertyName($document->getStructureType(), $locale);
 
-        if (!$route) {
-            $route = $this->routeRepository->findByEntity($document->getClass(), $document->getUuid(), $locale);
-        }
+        $route = $this->chainRouteGenerator->generate($document);
+        $document->setRoutePath($route->getPath());
 
-        if ($route) {
-            $document->setRoute($route);
-
-            return $this->routeManager->update($document, $document->getRoutePath(), false);
-        }
-
-        return $this->routeManager->create($document, $document->getRoutePath(), false);
+        $node = $this->documentInspector->getNode($document);
+        $node->setProperty($propertyName, $route->getPath());
     }
 
-    /**
-     * Removes old-routes where the node does not exists anymore.
-     *
-     * @param SessionInterface $session
-     * @param array $oldRoutes
-     * @param string $locale
-     */
-    private function removeOldChildRoutes(SessionInterface $session, array $oldRoutes, $locale)
+    private function updateChildRoutes(ChildrenBehavior $document)
     {
-        foreach ($oldRoutes as $oldRoute) {
-            $oldRouteEntity = $this->routeRepository->findByPath($oldRoute, $locale);
-            if ($oldRouteEntity && !$this->nodeExists($session, $oldRouteEntity->getEntityId())) {
-                $this->entityManager->remove($oldRouteEntity);
+        foreach ($document->getChildren() as $childDocument) {
+            if (!$childDocument instanceof RoutablePageBehavior) {
+                continue;
             }
-        }
 
-        $this->entityManager->flush();
+            $this->updateRoute($childDocument);
+        }
     }
 
     /**
      * Generates child routes.
      *
-     * @param ChildrenBehavior $document
      * @param string $locale
      *
      * @return string[]
@@ -444,34 +362,16 @@ class RoutableSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Removes route.
+     * Removes old-routes where the node does not exists anymore.
      *
-     * @param RemoveEvent $event
+     * @param string $locale
      */
-    public function handleRemove(RemoveEvent $event)
+    private function removeOldChildRoutes(SessionInterface $session, array $oldRoutes, $locale)
     {
-        $document = $event->getDocument();
-        if (!$document instanceof RoutableBehavior) {
-            return;
-        }
-
-        $locales = $this->documentInspector->getLocales($document);
-        foreach ($locales as $locale) {
-            $localizedDocument = $this->documentManager->find($document->getUuid(), $locale);
-
-            $route = $this->routeRepository->findByEntity(
-                $localizedDocument->getClass(),
-                $localizedDocument->getUuid(),
-                $locale
-            );
-            if (!$route) {
-                continue;
-            }
-
-            $this->entityManager->remove($route);
-
-            if ($document instanceof ChildrenBehavior) {
-                $this->removeChildRoutes($document, $locale);
+        foreach ($oldRoutes as $oldRoute) {
+            $oldRouteEntity = $this->routeRepository->findByPath($oldRoute, $locale);
+            if ($oldRouteEntity && !$this->nodeExists($session, $oldRouteEntity->getEntityId())) {
+                $this->entityManager->remove($oldRouteEntity);
             }
         }
 
@@ -479,44 +379,8 @@ class RoutableSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Update routes for copied article.
-     *
-     * @param CopyEvent $event
-     */
-    public function handleCopy(CopyEvent $event)
-    {
-        $document = $event->getDocument();
-        if (!$document instanceof RoutableBehavior) {
-            return;
-        }
-
-        $locales = $this->documentInspector->getLocales($document);
-        foreach ($locales as $locale) {
-            $localizedDocument = $this->documentManager->find($event->getCopiedPath(), $locale);
-
-            $route = $this->conflictResolver->resolve($this->chainRouteGenerator->generate($localizedDocument));
-            $localizedDocument->setRoutePath($route->getPath());
-
-            $node = $this->documentInspector->getNode($localizedDocument);
-            $node->setProperty(
-                $this->getRoutePathPropertyName($localizedDocument->getStructureType(), $locale),
-                $route->getPath()
-            );
-
-            $propertyName = $this->getRoutePathPropertyName($localizedDocument->getStructureType(), $locale);
-            $node = $this->documentInspector->getNode($localizedDocument);
-            $node->setProperty($propertyName, $route->getPath());
-
-            if ($localizedDocument instanceof ChildrenBehavior) {
-                $this->generateChildRoutes($localizedDocument, $locale);
-            }
-        }
-    }
-
-    /**
      * Iterate over children and remove routes.
      *
-     * @param ChildrenBehavior $document
      * @param string $locale
      */
     private function removeChildRoutes(ChildrenBehavior $document, $locale)
@@ -535,7 +399,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Removes route if exists.
      *
-     * @param RoutablePageBehavior $document
      * @param string $locale
      */
     private function removeChildRoute(RoutablePageBehavior $document, $locale)
@@ -581,7 +444,6 @@ class RoutableSubscriber implements EventSubscriberInterface
     /**
      * Returns true if given uuid exists.
      *
-     * @param SessionInterface $session
      * @param string $uuid
      *
      * @return bool

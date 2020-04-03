@@ -13,11 +13,10 @@ namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
-use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
 use Sulu\Component\Content\Document\LocalizationState;
-use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Event\AbstractMappingEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -35,11 +34,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
     const ADDITIONAL_WEBSPACES_PROPERTY = 'additionalWebspaces';
 
     /**
-     * @var StructureMetadataFactoryInterface
-     */
-    protected $structureMetadataFactory;
-
-    /**
      * @var DocumentManagerInterface
      */
     protected $documentManager;
@@ -54,27 +48,14 @@ class WebspaceSubscriber implements EventSubscriberInterface
      */
     protected $propertyEncoder;
 
-    /**
-     * @param StructureMetadataFactoryInterface $structureMetadataFactory
-     */
     public function __construct(
-        StructureMetadataFactoryInterface $structureMetadataFactory,
         DocumentManagerInterface $documentManager,
         DocumentInspector $documentInspector,
         PropertyEncoder $propertyEncoder
     ) {
-        $this->structureMetadataFactory = $structureMetadataFactory;
         $this->documentManager = $documentManager;
         $this->documentInspector = $documentInspector;
         $this->propertyEncoder = $propertyEncoder;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getStructureMetadataFactory()
-    {
-        return $this->structureMetadataFactory;
     }
 
     /**
@@ -89,9 +70,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param AbstractMappingEvent $event
-     */
     public function loadProperties(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
@@ -117,9 +95,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         $document->setAdditionalWebspaces($additionalWebspaces);
     }
 
-    /**
-     * @param AbstractMappingEvent $event
-     */
     public function saveProperties(AbstractMappingEvent $event)
     {
         $document = $event->getDocument();
@@ -176,5 +151,13 @@ class WebspaceSubscriber implements EventSubscriberInterface
     private function getAdditionalWebspacesPropertyName($locale)
     {
         return $this->propertyEncoder->localizedSystemName(self::ADDITIONAL_WEBSPACES_PROPERTY, $locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDocumentInspector()
+    {
+        return $this->documentInspector;
     }
 }

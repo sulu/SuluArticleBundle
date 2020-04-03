@@ -12,16 +12,6 @@
             <argument>%sulu.context%</argument>
             <tag name="console.command" />
         </service>
-        <service
-            id="sulu_article.move_page_tree_command"
-            class="Sulu\Bundle\ArticleBundle\Command\MovePageTreeCommand"
-        >
-            <argument type="service" id="sulu_article.page_tree_route.mover" />
-            <argument type="service" id="sulu.content.resource_locator.strategy_pool" />
-            <argument type="service" id="sulu_document_manager.document_manager" />
-            <argument>%sulu_article.page_tree_enabled%</argument>
-            <tag name="console.command" />
-        </service>
         <!-- sulu-admin -->
         <service id="sulu_article.admin" class="Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin">
             <argument type="service" id="sulu_admin.view_builder_factory"/>
@@ -133,24 +123,9 @@
         </service>
         <service id="sulu_article.subscriber.webspace"
                  class="Sulu\Bundle\ArticleBundle\Document\Subscriber\WebspaceSubscriber">
-            <argument type="service" id="sulu_page.structure.factory"/>
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="sulu_document_manager.document_inspector"/>
             <argument type="service" id="sulu_document_manager.property_encoder"/>
-
-            <tag name="sulu_document_manager.event_subscriber"/>
-        </service>
-        <service id="sulu_article.subscriber.routable"
-                 class="Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber">
-            <argument type="service" id="sulu_route.chain_generator"/>
-            <argument type="service" id="sulu_route.manager.route_manager"/>
-            <argument type="service" id="sulu.repository.route"/>
-            <argument type="service" id="doctrine.orm.entity_manager"/>
-            <argument type="service" id="sulu_document_manager.document_manager"/>
-            <argument type="service" id="sulu_document_manager.document_inspector"/>
-            <argument type="service" id="sulu_document_manager.property_encoder"/>
-            <argument type="service" id="sulu_page.structure.factory"/>
-            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
 
             <tag name="sulu_document_manager.event_subscriber"/>
         </service>
@@ -366,18 +341,6 @@
             <argument>%sulu_article.view_document.article.class%</argument>
 
             <tag name="sulu.content.type" alias="single_article_selection"/>
-        </service>
-
-        <service id="sulu_article.content_types.page_tree_route"
-                 class="Sulu\Bundle\ArticleBundle\Content\PageTreeRouteContentType">
-            <argument>%sulu_article.content-type.page_tree_route.template%</argument>
-            <argument type="service" id="sulu_document_manager.document_manager"/>
-            <argument type="service" id="sulu_document_manager.document_inspector"/>
-            <argument type="service" id="sulu_document_manager.document_registry"/>
-            <argument type="service" id="sulu_route.chain_generator"/>
-            <argument type="service" id="sulu_route.manager.conflict_resolver.auto_increment"/>
-
-            <tag name="sulu.content.type" alias="page_tree_route"/>
         </service>
 
         <!-- article resource item factory -->

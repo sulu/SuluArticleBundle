@@ -4,12 +4,17 @@
 
 # PHPCS
 .php_cs.cache
+/php-cs-fixer.phar
 
 # composer
 /composer.phar
 /composer.lock
 /auth.json
 /vendor
+
+# php-cs
+.php_cs
+.php_cs.cache
 
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~

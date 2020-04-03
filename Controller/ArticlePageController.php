@@ -41,7 +41,6 @@ class ArticlePageController extends RestController implements ClassResourceInter
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      *
@@ -79,7 +78,6 @@ class ArticlePageController extends RestController implements ClassResourceInter
      * Create article-page.
      *
      * @param string $articleUuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -109,7 +107,6 @@ class ArticlePageController extends RestController implements ClassResourceInter
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
@@ -148,7 +145,6 @@ class ArticlePageController extends RestController implements ClassResourceInter
      *
      * @param string $articleUuid
      * @param string $uuid
-     * @param Request $request
      *
      * @return Response
      */
