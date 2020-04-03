@@ -26,10 +26,10 @@ use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
@@ -141,14 +141,6 @@ class ArticleIndexer implements IndexerInterface
         $this->inspector = $inspector;
         $this->webspaceResolver = $webspaceResolver;
         $this->typeConfiguration = $typeConfiguration;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getStructureMetadataFactory()
-    {
-        return $this->structureMetadataFactory;
     }
 
     /**
@@ -484,5 +476,13 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $this->manager->createIndex();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDocumentInspector()
+    {
+        return $this->inspector;
     }
 }

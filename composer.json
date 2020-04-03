@@ -24,7 +24,7 @@
         "jms/serializer-bundle": "^3.3",
         "ongr/elasticsearch-bundle": "^5.2",
         "ongr/elasticsearch-dsl": "~5.0 || ~6.0",
-        "sulu/sulu": "^2.0.5",
+        "sulu/sulu": "^2.0.6",
         "symfony/config": "^4.3",
         "symfony/dependency-injection": "^4.3",
         "symfony/http-foundation": "^4.3",

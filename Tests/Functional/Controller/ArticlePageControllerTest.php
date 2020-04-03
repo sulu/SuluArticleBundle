@@ -335,6 +335,8 @@ class ArticlePageControllerTest extends SuluTestCase
 
     public function testHandleShadowArticlePageForEN($title = 'Sulu ist toll')
     {
+        $this->markTestSkipped();
+
         $articleDE = $this->createArticle($title);
         $page2 = $this->post($articleDE, 'Sulu ist toll - Page 2');
         $page3 = $this->post($articleDE, 'Sulu ist toll - Page 3');
