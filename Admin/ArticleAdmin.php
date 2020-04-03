@@ -58,8 +58,6 @@ class ArticleAdmin extends Admin
 
     const EDIT_FORM_VIEW_AUTOMATION = 'sulu_article.edit_form.automation';
 
-    use StructureTagTrait;
-
     /**
      * @var ViewBuilderFactoryInterface
      */
@@ -190,7 +188,7 @@ class ArticleAdmin extends Admin
             $this->viewBuilderFactory->createTabViewBuilder(static::LIST_VIEW, '/articles')
         );
 
-        foreach($this->getTypes() as $typeKey => $typeConfig) {
+        foreach ($this->getTypes() as $typeKey => $typeConfig) {
             $metadataRequestParameters = [
                 'tags[sulu_article.type]' => false,
             ];
