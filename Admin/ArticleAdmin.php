@@ -133,152 +133,176 @@ class ArticleAdmin extends Admin
             )
         );
 
-        $publishDisplayCondition = '(!_permissions || _permissions.live)';
+        if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
+            $viewCollection->add(
+                $this->viewBuilderFactory->createTabViewBuilder(static::LIST_VIEW, '/articles')
+            );
 
-        $formToolbarActionsWithType = [
-            new ToolbarAction(
-                'sulu_admin.save_with_publishing',
-                [
-                    'publish_visible_condition' => '(!_permissions || _permissions.live)',
-                    'save_visible_condition' => '(!_permissions || _permissions.edit)',
-                ]
-            ),
-            new ToolbarAction(
-                'sulu_admin.type',
-                [
-                    'disabled_condition' => '(_permissions && !_permissions.edit)',
-                ]
-            ),
-            new ToolbarAction(
-                'sulu_admin.delete',
-                [
-                    'visible_condition' => '(!_permissions || _permissions.delete)',
-                ]
-            ),
-            new DropdownToolbarAction(
-                'sulu_admin.edit',
-                'su-pen',
-                [
-                    new ToolbarAction(
-                        'sulu_admin.delete_draft',
+            foreach ($this->getTypes() as $typeKey => $typeConfig) {
+                if (!$this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::VIEW)) {
+                    continue;
+                }
+
+                $formToolbarActionsWithoutType = [];
+                $formToolbarActionsWithType = [];
+                $listToolbarActions = [];
+
+                if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::ADD)
+                    && $this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::ADD)) {
+                    $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
+                }
+
+                if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::EDIT)
+                    && $this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::EDIT)) {
+                    if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::LIVE)
+                        && $this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::LIVE)) {
+                        $saveToolbarAction = new ToolbarAction(
+                            'sulu_admin.save_with_publishing',
+                            [
+                                'publish_visible_condition' => '(!_permissions || _permissions.live)',
+                                'save_visible_condition' => '(!_permissions || _permissions.edit)',
+                            ]
+                        );
+                    } else {
+                        $saveToolbarAction = new ToolbarAction('sulu_admin.save');
+                    }
+
+                    $formToolbarActionsWithoutType[] = $saveToolbarAction;
+
+                    $formToolbarActionsWithType[] = $saveToolbarAction;
+                    $formToolbarActionsWithType[] = new ToolbarAction(
+                        'sulu_admin.type',
                         [
-                            'visible_condition' => $publishDisplayCondition,
+                            'disabled_condition' => '(_permissions && !_permissions.edit)',
                         ]
-                    ),
-                    new ToolbarAction(
-                        'sulu_admin.set_unpublished',
+                    );
+                }
+
+                if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::DELETE)
+                    && $this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::DELETE)) {
+                    $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.delete',
                         [
-                            'visible_condition' => $publishDisplayCondition,
+                            'visible_condition' => '(!_permissions || _permissions.delete)',
                         ]
-                    ),
-                ]
-            ),
-        ];
+                    );
+                    $listToolbarActions[] = new ToolbarAction('sulu_admin.delete');
+                }
 
-        $formToolbarActionsWithoutType = [
-            new ToolbarAction('sulu_admin.save_with_publishing'),
-        ];
+                if ($this->securityChecker->hasPermission(self::SECURITY_CONTEXT, PermissionTypes::LIVE)
+                    && $this->securityChecker->hasPermission(self::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::LIVE)) {
+                    $formToolbarActionsWithType[] = new DropdownToolbarAction(
+                        'sulu_admin.edit',
+                        'su-pen',
+                        [
+                            new ToolbarAction(
+                                'sulu_admin.delete_draft',
+                                [
+                                    'visible_condition' => '(!_permissions || _permissions.live)',
+                                ]
+                            ),
+                            new ToolbarAction(
+                                'sulu_admin.set_unpublished',
+                                [
+                                    'visible_condition' => '(!_permissions || _permissions.live)',
+                                ]
+                            ),
+                        ]
+                    );
+                }
 
-        $listToolbarActions = [
-            new ToolbarAction('sulu_admin.add'),
-            new ToolbarAction('sulu_admin.delete'),
-        ];
-
-        $viewCollection->add(
-            $this->viewBuilderFactory->createTabViewBuilder(static::LIST_VIEW, '/articles')
-        );
-
-        foreach ($this->getTypes() as $typeKey => $typeConfig) {
-            $metadataRequestParameters = [
-                'tags[sulu_article.type]' => false,
-            ];
-            if ($typeConfig['type']) {
                 $metadataRequestParameters = [
-                    'tags[sulu_article.type][type]' => $typeConfig['type'],
+                    'tags[sulu_article.type]' => false,
                 ];
-            }
 
-            $viewCollection->add(
-                $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW . '_' . $typeKey, '/:locale/' . $typeKey)
-                    ->setResourceKey('articles')
-                    ->setListKey('articles')
-                    ->setTabTitle($typeConfig['title'])
-                    ->addListAdapters(['table'])
-                    ->addLocales($locales)
-                    ->addRequestParameters(['types' => $typeKey])
-                    ->setDefaultLocale($locales[0])
-                    ->setAddView(static::ADD_FORM_VIEW . '_' . $typeKey)
-                    ->setEditView(static::EDIT_FORM_VIEW . '_' . $typeKey)
-                    ->addToolbarActions($listToolbarActions)
-                    ->setParent(static::LIST_VIEW)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createResourceTabViewBuilder(static::ADD_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/add')
-                    ->setResourceKey('articles')
-                    ->addLocales($locales)
-                    ->setBackView(static::LIST_VIEW . '_' . $typeKey)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createFormViewBuilder(self::ADD_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
-                    ->setResourceKey('articles')
-                    ->addMetadataRequestParameters($metadataRequestParameters)
-                    ->setFormKey('article')
-                    ->setTabTitle('sulu_admin.details')
-                    ->setEditView(static::EDIT_FORM_VIEW . '_' . $typeKey)
-                    ->addToolbarActions($formToolbarActionsWithType)
-                    ->setParent(static::ADD_FORM_VIEW . '_' . $typeKey)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/:id')
-                    ->setResourceKey('articles')
-                    ->addLocales($locales)
-                    ->setBackView(static::LIST_VIEW . '_' . $typeKey)
-                    ->setTitleProperty('title')
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
-                    ->setResourceKey('articles')
-                    ->addMetadataRequestParameters($metadataRequestParameters)
-                    ->setFormKey('article')
-                    ->setTabTitle('sulu_admin.details')
-                    ->setTabPriority(1024)
-                    ->addToolbarActions($formToolbarActionsWithType)
-                    ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SEO . '_' . $typeKey, '/seo')
-                    ->setResourceKey('articles')
-                    ->setFormKey('page_seo')
-                    ->setTabTitle('sulu_page.seo')
-                    ->addToolbarActions($formToolbarActionsWithoutType)
-                    ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_EXCERPT . '_' . $typeKey, '/excerpt')
-                    ->setResourceKey('articles')
-                    ->setFormKey('page_excerpt')
-                    ->setBackView(static::LIST_VIEW)
-                    ->setTabTitle('sulu_page.excerpt')
-                    ->addToolbarActions($formToolbarActionsWithoutType)
-                    ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-            );
-            $viewCollection->add(
-                $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SETTINGS . '_' . $typeKey, '/settings')
-                    ->setResourceKey('articles')
-                    ->setFormKey('article_settings')
-                    ->setBackView(static::LIST_VIEW)
-                    ->setTabTitle('sulu_page.settings')
-                    ->setTabPriority(512)
-                    ->addToolbarActions($formToolbarActionsWithoutType)
-                    ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-            );
+                if ($typeConfig['type']) {
+                    $metadataRequestParameters = [
+                        'tags[sulu_article.type][type]' => $typeConfig['type'],
+                    ];
+                }
 
-            if (isset($this->kernelBundles['SuluAutomationBundle'])) {
                 $viewCollection->add(
-                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
-                        ->setEntityClass(BasePageDocument::class)
+                    $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW . '_' . $typeKey, '/:locale/' . $typeKey)
+                        ->setResourceKey('articles')
+                        ->setListKey('articles')
+                        ->setTabTitle($typeConfig['title'])
+                        ->addListAdapters(['table'])
+                        ->addLocales($locales)
+                        ->addRequestParameters(['types' => $typeKey])
+                        ->setDefaultLocale($locales[0])
+                        ->setAddView(static::ADD_FORM_VIEW . '_' . $typeKey)
+                        ->setEditView(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                        ->addToolbarActions($listToolbarActions)
+                        ->setParent(static::LIST_VIEW)
+                );
+
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createResourceTabViewBuilder(static::ADD_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/add')
+                        ->setResourceKey('articles')
+                        ->addLocales($locales)
+                        ->setBackView(static::LIST_VIEW . '_' . $typeKey)
+                );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createFormViewBuilder(self::ADD_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
+                        ->setResourceKey('articles')
+                        ->addMetadataRequestParameters($metadataRequestParameters)
+                        ->setFormKey('article')
+                        ->setTabTitle('sulu_admin.details')
+                        ->setEditView(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                        ->addToolbarActions($formToolbarActionsWithType)
+                        ->setParent(static::ADD_FORM_VIEW . '_' . $typeKey)
+                );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/:id')
+                        ->setResourceKey('articles')
+                        ->addLocales($locales)
+                        ->setBackView(static::LIST_VIEW . '_' . $typeKey)
+                        ->setTitleProperty('title')
+                );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
+                        ->setResourceKey('articles')
+                        ->addMetadataRequestParameters($metadataRequestParameters)
+                        ->setFormKey('article')
+                        ->setTabTitle('sulu_admin.details')
+                        ->setTabPriority(1024)
+                        ->addToolbarActions($formToolbarActionsWithType)
                         ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
                 );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SEO . '_' . $typeKey, '/seo')
+                        ->setResourceKey('articles')
+                        ->setFormKey('page_seo')
+                        ->setTabTitle('sulu_page.seo')
+                        ->addToolbarActions($formToolbarActionsWithoutType)
+                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_EXCERPT . '_' . $typeKey, '/excerpt')
+                        ->setResourceKey('articles')
+                        ->setFormKey('page_excerpt')
+                        ->setBackView(static::LIST_VIEW)
+                        ->setTabTitle('sulu_page.excerpt')
+                        ->addToolbarActions($formToolbarActionsWithoutType)
+                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                );
+                $viewCollection->add(
+                    $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SETTINGS . '_' . $typeKey, '/settings')
+                        ->setResourceKey('articles')
+                        ->setFormKey('article_settings')
+                        ->setBackView(static::LIST_VIEW)
+                        ->setTabTitle('sulu_page.settings')
+                        ->setTabPriority(512)
+                        ->addToolbarActions($formToolbarActionsWithoutType)
+                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                );
+
+                if (isset($this->kernelBundles['SuluAutomationBundle'])) {
+                    $viewCollection->add(
+                        (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
+                            ->setEntityClass(BasePageDocument::class)
+                            ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                    );
+                }
             }
         }
     }
