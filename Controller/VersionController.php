@@ -75,7 +75,7 @@ class VersionController extends FOSRestController implements
 
         /** @var User $user */
         foreach ($users as $user) {
-            $fullNamesByIds[$user->getId()] = $user->getContact()->getFullName();
+            $fullNamesByIds[$user->getId()] = $user->getFullName();
         }
 
         $versionData = [];

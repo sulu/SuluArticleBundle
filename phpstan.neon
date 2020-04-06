@@ -1,10 +1,7 @@
 includes:
-    - vendor/jangregor/phpstan-prophecy/src/extension.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon
     - vendor/phpstan/phpstan-symfony/extension.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
 
 parameters:
@@ -16,8 +13,5 @@ parameters:
         - %currentWorkingDirectory%/vendor/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
-        # TODO enable when automation bundle is ready again
-        - %currentWorkingDirectory%/PageTree/AutomationPageTreeUpdater.php
-        - %currentWorkingDirectory%/PageTree/PageTreeRouteUpdateHandler.php
     ignoreErrors:
         - '#Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch()#'

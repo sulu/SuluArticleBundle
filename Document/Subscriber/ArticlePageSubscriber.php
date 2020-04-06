@@ -194,7 +194,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public function setPageTitleOnPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
-        if (!$document instanceof ArticleInterface) {
+        if (!$document instanceof ArticleInterface || !\method_exists($document, 'setPageTitle')) {
             return;
         }
 
