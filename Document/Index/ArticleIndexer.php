@@ -30,6 +30,7 @@ use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\LocalizationState;
@@ -190,11 +191,17 @@ class ArticleIndexer implements IndexerInterface
         }
         if ($document->getChanger() && $changer = $this->userManager->getUserById($document->getChanger())) {
             $article->setChangerFullName($changer->getFullName());
-            $article->setChangerContactId($changer->getId());
+
+            if ($changer instanceof User) {
+                $article->setChangerContactId($changer->getContact()->getId());
+            }
         }
         if ($document->getCreator() && $creator = $this->userManager->getUserById($document->getCreator())) {
             $article->setCreatorFullName($creator->getFullName());
-            $article->setCreatorContactId($creator->getId());
+
+            if ($creator instanceof User) {
+                $article->setCreatorContactId($creator->getContact()->getId());
+            }
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());

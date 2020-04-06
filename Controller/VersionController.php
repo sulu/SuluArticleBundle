@@ -16,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Component\Content\Document\Behavior\SecurityBehavior;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Version;
@@ -71,8 +72,10 @@ class VersionController extends FOSRestController implements
 
         $users = $this->get('sulu_security.user_repository')->findUsersById($userIds);
         $fullNamesByIds = [];
+
+        /** @var User $user */
         foreach ($users as $user) {
-            $fullNamesByIds[$user->getId()] = $user->getFullName();
+            $fullNamesByIds[$user->getId()] = $user->getContact()->getFullName();
         }
 
         $versionData = [];
