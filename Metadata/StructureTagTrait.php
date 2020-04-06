@@ -24,9 +24,9 @@ trait StructureTagTrait
      *
      * @return string
      */
-    protected function getType(StructureMetadata $metadata)
+    protected function getType(StructureMetadata $metadata, ?string $default = 'default')
     {
-        return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_TYPE, 'type', 'default');
+        return $this->getTagAttribute($metadata, ArticleAdmin::STRUCTURE_TAG_TYPE, 'type', $default);
     }
 
     /**
