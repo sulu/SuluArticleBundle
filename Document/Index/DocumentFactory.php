@@ -11,8 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
-
 /**
  * Factory for creating article-documents.
  */

@@ -76,7 +76,7 @@ class ArticleBridge extends StructureBridge
     /**
      * @return mixed
      *
-     * Will be called by SuluCollector to collect profiler data.
+     * Will be called by SuluCollector to collect profiler data
      */
     public function getOriginTemplate()
     {
