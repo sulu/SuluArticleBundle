@@ -111,7 +111,7 @@ class VersionController extends FOSRestController implements
      *
      * @throws RestException
      */
-    public function postTriggerAction(Request $request, string $uuid, int $version): Response
+    public function postTriggerAction(Request $request, string $uuid, string $version): Response
     {
         $action = $this->getRequestParameter($request, 'action', true);
         $locale = $this->getLocale($request);
