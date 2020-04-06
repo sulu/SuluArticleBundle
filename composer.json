@@ -25,11 +25,11 @@
         "ongr/elasticsearch-bundle": "^5.2",
         "ongr/elasticsearch-dsl": "~5.0 || ~6.0",
         "sulu/sulu": "^2.0.6",
-        "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
         "symfony/config": "^4.3",
         "symfony/dependency-injection": "^4.3",
         "symfony/http-foundation": "^4.3",
         "symfony/http-kernel": "^4.3",
+        "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
         "twig/twig": "^1.41 || ^2.0 || ^3.0"
     },
     "require-dev": {

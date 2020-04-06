@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Subscriber;
 
-use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
@@ -195,7 +194,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public function setPageTitleOnPersist(PersistEvent $event): void
     {
         $document = $event->getDocument();
-        if (!$document instanceof ArticleDocument) {
+        if (!$document instanceof ArticleInterface) {
             return;
         }
 
