@@ -39,7 +39,7 @@
         "massive/build-bundle": "^0.3 || ^0.4",
         "php-ffmpeg/php-ffmpeg": "^0.13 || ^0.14",
         "phpcr/phpcr-shell": "^1.1",
-        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan": "^0.12.18",
         "phpstan/phpstan-doctrine": "^0.12.9",
         "phpstan/phpstan-symfony": "^0.12.3",
         "phpunit/phpunit": "^8.2",
