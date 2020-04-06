@@ -84,9 +84,9 @@ class MediaViewObject
     /**
      * Set formats.
      *
-     * @param string[] $formats
+     * @param string|string[] $formats
      */
-    public function setFormats(array $formats): self
+    public function setFormats($formats): self
     {
         if (is_array($formats)) {
             $formats = json_encode($formats);
