@@ -190,8 +190,8 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     'resources' => [
                         'articles' => [
                             'routes' => [
-                                'list' => 'get_articles',
-                                'detail' => 'get_article',
+                                'list' => 'sulu_article.get_articles',
+                                'detail' => 'sulu_article.get_article',
                             ],
                         ],
                     ],

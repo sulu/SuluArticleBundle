@@ -2,6 +2,24 @@
 
 ## dev-develop
 
+### Routing changed
+
+Route definitions changed from xml to yaml.
+```
+sulu_article_api:
+-    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
++    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
+     type: rest
+     prefix: /admin/api
+
+sulu_article:
+-    resource: "@SuluArticleBundle/Resources/config/routing.xml"
++    resource: "@SuluArticleBundle/Resources/config/routing.yml"
+     prefix: /admin/articles
+```
+
+Also, the routes `get_articles` and `get_article` changed to `sulu_article.get_articles` and `sulu_article.get_article`.
+
 ### ArticleSelectionContentType constructor changed
 
 The last parameter `template` has been removed from the ArticleSelectionContentType constructor.

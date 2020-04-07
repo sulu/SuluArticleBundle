@@ -1,0 +1,9 @@
+sulu_article.templates:
+    path: /templates
+    defaults:
+        _controller: SuluArticleBundle:Template:get
+
+sulu_article.template.settings:
+    path: /template/settings.html
+    defaults:
+        _controller: SuluArticleBundle:Template:settings

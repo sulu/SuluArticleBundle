@@ -263,7 +263,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                 new ListRepresentation(
                     $result,
                     'articles',
-                    'get_articles',
+                    'sulu_article.get_articles',
                     $request->query->all(),
                     $page,
                     $limit,
