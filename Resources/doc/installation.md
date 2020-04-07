@@ -65,13 +65,9 @@ ongr_elasticsearch:
 # config/routes/sulu_admin.yaml
 
 sulu_article_api:
-    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
+    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
     type: rest
     prefix: /admin/api
-
-sulu_article:
-    resource: "@SuluArticleBundle/Resources/config/routing.xml"
-    prefix: /admin/articles
 ```
 
 ### Configure multi webspace setup

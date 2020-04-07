@@ -2,7 +2,3 @@ sulu_article_api:
     type: rest
     resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
     prefix: /api
-
-sulu_article:
-    resource: "@SuluArticleBundle/Resources/config/routing.yml"
-    prefix: /articles
