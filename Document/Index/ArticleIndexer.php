@@ -23,7 +23,6 @@ use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
-use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
@@ -36,8 +35,8 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Exception\DocumentManagerException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides methods to index articles.
@@ -163,7 +162,7 @@ class ArticleIndexer implements IndexerInterface
 
     protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article)
     {
-        $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
+        $this->eventDispatcher->dispatch(new IndexEvent($document, $article), IndexEvent::NAME);
     }
 
     /**
