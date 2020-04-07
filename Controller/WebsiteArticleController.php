@@ -30,24 +30,6 @@ use Twig\Environment;
 class WebsiteArticleController extends AbstractController
 {
     /**
-     * @var TemplateAttributeResolverInterface
-     */
-    private $templateAttributeResolver;
-
-    /**
-     * @var ArticleContentResolverInterface
-     */
-    private $articleContentResolver;
-
-    public function __construct(
-        TemplateAttributeResolverInterface $templateAttributeResolver,
-        ArticleContentResolverInterface $articleContentResolver
-    ) {
-        $this->templateAttributeResolver = $templateAttributeResolver;
-        $this->articleContentResolver = $articleContentResolver;
-    }
-
-    /**
      * Article index action.
      *
      * @param string $view
@@ -78,7 +60,8 @@ class WebsiteArticleController extends AbstractController
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $data = $this->templateAttributeResolver->resolve(array_merge($content, $attributes));
+        $templateAttributeResolver = $this->getTemplateAttributeResolver();
+        $data = $templateAttributeResolver->resolve(array_merge($content, $attributes));
 
         try {
             if ($partial) {
@@ -140,7 +123,9 @@ class WebsiteArticleController extends AbstractController
      */
     protected function resolveArticle(ArticleInterface $object, $pageNumber)
     {
-        return $this->articleContentResolver->resolve($object, $pageNumber);
+        $articleContentResolver = $this->getArticleContentResolver();
+
+        return $articleContentResolver->resolve($object, $pageNumber);
     }
 
     /**
@@ -177,10 +162,9 @@ class WebsiteArticleController extends AbstractController
 
     protected function renderBlock($template, $block, $attributes = [])
     {
-        /** @var Environment $twig */
-        $twig = $this->container->get('twig');
-        $attributes = $twig->mergeGlobals($attributes);
+        $twig = $this->getTwig();
 
+        $attributes = $twig->mergeGlobals($attributes);
         $template = $twig->loadTemplate($template);
 
         $level = ob_get_level();
@@ -200,10 +184,27 @@ class WebsiteArticleController extends AbstractController
         }
     }
 
+    protected function getTwig(): Environment
+    {
+        return $this->container->get('twig');
+    }
+
+    protected function getTemplateAttributeResolver(): TemplateAttributeResolverInterface
+    {
+        return $this->container->get('sulu_website.resolver.template_attribute');
+    }
+
+    protected function getArticleContentResolver(): ArticleContentResolverInterface
+    {
+        return $this->container->get('sulu_article.article_content_resolver');
+    }
+
     public static function getSubscribedServices()
     {
         return array_merge(parent::getSubscribedServices(), [
             'twig' => Environment::class,
+            'sulu_website.resolver.template_attribute' => TemplateAttributeResolverInterface::class,
+            'sulu_article.article_content_resolver' => ArticleContentResolverInterface::class,
         ]);
     }
 }
