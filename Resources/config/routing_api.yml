@@ -12,3 +12,4 @@ sulu_article.article.versioning:
     type: rest
     resource: Sulu\Bundle\ArticleBundle\Controller\VersionController
     name_prefix: sulu_article.
+    parent: sulu_article.article
