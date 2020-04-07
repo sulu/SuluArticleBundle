@@ -201,10 +201,12 @@ class WebsiteArticleController extends AbstractController
 
     public static function getSubscribedServices()
     {
-        return array_merge(parent::getSubscribedServices(), [
-            'twig' => Environment::class,
-            'sulu_website.resolver.template_attribute' => TemplateAttributeResolverInterface::class,
-            'sulu_article.article_content_resolver' => ArticleContentResolverInterface::class,
-        ]);
+        $subscribedServices = parent::getSubscribedServices();
+
+        $subscribedServices['twig'] = Environment::class;
+        $subscribedServices['sulu_website.resolver.template_attribute'] = TemplateAttributeResolverInterface::class;
+        $subscribedServices['sulu_article.article_content_resolver'] = ArticleContentResolverInterface::class;
+
+        return $subscribedServices;
     }
 }
