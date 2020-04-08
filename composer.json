@@ -19,6 +19,7 @@
     ],
     "require": {
         "php": "^7.2",
+        "ext-json": "*",
         "elasticsearch/elasticsearch": "~5.0 || ~6.0",
         "jms/serializer": "^3.3",
         "jms/serializer-bundle": "^3.3",
