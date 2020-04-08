@@ -13,13 +13,15 @@ namespace Sulu\Bundle\ArticleBundle\Event;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Contains information for index-events.
  */
 class IndexEvent extends Event
 {
+    public const NAME = 'sulu_article.index';
+
     /**
      * @var ArticleDocument
      */

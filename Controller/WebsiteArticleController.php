@@ -14,18 +14,20 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
 use Sulu\Bundle\PreviewBundle\Preview\Preview;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sulu\Bundle\WebsiteBundle\Resolver\TemplateAttributeResolverInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Twig\Template;
+use Twig\Environment;
 
 /**
  * Handles articles.
  */
-class WebsiteArticleController extends Controller
+class WebsiteArticleController extends AbstractController
 {
     /**
      * Article index action.
@@ -60,7 +62,8 @@ class WebsiteArticleController extends Controller
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $data = $this->get('sulu_website.resolver.template_attribute')->resolve(array_merge($content, $attributes));
+        $templateAttributeResolver = $this->getTemplateAttributeResolver();
+        $data = $templateAttributeResolver->resolve(array_merge($content, $attributes));
 
         try {
             if ($partial) {
@@ -116,7 +119,9 @@ class WebsiteArticleController extends Controller
      */
     protected function resolveArticle(ArticleInterface $object, int $pageNumber): array
     {
-        return $this->get('sulu_article.article_content_resolver')->resolve($object, $pageNumber);
+        $articleContentResolver = $this->getArticleContentResolver();
+
+        return $articleContentResolver->resolve($object, $pageNumber);
     }
 
     /**
@@ -151,10 +156,9 @@ class WebsiteArticleController extends Controller
 
     protected function renderBlock(string $template, string $block, array $attributes = []): string
     {
-        $twig = $this->get('twig');
-        $attributes = $twig->mergeGlobals($attributes);
+        $twig = $this->getTwig();
 
-        /** @var Template $template */
+        $attributes = $twig->mergeGlobals($attributes);
         $template = $twig->loadTemplate($template);
 
         $level = ob_get_level();
@@ -172,5 +176,31 @@ class WebsiteArticleController extends Controller
 
             throw $e;
         }
+    }
+
+    protected function getTwig(): Environment
+    {
+        return $this->container->get('twig');
+    }
+
+    protected function getTemplateAttributeResolver(): TemplateAttributeResolverInterface
+    {
+        return $this->container->get('sulu_website.resolver.template_attribute');
+    }
+
+    protected function getArticleContentResolver(): ArticleContentResolverInterface
+    {
+        return $this->container->get('sulu_article.article_content_resolver');
+    }
+
+    public static function getSubscribedServices()
+    {
+        $subscribedServices = parent::getSubscribedServices();
+
+        $subscribedServices['twig'] = Environment::class;
+        $subscribedServices['sulu_website.resolver.template_attribute'] = TemplateAttributeResolverInterface::class;
+        $subscribedServices['sulu_article.article_content_resolver'] = ArticleContentResolverInterface::class;
+
+        return $subscribedServices;
     }
 }

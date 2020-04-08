@@ -13,28 +13,67 @@ namespace Sulu\Bundle\ArticleBundle\Controller;
 
 use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\View\ViewHandlerInterface;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
-use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
+use Sulu\Component\DocumentManager\MetadataFactoryInterface;
+use Sulu\Component\Hash\RequestHashCheckerInterface;
+use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\RequestParametersTrait;
-use Sulu\Component\Rest\RestController;
 use Sulu\Component\Security\SecuredControllerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Provides API for article-pages.
  */
-class ArticlePageController extends RestController implements ClassResourceInterface, SecuredControllerInterface
+class ArticlePageController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
 {
     const DOCUMENT_TYPE = 'article_page';
 
     use RequestParametersTrait;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * @var RequestHashCheckerInterface
+     */
+    private $requestHashChecker;
+
+    public function __construct(
+        ViewHandlerInterface $viewHandler,
+        DocumentManagerInterface $documentManager,
+        MetadataFactoryInterface $metadataFactory,
+        FormFactoryInterface $formFactory,
+        RequestHashCheckerInterface $requestHashChecker,
+        ?TokenStorageInterface $tokenStorage = null
+    ) {
+        parent::__construct($viewHandler, $tokenStorage);
+
+        $this->documentManager = $documentManager;
+        $this->metadataFactory = $metadataFactory;
+        $this->formFactory = $formFactory;
+        $this->requestHashChecker = $requestHashChecker;
+    }
 
     /**
      * Returns single article-page.
@@ -44,7 +83,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
     public function getAction(string $articleUuid, string $uuid, Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
-        $document = $this->getDocumentManager()->find(
+        $document = $this->documentManager->find(
             $uuid,
             $locale,
             [
@@ -75,14 +114,14 @@ class ArticlePageController extends RestController implements ClassResourceInter
     public function postAction(string $articleUuid, Request $request): Response
     {
         $action = $request->get('action');
-        $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
+        $document = $this->documentManager->create(self::DOCUMENT_TYPE);
 
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
         $this->persistDocument($data, $document, $locale, $articleUuid);
         $this->handleActionParameter($action, $document->getParent(), $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
 
         $context = new Context();
         $context->setSerializeNull(true);
@@ -102,7 +141,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
         $action = $request->get('action');
         $data = $request->request->all();
 
-        $document = $this->getDocumentManager()->find(
+        $document = $this->documentManager->find(
             $uuid,
             $locale,
             [
@@ -111,11 +150,11 @@ class ArticlePageController extends RestController implements ClassResourceInter
             ]
         );
 
-        $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
+        $this->requestHashChecker->checkHash($request, $document, $document->getUuid());
 
         $this->persistDocument($data, $document, $locale, $articleUuid);
         $this->handleActionParameter($action, $document->getParent(), $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
 
         $context = new Context();
         $context->setSerializeNull(true);
@@ -133,10 +172,9 @@ class ArticlePageController extends RestController implements ClassResourceInter
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        $documentManager = $this->getDocumentManager();
-        $document = $documentManager->find($uuid, $locale);
-        $documentManager->remove($document);
-        $documentManager->flush();
+        $document = $this->documentManager->find($uuid, $locale);
+        $this->documentManager->remove($document);
+        $this->documentManager->flush();
 
         return $this->handleView($this->view(null));
     }
@@ -162,15 +200,15 @@ class ArticlePageController extends RestController implements ClassResourceInter
             throw new ParameterNotAllowedException('title', get_class($document));
         }
 
-        $article = $this->getDocumentManager()->find($articleUuid, $locale);
+        $article = $this->documentManager->find($articleUuid, $locale);
 
         if (!array_key_exists('template', $data)) {
             $data['template'] = $article->getStructureType();
         }
 
-        $formType = $this->getMetadataFactory()->getMetadataForAlias('article_page')->getFormType();
+        $formType = $this->metadataFactory->getMetadataForAlias('article_page')->getFormType();
 
-        $form = $this->createForm(
+        $form = $this->formFactory->create(
             $formType,
             $document,
             [
@@ -186,7 +224,7 @@ class ArticlePageController extends RestController implements ClassResourceInter
             throw new InvalidFormException($form);
         }
 
-        $this->getDocumentManager()->persist(
+        $this->documentManager->persist(
             $document,
             $locale,
             [
@@ -199,39 +237,13 @@ class ArticlePageController extends RestController implements ClassResourceInter
     }
 
     /**
-     * Returns document-manager.
-     *
-     * @return DocumentManagerInterface
-     */
-    protected function getDocumentManager()
-    {
-        return $this->get('sulu_document_manager.document_manager');
-    }
-
-    /**
-     * @return ContentMapperInterface
-     */
-    protected function getMapper()
-    {
-        return $this->get('sulu.content.mapper');
-    }
-
-    /**
-     * @return BaseMetadataFactory
-     */
-    protected function getMetadataFactory()
-    {
-        return $this->get('sulu_document_manager.metadata_factory.base');
-    }
-
-    /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
      */
     private function handleActionParameter(?string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
-                $this->getDocumentManager()->publish($document, $locale);
+                $this->documentManager->publish($document, $locale);
                 break;
         }
     }
