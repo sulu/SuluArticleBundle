@@ -31,28 +31,30 @@ class WebsiteArticleController extends AbstractController
 {
     /**
      * Article index action.
-     *
-     * @param string $view
-     * @param int $pageNumber
-     *
-     * @return Response
      */
-    public function indexAction(Request $request, ArticleInterface $object, $view, $pageNumber = 1, $preview = false, $partial = false)
-    {
+    public function indexAction(
+        Request $request,
+        ArticleInterface $object,
+        string $view,
+        int $pageNumber = 1,
+        bool $preview = false,
+        bool $partial = false
+    ): Response {
         return $this->renderArticle($request, $object, $view, $pageNumber, $preview, $partial);
     }
 
     /**
      * Render article with given view.
-     *
-     * @param string $view
-     * @param int $pageNumber
-     * @param array $attributes
-     *
-     * @return Response
      */
-    protected function renderArticle(Request $request, ArticleInterface $object, $view, $pageNumber, $preview, $partial, $attributes = [])
-    {
+    protected function renderArticle(
+        Request $request,
+        ArticleInterface $object,
+        string $view,
+        int $pageNumber,
+        bool $preview,
+        bool $partial,
+        array $attributes = []
+    ): Response {
         $object = $this->normalizeArticle($object);
 
         $requestFormat = $request->getRequestFormat();
@@ -102,10 +104,8 @@ class WebsiteArticleController extends AbstractController
     /**
      * Returns all the times the article-document.
      * This is necessary because the preview system passes an article-page here.
-     *
-     * @return ArticleDocument
      */
-    protected function normalizeArticle(ArticleInterface $object)
+    protected function normalizeArticle(ArticleInterface $object): ArticleDocument
     {
         if ($object instanceof ArticlePageDocument) {
             return $object->getParent();
@@ -116,12 +116,8 @@ class WebsiteArticleController extends AbstractController
 
     /**
      * Serialize given article with page-number.
-     *
-     * @param int $pageNumber
-     *
-     * @return array
      */
-    protected function resolveArticle(ArticleInterface $object, $pageNumber)
+    protected function resolveArticle(ArticleInterface $object, int $pageNumber): array
     {
         $articleContentResolver = $this->getArticleContentResolver();
 
@@ -130,10 +126,8 @@ class WebsiteArticleController extends AbstractController
 
     /**
      * Create response.
-     *
-     * @return Response
      */
-    private function createResponse(Request $request)
+    private function createResponse(Request $request): Response
     {
         $response = new Response();
         $cacheLifetime = $request->attributes->get('_cacheLifetime');
@@ -160,7 +154,7 @@ class WebsiteArticleController extends AbstractController
         return $response;
     }
 
-    protected function renderBlock($template, $block, $attributes = [])
+    protected function renderBlock(string $template, string $block, array $attributes = []): string
     {
         $twig = $this->getTwig();
 

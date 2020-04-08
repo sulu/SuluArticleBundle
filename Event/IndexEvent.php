@@ -40,20 +40,16 @@ class IndexEvent extends Event
 
     /**
      * Returns article.
-     *
-     * @return ArticleDocument
      */
-    public function getDocument()
+    public function getDocument(): ArticleDocument
     {
         return $this->document;
     }
 
     /**
      * Returns view-document.
-     *
-     * @return ArticleViewDocumentInterface
      */
-    public function getViewDocument()
+    public function getViewDocument(): ArticleViewDocumentInterface
     {
         return $this->viewDocument;
     }

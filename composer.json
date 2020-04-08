@@ -39,7 +39,9 @@
         "massive/build-bundle": "^0.3 || ^0.4",
         "php-ffmpeg/php-ffmpeg": "^0.13 || ^0.14",
         "phpcr/phpcr-shell": "^1.1",
-        "phpstan/phpstan": "^0.11",
+        "phpstan/phpstan": "^0.12.18",
+        "phpstan/phpstan-doctrine": "^0.12.9",
+        "phpstan/phpstan-symfony": "^0.12.3",
         "phpunit/phpunit": "^8.2",
         "sulu/automation-bundle": "2.0.0-alpha1",
         "symfony/browser-kit": "^4.3",
@@ -47,7 +49,8 @@
         "symfony/monolog-bundle": "^3.1",
         "symfony/stopwatch": "^4.3",
         "zendframework/zend-stdlib": "^2.3",
-        "zendframework/zendsearch": "@dev"
+        "zendframework/zendsearch": "@dev",
+        "thecodingmachine/phpstan-strict-rules": "^0.12.0"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."

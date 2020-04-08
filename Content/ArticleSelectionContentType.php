@@ -54,6 +54,9 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $this->articleDocumentClass = $articleDocumentClass;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getContentData(PropertyInterface $property)
     {
         $value = $property->getValue();
@@ -79,6 +82,9 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         return array_values($result);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function preResolve(PropertyInterface $property)
     {
         $uuids = $property->getValue();

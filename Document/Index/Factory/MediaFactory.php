@@ -32,13 +32,7 @@ class MediaFactory
         $this->mediaManager = $mediaManager;
     }
 
-    /**
-     * @param int $id
-     * @param string $locale
-     *
-     * @return MediaViewObject
-     */
-    public function create($id, $locale)
+    public function create(int $id, string $locale): MediaViewObject
     {
         $mediaViewObject = new MediaViewObject();
 

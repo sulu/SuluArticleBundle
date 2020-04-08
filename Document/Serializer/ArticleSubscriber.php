@@ -15,11 +15,13 @@ use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
@@ -98,16 +100,17 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append type to result.
      */
-    public function addTypeOnPostSerialize(ObjectEvent $event)
+    public function addTypeOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!($article instanceof ArticleDocument)) {
             return;
         }
 
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
 
         $articleType = $this->getType($structure->getStructure());
@@ -117,11 +120,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append webspace-settings to result.
      */
-    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event)
+    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!($article instanceof ArticleDocument)) {
             return;
@@ -149,9 +152,10 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append broken-indicator to result.
      */
-    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
+    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!($article instanceof ArticleViewDocumentInterface)) {
@@ -176,11 +180,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append page-title-property to result.
      */
-    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event)
+    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!$article instanceof ArticleInterface) {
             return;
@@ -198,10 +202,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 
     /**
      * Find page-title property.
-     *
-     * @return PropertyMetadata
      */
-    private function getPageTitleProperty(ArticleInterface $document)
+    private function getPageTitleProperty(ArticleInterface $document): ?PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article',

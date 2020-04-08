@@ -33,7 +33,7 @@
         </service>
 
         <!-- controller -->
-        <service id="sulu_article.article_controller"
+        <service id="Sulu\Bundle\ArticleBundle\Controller\ArticleController"
                  class="Sulu\Bundle\ArticleBundle\Controller\ArticleController"
                  public="true">
             <argument type="service" id="fos_rest.view_handler"/>
@@ -52,7 +52,7 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
-        <service id="sulu_article.article_page_controller"
+        <service id="Sulu\Bundle\ArticleBundle\Controller\ArticlePageController"
                  class="Sulu\Bundle\ArticleBundle\Controller\ArticlePageController"
                  public="true">
             <argument type="service" id="fos_rest.view_handler"/>
@@ -65,7 +65,7 @@
             <tag name="sulu.context" context="admin"/>
         </service>
 
-        <service id="sulu_article.version_controller"
+        <service id="Sulu\Bundle\ArticleBundle\Controller\VersionController"
                  class="Sulu\Bundle\ArticleBundle\Controller\VersionController"
                  public="true">
             <argument type="service" id="fos_rest.view_handler"/>

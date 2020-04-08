@@ -15,6 +15,7 @@ use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
@@ -59,9 +60,10 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
     /**
      * Loops thru current webspace locales and generates routes for them.
      */
-    public function addUrlsOnPostSerialize(ObjectEvent $event)
+    public function addUrlsOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
         $context = $event->getContext();
         $request = $this->requestStack->getCurrentRequest();

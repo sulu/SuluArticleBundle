@@ -22,7 +22,7 @@ trait StructureTagTrait
     /**
      * Returns type for given structure-metadata.
      *
-     * @return string
+     * @return mixed
      */
     protected function getType(StructureMetadata $metadata, ?string $default = 'default')
     {
@@ -32,7 +32,7 @@ trait StructureTagTrait
     /**
      * Returns multipage-configuration for given structure-metadata.
      *
-     * @return string
+     * @return mixed
      */
     protected function getMultipage(StructureMetadata $metadata)
     {
@@ -42,13 +42,11 @@ trait StructureTagTrait
     /**
      * Returns attribute for given tag in metadata.
      *
-     * @param string $tag
-     * @param string $attribute
      * @param mixed $default
      *
      * @return mixed
      */
-    private function getTagAttribute(StructureMetadata $metadata, $tag, $attribute, $default)
+    private function getTagAttribute(StructureMetadata $metadata, string $tag, string $attribute, $default)
     {
         if (!$metadata->hasTag($tag)) {
             return $default;

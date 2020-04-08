@@ -106,7 +106,7 @@ class ReindexCommand extends Command
         if (!$this->dropIndex($indexer, $input, $output)) {
             // Drop was canceled by user.
 
-            return;
+            return 0;
         }
 
         $indexer->createIndex();
@@ -129,14 +129,14 @@ class ReindexCommand extends Command
                 $this->humanBytes(memory_get_peak_usage())
             )
         );
+
+        return 0;
     }
 
     /**
      * Drop index if requested.
-     *
-     * @return bool
      */
-    protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
+    protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output): bool
     {
         if (!$input->getOption('drop')) {
             return true;
@@ -174,7 +174,7 @@ class ReindexCommand extends Command
     /**
      * Clear article-content of index.
      */
-    protected function clearIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
+    protected function clearIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output): void
     {
         if (!$input->getOption('clear')) {
             return;
@@ -186,10 +186,8 @@ class ReindexCommand extends Command
 
     /**
      * Index documents for given locale.
-     *
-     * @param string $locale
      */
-    protected function indexDocuments($locale, IndexerInterface $indexer, OutputInterface $output)
+    protected function indexDocuments(string $locale, IndexerInterface $indexer, OutputInterface $output): void
     {
         $documents = $this->getDocuments($locale);
         $count = count($documents);
@@ -214,12 +212,8 @@ class ReindexCommand extends Command
 
     /**
      * Query for documents with given locale.
-     *
-     * @param string $locale
-     *
-     * @return QueryResultInterface
      */
-    protected function getDocuments($locale)
+    protected function getDocuments(string $locale): QueryResultInterface
     {
         $sql2 = sprintf(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article" AND [%s] IS NOT NULL',
@@ -233,13 +227,8 @@ class ReindexCommand extends Command
      * Converts bytes into human readable.
      *
      * Inspired by http://jeffreysambells.com/2012/10/25/human-readable-filesize-php
-     *
-     * @param int $bytes
-     * @param int $dec
-     *
-     * @return string
      */
-    protected function humanBytes($bytes, $dec = 2)
+    protected function humanBytes(int $bytes, int $dec = 2): string
     {
         $size = ['b', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = (int) floor((strlen($bytes) - 1) / 3);

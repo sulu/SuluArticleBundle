@@ -45,7 +45,7 @@ before_install:
   - composer self-update
 
 install:
-  - if [[ $PHPSTAN == 'true' ]]; then composer require --dev phpstan/phpstan:^0.11 --no-update $COMPOSER_FLAGS ; fi
+  - if [[ $PHPSTAN == 'true' ]]; then composer require --dev phpstan/phpstan:^0.12 --no-update $COMPOSER_FLAGS ; fi
   - composer update $COMPOSER_FLAGS
   - composer info -i
   - java -version

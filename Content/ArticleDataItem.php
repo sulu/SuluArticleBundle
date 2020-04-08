@@ -42,11 +42,7 @@ class ArticleDataItem implements ItemInterface
      */
     private $resource;
 
-    /**
-     * @param string $id
-     * @param string $title
-     */
-    public function __construct($id, $title, ArticleViewDocumentInterface $resource)
+    public function __construct(string $id, string $title, ArticleViewDocumentInterface $resource)
     {
         $this->id = $id;
         $this->title = $title;

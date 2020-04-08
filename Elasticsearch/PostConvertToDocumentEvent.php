@@ -45,30 +45,24 @@ class PostConvertToDocumentEvent extends Event
 
     /**
      * Returns rawData.
-     *
-     * @return array
      */
-    public function getRawData()
+    public function getRawData(): array
     {
         return $this->rawData;
     }
 
     /**
      * Returns document.
-     *
-     * @return object
      */
-    public function getDocument()
+    public function getDocument(): object
     {
         return $this->document;
     }
 
     /**
      * Returns manager.
-     *
-     * @return Manager
      */
-    public function getManager()
+    public function getManager(): Manager
     {
         return $this->manager;
     }

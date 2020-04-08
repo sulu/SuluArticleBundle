@@ -20,7 +20,7 @@ use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
  */
 class ElasticSearchFieldDescriptor extends FieldDescriptor
 {
-    public static function create(string $name, string $translation = null)
+    public static function create(string $name, string $translation = null): ElasticSearchFieldDescriptorBuilder
     {
         return new ElasticSearchFieldDescriptorBuilder($name, $translation);
     }
@@ -51,10 +51,7 @@ class ElasticSearchFieldDescriptor extends FieldDescriptor
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getSortField()
+    public function getSortField(): string
     {
         return $this->sortField;
     }

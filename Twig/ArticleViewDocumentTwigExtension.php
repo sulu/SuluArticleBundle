@@ -74,9 +74,9 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
     }
 
     /**
-     * Returns an array of possible function in this extension.
+     * {@inheritdoc}
      *
-     * @return array
+     * Returns an array of possible function in this extension.
      */
     public function getFunctions()
     {
@@ -89,18 +89,14 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
     /**
      * Loads recent articles with given parameters.
      *
-     * @param int $limit
-     * @param null|string $locale
-     * @param bool $ignoreWebspaces
-     *
      * @return ArticleResourceItem[]
      */
     public function loadRecent(
-        $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
+        int $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null,
-        $ignoreWebspaces = false
-    ) {
+        ?string $locale = null,
+        bool $ignoreWebspaces = false
+    ): array {
         $excludeUuid = null;
 
         /** @var Request $request */
@@ -135,20 +131,16 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
     /**
      * Loads similar articles with given parameters.
      *
-     * @param int $limit
-     * @param null $locale
-     * @param bool $ignoreWebspaces
-     *
      * @throws ArticleInRequestNotFoundException
      *
      * @return ArticleResourceItem[]
      */
     public function loadSimilar(
-        $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
+        int $limit = ArticleViewDocumentRepository::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null,
-        $ignoreWebspaces = false
-    ) {
+        ?string $locale = null,
+        bool $ignoreWebspaces = false
+    ): array {
         $uuid = null;
 
         $request = $this->requestStack->getCurrentRequest();
@@ -183,10 +175,7 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
         return $this->getResourceItems($articleViewDocuments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'sulu_article.article_view_document';
     }
@@ -194,7 +183,7 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
     /**
      * @return ArticleResourceItem[]
      */
-    private function getResourceItems(DocumentIterator $articleViewDocuments)
+    private function getResourceItems(DocumentIterator $articleViewDocuments): array
     {
         $articleResourceItems = [];
 
@@ -207,10 +196,7 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
         return $articleResourceItems;
     }
 
-    /**
-     * @return string
-     */
-    private function getArticleType(ArticleDocument $articleDocument)
+    private function getArticleType(ArticleDocument $articleDocument): string
     {
         $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
             'article',
@@ -220,12 +206,7 @@ class ArticleViewDocumentTwigExtension extends AbstractExtension
         return $this->getType($structureMetadata);
     }
 
-    /**
-     * @param bool $ignoreWebspaces
-     *
-     * @return null|string
-     */
-    private function getWebspaceKey(Request $request, $ignoreWebspaces)
+    private function getWebspaceKey(Request $request, bool $ignoreWebspaces): ?string
     {
         if ($ignoreWebspaces) {
             return null;

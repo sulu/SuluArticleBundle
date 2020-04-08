@@ -140,13 +140,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         return $result;
     }
 
-    /**
-     * @param string $locale
-     * @param string $scheme
-     *
-     * @return LinkItem
-     */
-    protected function createLinkItem(ArticleViewDocumentInterface $document, $locale, $scheme)
+    protected function createLinkItem(ArticleViewDocumentInterface $document, string $locale, string $scheme): LinkItem
     {
         $url = $this->webspaceManager->findUrlByResourceLocator(
             $document->getRoutePath(),

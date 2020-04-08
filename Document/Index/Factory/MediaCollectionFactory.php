@@ -36,12 +36,9 @@ class MediaCollectionFactory
     /**
      * Create media collection object.
      *
-     * @param array $data
-     * @param $locale
-     *
      * @return MediaViewObject[]|Collection
      */
-    public function create($data, $locale)
+    public function create(array $data, string $locale)
     {
         $mediaCollection = new Collection();
 

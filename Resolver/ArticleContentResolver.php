@@ -16,7 +16,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ContentProxyFactory;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
 use Sulu\Component\Serializer\ArraySerializerInterface;
 
@@ -54,6 +56,9 @@ class ArticleContentResolver implements ArticleContentResolverInterface
         $this->contentProxyFactory = $contentProxyFactory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function resolve(ArticleInterface $article, int $pageNumber = 1)
     {
         $data = $this->serializer->serialize(
@@ -85,12 +90,8 @@ class ArticleContentResolver implements ArticleContentResolverInterface
 
     /**
      * Returns article page by page-number.
-     *
-     * @param int $pageNumber
-     *
-     * @return ArticleDocument
      */
-    private function getArticleForPage(ArticleDocument $article, $pageNumber)
+    private function getArticleForPage(ArticleDocument $article, int $pageNumber): ArticleDocument
     {
         $children = $article->getChildren();
         if (null === $children || 1 === $pageNumber) {
@@ -108,19 +109,24 @@ class ArticleContentResolver implements ArticleContentResolverInterface
 
     /**
      * Returns content and view of article.
-     *
-     * @return array
      */
-    private function resolveContent(ArticleInterface $article)
+    private function resolveContent(ArticleDocument $article): array
     {
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
         $structure->setDocument($article);
 
         $data = $article->getStructure()->toArray();
 
         $extension = [];
-        foreach ($article->getExtensionsData()->toArray() as $name => $extensionData) {
-            $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($extensionData);
+
+        $extensionData = $article->getExtensionsData();
+        if ($extensionData instanceof ExtensionContainer) {
+            $extensionData = $extensionData->toArray();
+        }
+
+        foreach ($extensionData as $name => $value) {
+            $extension[$name] = $this->extensionManager->getExtension('article', $name)->getContentData($value);
         }
 
         $content = $this->contentProxyFactory->createContentProxy($structure, $data);

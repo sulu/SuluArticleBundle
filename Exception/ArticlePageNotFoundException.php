@@ -26,11 +26,7 @@ class ArticlePageNotFoundException extends \Exception
      */
     private $articleUuid;
 
-    /**
-     * @param string $pageUuid
-     * @param string $articleUuid
-     */
-    public function __construct($pageUuid, $articleUuid)
+    public function __construct(string $pageUuid, string $articleUuid)
     {
         parent::__construct(sprintf('Page "%s" not found in article "%s".', $pageUuid, $articleUuid));
         $this->pageUuid = $pageUuid;
@@ -39,20 +35,16 @@ class ArticlePageNotFoundException extends \Exception
 
     /**
      * Returns page-uuid.
-     *
-     * @return string
      */
-    public function getPageUuid()
+    public function getPageUuid(): string
     {
         return $this->pageUuid;
     }
 
     /**
      * Returns article-uuid.
-     *
-     * @return string
      */
-    public function getArticleUuid()
+    public function getArticleUuid(): string
     {
         return $this->articleUuid;
     }

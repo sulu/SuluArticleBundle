@@ -72,21 +72,14 @@ class ArticleViewDocumentRepository
 
     /**
      * Finds recent articles for given parameters sorted by field `authored`.
-     *
-     * @param null|string $excludeUuid
-     * @param int $limit
-     * @param null|string $locale
-     * @param null|string $webspaceKey
-     *
-     * @return DocumentIterator
      */
     public function findRecent(
-        $excludeUuid = null,
-        $limit = self::DEFAULT_LIMIT,
+        ?string $excludeUuid = null,
+        int $limit = self::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null,
-        $webspaceKey = null
-    ) {
+        ?string $locale = null,
+        ?string $webspaceKey = null
+    ): DocumentIterator {
         $search = $this->createSearch($limit, $types, $locale, $webspaceKey);
 
         if ($excludeUuid) {
@@ -100,21 +93,14 @@ class ArticleViewDocumentRepository
 
     /**
      * Finds similar articles for given `uuid` with given parameters.
-     *
-     * @param string $uuid
-     * @param int $limit
-     * @param null|string $locale
-     * @param null|string $webspaceKey
-     *
-     * @return DocumentIterator
      */
     public function findSimilar(
-        $uuid,
-        $limit = self::DEFAULT_LIMIT,
+        string $uuid,
+        int $limit = self::DEFAULT_LIMIT,
         array $types = null,
-        $locale = null,
-        $webspaceKey = null
-    ) {
+        ?string $locale = null,
+        ?string $webspaceKey = null
+    ): DocumentIterator {
         $search = $this->createSearch($limit, $types, $locale, $webspaceKey);
 
         $search->addQuery(
@@ -138,18 +124,13 @@ class ArticleViewDocumentRepository
 
     /**
      * Creates search with default queries (size, locale, types, webspace).
-     *
-     * @param int $limit
-     * @param null|string $locale
-     * @param null|string $webspaceKey
-     *
-     * @return Search
      */
     private function createSearch(
-        $limit, array $types = null,
-        $locale = null,
-        $webspaceKey = null
-    ) {
+        int $limit,
+        ?array $types = null,
+        ?string $locale = null,
+        ?string $webspaceKey = null
+    ): Search {
         $search = $this->repository->createSearch();
 
         // set size
