@@ -177,12 +177,6 @@ sulu_article:
     default_additional_webspaces: []
     smart_content:
         default_limit:        100
-    content_types:
-        article:
-            template:             'SuluArticleBundle:Template:content-types/article-selection.html.twig'
-        page_tree_route:
-            template:             'SuluArticleBundle:Template:content-types/page-tree-route.html.twig'
-            page_route_cascade:   request # One of "request"; "task"; "off"
     documents:
         article:
             view:                 Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument
