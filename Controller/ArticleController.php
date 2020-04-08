@@ -344,7 +344,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 new ListRepresentation(
                     $result,
                     'articles',
-                    'get_articles',
+                    'sulu_article.get_articles',
                     $request->query->all(),
                     $page,
                     $limit,
