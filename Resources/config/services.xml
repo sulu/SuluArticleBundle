@@ -32,6 +32,64 @@
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
         </service>
 
+        <!-- controller -->
+        <service id="sulu_article.article_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\ArticleController"
+                 public="true">
+            <argument type="service" id="fos_rest.view_handler"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu.content.mapper"/>
+            <argument type="service" id="sulu_document_manager.metadata_factory.base"/>
+            <argument type="service" id="sulu_core.list_rest_helper"/>
+            <argument type="service" id="es.manager.default"/>
+            <argument type="service" id="sulu_article.view_document.factory"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="sulu_hash.request_hash_checker"/>
+            <argument type="service" id="sulu_security.security_checker"/>
+            <argument>%sulu_article.display_tab_all%</argument>
+            <argument type="service" id="security.token_storage"/>
+
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
+        <service id="sulu_article.article_page_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\ArticlePageController"
+                 public="true">
+            <argument type="service" id="fos_rest.view_handler"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.metadata_factory.base"/>
+            <argument type="service" id="form.factory"/>
+            <argument type="service" id="sulu_hash.request_hash_checker"/>
+            <argument type="service" id="security.token_storage"/>
+
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
+        <service id="sulu_article.version_controller"
+                 class="Sulu\Bundle\ArticleBundle\Controller\VersionController"
+                 public="true">
+            <argument type="service" id="fos_rest.view_handler"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_core.list_rest_helper"/>
+            <argument type="service" id="sulu_security.user_repository"/>
+            <argument type="service" id="security.token_storage"/>
+
+            <tag name="sulu.context" context="admin"/>
+        </service>
+
+        <service id="sulu_article.website_article_controller" class="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" public="true">
+            <argument type="service" id="sulu_website.resolver.template_attribute"/>
+            <argument type="service" id="sulu_article.article_content_resolver"/>
+
+            <tag name="container.service_subscriber" />
+            <tag name="controller.service_arguments" />
+
+            <call method="setContainer">
+                <argument type="service" id="Psr\Container\ContainerInterface" />
+            </call>
+        </service>
+        <service id="Sulu\Bundle\ArticleBundle\Controller\WebsiteArticleController" alias="sulu_article.website_article_controller" public="true"/>
+
         <!-- view -->
         <service id="sulu_article.view_document.factory"
             class="Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactory"
@@ -196,6 +254,8 @@
             <argument type="service" id="sulu_page.extension.manager"/>
             <argument type="service" id="sulu_article.content_proxy_factory"/>
         </service>
+        <service id="Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface" alias="sulu_article.article_content_resolver"/>
+
         <service id="sulu_article.serializer.urls"
                  class="Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber">
             <argument type="service" id="request_stack"/>

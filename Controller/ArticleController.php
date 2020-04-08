@@ -15,6 +15,7 @@ use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\View\ViewHandlerInterface;
 use ONGR\ElasticsearchBundle\Mapping\Caser;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
@@ -27,33 +28,117 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
+use Sulu\Component\DocumentManager\MetadataFactoryInterface;
+use Sulu\Component\Hash\RequestHashCheckerInterface;
+use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
+use Sulu\Component\Rest\ListBuilder\ListRestHelperInterface;
 use Sulu\Component\Rest\RequestParametersTrait;
-use Sulu\Component\Rest\RestController;
 use Sulu\Component\Security\Authorization\PermissionTypes;
+use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Provides API for articles.
  */
-class ArticleController extends RestController implements ClassResourceInterface, SecuredControllerInterface
+class ArticleController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
 {
     const DOCUMENT_TYPE = 'article';
 
     use RequestParametersTrait;
     use ArticleViewDocumentIdTrait;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var ContentMapperInterface
+     */
+    private $contentMapper;
+
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
+     * @var ListRestHelperInterface
+     */
+    private $restHelper;
+
+    /**
+     * @var Manager
+     */
+    private $manager;
+
+    /**
+     * @var DocumentFactoryInterface
+     */
+    private $documentFactory;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * @var RequestHashCheckerInterface
+     */
+    private $requestHashChecker;
+
+    /**
+     * @var SecurityCheckerInterface
+     */
+    private $securityChecker;
+
+    /**
+     * @var bool
+     */
+    private $displayTabAll;
+
+    public function __construct(
+        ViewHandlerInterface $viewHandler,
+        DocumentManagerInterface $documentManager,
+        ContentMapperInterface $contentMapper,
+        MetadataFactoryInterface $metadataFactory,
+        ListRestHelperInterface $restHelper,
+        Manager $manager,
+        DocumentFactoryInterface $documentFactory,
+        FormFactoryInterface $formFactory,
+        RequestHashCheckerInterface $requestHashChecker,
+        SecurityCheckerInterface $securityChecker,
+        bool $displayTabAll,
+        ?TokenStorageInterface $tokenStorage = null
+    ) {
+        parent::__construct($viewHandler, $tokenStorage);
+
+        $this->documentManager = $documentManager;
+        $this->contentMapper = $contentMapper;
+        $this->metadataFactory = $metadataFactory;
+        $this->restHelper = $restHelper;
+        $this->manager = $manager;
+        $this->documentFactory = $documentFactory;
+        $this->formFactory = $formFactory;
+        $this->requestHashChecker = $requestHashChecker;
+        $this->securityChecker = $securityChecker;
+        $this->displayTabAll = $displayTabAll;
+    }
 
     /**
      * Create field-descriptor array.
@@ -69,7 +154,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             'typeTranslation' => ElasticSearchFieldDescriptor::create('typeTranslation', 'sulu_article.list.type')
                 ->setSortField('typeTranslation.raw')
                 ->setVisibility(
-                    $this->getParameter('sulu_article.display_tab_all') ?
+                    $this->displayTabAll ?
                         FieldDescriptorInterface::VISIBILITY_YES :
                         FieldDescriptorInterface::VISIBILITY_NEVER
                 )
@@ -122,15 +207,11 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        $restHelper = $this->get('sulu_core.list_rest_helper');
-
-        /** @var Manager $manager */
-        $manager = $this->get('es.manager.default');
-        $repository = $manager->getRepository($this->get('sulu_article.view_document.factory')->getClass('article'));
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch();
 
-        $limit = (int) $restHelper->getLimit();
-        $page = (int) $restHelper->getPage();
+        $limit = (int) $this->restHelper->getLimit();
+        $page = (int) $this->restHelper->getPage();
 
         if (null !== $locale) {
             $search->addQuery(new TermQuery('locale', $locale));
@@ -141,12 +222,12 @@ class ArticleController extends RestController implements ClassResourceInterface
             $limit = count($ids);
         }
 
-        $searchFields = $restHelper->getSearchFields();
+        $searchFields = $this->restHelper->getSearchFields();
         if (0 === count($searchFields)) {
             $searchFields = ['title'];
         }
 
-        $searchPattern = $restHelper->getSearchPattern();
+        $searchPattern = $this->restHelper->getSearchPattern();
         if (!empty($searchPattern)) {
             $boolQuery = new BoolQuery();
             foreach ($searchFields as $searchField) {
@@ -211,11 +292,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new MatchAllQuery());
         }
 
-        if (null !== $restHelper->getSortColumn() &&
-            $sortField = $this->getSortFieldName($restHelper->getSortColumn())
+        if (null !== $this->restHelper->getSortColumn() &&
+            $sortField = $this->getSortFieldName($this->restHelper->getSortColumn())
         ) {
             $search->addSort(
-                new FieldSort($sortField, $restHelper->getSortOrder())
+                new FieldSort($sortField, $this->restHelper->getSortOrder())
             );
         }
 
@@ -226,7 +307,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->setFrom(($page - 1) * $limit);
 
             $fields = array_merge(
-                $restHelper->getFields() ?: [],
+                $this->restHelper->getFields() ?: [],
                 ['id', 'localizationState', 'publishedState', 'published', 'title', 'routePath']
             );
             $fieldDescriptors = array_filter(
@@ -313,7 +394,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     public function getAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
-        $document = $this->getDocumentManager()->find(
+        $document = $this->documentManager->find(
             $id,
             $locale
         );
@@ -333,13 +414,13 @@ class ArticleController extends RestController implements ClassResourceInterface
     public function postAction(Request $request): Response
     {
         $action = $request->get('action');
-        $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
+        $document = $this->documentManager->create(self::DOCUMENT_TYPE);
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
 
         $context = new Context();
         $context->setSerializeNull(true);
@@ -359,7 +440,7 @@ class ArticleController extends RestController implements ClassResourceInterface
         $action = $request->get('action');
         $data = $request->request->all();
 
-        $document = $this->getDocumentManager()->find(
+        $document = $this->documentManager->find(
             $id,
             $locale,
             [
@@ -368,11 +449,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             ]
         );
 
-        $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
+        $this->requestHashChecker->checkHash($request, $document, $document->getUuid());
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
 
         $context = new Context();
         $context->setSerializeNull(true);
@@ -390,7 +471,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         $ids = array_filter(explode(',', $request->get('ids', '')));
 
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
         foreach ($ids as $id) {
             $document = $documentManager->find($id);
             $documentManager->remove($document);
@@ -405,7 +486,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     public function deleteAction(string $id): Response
     {
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
         $document = $documentManager->find($id);
         $documentManager->remove($document);
         $documentManager->flush();
@@ -432,51 +513,50 @@ class ArticleController extends RestController implements ClassResourceInterface
         try {
             switch ($action) {
                 case 'unpublish':
-                    $document = $this->getDocumentManager()->find($id, $locale);
-                    $this->getDocumentManager()->unpublish($document, $locale);
-                    $this->getDocumentManager()->flush();
+                    $document = $this->documentManager->find($id, $locale);
+                    $this->documentManager->unpublish($document, $locale);
+                    $this->documentManager->flush();
 
-                    $data = $this->getDocumentManager()->find($id, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 case 'remove-draft':
-                    $data = $this->getDocumentManager()->find($id, $locale);
-                    $this->getDocumentManager()->removeDraft($data, $locale);
-                    $this->getDocumentManager()->flush();
+                    $data = $this->documentManager->find($id, $locale);
+                    $this->documentManager->removeDraft($data, $locale);
+                    $this->documentManager->flush();
 
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $destLocales = explode(',', $destLocales);
 
-                    $securityChecker = $this->get('sulu_security.security_checker');
                     foreach ($destLocales as $destLocale) {
-                        $securityChecker->checkPermission(
+                        $this->securityChecker->checkPermission(
                             new SecurityCondition($this->getSecurityContext(), $destLocale),
                             PermissionTypes::EDIT
                         );
                     }
 
-                    $this->getMapper()->copyLanguage($id, $userId, null, $locale, $destLocales);
+                    $this->contentMapper->copyLanguage($id, $userId, null, $locale, $destLocales);
 
-                    $data = $this->getDocumentManager()->find($id, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
-                    $document = $this->getDocumentManager()->find($id, $locale);
-                    $copiedPath = $this->getDocumentManager()->copy($document, dirname($document->getPath()));
-                    $this->getDocumentManager()->flush();
+                    $document = $this->documentManager->find($id, $locale);
+                    $copiedPath = $this->documentManager->copy($document, dirname($document->getPath()));
+                    $this->documentManager->flush();
 
-                    $data = $this->getDocumentManager()->find($copiedPath, $locale);
+                    $data = $this->documentManager->find($copiedPath, $locale);
 
                     break;
                 case 'order':
                     $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
-                    $this->getDocumentManager()->flush();
-                    $this->getDocumentManager()->clear();
+                    $this->documentManager->flush();
+                    $this->documentManager->clear();
 
-                    $data = $this->getDocumentManager()->find($id, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 default:
@@ -503,7 +583,7 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function orderPages(array $pages, string $locale): void
     {
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
 
         for ($i = 0; $i < count($pages); ++$i) {
             $document = $documentManager->find($pages[$i], $locale);
@@ -529,8 +609,8 @@ class ArticleController extends RestController implements ClassResourceInterface
      */
     private function persistDocument(array $data, $document, string $locale): void
     {
-        $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
-        $form = $this->createForm(
+        $formType = $this->metadataFactory->getMetadataForAlias('article')->getFormType();
+        $form = $this->formFactory->create(
             $formType,
             $document,
             [
@@ -557,7 +637,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             $document->setAdditionalWebspaces(null);
         }
 
-        $this->getDocumentManager()->persist(
+        $this->documentManager->persist(
             $document,
             $locale,
             [
@@ -565,16 +645,6 @@ class ArticleController extends RestController implements ClassResourceInterface
                 'clear_missing_content' => false,
             ]
         );
-    }
-
-    protected function getDocumentManager(): DocumentManagerInterface
-    {
-        return $this->get('sulu_document_manager.document_manager');
-    }
-
-    protected function getMapper(): ContentMapperInterface
-    {
-        return $this->get('sulu.content.mapper');
     }
 
     /**
@@ -586,7 +656,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         switch ($actionParameter) {
             case 'publish':
-                $this->getDocumentManager()->publish($document, $locale);
+                $this->documentManager->publish($document, $locale);
 
                 break;
         }
@@ -602,10 +672,5 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         return null;
-    }
-
-    protected function getMetadataFactory(): BaseMetadataFactory
-    {
-        return $this->get('sulu_document_manager.metadata_factory.base');
     }
 }
