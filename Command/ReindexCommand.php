@@ -197,17 +197,17 @@ class ReindexCommand extends Command
             return;
         }
 
-        $progessBar = new ProgressBar($output, $count);
-        $progessBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
-        $progessBar->start();
+        $progressBar = new ProgressBar($output, $count);
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $progressBar->start();
 
         foreach ($documents as $document) {
             $indexer->index($document);
-            $progessBar->advance();
+            $progressBar->advance();
         }
 
         $indexer->flush();
-        $progessBar->finish();
+        $progressBar->finish();
     }
 
     /**
