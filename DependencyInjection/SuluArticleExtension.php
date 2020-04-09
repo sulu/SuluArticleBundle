@@ -285,11 +285,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
         $container->setParameter('sulu_article.search_fields', $config['search_fields']);
 
-        $container->setParameter(
-            'sulu_article.content-type.article.template',
-            $config['content_types']['article']['template']
-        );
-
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
 
