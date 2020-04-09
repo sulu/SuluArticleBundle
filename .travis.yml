@@ -12,8 +12,6 @@ env:
     - JACKRABBIT_VERSION=2.12.0
     - PHPCR_TRANSPORT=doctrinedbal
     - SYMFONY__DATABASE__VERSION=5.5.39
-    - ES_VERSION="6.5.4"
-    - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
     - DATABASE_CHARSET=utf8mb4
     - DATABASE_COLLATE=utf8mb4_unicode_ci
 
@@ -36,6 +34,8 @@ matrix:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
+        - ES_VERSION="6.5.4"
+        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         # Code coverage currently disabled takes a very long time
         # - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
