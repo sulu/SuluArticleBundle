@@ -49,11 +49,11 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
      */
     protected function createSearch(Search $search, array $filters, string $locale): Search
     {
-        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
-            return null;
-        }
-
         $search = parent::createSearch($search, $filters, $locale);
+
+        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
+            return $search;
+        }
 
         $document = $this->documentManager->find($filters['dataSource'], $locale);
         if ($document) {
