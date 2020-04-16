@@ -1,6 +1,6 @@
 {
     "name": "sulu/article-bundle",
-    "description": "Sulu bundle for managing articles",
+    "description": "Bundle for managing localized content-rich entities like blog-posts in the Sulu content management system.",
     "type": "sulu-bundle",
     "license": "MIT",
     "homepage": "https://github.com/sulu/SuluArticleBundle",
