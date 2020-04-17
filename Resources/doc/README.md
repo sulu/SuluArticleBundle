@@ -12,6 +12,5 @@ This documentation covers basic-topics to install and use this bundle.
 * [Twig-Extensions](twig-extensions.md)
 * [Commands](commands.md)
 * [Author](author.md)
-* [Multi-Page](multi-page.md)
 * [Article Types](article-types.md)
 * [Multi Webspaces](multi-webspaces.md)
