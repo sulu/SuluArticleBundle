@@ -128,7 +128,9 @@ class ArticleIndexListener
 
 ### Troubleshooting
 
-If you have no bundle (e.g. in your application) you have to add a `AppBundle` to your src directory and enable it in the `config/bundles.php` file.
+Unfortunately, the ElasticsearchBundle allows to overwrite document classes only if an `AppBundle` is registered in the 
+application. If you do not have registered such a bundle yet, you need to add it to your `src` directory and enable it
+in the `config/bundles.php` file.
 
 ```
 <?php
@@ -142,5 +144,4 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class AppBundle extends Bundle
 {
 }
-
 ```
