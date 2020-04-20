@@ -72,11 +72,14 @@ performance.
 
 ### Elasticsearch dependency
 
-The SuluArticleBundle was originally developed to be used in the publishing industry. To allow for **implementing 
-efficient and flexible search endpoints** for a big number of articles, the bundle **utilizes a view layer that is 
-stored in an Elasticsearch index**. This makes Elasticsearch a **hard dependency** of the bundle. If your project will 
-not utilize these performance optimizations, it might be more convenient to use Sulu pages below a specific parent 
-page instead of articles for managing content-rich entities.
+The SuluArticleBundle was originally developed to be used in the publishing industry. To satisfy the initial 
+requirements regarding performance and scalability, a **view layer stored in an Elasticsearch index** was utilized. 
+Because of this, there is **no way to use the bundle without Elasticsearch** at the moment. It is planned to
+remove this hard dependency in the next major version.
+
+If you cannot or do not want to make Elasticsearch a dependency of your project, you can **use Sulu pages for 
+certain use cases** instead of the SuluArticleBundle. However, be aware that the article list provides a better 
+performance and is more comfortable to use with a large number of entities.
 
 
 ## ❤️&nbsp; Support and Contributions
