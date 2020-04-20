@@ -11,9 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Command;
 
-use PHPCR\Query\QueryResultInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Component\DocumentManager\Collection\QueryResultCollection;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\HttpKernel\SuluKernel;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -213,7 +213,7 @@ class ReindexCommand extends Command
     /**
      * Query for documents with given locale.
      */
-    protected function getDocuments(string $locale): QueryResultInterface
+    protected function getDocuments(string $locale): QueryResultCollection
     {
         $sql2 = sprintf(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article" AND [%s] IS NOT NULL',
