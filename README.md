@@ -28,11 +28,11 @@
 </p>
 <br/>
 
-The **SuluArticleBundle** integrates a performance optimized way for managing articles into the [Sulu](https://sulu.io/) 
+The **SuluArticleBundle** integrates a performance optimized way for managing articles in the [Sulu](https://sulu.io/) 
 content management system. In the context of this bundle, **articles are localized content-rich entities** that are 
 **manageable via the Sulu administration interface** and can be **rendered on a website delivered by Sulu**. 
-This makes them a good choice for managing things like blog posts, products or even recipes inside of a Sulu project. 
-To keep things clean, the bundle allows to **manage different types of articles via separated lists** in the 
+This makes them a good choice for managing things like blog posts, products or even recipes in a Sulu project. 
+In order to keep things clean, the bundle allows to **manage different types of articles via separated lists** in the 
 administration interface.
 
 <br/>
@@ -65,9 +65,9 @@ find out **how to set up and configure the SuluArticleBundle** to your specific 
 
 Similar to Sulu pages, articles are **configured via templates** and can include additional **SEO and excerpt information**.
 Moreover, articles support the same **drafting, publishing and versioning functionality** as provided by pages.
-On the other hand, in contrast to Sulu pages, articles are **managed in a flat list** instead of a tree structure. 
-Furthermore, unlike the Sulu page tree, the article bundle is **optimized for managing a big number of articles** without 
-any performance decline.
+In contrast to Sulu pages, articles are **managed in a flat list** instead of a tree structure. Furthermore, unlike 
+the Sulu page tree, the article bundle is **optimized for managing a big number of articles** without neglecting 
+performance.
 
 
 ### Elasticsearch dependency
