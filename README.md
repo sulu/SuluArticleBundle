@@ -63,11 +63,10 @@ find out **how to set up and configure the SuluArticleBundle** to your specific 
 
 ### Article Characteristics
 
-Similar to Sulu pages, articles are **configured via templates** and can include additional **SEO and excerpt information**.
+Like Sulu pages, articles are **configured via templates** and can include additional **SEO and excerpt information**.
 Moreover, articles support the same **drafting, publishing and versioning functionality** as provided by pages.
 In contrast to Sulu pages, articles are **managed in a flat list** instead of a tree structure. Furthermore, unlike 
-the Sulu page tree, the article bundle is **optimized for managing a big number of articles** without neglecting 
-performance.
+the Sulu page tree, the article bundle is **optimized for managing a big number of articles**.
 
 
 ### Elasticsearch dependency
