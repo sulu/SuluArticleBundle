@@ -56,7 +56,7 @@ class DateShardingSubscriber implements EventSubscriberInterface
      *
      * The format of parent node is: /%base%/%articles%/
      */
-    public function handleSetParentNode(PersistEvent $event)
+    public function handleSetParentNode(PersistEvent $event): void
     {
         if (!$event->getDocument() instanceof DateShardingBehavior || $event->hasParentNode()) {
             return;

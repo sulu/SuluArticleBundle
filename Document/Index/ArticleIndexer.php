@@ -23,21 +23,22 @@ use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
 use Sulu\Bundle\ArticleBundle\Document\LocalizationStateViewObject;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
-use Sulu\Bundle\ArticleBundle\Event\Events;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ArticleBundle\Metadata\PageTreeTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
+use Sulu\Bundle\SecurityBundle\Entity\User;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
+use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Exception\DocumentManagerException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides methods to index articles.
@@ -144,21 +145,9 @@ class ArticleIndexer implements IndexerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getStructureMetadataFactory()
-    {
-        return $this->structureMetadataFactory;
-    }
-
-    /**
      * Returns translation for given article type.
-     *
-     * @param string $type
-     *
-     * @return string
      */
-    private function getTypeTranslation($type)
+    private function getTypeTranslation(string $type): string
     {
         if (!array_key_exists($type, $this->typeConfiguration)) {
             return ucfirst($type);
@@ -169,25 +158,19 @@ class ArticleIndexer implements IndexerInterface
         return $this->translator->trans($typeTranslationKey, [], 'backend');
     }
 
-    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article)
+    protected function dispatchIndexEvent(ArticleDocument $document, ArticleViewDocumentInterface $article): void
     {
-        $this->eventDispatcher->dispatch(Events::INDEX_EVENT, new IndexEvent($document, $article));
+        $this->eventDispatcher->dispatch(new IndexEvent($document, $article), IndexEvent::NAME);
     }
 
-    /**
-     * @param string $locale
-     * @param string $localizationState
-     *
-     * @return ArticleViewDocumentInterface
-     */
     protected function createOrUpdateArticle(
         ArticleDocument $document,
-        $locale,
-        $localizationState = LocalizationState::LOCALIZED
-    ) {
+        string $locale,
+        string $localizationState = LocalizationState::LOCALIZED
+    ): ArticleViewDocumentInterface {
         $article = $this->findOrCreateViewDocument($document, $locale, $localizationState);
         if (!$article) {
-            return;
+            return null;
         }
 
         $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
@@ -207,11 +190,17 @@ class ArticleIndexer implements IndexerInterface
         }
         if ($document->getChanger() && $changer = $this->userManager->getUserById($document->getChanger())) {
             $article->setChangerFullName($changer->getFullName());
-            $article->setChangerContactId($changer->getContact()->getId());
+
+            if ($changer instanceof User) {
+                $article->setChangerContactId($changer->getContact()->getId());
+            }
         }
         if ($document->getCreator() && $creator = $this->userManager->getUserById($document->getCreator())) {
             $article->setCreatorFullName($creator->getFullName());
-            $article->setCreatorContactId($creator->getContact()->getId());
+
+            if ($creator instanceof User) {
+                $article->setCreatorContactId($creator->getContact()->getId());
+            }
         }
         $article->setType($this->getType($structureMetadata));
         $article->setStructureType($document->getStructureType());
@@ -225,7 +214,12 @@ class ArticleIndexer implements IndexerInterface
             )
         );
 
-        $extensions = $document->getExtensionsData()->toArray();
+        $extensions = $document->getExtensionsData();
+
+        if ($extensions instanceof ExtensionContainer) {
+            $extensions = $extensions->toArray();
+        }
+
         if (array_key_exists('excerpt', $extensions)) {
             $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
         }
@@ -258,14 +252,12 @@ class ArticleIndexer implements IndexerInterface
 
     /**
      * Returns view-document from index or create a new one.
-     *
-     * @param string $locale
-     * @param string $localizationState
-     *
-     * @return ArticleViewDocumentInterface
      */
-    protected function findOrCreateViewDocument(ArticleDocument $document, $locale, $localizationState)
-    {
+    protected function findOrCreateViewDocument(
+        ArticleDocument $document,
+        string $locale,
+        string $localizationState
+    ): ArticleViewDocumentInterface {
         $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
         /** @var ArticleViewDocumentInterface $article */
         $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
@@ -292,7 +284,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Maps pages from document to view-document.
      */
-    private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article)
+    private function mapPages(ArticleDocument $document, ArticleViewDocumentInterface $article): void
     {
         $pages = [];
         /** @var ArticlePageDocument $child */
@@ -302,12 +294,14 @@ class ArticleIndexer implements IndexerInterface
             }
 
             /** @var ArticlePageViewObject $page */
-            $pages[] = $page = $this->documentFactory->create('article_page');
+            $page = $this->documentFactory->create('article_page');
             $page->uuid = $child->getUuid();
             $page->pageNumber = $child->getPageNumber();
             $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
             $page->contentData = json_encode($child->getStructure()->toArray());
+
+            $pages[] = $page;
         }
 
         $article->setPages(new Collection($pages));
@@ -316,10 +310,8 @@ class ArticleIndexer implements IndexerInterface
     /**
      * Set parent-page-uuid to view-document.
      */
-    private function setParentPageUuid(
-        ArticleDocument $document,
-        ArticleViewDocumentInterface $article
-    ) {
+    private function setParentPageUuid(ArticleDocument $document, ArticleViewDocumentInterface $article): void
+    {
         $parentPageUuid = $this->getParentPageUuidFromPageTree($document);
 
         if (!$parentPageUuid) {
@@ -329,10 +321,7 @@ class ArticleIndexer implements IndexerInterface
         $article->setParentPageUuid($parentPageUuid);
     }
 
-    /**
-     * @param string $id
-     */
-    protected function removeArticle($id)
+    protected function removeArticle(string $id): void
     {
         $article = $this->manager->find(
             $this->documentFactory->getClass('article'),
@@ -348,7 +337,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($document)
+    public function remove(ArticleDocument $document): void
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
@@ -362,7 +351,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function flush()
+    public function flush(): void
     {
         $this->manager->commit();
     }
@@ -370,7 +359,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $pageSize = 500;
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
@@ -394,12 +383,13 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function setUnpublished($uuid, $locale)
+    public function setUnpublished(string $uuid, string $locale): ArticleViewDocumentInterface
     {
         $articleId = $this->getViewDocumentId($uuid, $locale);
+        /** @var ArticleViewDocumentInterface|null $article */
         $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
         if (!$article) {
-            return;
+            return null;
         }
 
         $article->setPublished(null);
@@ -413,7 +403,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function index(ArticleDocument $document)
+    public function index(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
             $this->indexShadow($document);
@@ -429,7 +419,7 @@ class ArticleIndexer implements IndexerInterface
         $this->createOrUpdateShadows($document);
     }
 
-    protected function indexShadow(ArticleDocument $document)
+    protected function indexShadow(ArticleDocument $document): void
     {
         $shadowDocument = $this->documentManager->find(
             $document->getUuid(),
@@ -445,18 +435,19 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->persist($article);
     }
 
-    protected function createOrUpdateShadows(ArticleDocument $document)
+    protected function createOrUpdateShadows(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
             return;
         }
 
-        foreach ($this->inspector->getShadowLocales($document) as $shadowLocale) {
+        foreach (array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
             try {
                 /** @var ArticleDocument $shadowDocument */
                 $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);
                 $this->indexShadow($shadowDocument);
             } catch (DocumentManagerException $documentManagerException) {
+                // @ignoreException
                 // do nothing
             }
         }
@@ -465,7 +456,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function dropIndex()
+    public function dropIndex(): void
     {
         if (!$this->manager->indexExists()) {
             return;
@@ -477,12 +468,20 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function createIndex()
+    public function createIndex(): void
     {
         if ($this->manager->indexExists()) {
             return;
         }
 
         $this->manager->createIndex();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDocumentInspector()
+    {
+        return $this->inspector;
     }
 }

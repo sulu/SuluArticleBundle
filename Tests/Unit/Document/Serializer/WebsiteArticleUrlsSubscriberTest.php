@@ -12,21 +12,23 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Serializer;
 
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\SerializationContext;
-use PhpCollection\Map;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepository;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Localization\Localization;
-use Sulu\Component\Serializer\ArraySerializationVisitor;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebsiteArticleUrlsSubscriberTest extends TestCase
 {
     /**
      * @var RequestStack
@@ -46,7 +48,7 @@ class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->requestStack = $this->prophesize(RequestStack::class);
         $this->routeRepository = $this->prophesize(RouteRepository::class);
@@ -68,15 +70,13 @@ class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testAddUrlsOnPostSerialize()
     {
         $article = $this->prophesize(ArticleDocument::class);
-        $visitor = $this->prophesize(ArraySerializationVisitor::class);
+        $visitor = $this->prophesize(SerializationVisitorInterface::class);
+
         $context = $this->prophesize(SerializationContext::class);
+        $context->hasAttribute('urls')->willReturn(true);
 
         $entityId = '123-123-123';
         $article->getUuid()->willReturn($entityId);
-
-        $contextAttributes = $this->prophesize(Map::class);
-        $contextAttributes->containsKey('website')->willReturn(true);
-        $context->reveal()->attributes = $contextAttributes->reveal();
 
         $event = $this->prophesize(ObjectEvent::class);
         $event->getObject()->willReturn($article->reveal());
@@ -93,8 +93,9 @@ class WebsiteArticleUrlsSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->routeRepository->findByEntity($entityClass, $entityId, $locale)->willReturn($route->reveal());
         }
 
-        $context->accept($expected)->willReturn($expected)->shouldBeCalled();
-        $visitor->addData('urls', $expected)->shouldBeCalled();
+        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
+            return 'urls' === $metadata->name;
+        }), $expected)->shouldBeCalled();
 
         $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
     }

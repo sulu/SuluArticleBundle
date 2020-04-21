@@ -24,8 +24,8 @@ use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides methods to index articles.
@@ -81,7 +81,7 @@ class ArticleGhostIndexer extends ArticleIndexer
     /**
      * {@inheritdoc}
      */
-    public function index(ArticleDocument $document)
+    public function index(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
             $this->indexShadow($document);
@@ -96,7 +96,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         $this->manager->persist($article);
     }
 
-    private function createOrUpdateGhosts(ArticleDocument $document)
+    private function createOrUpdateGhosts(ArticleDocument $document): void
     {
         $documentLocale = $document->getLocale();
         /** @var Localization $localization */
@@ -127,6 +127,7 @@ class ArticleGhostIndexer extends ArticleIndexer
             );
 
             if ($article) {
+                $this->dispatchIndexEvent($ghostDocument, $article);
                 $this->manager->persist($article);
             }
         }

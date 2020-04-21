@@ -9,12 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Content;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
-use Sulu\Bundle\ContentBundle\Document\PageDocument;
+use Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider;
+use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\DatasourceItem;
@@ -24,7 +25,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -55,6 +56,37 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
         $this->assertEquals($articles[0]['id'], $result->getItems()[0]->getId());
+    }
+
+    public function testSortByTitle()
+    {
+        $page1 = $this->createPage('Test Page', '/page-1');
+
+        $articles = [
+            $this->createArticle($page1, 'Test A'),
+            $this->createArticle($page1, 'Test B'),
+        ];
+
+        $filters = [
+            'dataSource' => $page1->getUuid(),
+            'sortBy' => 'title.raw',
+            'sortMethod' => 'asc',
+        ];
+
+        /** @var PageTreeArticleDataProvider $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
+        $result = $dataProvider->resolveDataItems($filters, [], ['locale' => 'de']);
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertEquals($articles[0]['title'], $result->getItems()[0]->getTitle());
+        $this->assertEquals($articles[1]['title'], $result->getItems()[1]->getTitle());
+
+        $filters['sortMethod'] = 'desc';
+
+        $result = $dataProvider->resolveDataItems($filters, [], ['locale' => 'de']);
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertEquals($articles[0]['title'], $result->getItems()[1]->getTitle());
+        $this->assertEquals($articles[1]['title'], $result->getItems()[0]->getTitle());
     }
 
     public function testResolveDataSource()

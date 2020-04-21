@@ -16,11 +16,12 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkConfiguration;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkItem;
-use Sulu\Bundle\ContentBundle\Markup\Link\LinkProviderInterface;
+use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfigurationBuilder;
+use Sulu\Bundle\MarkupBundle\Markup\Link\LinkItem;
+use Sulu\Bundle\MarkupBundle\Markup\Link\LinkProviderInterface;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Integrates articles into link-system.
@@ -50,6 +51,11 @@ class ArticleLinkProvider implements LinkProviderInterface
     private $requestStack;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @var array
      */
     private $types;
@@ -64,15 +70,12 @@ class ArticleLinkProvider implements LinkProviderInterface
      */
     private $environment;
 
-    /**
-     * @param string $articleViewClass
-     * @param string $environment
-     */
     public function __construct(
         Manager $liveManager,
         Manager $defaultManager,
         WebspaceManagerInterface $webspaceManager,
         RequestStack $requestStack,
+        TranslatorInterface $translator,
         array $types,
         $articleViewClass,
         $environment
@@ -81,6 +84,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         $this->defaultManager = $defaultManager;
         $this->webspaceManager = $webspaceManager;
         $this->requestStack = $requestStack;
+        $this->translator = $translator;
         $this->types = $types;
         $this->articleViewClass = $articleViewClass;
         $this->environment = $environment;
@@ -91,22 +95,17 @@ class ArticleLinkProvider implements LinkProviderInterface
      */
     public function getConfiguration()
     {
-        $tabs = null;
-        if (1 < count($this->types)) {
-            $tabs = array_map(
-                function($type) {
-                    return ['title' => $type['translation_key']];
-                },
-                $this->types
-            );
-        }
+        // TODO implement tabs again?
 
-        return new LinkConfiguration(
-            'sulu_article.ckeditor.link',
-            'ckeditor/link/article@suluarticle',
-            [],
-            ['tabs' => $tabs]
-        );
+        return LinkConfigurationBuilder::create()
+            ->setTitle($this->translator->trans('sulu_article.articles', [], 'admin'))
+            ->setResourceKey('articles')
+            ->setListAdapter('table')
+            ->setDisplayProperties(['title'])
+            ->setOverlayTitle($this->translator->trans('sulu_article.single_selection_overlay_title', [], 'admin'))
+            ->setEmptyText($this->translator->trans('sulu_article.no_article_selected', [], 'admin'))
+            ->setIcon('su-newspaper')
+            ->getLinkConfiguration();
     }
 
     /**
@@ -141,13 +140,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         return $result;
     }
 
-    /**
-     * @param string $locale
-     * @param string $scheme
-     *
-     * @return LinkItem
-     */
-    protected function createLinkItem(ArticleViewDocumentInterface $document, $locale, $scheme)
+    protected function createLinkItem(ArticleViewDocumentInterface $document, string $locale, string $scheme): LinkItem
     {
         $url = $this->webspaceManager->findUrlByResourceLocator(
             $document->getRoutePath(),

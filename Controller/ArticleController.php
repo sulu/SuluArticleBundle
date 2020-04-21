@@ -11,10 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\Controller;
 
+use FOS\RestBundle\Context\Context;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use Guzzle\Inflection\Inflector;
-use JMS\Serializer\SerializationContext;
+use FOS\RestBundle\View\ViewHandlerInterface;
+use ONGR\ElasticsearchBundle\Mapping\Caser;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\FullText\MatchPhrasePrefixQuery;
@@ -26,28 +28,34 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\DocumentManager\Metadata\BaseMetadataFactory;
+use Sulu\Component\DocumentManager\MetadataFactoryInterface;
+use Sulu\Component\Hash\RequestHashCheckerInterface;
+use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
+use Sulu\Component\Rest\ListBuilder\ListRestHelperInterface;
 use Sulu\Component\Rest\RequestParametersTrait;
-use Sulu\Component\Rest\RestController;
 use Sulu\Component\Security\Authorization\PermissionTypes;
+use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Provides API for articles.
  */
-class ArticleController extends RestController implements ClassResourceInterface, SecuredControllerInterface
+class ArticleController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
 {
     const DOCUMENT_TYPE = 'article';
 
@@ -55,19 +63,101 @@ class ArticleController extends RestController implements ClassResourceInterface
     use ArticleViewDocumentIdTrait;
 
     /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var ContentMapperInterface
+     */
+    private $contentMapper;
+
+    /**
+     * @var MetadataFactoryInterface
+     */
+    private $metadataFactory;
+
+    /**
+     * @var ListRestHelperInterface
+     */
+    private $restHelper;
+
+    /**
+     * @var Manager
+     */
+    private $manager;
+
+    /**
+     * @var DocumentFactoryInterface
+     */
+    private $documentFactory;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
+
+    /**
+     * @var RequestHashCheckerInterface
+     */
+    private $requestHashChecker;
+
+    /**
+     * @var SecurityCheckerInterface
+     */
+    private $securityChecker;
+
+    /**
+     * @var bool
+     */
+    private $displayTabAll;
+
+    public function __construct(
+        ViewHandlerInterface $viewHandler,
+        DocumentManagerInterface $documentManager,
+        ContentMapperInterface $contentMapper,
+        MetadataFactoryInterface $metadataFactory,
+        ListRestHelperInterface $restHelper,
+        Manager $manager,
+        DocumentFactoryInterface $documentFactory,
+        FormFactoryInterface $formFactory,
+        RequestHashCheckerInterface $requestHashChecker,
+        SecurityCheckerInterface $securityChecker,
+        bool $displayTabAll,
+        ?TokenStorageInterface $tokenStorage = null
+    ) {
+        parent::__construct($viewHandler, $tokenStorage);
+
+        $this->documentManager = $documentManager;
+        $this->contentMapper = $contentMapper;
+        $this->metadataFactory = $metadataFactory;
+        $this->restHelper = $restHelper;
+        $this->manager = $manager;
+        $this->documentFactory = $documentFactory;
+        $this->formFactory = $formFactory;
+        $this->requestHashChecker = $requestHashChecker;
+        $this->securityChecker = $securityChecker;
+        $this->displayTabAll = $displayTabAll;
+    }
+
+    /**
      * Create field-descriptor array.
      *
      * @return ElasticSearchFieldDescriptor[]
      */
-    protected function getFieldDescriptors()
+    protected function getFieldDescriptors(): array
     {
         return [
             'uuid' => ElasticSearchFieldDescriptor::create('id', 'public.id')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'typeTranslation' => ElasticSearchFieldDescriptor::create('typeTranslation', 'sulu_article.list.type')
                 ->setSortField('typeTranslation.raw')
-                ->setDisabled(!$this->getParameter('sulu_article.display_tab_all'))
+                ->setVisibility(
+                    $this->displayTabAll ?
+                        FieldDescriptorInterface::VISIBILITY_YES :
+                        FieldDescriptorInterface::VISIBILITY_NEVER
+                )
                 ->build(),
             'title' => ElasticSearchFieldDescriptor::create('title', 'public.title')
                 ->setSortField('title.raw')
@@ -84,62 +174,44 @@ class ArticleController extends RestController implements ClassResourceInterface
             'created' => ElasticSearchFieldDescriptor::create('created', 'public.created')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'changed' => ElasticSearchFieldDescriptor::create('changed', 'public.changed')
                 ->setSortField('authored')
                 ->setType('datetime')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'authored' => ElasticSearchFieldDescriptor::create('authored', 'sulu_article.authored')
                 ->setSortField('authored')
                 ->setType('datetime')
                 ->build(),
             'localizationState' => ElasticSearchFieldDescriptor::create('localizationState')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'published' => ElasticSearchFieldDescriptor::create('published')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'publishedState' => ElasticSearchFieldDescriptor::create('publishedState')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'routePath' => ElasticSearchFieldDescriptor::create('routePath')
-                ->setDisabled(true)
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
         ];
     }
 
     /**
-     * Returns fields.
-     *
-     * @return Response
-     */
-    public function cgetFieldsAction()
-    {
-        $fieldDescriptors = $this->getFieldDescriptors();
-
-        return $this->handleView($this->view(array_values($fieldDescriptors)));
-    }
-
-    /**
      * Returns list of articles.
-     *
-     * @return Response
      */
-    public function cgetAction(Request $request)
+    public function cgetAction(Request $request): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        $restHelper = $this->get('sulu_core.list_rest_helper');
-
-        /** @var Manager $manager */
-        $manager = $this->get('es.manager.default');
-        $repository = $manager->getRepository($this->get('sulu_article.view_document.factory')->getClass('article'));
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch();
 
-        $limit = (int) $restHelper->getLimit();
-        $page = (int) $restHelper->getPage();
+        $limit = (int) $this->restHelper->getLimit();
+        $page = (int) $this->restHelper->getPage();
 
         if (null !== $locale) {
             $search->addQuery(new TermQuery('locale', $locale));
@@ -150,9 +222,13 @@ class ArticleController extends RestController implements ClassResourceInterface
             $limit = count($ids);
         }
 
-        if (!empty($searchPattern = $restHelper->getSearchPattern())
-            && 0 < count($searchFields = $restHelper->getSearchFields())
-        ) {
+        $searchFields = $this->restHelper->getSearchFields();
+        if (0 === count($searchFields)) {
+            $searchFields = ['title'];
+        }
+
+        $searchPattern = $this->restHelper->getSearchPattern();
+        if (!empty($searchPattern)) {
             $boolQuery = new BoolQuery();
             foreach ($searchFields as $searchField) {
                 $boolQuery->add(new MatchPhrasePrefixQuery($searchField, $searchPattern), BoolQuery::SHOULD);
@@ -160,8 +236,18 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery($boolQuery);
         }
 
-        if (null !== ($type = $request->get('type'))) {
-            $search->addQuery(new TermQuery('type', $type));
+        if (null !== ($typeString = $request->get('types'))) {
+            $types = explode(',', $typeString);
+
+            if (count($types) > 1) {
+                $query = new BoolQuery();
+
+                foreach ($types as $type) {
+                    $query->add(new TermQuery('type', $type));
+                }
+            } elseif ($types[0]) {
+                $search->addQuery(new TermQuery('type', $types[0]));
+            }
         }
 
         if ($contactId = $request->get('contactId')) {
@@ -206,11 +292,11 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->addQuery(new MatchAllQuery());
         }
 
-        if (null !== $restHelper->getSortColumn() &&
-            $sortField = $this->getSortFieldName($restHelper->getSortColumn())
+        if (null !== $this->restHelper->getSortColumn() &&
+            $sortField = $this->getSortFieldName($this->restHelper->getSortColumn())
         ) {
             $search->addSort(
-                new FieldSort($sortField, $restHelper->getSortOrder())
+                new FieldSort($sortField, $this->restHelper->getSortOrder())
             );
         }
 
@@ -221,8 +307,8 @@ class ArticleController extends RestController implements ClassResourceInterface
             $search->setFrom(($page - 1) * $limit);
 
             $fields = array_merge(
-                $restHelper->getFields() ?: [],
-                ['id', 'localizationState', 'publishedState', 'published']
+                $this->restHelper->getFields() ?: [],
+                ['id', 'localizationState', 'publishedState', 'published', 'title', 'routePath']
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,
@@ -258,7 +344,7 @@ class ArticleController extends RestController implements ClassResourceInterface
                 new ListRepresentation(
                     $result,
                     'articles',
-                    'get_articles',
+                    'sulu_article.get_articles',
                     $request->query->all(),
                     $page,
                     $limit,
@@ -275,7 +361,7 @@ class ArticleController extends RestController implements ClassResourceInterface
     {
         $result = [];
         foreach ($fieldDescriptors as $fieldDescriptor) {
-            $property = Inflector::getDefault()->snake($fieldDescriptor->getName());
+            $property = Caser::snake($fieldDescriptor->getName());
             if ('id' === $property) {
                 $property = 'uuid';
             }
@@ -288,14 +374,8 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Returns query to filter by given range.
-     *
-     * @param string $field
-     * @param string $from
-     * @param string $to
-     *
-     * @return RangeQuery
      */
-    private function getRangeQuery($field, $from, $to)
+    private function getRangeQuery(string $field, string $from, string $to): RangeQuery
     {
         return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
     }
@@ -303,67 +383,59 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Returns single article.
      *
-     * @param string $uuid
-     *
-     * @return Response
+     * @Get(defaults={"id" = ""})
      */
-    public function getAction($uuid, Request $request)
+    public function getAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
-        $document = $this->getDocumentManager()->find(
-            $uuid,
+        $document = $this->documentManager->find(
+            $id,
             $locale
         );
 
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
     /**
      * Create article.
-     *
-     * @return Response
      */
-    public function postAction(Request $request)
+    public function postAction(Request $request): Response
     {
         $action = $request->get('action');
-        $document = $this->getDocumentManager()->create(self::DOCUMENT_TYPE);
+        $document = $this->documentManager->create(self::DOCUMENT_TYPE);
         $locale = $this->getRequestParameter($request, 'locale', true);
         $data = $request->request->all();
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
+
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
 
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
     /**
      * Update articles.
-     *
-     * @param string $uuid
-     *
-     * @return Response
      */
-    public function putAction(Request $request, $uuid)
+    public function putAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
         $action = $request->get('action');
         $data = $request->request->all();
 
-        $document = $this->getDocumentManager()->find(
-            $uuid,
+        $document = $this->documentManager->find(
+            $id,
             $locale,
             [
                 'load_ghost_content' => false,
@@ -371,31 +443,29 @@ class ArticleController extends RestController implements ClassResourceInterface
             ]
         );
 
-        $this->get('sulu_hash.request_hash_checker')->checkHash($request, $document, $document->getUuid());
+        $this->requestHashChecker->checkHash($request, $document, $document->getUuid());
 
         $this->persistDocument($data, $document, $locale);
         $this->handleActionParameter($action, $document, $locale);
-        $this->getDocumentManager()->flush();
+        $this->documentManager->flush();
+
+        $context = new Context();
+        $context->setSerializeNull(true);
+        $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
 
         return $this->handleView(
-            $this->view($document)->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            )
+            $this->view($document)->setContext($context)
         );
     }
 
     /**
      * Deletes multiple documents.
-     *
-     * @return Response
      */
-    public function cdeleteAction(Request $request)
+    public function cdeleteAction(Request $request): Response
     {
         $ids = array_filter(explode(',', $request->get('ids', '')));
 
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
         foreach ($ids as $id) {
             $document = $documentManager->find($id);
             $documentManager->remove($document);
@@ -407,14 +477,10 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Deletes multiple documents.
-     *
-     * @param string $id
-     *
-     * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(string $id): Response
     {
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
         $document = $documentManager->find($id);
         $documentManager->remove($document);
         $documentManager->flush();
@@ -425,13 +491,9 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Trigger a action for given article specified over get-action parameter.
      *
-     * @Post("/articles/{uuid}")
-     *
-     * @param string $uuid
-     *
-     * @return Response
+     * @Post("/articles/{id}")
      */
-    public function postTriggerAction($uuid, Request $request)
+    public function postTriggerAction(string $id, Request $request): Response
     {
         // extract parameter
         $action = $this->getRequestParameter($request, 'action', true);
@@ -445,64 +507,64 @@ class ArticleController extends RestController implements ClassResourceInterface
         try {
             switch ($action) {
                 case 'unpublish':
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
-                    $this->getDocumentManager()->unpublish($document, $locale);
-                    $this->getDocumentManager()->flush();
+                    $document = $this->documentManager->find($id, $locale);
+                    $this->documentManager->unpublish($document, $locale);
+                    $this->documentManager->flush();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 case 'remove-draft':
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
-                    $this->getDocumentManager()->removeDraft($data, $locale);
-                    $this->getDocumentManager()->flush();
+                    $data = $this->documentManager->find($id, $locale);
+                    $this->documentManager->removeDraft($data, $locale);
+                    $this->documentManager->flush();
 
                     break;
                 case 'copy-locale':
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $destLocales = explode(',', $destLocales);
 
-                    $securityChecker = $this->get('sulu_security.security_checker');
                     foreach ($destLocales as $destLocale) {
-                        $securityChecker->checkPermission(
+                        $this->securityChecker->checkPermission(
                             new SecurityCondition($this->getSecurityContext(), $destLocale),
                             PermissionTypes::EDIT
                         );
                     }
 
-                    $this->getMapper()->copyLanguage($uuid, $userId, null, $locale, $destLocales);
+                    $this->contentMapper->copyLanguage($id, $userId, null, $locale, $destLocales);
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 case 'copy':
                     /** @var ArticleDocument $document */
-                    $document = $this->getDocumentManager()->find($uuid, $locale);
-                    $copiedPath = $this->getDocumentManager()->copy($document, dirname($document->getPath()));
-                    $this->getDocumentManager()->flush();
+                    $document = $this->documentManager->find($id, $locale);
+                    $copiedPath = $this->documentManager->copy($document, dirname($document->getPath()));
+                    $this->documentManager->flush();
 
-                    $data = $this->getDocumentManager()->find($copiedPath, $locale);
+                    $data = $this->documentManager->find($copiedPath, $locale);
 
                     break;
                 case 'order':
                     $this->orderPages($this->getRequestParameter($request, 'pages', true), $locale);
-                    $this->getDocumentManager()->flush();
-                    $this->getDocumentManager()->clear();
+                    $this->documentManager->flush();
+                    $this->documentManager->clear();
 
-                    $data = $this->getDocumentManager()->find($uuid, $locale);
+                    $data = $this->documentManager->find($id, $locale);
 
                     break;
                 default:
                     throw new RestException('Unrecognized action: ' . $action);
             }
 
+            // create context
+            $context = new Context();
+            $context->setSerializeNull(true);
+            $context->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage']);
+
             // prepare view
             $view = $this->view($data);
-            $view->setSerializationContext(
-                SerializationContext::create()
-                    ->setSerializeNull(true)
-                    ->setGroups(['defaultPage', 'defaultArticle', 'smallArticlePage'])
-            );
+            $view->setContext($context);
         } catch (RestException $exc) {
             $view = $this->view($exc->toArray(), 400);
         }
@@ -512,12 +574,10 @@ class ArticleController extends RestController implements ClassResourceInterface
 
     /**
      * Ordering given pages.
-     *
-     * @param string $locale
      */
-    private function orderPages(array $pages, $locale)
+    private function orderPages(array $pages, string $locale): void
     {
-        $documentManager = $this->getDocumentManager();
+        $documentManager = $this->documentManager;
 
         for ($i = 0; $i < count($pages); ++$i) {
             $document = $documentManager->find($pages[$i], $locale);
@@ -536,17 +596,13 @@ class ArticleController extends RestController implements ClassResourceInterface
     /**
      * Persists the document using the given Formation.
      *
-     * @param array $data
-     * @param object $document
-     * @param string $locale
-     *
      * @throws InvalidFormException
      * @throws MissingParameterException
      */
-    private function persistDocument($data, $document, $locale)
+    private function persistDocument(array $data, object $document, string $locale): void
     {
-        $formType = $this->getMetadataFactory()->getMetadataForAlias('article')->getFormType();
-        $form = $this->createForm(
+        $formType = $this->metadataFactory->getMetadataForAlias('article')->getFormType();
+        $form = $this->formFactory->create(
             $formType,
             $document,
             [
@@ -568,7 +624,12 @@ class ArticleController extends RestController implements ClassResourceInterface
             $document->setAdditionalWebspaces(null);
         }
 
-        $this->getDocumentManager()->persist(
+        if (array_key_exists('customizeWebspaceSettings', $data) && false === $data['customizeWebspaceSettings']) {
+            $document->setMainWebspace(null);
+            $document->setAdditionalWebspaces(null);
+        }
+
+        $this->documentManager->persist(
             $document,
             $locale,
             [
@@ -579,48 +640,21 @@ class ArticleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Returns document-manager.
-     *
-     * @return DocumentManagerInterface
-     */
-    protected function getDocumentManager()
-    {
-        return $this->get('sulu_document_manager.document_manager');
-    }
-
-    /**
-     * @return ContentMapperInterface
-     */
-    protected function getMapper()
-    {
-        return $this->get('sulu.content.mapper');
-    }
-
-    /**
      * Delegates actions by given actionParameter, which can be retrieved from the request.
-     *
-     * @param string $actionParameter
-     * @param object $document
-     * @param string $locale
      */
-    private function handleActionParameter($actionParameter, $document, $locale)
+    private function handleActionParameter(?string $actionParameter, object $document, string $locale): void
     {
         switch ($actionParameter) {
             case 'publish':
-                $this->getDocumentManager()->publish($document, $locale);
+                $this->documentManager->publish($document, $locale);
 
                 break;
         }
     }
 
-    /**
-     * @param string $sortBy
-     *
-     * @return null|string
-     */
-    private function getSortFieldName($sortBy)
+    private function getSortFieldName(string $sortBy): ?string
     {
-        $sortBy = Inflector::getDefault()->snake($sortBy);
+        $sortBy = Caser::snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();
 
         if (array_key_exists($sortBy, $fieldDescriptors)) {
@@ -628,13 +662,5 @@ class ArticleController extends RestController implements ClassResourceInterface
         }
 
         return null;
-    }
-
-    /**
-     * @return BaseMetadataFactory
-     */
-    protected function getMetadataFactory()
-    {
-        return $this->get('sulu_document_manager.metadata_factory.base');
     }
 }

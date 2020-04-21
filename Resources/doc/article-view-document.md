@@ -99,7 +99,7 @@ sulu_article:
 ```php
 <?php
 
-namespace AppBundle\EventListener;
+namespace App\EventListener;
 
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 
@@ -121,7 +121,27 @@ class ArticleIndexListener
 ```
 
 ```xml
-<service id="app.sulu_article.index_listener" class="AppBundle\EventListener\ArticleIndexListener">
+<service id="app.sulu_article.index_listener" class="App\EventListener\ArticleIndexListener">
     <tag name="kernel.event_listener" event="sulu_article.index" method="onIndex"/>
 </service>
+```
+
+### Troubleshooting
+
+Unfortunately, the ElasticsearchBundle allows to overwrite document classes only if an `AppBundle` is registered in the 
+application. If you do not have registered such a bundle yet, you need to add it to your `src` directory and enable it
+in the `config/bundles.php` file.
+
+```
+<?php
+
+// src/AppBundle.php
+
+namespace App;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class AppBundle extends Bundle
+{
+}
 ```

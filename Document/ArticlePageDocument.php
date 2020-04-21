@@ -131,7 +131,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setUuid($uuid)
+    public function setUuid($uuid): RoutablePageBehavior
     {
         $this->uuid = $uuid;
 
@@ -161,7 +161,7 @@ class ArticlePageDocument implements
      *
      * @return string
      */
-    public function getPageTitle()
+    public function getPageTitle(): ?string
     {
         return $this->pageTitle;
     }
@@ -245,7 +245,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructureType()
+    public function getStructureType(): ?string
     {
         return $this->structureType;
     }
@@ -263,7 +263,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getStructure()
+    public function getStructure(): StructureInterface
     {
         return $this->structure;
     }
@@ -297,16 +297,18 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function removeRoute()
+    public function removeRoute(): RoutablePageBehavior
     {
         $this->route = null;
         $this->routePath = null;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoutePath()
+    public function getRoutePath(): ?string
     {
         return $this->routePath;
     }
@@ -314,15 +316,17 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setRoutePath($routePath)
+    public function setRoutePath($routePath): RoutablePageBehavior
     {
         $this->routePath = $routePath;
+
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getClass()
+    public function getClass(): string
     {
         return get_class($this);
     }
@@ -330,7 +334,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageNumber()
+    public function getPageNumber(): int
     {
         return $this->pageNumber;
     }
@@ -338,7 +342,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function setPageNumber($pageNumber)
+    public function setPageNumber(int $pageNumber): PageBehavior
     {
         $this->pageNumber = $pageNumber;
 
@@ -348,7 +352,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getArticleUuid()
+    public function getArticleUuid(): string
     {
         return $this->getParent()->getUuid();
     }
@@ -356,7 +360,7 @@ class ArticlePageDocument implements
     /**
      * {@inheritdoc}
      */
-    public function getPageUuid()
+    public function getPageUuid(): string
     {
         return $this->getUuid();
     }

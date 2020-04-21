@@ -1,0 +1,14 @@
+{
+    "sulu_article.articles": "Artikel",
+    "sulu_article.article": "Artikel",
+    "sulu_article.no_article_selected": "Kein Artikel ausgewählt",
+    "sulu_article.single_selection_overlay_title": "Artikel auswählen",
+    "sulu_article.selection_overlay_title": "Artikel auswählen",
+    "sulu_article.selection_label": "{count} Artikel ausgewählt",
+    "sulu_article.webspace_settings": "Webspace Einstellungen",
+    "sulu_article.customize_webspace_settings": "Webspace Einstellungen anpassen",
+    "sulu_article.main_webspace": "Haupt Webspace",
+    "sulu_article.additional_webspace": "Zusätzliche Webspaces",
+    "sulu_article.shadow_article": "Shadow Artikel",
+    "sulu_article.enable_shadow_article": "Shadow Artikel aktivieren"
+}

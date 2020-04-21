@@ -1,1 +1,0 @@
-define([],function(){"use strict";return{transformTemplateData:function(a){return function(b){return a({data:b})}}}});

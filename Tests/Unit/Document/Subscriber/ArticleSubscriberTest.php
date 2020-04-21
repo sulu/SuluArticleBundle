@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use PHPCR\NodeInterface;
 use PHPCR\PathNotFoundException;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -32,7 +33,7 @@ use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
-class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
+class ArticleSubscriberTest extends TestCase
 {
     /**
      * @var IndexerInterface
@@ -82,7 +83,7 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->indexer = $this->prophesize(IndexerInterface::class);
         $this->liveIndexer = $this->prophesize(IndexerInterface::class);
@@ -365,9 +366,20 @@ class ArticleSubscriberTest extends \PHPUnit_Framework_TestCase
             $child->getLocale()->willReturn($this->locale);
             $child->getShadowLocale()->willReturn(null);
             $child->isShadowLocaleEnabled()->willReturn(false);
-            $child->getStructureType()->willReturn('my-test');
+            $child->getStructureType()->willReturn('my-other-test');
+            $child->setStructureType('my-test')->shouldBeCalled();
 
             $this->documentInspector->getLocalizationState($child)->willReturn(LocalizationState::LOCALIZED);
+
+            $this->documentManager->persist(
+                $child->reveal(),
+                $this->locale,
+                [
+                    'clear_missing_content' => false,
+                    'auto_name' => false,
+                    'auto_rename' => false,
+                ]
+            )->shouldBeCalled();
 
             $children[] = $child;
         }

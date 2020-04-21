@@ -1,6 +1,4 @@
 # PHPUnit
-/Tests/app/config/parameters.yml
-/app/phpunit.xml
 /phpunit.xml
 .phpunit.result.cache
 
@@ -37,6 +35,5 @@ node_modules/
 npm-debug.log
 
 # tests
-Tests/app/cache
-Tests/app/logs
-Tests/app/data
+/Tests/Application/config/parameters.yml
+/Tests/Application/var

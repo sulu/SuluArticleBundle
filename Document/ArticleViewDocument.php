@@ -382,6 +382,8 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
+
+        return $this;
     }
 
     /**
@@ -632,6 +634,8 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setTeaserMediaId($teaserMediaId)
     {
         $this->teaserMediaId = $teaserMediaId;
+
+        return $this;
     }
 
     /**

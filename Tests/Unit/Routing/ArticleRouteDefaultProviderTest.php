@@ -11,22 +11,23 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
+use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\Document\UnknownDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzer;
 use Sulu\Component\Webspace\Webspace;
 
-class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteDefaultProviderTest extends TestCase
 {
     /**
      * @var DocumentManagerInterface
@@ -78,7 +79,7 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
      */
     private $locale = 'de';
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
@@ -147,9 +148,9 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $article->getPageNumber()->willReturn(1);
 
         $structureMetadata = new StructureMetadata('default');
-        $structureMetadata->view = 'default.html.twig';
-        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
-        $structureMetadata->controller = 'SuluArticleBundle:Default:index';
+        $structureMetadata->setView('default.html.twig');
+        $structureMetadata->setCacheLifetime(['type' => 'seconds', 'value' => 3600]);
+        $structureMetadata->setController('Sulu\\Bundle\\ArticleBundle\\Controller\\WebsiteArticleController::indexAction');
 
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($article->reveal());
         $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);
@@ -168,7 +169,7 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
                 'structure' => $structure->reveal(),
                 'view' => 'default.html.twig',
                 'pageNumber' => 1,
-                '_controller' => 'SuluArticleBundle:Default:index',
+                '_controller' => 'Sulu\\Bundle\\ArticleBundle\\Controller\\WebsiteArticleController::indexAction',
                 '_cacheLifetime' => 3600,
             ],
             $result
@@ -186,9 +187,9 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
         $articlePage->getParent()->willReturn($article->reveal());
 
         $structureMetadata = new StructureMetadata('default');
-        $structureMetadata->view = 'default.html.twig';
-        $structureMetadata->cacheLifetime = ['type' => 'seconds', 'value' => 3600];
-        $structureMetadata->controller = 'SuluArticleBundle:Default:index';
+        $structureMetadata->setView('default.html.twig');
+        $structureMetadata->setCacheLifetime(['type' => 'seconds', 'value' => 3600]);
+        $structureMetadata->setController('Sulu\\Bundle\\ArticleBundle\\Controller\\WebsiteArticleController::indexAction');
 
         $this->documentManager->find($this->entityId, $this->locale)->willReturn($articlePage->reveal());
         $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($structureMetadata);
@@ -207,7 +208,7 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
                 'structure' => $structure->reveal(),
                 'view' => 'default.html.twig',
                 'pageNumber' => 2,
-                '_controller' => 'SuluArticleBundle:Default:index',
+                '_controller' => 'Sulu\\Bundle\\ArticleBundle\\Controller\\WebsiteArticleController::indexAction',
                 '_cacheLifetime' => 3600,
             ],
             $result

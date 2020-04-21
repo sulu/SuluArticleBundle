@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
 use ONGR\ElasticsearchDSL\Search;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Content\ArticleSelectionContentType;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
@@ -25,7 +26,7 @@ use Sulu\Component\Content\Compat\StructureInterface;
 /**
  * Unit testcases for ArticleSelection ContentType.
  */
-class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
+class ArticleSelectionContentTypeTest extends TestCase
 {
     public function testGetContentData()
     {
@@ -73,8 +74,7 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
@@ -98,8 +98,7 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
@@ -121,27 +120,11 @@ class ArticleSelectionContentTypeTest extends \PHPUnit_Framework_TestCase
         $contentType = new ArticleSelectionContentType(
             $manager->reveal(),
             $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
+            ArticleViewDocument::class
         );
 
         $result = $contentType->getContentData($property->reveal());
 
         $this->assertCount(0, $result);
-    }
-
-    public function testGetTemplate()
-    {
-        $manager = $this->prophesize(Manager::class);
-        $referenceStore = $this->prophesize(ReferenceStoreInterface::class);
-
-        $contentType = new ArticleSelectionContentType(
-            $manager->reveal(),
-            $referenceStore->reveal(),
-            ArticleViewDocument::class,
-            'test.html.twig'
-        );
-
-        $this->assertEquals('test.html.twig', $contentType->getTemplate());
     }
 }

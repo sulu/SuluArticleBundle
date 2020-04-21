@@ -20,19 +20,13 @@ interface DocumentFactoryInterface
 {
     /**
      * Returns class of article-document.
-     *
-     * @param string $type
-     *
-     * @return string
      */
-    public function getClass($type);
+    public function getClass(string $type): string;
 
     /**
      * Create a new indexable article-document.
      *
-     * @param string $type
-     *
      * @return ArticleViewDocumentInterface
      */
-    public function create($type);
+    public function create(string $type);
 }

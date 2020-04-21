@@ -11,10 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Command;
 
-use PHPCR\Query\QueryResultInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\PropertyEncoder;
+use Sulu\Component\DocumentManager\Collection\QueryResultCollection;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\HttpKernel\SuluKernel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,14 +28,60 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 /**
  * Reindixes articles.
  */
-class ReindexCommand extends ContainerAwareCommand
+class ReindexCommand extends Command
 {
+    /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
+     * @var PropertyEncoder
+     */
+    private $propertyEncoder;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
+
+    /**
+     * @var IndexerInterface
+     */
+    private $draftIndexer;
+
+    /**
+     * @var IndexerInterface
+     */
+    private $liveIndexer;
+
+    /**
+     * @var string
+     */
+    private $suluContext;
+
+    public function __construct(
+        WebspaceManagerInterface $webspaceManager,
+        PropertyEncoder $propertyEncoder,
+        DocumentManagerInterface $documentManager,
+        IndexerInterface $draftIndexer,
+        IndexerInterface $liveIndexer,
+        string $suluContext
+    ) {
+        parent::__construct('sulu:article:reindex');
+        $this->webspaceManager = $webspaceManager;
+        $this->propertyEncoder = $propertyEncoder;
+        $this->documentManager = $documentManager;
+        $this->draftIndexer = $draftIndexer;
+        $this->liveIndexer = $liveIndexer;
+        $this->suluContext = $suluContext;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function configure()
     {
-        $this->setName('sulu:article:reindex');
         $this->setDescription('Rebuild elastic-search index for articles');
         $this->setHelp('This command will load all articles and index them to elastic-search indexes.');
         $this->addOption('drop', null, InputOption::VALUE_NONE, 'Drop and recreate index before reindex');
@@ -44,30 +93,26 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $context = $this->getContainer()->getParameter('sulu.context');
         $startTime = microtime(true);
 
-        $id = 'sulu_article.elastic_search.article_indexer';
-        if (SuluKernel::CONTEXT_WEBSITE === $context) {
-            $id = 'sulu_article.elastic_search.article_live_indexer';
-        }
+        $indexer = SuluKernel::CONTEXT_WEBSITE === $this->suluContext
+            ? $this->liveIndexer
+            : $this->draftIndexer;
 
-        /** @var IndexerInterface $indexer */
-        $indexer = $this->getContainer()->get($id);
-
-        $output->writeln(sprintf('Reindex articles for the <comment>`%s`</comment> context' . PHP_EOL, $context));
+        $output->writeln(
+            sprintf('Reindex articles for the <comment>`%s`</comment> context' . PHP_EOL, $this->suluContext)
+        );
 
         if (!$this->dropIndex($indexer, $input, $output)) {
             // Drop was canceled by user.
 
-            return;
+            return 0;
         }
 
         $indexer->createIndex();
         $this->clearIndex($indexer, $input, $output);
 
-        $webspaceManager = $this->getContainer()->get('sulu_core.webspace.webspace_manager');
-        $locales = $webspaceManager->getAllLocalizations();
+        $locales = $this->webspaceManager->getAllLocalizations();
 
         foreach ($locales as $locale) {
             $output->writeln(sprintf('<info>Locale "</info>%s<info>"</info>' . PHP_EOL, $locale->getLocale()));
@@ -84,14 +129,14 @@ class ReindexCommand extends ContainerAwareCommand
                 $this->humanBytes(memory_get_peak_usage())
             )
         );
+
+        return 0;
     }
 
     /**
      * Drop index if requested.
-     *
-     * @return bool
      */
-    protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
+    protected function dropIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output): bool
     {
         if (!$input->getOption('drop')) {
             return true;
@@ -116,9 +161,11 @@ class ReindexCommand extends ContainerAwareCommand
 
         $indexer->dropIndex();
 
-        $context = $this->getContainer()->getParameter('sulu.context');
         $output->writeln(
-            sprintf('Dropped and recreated index for the <comment>`%s`</comment> context' . PHP_EOL, $context)
+            sprintf(
+                'Dropped and recreated index for the <comment>`%s`</comment> context' . PHP_EOL,
+                $this->suluContext
+            )
         );
 
         return true;
@@ -127,23 +174,20 @@ class ReindexCommand extends ContainerAwareCommand
     /**
      * Clear article-content of index.
      */
-    protected function clearIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output)
+    protected function clearIndex(IndexerInterface $indexer, InputInterface $input, OutputInterface $output): void
     {
         if (!$input->getOption('clear')) {
             return;
         }
 
-        $context = $this->getContainer()->getParameter('sulu.context');
-        $output->writeln(sprintf('Cleared index for the <comment>`%s`</comment> context', $context));
+        $output->writeln(sprintf('Cleared index for the <comment>`%s`</comment> context', $this->suluContext));
         $indexer->clear();
     }
 
     /**
      * Index documents for given locale.
-     *
-     * @param string $locale
      */
-    protected function indexDocuments($locale, IndexerInterface $indexer, OutputInterface $output)
+    protected function indexDocuments(string $locale, IndexerInterface $indexer, OutputInterface $output): void
     {
         $documents = $this->getDocuments($locale);
         $count = count($documents);
@@ -153,50 +197,38 @@ class ReindexCommand extends ContainerAwareCommand
             return;
         }
 
-        $progessBar = new ProgressBar($output, $count);
-        $progessBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
-        $progessBar->start();
+        $progressBar = new ProgressBar($output, $count);
+        $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
+        $progressBar->start();
 
         foreach ($documents as $document) {
             $indexer->index($document);
-            $progessBar->advance();
+            $progressBar->advance();
         }
 
         $indexer->flush();
-        $progessBar->finish();
+        $progressBar->finish();
     }
 
     /**
      * Query for documents with given locale.
-     *
-     * @param string $locale
-     *
-     * @return QueryResultInterface
      */
-    protected function getDocuments($locale)
+    protected function getDocuments(string $locale): QueryResultCollection
     {
-        $propertyEncoder = $this->getContainer()->get('sulu_document_manager.property_encoder');
-        $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-
         $sql2 = sprintf(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article" AND [%s] IS NOT NULL',
-            $propertyEncoder->localizedSystemName('template', $locale)
+            $this->propertyEncoder->localizedSystemName('template', $locale)
         );
 
-        return $documentManager->createQuery($sql2, $locale, ['load_ghost_content' => false])->execute();
+        return $this->documentManager->createQuery($sql2, $locale, ['load_ghost_content' => false])->execute();
     }
 
     /**
      * Converts bytes into human readable.
      *
      * Inspired by http://jeffreysambells.com/2012/10/25/human-readable-filesize-php
-     *
-     * @param int $bytes
-     * @param int $dec
-     *
-     * @return string
      */
-    protected function humanBytes($bytes, $dec = 2)
+    protected function humanBytes(int $bytes, int $dec = 2): string
     {
         $size = ['b', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $factor = (int) floor((strlen($bytes) - 1) / 3);

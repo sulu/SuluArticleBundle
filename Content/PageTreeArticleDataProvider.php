@@ -26,14 +26,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     public function getConfiguration()
     {
         return $this->getConfigurationBuilder()
-            ->enableDatasource(
-                'content-datasource@sulucontent',
-                [
-                    'rootUrl' => '/admin/api/nodes?language={locale}&fields=title,order,published&webspace-nodes=all',
-                    'selectedUrl' => '/admin/api/nodes/{datasource}?tree=true&language={locale}&fields=title,order,published&webspace-nodes=all',
-                    'resultKey' => 'nodes',
-                ]
-            )
+            ->enableDatasource('pages', 'pages', 'column_list')
             ->getConfiguration();
     }
 
@@ -43,7 +36,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         if (!$datasource) {
-            return;
+            return null;
         }
 
         $document = $this->documentManager->find($datasource, $options['locale']);
@@ -54,13 +47,13 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
     /**
      * {@inheritdoc}
      */
-    protected function createSearch(Search $search, array $filters, $locale)
+    protected function createSearch(Search $search, array $filters, string $locale): Search
     {
-        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
-            return;
-        }
-
         $search = parent::createSearch($search, $filters, $locale);
+
+        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
+            return $search;
+        }
 
         $document = $this->documentManager->find($filters['dataSource'], $locale);
         if ($document) {

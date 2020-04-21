@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByType;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
@@ -18,7 +19,7 @@ use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 
-class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteGeneratorByTypeTest extends TestCase
 {
     /**
      * @var RouteGeneratorInterface
@@ -40,7 +41,7 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
      */
     private $config = ['type1' => '/test1/{entity.getTitle()', 'type2' => '/test2/{entity.getTitle()'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->generatorBySchema = $this->prophesize(RouteGeneratorInterface::class);
         $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
@@ -54,7 +55,9 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
     public function testGenerate()
     {
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type1']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type1']],
+        ]);
 
         $this->structureMetadataFactory->getStructureMetadata('article', 'test1')->willReturn($metadata);
 
@@ -69,10 +72,12 @@ class ArticleRouteGeneratorByTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNotConfigured()
     {
-        $this->setExpectedException(RouteSchemaNotFoundException::class);
+        $this->expectException(RouteSchemaNotFoundException::class);
 
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type3']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'type3']],
+        ]);
 
         $this->structureMetadataFactory->getStructureMetadata('article', 'test3')->willReturn($metadata);
 

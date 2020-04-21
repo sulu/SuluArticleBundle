@@ -12,7 +12,9 @@ Allows to select articles and assign them to another page or article.
 
 ### Parameters
 
-No parameters.
+| Name  | Type    | Description                                         |
+|-------|---------|-----------------------------------------------------|
+| types | string  | Comma separated list of types which can be selected |
 
 ### Returns
 
@@ -24,6 +26,31 @@ The content-type returns a list of [ArticleViewDocumentInterface](article-view-d
 <property name="articles" type="article_selection">
    <meta>
         <title lang="en">Articles</title>
+        <title lang="de">Artikel</title>
+    </meta>
+</property>
+```
+
+## Single-Article-Selection
+
+Allows to select a single article and assign it to another page or article.
+
+### Parameters
+
+| Name  | Type    | Description                                         |
+|-------|---------|-----------------------------------------------------|
+| types | string  | Comma separated list of types which can be selected |
+
+### Returns
+
+The content-type returns a single [ArticleViewDocumentInterface](article-view-document.md) instance.
+
+### Example
+
+```xml
+<property name="article" type="single_article_selection">
+   <meta>
+        <title lang="en">Article</title>
         <title lang="de">Artikel</title>
     </meta>
 </property>

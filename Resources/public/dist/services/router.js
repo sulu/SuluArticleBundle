@@ -1,1 +1,0 @@
-define(["config","suluarticle/services/base-router","suluarticle/services/typed-router"],function(a,b,c){"use strict";var d=Object.keys(a.get("sulu_article").types);return d.length>1?c:b});

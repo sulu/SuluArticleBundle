@@ -1,0 +1,54 @@
+imports:
+    - { resource: parameters.yml }
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        url: ~
+        driver:   "%database_driver%"
+        host:     "%database_host%"
+        port:     "%database_port%"
+        dbname:   "%database_name%"
+        user:     "%database_user%"
+        password: "%database_password%"
+
+        charset: '%env(DATABASE_CHARSET)%'
+        default_table_options:
+            charset: '%env(DATABASE_CHARSET)%'
+            collate: '%env(DATABASE_COLLATE)%'
+
+    orm:
+        mappings:
+            gedmo_tree:
+                type: xml
+                prefix: Gedmo\Tree\Entity
+                dir: "%kernel.root_dir%/../../vendor/gedmo/doctrine-extensions/lib/Gedmo/Tree/Entity"
+                alias: GedmoTree
+                is_bundle: false
+
+# Sulu Routing
+sulu_route:
+    mappings:
+        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
+            generator: "schema"
+            options:
+                route_schema: "/articles/{object.getTitle()}"
+        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
+            generator: "article_page"
+            options:
+                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
+                parent: "{object.getParent().getRoutePath()}"
+
+sulu_article:
+    index_name: "su_articles_tests"
+    hosts: ["%elasticsearch_host%"]
+    default_main_webspace: 'sulu_io'
+
+ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer

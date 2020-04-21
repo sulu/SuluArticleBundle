@@ -74,10 +74,8 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
 
     /**
      * Checks if the enhancer should add an canonical tag to the route attributes.
-     *
-     * @return bool
      */
-    private function shouldAddCanonicalTag(array $defaults, Request $request)
+    private function shouldAddCanonicalTag(array $defaults, Request $request): bool
     {
         if (!array_key_exists('object', $defaults)) {
             return false;

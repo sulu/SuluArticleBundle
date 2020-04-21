@@ -12,13 +12,15 @@
 namespace Sulu\Bundle\ArticleBundle\Elasticsearch;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event args for "es.post_convert_to_document".
  */
 class PostConvertToDocumentEvent extends Event
 {
+    public const NAME = 'es.post_convert_to_document';
+
     /**
      * @var array
      */
@@ -43,30 +45,24 @@ class PostConvertToDocumentEvent extends Event
 
     /**
      * Returns rawData.
-     *
-     * @return array
      */
-    public function getRawData()
+    public function getRawData(): array
     {
         return $this->rawData;
     }
 
     /**
      * Returns document.
-     *
-     * @return object
      */
-    public function getDocument()
+    public function getDocument(): object
     {
         return $this->document;
     }
 
     /**
      * Returns manager.
-     *
-     * @return Manager
      */
-    public function getManager()
+    public function getManager(): Manager
     {
         return $this->manager;
     }

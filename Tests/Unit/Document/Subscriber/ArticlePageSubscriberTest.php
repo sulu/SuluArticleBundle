@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
 use Ferrandini\Urlizer;
 use PHPCR\NodeInterface;
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
@@ -29,7 +30,7 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\NameResolver;
 use Symfony\Cmf\Api\Slugifier\SlugifierInterface;
 
-class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
+class ArticlePageSubscriberTest extends TestCase
 {
     /**
      * @var StructureMetadataFactoryInterface
@@ -84,7 +85,7 @@ class ArticlePageSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->factory = $this->prophesize(StructureMetadataFactoryInterface::class);
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);

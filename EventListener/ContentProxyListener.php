@@ -41,7 +41,7 @@ class ContentProxyListener
     /**
      * Add the proxies for content and view to view-documents.
      */
-    public function onPostConvertToDocument(PostConvertToDocumentEvent $event)
+    public function onPostConvertToDocument(PostConvertToDocumentEvent $event): void
     {
         $document = $event->getDocument();
         if (!$document instanceof ArticleViewDocumentInterface) {
@@ -49,6 +49,11 @@ class ContentProxyListener
         }
 
         $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
+
+        if (!$structure) {
+            throw new \RuntimeException(sprintf('Could not find article structure from type "%s".', $document->getStructureType()));
+        }
+
         $structure->setUuid($document->getUuid());
         $structure->setLanguageCode($document->getLocale());
 
@@ -65,12 +70,8 @@ class ContentProxyListener
 
     /**
      * Create content and view proxy for given content-data.
-     *
-     * @param string $contentData
-     *
-     * @return array
      */
-    private function getProxies($contentData, StructureInterface $structure)
+    private function getProxies(string $contentData, StructureInterface $structure): array
     {
         $contentData = $contentData ?: '{}';
         $data = json_decode($contentData, true);

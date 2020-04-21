@@ -1,1 +1,0 @@
-define(["type/default"],function(a){"use strict";return function(b,c){var d={},e={setValue:function(a){App.dom.data(b,"value",a)},getValue:function(){return App.dom.data(b,"value")},needsValidation:function(){return!0},validate:function(){var a=this.getValue();return a&&a.page&&a.page.uuid}};return new a(b,d,c,"pageTreeRoute",e)}});

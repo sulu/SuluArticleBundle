@@ -1,26 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <serializer>
-    <class name="Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument" xmlns:h="https://github.com/willdurand/Hateoas" >
-        <h:relation rel="self">
-            <h:href route="get_article_page">
-                <h:parameter name="uuid" value="expr(object.getUuid())"/>
-                <h:parameter name="articleUuid" value="expr(object.getParent().getUuid())"/>
-                <h:parameter name="locale" value="expr(object.getLocale())"/>
-            </h:href>
-            <h:exclusion groups="defaultArticlePage,smallArticlePage"/>
-        </h:relation>
-
-        <h:relation rel="article">
-            <h:embedded>
-                <h:content>expr(object.getParent())</h:content>
-            </h:embedded>
-            <h:exclusion groups="defaultArticlePage"/>
-        </h:relation>
-
+    <class name="Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument" exclusion-policy="ALL">
         <property name="uuid" serialized-name="id" type="string" groups="defaultArticlePage,smallArticlePage,preview"/>
         <property name="nodeName" type="string" groups="preview"/>
         <property name="path" type="string"/>
         <property name="routePath" serialized-name="route" type="string" groups="defaultArticle,smallArticle,preview"/>
+
+        <property name="parent" groups="defaultArticlePage"/>
 
         <property name="locale" type="string" groups="preview"/>
         <property name="originalLocale" type="string" groups="preview"/>

@@ -40,13 +40,10 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     private $articleDocumentClass;
 
-    /**
-     * @param $articleDocumentClass
-     */
     public function __construct(
         DocumentManagerInterface $documentManager,
         SerializerInterface $serializer,
-        $articleDocumentClass
+        string $articleDocumentClass
     ) {
         $this->documentManager = $documentManager;
         $this->serializer = $serializer;
@@ -94,6 +91,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             try {
                 $propertyAccess->setValue($structure, $property, $value);
             } catch (\InvalidArgumentException $e) {
+                // @ignoreException
                 //ignore not existing properties
             }
         }
@@ -142,7 +140,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     /**
      * {@inheritdoc}
      *
-     * @param ArticleDocument $object
+     * @param ArticleDocument $serializedObject
      */
     public function deserialize($serializedObject, $objectClass)
     {
@@ -153,7 +151,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             $this->articleDocumentClass,
             'json',
             DeserializationContext::create()
-                ->setSerializeNull(true)
                 ->setGroups(['preview'])
         );
 

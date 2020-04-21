@@ -11,12 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
 use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteGeneratorByTemplate;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
 
-class ArticleRouteGeneratorByTemplateTest extends \PHPUnit_Framework_TestCase
+class ArticleRouteGeneratorByTemplateTest extends TestCase
 {
     /**
      * @var RouteGeneratorInterface
@@ -30,7 +31,7 @@ class ArticleRouteGeneratorByTemplateTest extends \PHPUnit_Framework_TestCase
 
     private $config = ['test1' => '/test1/{entity.getTitle()', 'test2' => '/test2/{entity.getTitle()'];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->generatorBySchema = $this->prophesize(RouteGeneratorInterface::class);
         $this->generatorByTemplate = new ArticleRouteGeneratorByTemplate($this->generatorBySchema->reveal());
@@ -49,7 +50,7 @@ class ArticleRouteGeneratorByTemplateTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNotConfigured()
     {
-        $this->setExpectedException(RouteSchemaNotFoundException::class);
+        $this->expectException(RouteSchemaNotFoundException::class);
 
         $entity = $this->prophesize(StructureBehavior::class);
         $entity->getStructureType()->willReturn('test3');

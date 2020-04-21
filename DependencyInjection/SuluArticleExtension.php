@@ -19,7 +19,6 @@ use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -42,10 +41,40 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 [
                     'content' => [
                         'structure' => [
+                            'paths' => [
+                                'article' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article',
+                                ],
+                                'article_page' => [
+                                    'path' => '%kernel.project_dir%/config/templates/articles',
+                                    'type' => 'article_page',
+                                ],
+                            ],
+                            'default_type' => [
+                                'article' => 'default',
+                                'article_page' => 'default',
+                            ],
                             'type_map' => [
                                 'article' => ArticleBridge::class,
                                 'article_page' => ArticlePageBridge::class,
                             ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('sulu_route')) {
+            $container->prependExtensionConfig(
+                'sulu_route',
+                [
+                    'mappings' => [
+                        'Sulu\Bundle\ArticleBundle\Document\ArticleDocument' => [
+                            'resource_key' => 'articles',
+                        ],
+                        'Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument' => [
+                            'resource_key' => 'article_pages',
                         ],
                     ],
                 ]
@@ -70,7 +99,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
         if ($container->hasExtension('sulu_search')) {
             $container->prependExtensionConfig(
-                'sulu_content',
+                'sulu_page',
                 [
                     'search' => [
                         'mapping' => [
@@ -143,6 +172,101 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ]
             );
         }
+
+        if ($container->hasExtension('sulu_admin')) {
+            $container->prependExtensionConfig(
+                'sulu_admin',
+                [
+                    'lists' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/lists',
+                        ],
+                    ],
+                    'forms' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/forms',
+                        ],
+                    ],
+                    'resources' => [
+                        'articles' => [
+                            'routes' => [
+                                'list' => 'sulu_article.get_articles',
+                                'detail' => 'sulu_article.get_article',
+                            ],
+                        ],
+                    ],
+                    'field_type_options' => [
+                        'selection' => [
+                            'article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title', 'routePath'],
+                                        'icon' => 'su-newspaper',
+                                        'label' => 'sulu_article.selection_label',
+                                        'overlay_title' => 'sulu_article.selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'single_selection' => [
+                            'single_article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title'],
+                                        'empty_text' => 'sulu_article.no_article_selected',
+                                        'icon' => 'su-newspaper',
+                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
+        if ($container->hasExtension('ongr_elasticsearch')) {
+            $configs = $container->getExtensionConfig($this->getAlias());
+            $config = $this->processConfiguration(new Configuration(), $configs);
+
+            $indexName = $config['index_name'];
+            $hosts = $config['hosts'];
+
+            $ongrElasticSearchConfig = [
+                'managers' => [
+                    'default' => [
+                        'index' => [
+                            'index_name' => $indexName,
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                    'live' => [
+                        'index' => [
+                            'index_name' => $indexName . '_live',
+                        ],
+                        'mappings' => ['SuluArticleBundle'],
+                    ],
+                ],
+            ];
+
+            if (count($hosts) > 0) {
+                $ongrElasticSearchConfig['managers']['default']['index']['hosts'] = $hosts;
+                $ongrElasticSearchConfig['managers']['live']['index']['hosts'] = $hosts;
+            }
+
+            $container->prependExtensionConfig(
+                'ongr_elasticsearch',
+                $ongrElasticSearchConfig
+            );
+        }
     }
 
     /**
@@ -161,34 +285,12 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
         $container->setParameter('sulu_article.search_fields', $config['search_fields']);
 
-        $container->setParameter(
-            'sulu_article.content-type.article.template',
-            $config['content_types']['article']['template']
-        );
-
-        $container->setParameter(
-            'sulu_article.content-type.page_tree_route.template',
-            $config['content_types']['page_tree_route']['template']
-        );
-
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.xml');
 
         $bundles = $container->getParameter('kernel.bundles');
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
-        } elseif ('task' === $config['content_types']['page_tree_route']['page_route_cascade']) {
-            throw new InvalidConfigurationException('You need to install the SuluAutomationBundle to use task cascading!');
-        }
-
-        $container->setAlias(
-            'sulu_article.page_tree_route.updater',
-            'sulu_article.page_tree_route.updater.' . $config['content_types']['page_tree_route']['page_route_cascade']
-        );
-
-        $loader->load('page_tree_move.xml');
-        if ('off' !== $config['content_types']['page_tree_route']['page_route_cascade']) {
-            $loader->load('page_tree_update.xml');
         }
 
         $this->appendDefaultAuthor($config, $container);
@@ -214,7 +316,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     /**
      * Append configuration for article "set_default_author".
      */
-    private function appendDefaultAuthor(array $config, ContainerBuilder $container)
+    private function appendDefaultAuthor(array $config, ContainerBuilder $container): void
     {
         $mapping = $container->getParameter('sulu_document_manager.mapping');
         foreach ($mapping as $key => $item) {
@@ -230,7 +332,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     /**
      * Append configuration for article-page (cloned from article).
      */
-    private function appendArticlePageConfig(ContainerBuilder $container)
+    private function appendArticlePageConfig(ContainerBuilder $container): void
     {
         $paths = $container->getParameter('sulu.content.structure.paths');
         $paths['article_page'] = $this->cloneArticleConfig($paths['article'], 'article_page');
@@ -243,12 +345,8 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Clone given path configuration and use given type.
-     *
-     * @param string $type
-     *
-     * @return array
      */
-    private function cloneArticleConfig(array $config, $type)
+    private function cloneArticleConfig(array $config, string $type): array
     {
         $result = [];
         foreach ($config as $item) {

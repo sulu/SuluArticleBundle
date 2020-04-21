@@ -14,13 +14,18 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
+use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 
 /**
  * Extends serialization for articles.
@@ -43,12 +48,24 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     private $structureMetadataFactory;
 
+    /**
+     * @var WebspaceResolver
+     */
+    private $webspaceResolver;
+
+    /**
+     * @var LocalizationManagerInterface
+     */
+    private $localizationManager;
+
     public function __construct(
         StructureManagerInterface $structureManager,
-        StructureMetadataFactoryInterface $structureMetadataFactory
+        StructureMetadataFactoryInterface $structureMetadataFactory,
+        WebspaceResolver $webspaceResolver
     ) {
         $this->structureManager = $structureManager;
         $this->structureMetadataFactory = $structureMetadataFactory;
+        $this->webspaceResolver = $webspaceResolver;
     }
 
     /**
@@ -61,6 +78,11 @@ class ArticleSubscriber implements EventSubscriberInterface
                 'event' => Events::POST_SERIALIZE,
                 'format' => 'json',
                 'method' => 'addTypeOnPostSerialize',
+            ],
+            [
+                'event' => Events::POST_SERIALIZE,
+                'format' => 'json',
+                'method' => 'addWebspaceSettingsOnPostSerialize',
             ],
             [
                 'event' => Events::POST_SERIALIZE,
@@ -78,26 +100,62 @@ class ArticleSubscriber implements EventSubscriberInterface
     /**
      * Append type to result.
      */
-    public function addTypeOnPostSerialize(ObjectEvent $event)
+    public function addTypeOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!($article instanceof ArticleDocument)) {
             return;
         }
 
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $visitor->addData('articleType', $context->accept($this->getType($structure->getStructure())));
+
+        $articleType = $this->getType($structure->getStructure());
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'articleType', $articleType), $articleType);
+    }
+
+    /**
+     * Append webspace-settings to result.
+     */
+    public function addWebspaceSettingsOnPostSerialize(ObjectEvent $event): void
+    {
+        $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
+        $visitor = $event->getVisitor();
+
+        if (!($article instanceof ArticleDocument)) {
+            return;
+        }
+
+        $customizeWebspaceSettings = (null !== $article->getMainWebspace());
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'customizeWebspaceSettings', $customizeWebspaceSettings),
+            $customizeWebspaceSettings
+        );
+        if ($article->getMainWebspace()) {
+            return;
+        }
+
+        $mainWebspace = $this->webspaceResolver->resolveMainWebspace($article);
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'mainWebspace', $mainWebspace), $mainWebspace);
+
+        $additionalWebspace = $this->webspaceResolver->resolveAdditionalWebspaces($article);
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'additionalWebspace', $additionalWebspace),
+            $additionalWebspace
+        );
     }
 
     /**
      * Append broken-indicator to result.
      */
-    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event)
+    public function addBrokenIndicatorOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
         if (!($article instanceof ArticleViewDocumentInterface)) {
@@ -105,18 +163,28 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $structure = $this->structureManager->getStructure($article->getStructureType(), 'article');
-        $visitor->addData('broken', !$structure || $structure->getKey() !== $article->getStructureType());
-        $visitor->addData('originalStructureType', $article->getStructureType());
+
+        $broken = (!$structure || $structure->getKey() !== $article->getStructureType());
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'broken', $broken),
+            $broken
+        );
+
+        $originalStructureType = $article->getStructureType();
+        $visitor->visitProperty(
+            new StaticPropertyMetadata('', 'originalStructureType', $originalStructureType),
+            $originalStructureType
+        );
     }
 
     /**
      * Append page-title-property to result.
      */
-    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event)
+    public function addPageTitlePropertyNameOnPostSerialize(ObjectEvent $event): void
     {
         $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!$article instanceof ArticleInterface) {
             return;
@@ -124,16 +192,18 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $property = $this->getPageTitleProperty($article);
         if ($property) {
-            $visitor->addData('_pageTitlePropertyName', $context->accept($property->getName()));
+            $propertyName = $property->getName();
+            $visitor->visitProperty(
+                new StaticPropertyMetadata('', '_pageTitlePropertyName', $propertyName),
+                $propertyName
+            );
         }
     }
 
     /**
      * Find page-title property.
-     *
-     * @return PropertyMetadata
      */
-    private function getPageTitleProperty(ArticleInterface $document)
+    private function getPageTitleProperty(ArticleInterface $document): ?PropertyMetadata
     {
         $metadata = $this->structureMetadataFactory->getStructureMetadata(
             'article',

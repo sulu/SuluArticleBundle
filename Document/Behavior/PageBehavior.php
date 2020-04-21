@@ -22,17 +22,11 @@ interface PageBehavior extends ParentBehavior, UuidBehavior, PathBehavior
 {
     /**
      * Returns page-number.
-     *
-     * @return int
      */
-    public function getPageNumber();
+    public function getPageNumber(): int;
 
     /**
      * Set page-number.
-     *
-     * @param int $pageNumber
-     *
-     * @return self
      */
-    public function setPageNumber($pageNumber);
+    public function setPageNumber(int $pageNumber): self;
 }

@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Sitemap;
 
+use ONGR\ElasticsearchBundle\Result\DocumentIterator;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchBundle\Service\Repository;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
@@ -56,36 +57,44 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function build($page, $portalKey)
+    public function build($page, $scheme, $host)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
-        $portal = $this->webspaceManager->findPortalByKey($portalKey);
 
-        if (!$portal) {
-            throw new \InvalidArgumentException('Portal with key "' . $portalKey . '" not found');
-        }
+        $webspaceKeys = $this->getWebspaceKeysByHost($host);
 
         $result = [];
-
         $from = 0;
         $size = 1000;
+
         do {
-            $bulk = $this->getBulk($repository, $portal->getWebspace()->getKey(), $from, $size);
-            /** @var SitemapUrl[] $alternatives */
+            $bulk = $this->getBulk($repository, $webspaceKeys, $from, $size);
+            /** @var SitemapUrl[] $sitemapUrlListByUuid */
             $sitemapUrlListByUuid = [];
 
             /** @var ArticleViewDocumentInterface $item */
             foreach ($bulk as $item) {
-                $result[] = $url = $this->buildUrl($item);
-
-                if (!isset($sitemapUrlListByUuid[$item->getUuid()])) {
-                    $sitemapUrlListByUuid[$item->getUuid()] = [];
-                }
-
-                $sitemapUrlListByUuid[$item->getUuid()] = $this->setAlternatives(
-                    $sitemapUrlListByUuid[$item->getUuid()],
-                    $url
+                // Get all webspace keys which are for the current document and current selected webspaces
+                $itemWebspaceKeys = array_intersect(
+                    array_merge([$item->getMainWebspace()], $item->getAdditionalWebspaces()),
+                    $webspaceKeys
                 );
+
+                foreach ($itemWebspaceKeys as $itemWebspaceKey) {
+                    $url = $this->buildUrl($item, $scheme, $host, $itemWebspaceKey);
+
+                    $result[] = $url;
+
+                    $alternativeUrlsKey = $itemWebspaceKey . '__' . $item->getUuid();
+                    if (!isset($sitemapUrlListByUuid[$alternativeUrlsKey])) {
+                        $sitemapUrlListByUuid[$alternativeUrlsKey] = [];
+                    }
+
+                    $sitemapUrlListByUuid[$alternativeUrlsKey] = $this->setAlternatives(
+                        $sitemapUrlListByUuid[$alternativeUrlsKey],
+                        $url
+                    );
+                }
             }
 
             $from += $size;
@@ -94,12 +103,33 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $result;
     }
 
-    /**
-     * @return SitemapUrl
-     */
-    protected function buildUrl(ArticleViewDocumentInterface $articleView)
-    {
-        return new SitemapUrl($articleView->getRoutePath(), $articleView->getLocale(), $articleView->getChanged());
+    protected function buildUrl(
+        ArticleViewDocumentInterface $articleView,
+        string $scheme,
+        string $host,
+        string $webspaceKey
+    ): SitemapUrl {
+        return new SitemapUrl(
+            $this->findUrl($articleView, $scheme, $host, $webspaceKey),
+            $articleView->getLocale(),
+            $articleView->getChanged()
+        );
+    }
+
+    private function findUrl(
+        ArticleViewDocumentInterface $articleView,
+        string $scheme,
+        string $host,
+        string $webspaceKey
+    ): string {
+        return $this->webspaceManager->findUrlByResourceLocator(
+            $articleView->getRoutePath(),
+            null,
+            $articleView->getLocale(),
+            $webspaceKey,
+            $host,
+            $scheme
+        );
     }
 
     /**
@@ -109,7 +139,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
      *
      * @return SitemapUrl[]
      */
-    private function setAlternatives(array $sitemapUrlList, SitemapUrl $sitemapUrl)
+    private function setAlternatives(array $sitemapUrlList, SitemapUrl $sitemapUrl): array
     {
         foreach ($sitemapUrlList as $sitemapUrlFromList) {
             // Add current as alternative to exist.
@@ -128,7 +158,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $sitemapUrlList;
     }
 
-    private function getBulk(Repository $repository, $webspaceKey, $from, $size)
+    private function getBulk(Repository $repository, array $webspaceKeys, int $from, int $size): DocumentIterator
     {
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'))
@@ -136,8 +166,11 @@ class ArticleSitemapProvider implements SitemapProviderInterface
             ->setSize($size);
 
         $webspaceQuery = new BoolQuery();
-        $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
-        $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+        foreach ($webspaceKeys as $webspaceKey) {
+            $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
+            $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+        }
+
         $search->addQuery($webspaceQuery);
 
         return $repository->findDocuments($search);
@@ -146,20 +179,51 @@ class ArticleSitemapProvider implements SitemapProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function createSitemap($alias)
+    public function createSitemap($scheme, $host)
     {
-        return new Sitemap($alias, $this->getMaxPage());
+        return new Sitemap($this->getAlias(), $this->getMaxPage($scheme, $host));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMaxPage()
+    public function getMaxPage($schema, $host)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('seo.hide_in_sitemap', 'false'));
 
+        $webspaceKeys = $this->getWebspaceKeysByHost($host);
+
+        $webspaceQuery = new BoolQuery();
+        foreach ($webspaceKeys as $webspaceKey) {
+            $webspaceQuery->add(new TermQuery('main_webspace', $webspaceKey), BoolQuery::SHOULD);
+            $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
+        }
+
         return ceil($repository->count($search) / static::PAGE_SIZE);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getWebspaceKeysByHost(string $host): array
+    {
+        $portalInformations = $this->webspaceManager->findPortalInformationsByHostIncludingSubdomains($host);
+
+        $webspaceKeys = [];
+        foreach ($portalInformations as $portalInformation) {
+            $webspaceKeys[] = $portalInformation->getWebspaceKey();
+        }
+
+        return $webspaceKeys;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return 'articles';
     }
 }

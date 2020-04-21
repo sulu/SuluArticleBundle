@@ -9,14 +9,20 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Functional\Markup;
+namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Markup;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Symfony\Component\BrowserKit\Client;
 
 class ArticleLinkProviderTest extends SuluTestCase
 {
+    /**
+     * @var Client
+     */
+    private $client;
+
     /**
      * @var ArticleLinkProvider
      */
@@ -25,9 +31,11 @@ class ArticleLinkProviderTest extends SuluTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
+
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -58,10 +66,10 @@ class ArticleLinkProviderTest extends SuluTestCase
 
         $this->assertCount(2, $result);
         $this->assertEquals($articles[0]['id'], $result[0]->getId());
-        $this->assertEquals('http://{host}' . $articles[0]['route'], $result[0]->getUrl());
+        $this->assertEquals('http://test.localhost' . $articles[0]['route'], $result[0]->getUrl());
         $this->assertFalse($result[0]->isPublished());
         $this->assertEquals($articles[1]['id'], $result[1]->getId());
-        $this->assertEquals('http://{host}' . $articles[1]['route'], $result[1]->getUrl());
+        $this->assertEquals('http://test.localhost' . $articles[1]['route'], $result[1]->getUrl());
         $this->assertTrue($result[1]->isPublished());
     }
 
@@ -115,25 +123,23 @@ class ArticleLinkProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     private function createAndPublishArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 }

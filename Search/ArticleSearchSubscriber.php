@@ -38,6 +38,8 @@ class ArticleSearchSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
      * Returns the events this subscriber has subscribed.
      */
     public static function getSubscribedEvents()
@@ -47,7 +49,7 @@ class ArticleSearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function handlePreIndex(PreIndexEvent $event)
+    public function handlePreIndex(PreIndexEvent $event): void
     {
         $subject = $event->getSubject();
         $document = $event->getDocument();

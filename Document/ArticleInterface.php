@@ -21,45 +21,33 @@ interface ArticleInterface
 {
     /**
      * Returns article-uuid.
-     *
-     * @return string
      */
-    public function getArticleUuid();
+    public function getArticleUuid(): string;
 
     /**
      * Returns page-uuid.
-     *
-     * @return string
      */
-    public function getPageUuid();
+    public function getPageUuid(): string;
 
     /**
      * Returns page-number.
-     *
-     * @return int
      */
-    public function getPageNumber();
+    public function getPageNumber(): int;
 
     /**
      * Returns page-title.
-     *
-     * @return string
      */
-    public function getPageTitle();
+    public function getPageTitle(): ?string;
 
     /**
      * Returns structure-type.
-     *
-     * @return string
      */
-    public function getStructureType();
+    public function getStructureType(): ?string;
 
     /**
      * Returns structure.
-     *
-     * @return StructureInterface
      */
-    public function getStructure();
+    public function getStructure(): StructureInterface;
 
     /**
      * Return the workflow stage.
@@ -70,6 +58,9 @@ interface ArticleInterface
 
     /**
      * Returns all extension data.
+     *
+     * TODO cannot set return typehint to ExtensionContainer, because Sulu's ExtensionBehavior::getExtensionData()
+     * returns an array
      *
      * @return ExtensionContainer
      */

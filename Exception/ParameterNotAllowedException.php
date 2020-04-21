@@ -26,11 +26,7 @@ class ParameterNotAllowedException extends \Exception
      */
     private $class;
 
-    /**
-     * @param string $property
-     * @param string $class
-     */
-    public function __construct($property, $class)
+    public function __construct(string $property, string $class)
     {
         parent::__construct(sprintf('Parameter "%s" is not allowed for class "%s".', $property, $class));
 
@@ -40,20 +36,16 @@ class ParameterNotAllowedException extends \Exception
 
     /**
      * Returns property.
-     *
-     * @return string
      */
-    public function getProperty()
+    public function getProperty(): string
     {
         return $this->property;
     }
 
     /**
      * Returns class.
-     *
-     * @return string
      */
-    public function getClass()
+    public function getClass(): string
     {
         return $this->class;
     }

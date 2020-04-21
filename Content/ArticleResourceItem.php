@@ -40,164 +40,130 @@ class ArticleResourceItem implements ResourceItemInterface
 
     /**
      * Returns uuid.
-     *
-     * @return string
      */
-    public function getUuid()
+    public function getUuid(): string
     {
         return $this->article->getUuid();
     }
 
     /**
      * Returns locale.
-     *
-     * @return string
      */
-    public function getLocale()
+    public function getLocale(): string
     {
         return $this->article->getLocale();
     }
 
     /**
      * Returns title.
-     *
-     * @return string
      */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->article->getTitle();
     }
 
     /**
      * Returns type.
-     *
-     * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->article->getType();
     }
 
     /**
      * Returns changer.
-     *
-     * @return string
      */
-    public function getChanger()
+    public function getChanger(): string
     {
         return $this->article->getChangerFullName();
     }
 
     /**
      * Returns creator.
-     *
-     * @return string
      */
-    public function getCreator()
+    public function getCreator(): string
     {
         return $this->article->getCreatorFullName();
     }
 
     /**
      * Return changed.
-     *
-     * @return \DateTime
      */
-    public function getChanged()
+    public function getChanged(): \DateTime
     {
         return $this->article->getChanged();
     }
 
     /**
      * Returns created.
-     *
-     * @return \DateTime
      */
-    public function getCreated()
+    public function getCreated(): \DateTime
     {
         return $this->article->getCreated();
     }
 
     /**
      * Returns published.
-     *
-     * @return \DateTime
      */
-    public function getPublished()
+    public function getPublished(): \DateTime
     {
         return $this->article->getPublished();
     }
 
     /**
      * Returns authored.
-     *
-     * @return \DateTime
      */
-    public function getAuthored()
+    public function getAuthored(): \DateTime
     {
         return $this->article->getAuthored();
     }
 
     /**
      * Returns excerpt.
-     *
-     * @return ExcerptViewObject
      */
-    public function getExcerpt()
+    public function getExcerpt(): ExcerptViewObject
     {
         return $this->article->getExcerpt();
     }
 
     /**
      * Returns seo.
-     *
-     * @return SeoViewObject
      */
-    public function getSeo()
+    public function getSeo(): SeoViewObject
     {
         return $this->article->getSeo();
     }
 
     /**
      * Returns route-path.
-     *
-     * @return string
      */
-    public function getRoutePath()
+    public function getRoutePath(): string
     {
         return $this->article->getRoutePath();
     }
 
     /**
      * Returns view-object.
-     *
-     * @return ArticleViewDocumentInterface
      */
-    public function getContent()
+    public function getContent(): ArticleViewDocumentInterface
     {
         return $this->article;
     }
 
-    /**
-     * @return string
-     */
-    public function getTargetWebspace()
+    public function getTargetWebspace(): string
     {
         return $this->article->getTargetWebspace();
     }
 
-    /**
-     * @return string
-     */
-    public function getMainWebspace()
+    public function getMainWebspace(): string
     {
         return $this->article->getMainWebspace();
     }
 
     /**
-     * @return null|string[]
+     * @return string[]|null
      */
-    public function getAdditionalWebspaces()
+    public function getAdditionalWebspaces(): ?array
     {
         return $this->article->getAdditionalWebspaces();
     }
@@ -216,5 +182,21 @@ class ArticleResourceItem implements ResourceItemInterface
     public function getId()
     {
         return $this->getUuid();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthorId()
+    {
+        return $this->article->getAuthorId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAuthorFullName()
+    {
+        return $this->article->getAuthorFullName();
     }
 }

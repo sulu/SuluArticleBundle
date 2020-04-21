@@ -11,6 +11,8 @@
 
 namespace Sulu\Bundle\ArticleBundle\ListBuilder;
 
+use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
+
 final class ElasticSearchFieldDescriptorBuilder
 {
     /**
@@ -29,14 +31,14 @@ final class ElasticSearchFieldDescriptorBuilder
     private $sortField = null;
 
     /**
-     * @var bool
+     * @var string
      */
-    private $disabled = false;
+    private $visibility = FieldDescriptorInterface::VISIBILITY_YES;
 
     /**
-     * @var bool
+     * @var string
      */
-    private $default = false;
+    private $searchability = FieldDescriptorInterface::SEARCHABILITY_NEVER;
 
     /**
      * @var string
@@ -48,13 +50,13 @@ final class ElasticSearchFieldDescriptorBuilder
      */
     private $sortable = false;
 
-    public function __construct($name, $translation)
+    public function __construct(string $name, string $translation = null)
     {
         $this->name = $name;
         $this->translation = $translation;
     }
 
-    public function setSortField($sortField)
+    public function setSortField(string $sortField)
     {
         $this->sortField = $sortField;
         $this->sortable = true;
@@ -62,38 +64,36 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
-    public function setDisabled($disabled)
+    public function setVisibility(string $visibility)
     {
-        $this->disabled = $disabled;
+        $this->visibility = $visibility;
 
         return $this;
     }
 
-    public function setDefault($default)
+    public function setSearchability(string $searchability)
     {
-        $this->default = $default;
+        $this->searchability = $searchability;
 
         return $this;
     }
 
-    public function setType($type)
+    public function setType(string $type)
     {
         $this->type = $type;
 
         return $this;
     }
 
-    public function build()
+    public function build(): ElasticSearchFieldDescriptor
     {
         return new ElasticSearchFieldDescriptor(
             $this->name,
             $this->sortField,
             $this->translation,
-            $this->disabled,
-            $this->default,
+            $this->visibility,
+            $this->searchability,
             $this->type,
-            '',
-            '',
             $this->sortable
         );
     }

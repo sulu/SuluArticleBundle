@@ -16,13 +16,14 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
+use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
+use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Sulu\Component\HttpCache\CacheLifetimeResolverInterface;
 use Sulu\Component\Webspace\Analyzer\RequestAnalyzer;
 
 /**
@@ -90,6 +91,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         $pageNumber = $object->getPageNumber();
         if ($object instanceof ArticlePageDocument) {
             // the article contains the seo/excerpt data and the controller handles the page-number automatically
+            /** @var ArticleDocument $object */
             $object = $object->getParent();
         }
 
@@ -97,16 +99,17 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
         // this parameter should not be used
         // but the sulu-collector for the profiler needs it to determine data from request
+        /** @var StructureBridge $structure */
         $structure = $this->structureManager->wrapStructure('article', $metadata);
         $structure->setDocument($object);
 
         return [
             'object' => $object,
-            'view' => $metadata->view,
+            'view' => $metadata->getView(),
             'pageNumber' => $pageNumber,
             'structure' => $structure,
             '_cacheLifetime' => $this->getCacheLifetime($metadata),
-            '_controller' => $metadata->controller,
+            '_controller' => $metadata->getController(),
         ];
     }
 
@@ -154,14 +157,10 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
 
     /**
      * Get cache life time.
-     *
-     * @param StructureMetadata $metadata
-     *
-     * @return int|null
      */
-    private function getCacheLifetime($metadata)
+    private function getCacheLifetime(StructureMetadata $metadata): ?int
     {
-        $cacheLifetime = $metadata->cacheLifetime;
+        $cacheLifetime = $metadata->getCacheLifetime();
 
         if (!$cacheLifetime) {
             return null;

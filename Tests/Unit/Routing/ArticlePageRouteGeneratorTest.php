@@ -11,12 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Routing;
 
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Routing\ArticlePageRouteGenerator;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
 use Sulu\Bundle\RouteBundle\Generator\TokenProviderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ArticlePageRouteGeneratorTest extends \PHPUnit_Framework_TestCase
+class ArticlePageRouteGeneratorTest extends TestCase
 {
     /**
      * @var string
@@ -41,7 +42,7 @@ class ArticlePageRouteGeneratorTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    public function setUp(): void
     {
         $this->routeGenerator = $this->prophesize(RouteGeneratorInterface::class);
         $this->tokenProvider = $this->prophesize(TokenProviderInterface::class);

@@ -14,6 +14,8 @@ namespace Sulu\Bundle\ArticleBundle\Document\Serializer;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 
 /**
@@ -38,16 +40,17 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     /**
      * Append title to result.
      */
-    public function addTitleOnPostSerialize(ObjectEvent $event)
+    public function addTitleOnPostSerialize(ObjectEvent $event): void
     {
         $articlePage = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
-        $context = $event->getContext();
 
         if (!$articlePage instanceof ArticlePageDocument) {
             return;
         }
 
-        $visitor->addData('title', $context->accept($articlePage->getParent()->getTitle()));
+        $title = $articlePage->getParent()->getTitle();
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'title', $title), $title);
     }
 }

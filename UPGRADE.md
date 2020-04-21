@@ -1,5 +1,32 @@
 # Upgrade
 
+## dev-develop
+
+### Routing changed
+
+Route definitions changed from xml to yaml.
+```
+sulu_article_api:
+-    resource: "@SuluArticleBundle/Resources/config/routing_api.xml"
++    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
+     type: rest
+     prefix: /admin/api
+```
+
+Also, the routes `get_articles` and `get_article` changed to `sulu_article.get_articles` and `sulu_article.get_article`.
+
+### ArticleSelectionContentType constructor changed
+
+The last parameter `template` has been removed from the ArticleSelectionContentType constructor.
+
+### The article type filter changed
+
+The filter for article types has changed from `?type=blog` to `?types=blog`
+
+### ElasticSearchFieldDescriptor constructor changed
+
+The ElasticSearchFieldDescriptor changed see FieldDescriptor update in the UPGRADE.md of sulu/sulu.
+
 ## 1.1.1
 
 New security-contexts have been created per article type.

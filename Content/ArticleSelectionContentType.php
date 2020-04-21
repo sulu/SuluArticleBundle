@@ -42,27 +42,16 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
      */
     private $articleDocumentClass;
 
-    /**
-     * @var string
-     */
-    private $template;
-
-    /**
-     * @param string $articleDocumentClass
-     * @param string $template
-     */
     public function __construct(
         Manager $searchManager,
         ReferenceStoreInterface $referenceStore,
-        $articleDocumentClass,
-        $template
+        string $articleDocumentClass
     ) {
         parent::__construct('Article', []);
 
         $this->searchManager = $searchManager;
         $this->referenceStore = $referenceStore;
         $this->articleDocumentClass = $articleDocumentClass;
-        $this->template = $template;
     }
 
     /**
@@ -91,14 +80,6 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         ksort($result);
 
         return array_values($result);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
-    {
-        return $this->template;
     }
 
     /**

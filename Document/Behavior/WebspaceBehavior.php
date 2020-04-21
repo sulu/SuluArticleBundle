@@ -18,27 +18,17 @@ use Sulu\Component\DocumentManager\Behavior\Mapping\LocaleBehavior;
  */
 interface WebspaceBehavior extends LocaleBehavior
 {
-    /**
-     * @return null|string
-     */
-    public function getMainWebspace();
+    public function getMainWebspace(): ?string;
+
+    public function setMainWebspace(?string $webspace): self;
 
     /**
-     * @param null|string $webspace
-     *
-     * @return self
+     * @return string[]|null
      */
-    public function setMainWebspace($webspace);
+    public function getAdditionalWebspaces(): ?array;
 
     /**
-     * @return null|string[]
+     * @param string[]|null $additionalWebspaces
      */
-    public function getAdditionalWebspaces();
-
-    /**
-     * @param null|string[] $additionalWebspaces
-     *
-     * @return self
-     */
-    public function setAdditionalWebspaces($additionalWebspaces);
+    public function setAdditionalWebspaces(?array $additionalWebspaces): self;
 }

@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Twig;
 
 use ONGR\ElasticsearchBundle\Result\DocumentIterator;
+use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\Content\ArticleResourceItem;
 use Sulu\Bundle\ArticleBundle\Content\ArticleResourceItemFactory;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -27,7 +28,7 @@ use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
+class ArticleViewDocumentTwigExtensionTest extends TestCase
 {
     public function testFindSimilar()
     {
@@ -151,7 +152,9 @@ class ArticleViewDocumentTwigExtensionTest extends \PHPUnit_Framework_TestCase
     private function getMetadataFactory()
     {
         $metadata = new StructureMetadata();
-        $metadata->tags[] = ['name' => 'sulu_article.type', 'attributes' => ['type' => 'blog']];
+        $metadata->setTags([
+            ['name' => 'sulu_article.type', 'attributes' => ['type' => 'blog']],
+        ]);
 
         $metadataFactory = $this->prophesize(StructureMetadataFactory::class);
         $metadataFactory->getStructureMetadata('article', 'blog')->willReturn($metadata);
