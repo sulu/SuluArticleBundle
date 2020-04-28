@@ -78,7 +78,7 @@ Add xml template for structure in configured folder:
 ```
 
 Example is located in Bundle
-[article_default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.xml).
+[default.xml](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.xml).
 
 Add template for article type in configured folder:
 
@@ -87,7 +87,7 @@ Add template for article type in configured folder:
 ```
 
 Example is located in Bundle
-[article_default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/article_default.html.twig).
+[default.html.twig](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc/default.html.twig).
 
 ## Initialize bundle
 
