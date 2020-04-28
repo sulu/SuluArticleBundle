@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\TermLevel\IdsQuery;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\PageBundle\Teaser\Configuration\TeaserConfiguration;
@@ -59,7 +60,9 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             'articles',
             'table',
             ['title'],
-            $this->translator->trans('sulu_article.single_selection_overlay_title', [], 'admin')
+            $this->translator->trans('sulu_article.single_selection_overlay_title', [], 'admin'),
+            ArticleAdmin::EDIT_FORM_VIEW,
+            ['id' => 'id']
         );
     }
 

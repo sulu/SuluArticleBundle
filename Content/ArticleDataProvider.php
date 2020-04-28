@@ -118,6 +118,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                 ]
             );
 
+        // for sulu versions < 2.1 the enableView does not exist
         if (method_exists($builder, 'enableView')) {
             $builder->enableView(ArticleAdmin::EDIT_FORM_VIEW, ['id' => 'id']);
         }
