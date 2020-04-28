@@ -74,7 +74,7 @@ sulu_article:
 Add xml template for structure in configured folder:
 
 ```
-%kernel.root_dir%/Resources/templates/articles/article_default.xml
+%kernel.root_dir%/Resources/templates/articles/default.xml
 ```
 
 Example is located in Bundle
@@ -83,7 +83,7 @@ Example is located in Bundle
 Add template for article type in configured folder:
 
 ```
-%kernel.root_dir%/Resources/views/articles/article_default.html.twig
+%kernel.root_dir%/Resources/views/articles/default.html.twig
 ```
 
 Example is located in Bundle
