@@ -19,6 +19,7 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
@@ -101,7 +102,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected function getConfigurationBuilder(): BuilderInterface
     {
-        return Builder::create()
+        $builder = Builder::create()
             ->enableTags()
             ->enableCategories()
             ->enableLimit()
@@ -116,6 +117,12 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                     ['column' => 'author_full_name.raw', 'title' => 'sulu_admin.author'],
                 ]
             );
+
+        if (method_exists($builder, 'enableView')) {
+            $builder->enableView(ArticleAdmin::EDIT_FORM_VIEW, ['id' => 'id']);
+        }
+
+        return $builder;
     }
 
     /**
