@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
@@ -19,6 +20,7 @@ use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
+use Sulu\Component\SmartContent\Configuration\BuilderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -174,62 +176,77 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
 
         if ($container->hasExtension('sulu_admin')) {
+            $suluAdminConfig = [
+                'lists' => [
+                    'directories' => [
+                        __DIR__ . '/../Resources/config/lists',
+                    ],
+                ],
+                'forms' => [
+                    'directories' => [
+                        __DIR__ . '/../Resources/config/forms',
+                    ],
+                ],
+                'resources' => [
+                    'articles' => [
+                        'routes' => [
+                            'list' => 'sulu_article.get_articles',
+                            'detail' => 'sulu_article.get_article',
+                        ],
+                    ],
+                ],
+                'field_type_options' => [
+                    'selection' => [
+                        'article_selection' => [
+                            'default_type' => 'list_overlay',
+                            'resource_key' => 'articles',
+                            'types' => [
+                                'list_overlay' => [
+                                    'adapter' => 'table',
+                                    'list_key' => 'articles',
+                                    'display_properties' => ['title', 'routePath'],
+                                    'icon' => 'su-newspaper',
+                                    'label' => 'sulu_article.selection_label',
+                                    'overlay_title' => 'sulu_article.selection_overlay_title',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'single_selection' => [
+                        'single_article_selection' => [
+                            'default_type' => 'list_overlay',
+                            'resource_key' => 'articles',
+                            'types' => [
+                                'list_overlay' => [
+                                    'adapter' => 'table',
+                                    'list_key' => 'articles',
+                                    'display_properties' => ['title'],
+                                    'empty_text' => 'sulu_article.no_article_selected',
+                                    'icon' => 'su-newspaper',
+                                    'overlay_title' => 'sulu_article.single_selection_overlay_title',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+
+            $articleViewConfig = [
+                'name' => ArticleAdmin::EDIT_FORM_VIEW,
+                'result_to_view' => [
+                    'id' => 'id',
+                ],
+            ];
+
+            // for sulu versions < 2.1 the view config does not exist and will fail
+            if (method_exists(BuilderInterface::class, 'enableView')) {
+                $suluAdminConfig['field_type_options']['selection']['article_selection']['view'] = $articleViewConfig;
+                $suluAdminConfig['field_type_options']['single_selection']['single_article_selection']['view'] = $articleViewConfig;
+            }
+
             $container->prependExtensionConfig(
                 'sulu_admin',
-                [
-                    'lists' => [
-                        'directories' => [
-                            __DIR__ . '/../Resources/config/lists',
-                        ],
-                    ],
-                    'forms' => [
-                        'directories' => [
-                            __DIR__ . '/../Resources/config/forms',
-                        ],
-                    ],
-                    'resources' => [
-                        'articles' => [
-                            'routes' => [
-                                'list' => 'sulu_article.get_articles',
-                                'detail' => 'sulu_article.get_article',
-                            ],
-                        ],
-                    ],
-                    'field_type_options' => [
-                        'selection' => [
-                            'article_selection' => [
-                                'default_type' => 'list_overlay',
-                                'resource_key' => 'articles',
-                                'types' => [
-                                    'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => 'articles',
-                                        'display_properties' => ['title', 'routePath'],
-                                        'icon' => 'su-newspaper',
-                                        'label' => 'sulu_article.selection_label',
-                                        'overlay_title' => 'sulu_article.selection_overlay_title',
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'single_selection' => [
-                            'single_article_selection' => [
-                                'default_type' => 'list_overlay',
-                                'resource_key' => 'articles',
-                                'types' => [
-                                    'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => 'articles',
-                                        'display_properties' => ['title'],
-                                        'empty_text' => 'sulu_article.no_article_selected',
-                                        'icon' => 'su-newspaper',
-                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
+                $suluAdminConfig
             );
         }
 
