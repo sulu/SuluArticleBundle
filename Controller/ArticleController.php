@@ -325,6 +325,11 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $result = [];
         foreach ($searchResult as $document) {
             $documentData = $this->normalize($document['_source'], $fieldDescriptors);
+
+            if ('ghost' == $documentData['localizationState']['state']) {
+                $documentData['ghostLocale'] = $documentData['localizationState']['locale'];
+            }
+
             if (false !== ($index = array_search($documentData['id'], $ids))) {
                 $result[$index] = $documentData;
             } else {
