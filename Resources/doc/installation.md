@@ -4,6 +4,33 @@
 
 The SuluArticleBundle requires a running elasticsearch `^5.0`.
 
+Before installing the Article Bundle by running the require you will need to configure the Elasticsearch Bundle, as
+this will be added by composer to the `config/bundles.php` automatically and then break the installation process.
+
+```yml
+# config/packages/ongr_elasticsearch.yaml
+
+ongr_elasticsearch:
+    analysis:
+        tokenizer:
+            pathTokenizer:
+                type: path_hierarchy
+        analyzer:
+            pathAnalyzer:
+                tokenizer: pathTokenizer
+    managers:
+        default:
+            index:
+                index_name: 'su_articles'
+                hosts:
+                    - 'user:password@127.0.0.1:9200'
+        live:
+            index:
+                index_name: 'su_articles_live'
+                hosts:
+                    - 'user:password@127.0.0.1:9200'
+```
+
 ## Install the bundle
 
 ```bash
