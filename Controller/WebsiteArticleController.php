@@ -159,7 +159,7 @@ class WebsiteArticleController extends AbstractController
         $twig = $this->getTwig();
 
         $attributes = $twig->mergeGlobals($attributes);
-        $template = $twig->loadTemplate($template);
+        $template = $twig->load($template);
 
         $level = ob_get_level();
         ob_start();
