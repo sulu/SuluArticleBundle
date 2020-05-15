@@ -241,7 +241,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
             if (count($types) > 1) {
                 $query = new BoolQuery();
-                
+
                 foreach ($types as $type) {
                     $query->add(new MatchQuery('type', $type), BoolQuery::SHOULD);
                 }
