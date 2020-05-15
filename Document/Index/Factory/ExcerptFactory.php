@@ -62,8 +62,8 @@ class ExcerptFactory
         $excerpt->description = $data['description'];
         $excerpt->tags = $this->tagCollectionFactory->create($data['tags']);
         $excerpt->categories = $this->categoryCollectionFactory->create($data['categories'], $locale);
-        $excerpt->icon = $this->mediaCollectionFactory->create($data['icon'], $locale);
-        $excerpt->images = $this->mediaCollectionFactory->create($data['images'], $locale);
+        $excerpt->icon = $this->mediaCollectionFactory->create($data['icon'] ?? [], $locale);
+        $excerpt->images = $this->mediaCollectionFactory->create($data['images'] ?? [], $locale);
 
         return $excerpt;
     }
