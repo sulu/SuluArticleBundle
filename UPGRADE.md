@@ -1,6 +1,16 @@
 # Upgrade
 
-## dev-develop
+## dev-master
+
+### Teaser Migrations
+
+Run the following command to migrate the teaser provider in the articles.
+
+````bash
+bin/console phpcr:migrations:migrate
+````
+
+## 2.0.0
 
 ### Routing changed
 
