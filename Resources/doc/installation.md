@@ -2,23 +2,12 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0`.
+The SuluArticleBundle requires a running elasticsearch `^5.0` or `^6.0`.
 
 ## Install the bundle
 
 ```bash
 composer require sulu/article-bundle
-```
-
-### Add bundles to AbstractKernel
-
-The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
-
-```php
-/* config/bundles.php */
-
-Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
-ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
 
 ### Configure SuluArticleBundle and sulu core
