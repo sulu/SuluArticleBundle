@@ -1,6 +1,17 @@
 # Upgrade
 
-## dev-master
+## dev-release/2.0
+
+### Mapping of index changed
+
+Because the length of the indexed formats of the MediaViewObject the type has been changed to `binary`.
+
+To upgrade it run following commands:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
 
 ### Teaser Migrations
 

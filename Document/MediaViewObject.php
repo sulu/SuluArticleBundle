@@ -46,7 +46,7 @@ class MediaViewObject
     /**
      * @var string
      *
-     * @Property(type="keyword")
+     * @Property(type="binary")
      */
     protected $formats = '{}';
 
