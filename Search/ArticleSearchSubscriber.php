@@ -14,7 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Search;
 use Massive\Bundle\SearchBundle\Search\Event\PreIndexEvent;
 use Massive\Bundle\SearchBundle\Search\Field;
 use Massive\Bundle\SearchBundle\Search\SearchEvents;
-use Sulu\Bundle\ArticleBundle\Document\Behavior\WebspaceBehavior;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\SearchBundle\Search\Factory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -58,9 +58,11 @@ class ArticleSearchSubscriber implements EventSubscriberInterface
         $subject = $event->getSubject();
         $document = $event->getDocument();
 
-        if (!$subject instanceof WebspaceBehavior) {
+        if (!$subject instanceof ArticleDocument) {
             return;
         }
+
+        $document->setUrl($subject->getRoutePath());
 
         $document->addField(
             $this->factory->createField(
