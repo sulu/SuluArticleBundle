@@ -1,14 +1,15 @@
 # Article Types
 
 The SuluArticleBundle provides an additional way to divide different types of templates and group articles in the 
-Sulu-Admin.
+Sulu-Admin. The article type of a template is set with the `sulu_article.type` tag.
 
 This has following impacts:
 
 * The article list in the Sulu-Admin will be extended by a tab-navigation to filter for article-types.
-* When creating a new article you have to decide which type of article you want to create.
-* You can only choose templates with the same article-type.
-* Article-Types cannot be changed.
+* Permissions in the settings area of the Sulu-Admin are managed separately for each article type.
+* When changing the template of an article, you can only choose templates with the same article-type.
+
+> To allow users to see a newly added article type, you need to add the permissions for the article to the respective user roles
 
 The article-type can also be used for querying the elastic-search index, it is stored in the field `type`.
 
