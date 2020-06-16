@@ -192,3 +192,17 @@ sulu_article:
         - excerpt.seo.keywords
         - teaser_description
 ```
+
+## Troubleshooting
+
+### Add bundles to AbstractKernel
+
+The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`. This should be done
+automatically by Symfony Flex, if that fails for some reason you have to do it manually:
+
+```php		
+/* config/bundles.php */
+       	
+Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
+ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
+```
