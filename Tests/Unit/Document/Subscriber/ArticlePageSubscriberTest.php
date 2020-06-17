@@ -11,7 +11,6 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Document\Subscriber;
 
-use Ferrandini\Urlizer;
 use PHPCR\NodeInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -19,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\ArticlePageSubscriber;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Bundle\DocumentManagerBundle\Slugifier\Urlizer;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\Structure\StructureInterface;
 use Sulu\Component\Content\Document\WorkflowStage;
