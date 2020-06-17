@@ -34,7 +34,6 @@ use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Entity\Tag;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Symfony\Component\BrowserKit\Client;
 
 /**
  * Functional testcases for Article API.

@@ -18,7 +18,6 @@ use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Symfony\Component\BrowserKit\Client;
 
 class ArticleIndexerTest extends BaseTestCase
 {

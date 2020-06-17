@@ -15,7 +15,6 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider;
 use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
-use Symfony\Component\BrowserKit\Client;
 
 class ArticleSitemapProviderTest extends BaseTestCase
 {

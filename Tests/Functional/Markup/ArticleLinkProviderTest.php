@@ -14,7 +14,6 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Markup;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
 use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
-use Symfony\Component\BrowserKit\Client;
 
 class ArticleLinkProviderTest extends BaseTestCase
 {
