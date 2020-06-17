@@ -46,11 +46,6 @@ class ArticleControllerTest extends BaseTestCase
     private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
 
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var DocumentManagerInterface
      */
     private $documentManager;

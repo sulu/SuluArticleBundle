@@ -19,11 +19,6 @@ use Symfony\Component\BrowserKit\Client;
 class ArticleLinkProviderTest extends BaseTestCase
 {
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var ArticleLinkProvider
      */
     private $articleLinkProvider;

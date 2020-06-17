@@ -20,11 +20,6 @@ use Symfony\Component\BrowserKit\Client;
 class ArticleSitemapProviderTest extends BaseTestCase
 {
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var ArticleSitemapProvider
      */
     protected $articleSitemapProvider;

@@ -23,11 +23,6 @@ use Symfony\Component\BrowserKit\Client;
 class ArticleIndexerTest extends BaseTestCase
 {
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var string
      */
     private $locale = 'en';
