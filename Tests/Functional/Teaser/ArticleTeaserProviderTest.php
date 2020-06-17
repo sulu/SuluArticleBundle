@@ -12,8 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
 
 class ArticleTeaserProviderTest extends BaseTestCase
 {

@@ -37,8 +37,8 @@ use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Exception\DocumentManagerException;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides methods to index articles.

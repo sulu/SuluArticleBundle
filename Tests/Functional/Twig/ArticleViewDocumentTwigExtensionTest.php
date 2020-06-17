@@ -13,8 +13,8 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Twig;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
