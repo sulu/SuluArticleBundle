@@ -32,6 +32,8 @@ class VersionControllerTest extends BaseTestCase
 
     public function setUp(): void
     {
+        parent::setUp();
+
         if (!$this->getContainer()->getParameter('sulu_document_manager.versioning.enabled')) {
             $this->markTestSkipped('Versioning is not enabled');
         }
