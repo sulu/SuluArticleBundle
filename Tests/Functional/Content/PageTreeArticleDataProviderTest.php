@@ -15,12 +15,12 @@ use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\DatasourceItem;
 
-class PageTreeArticleDataProviderTest extends SuluTestCase
+class PageTreeArticleDataProviderTest extends BaseTestCase
 {
     /**
      * {@inheritdoc}
@@ -110,8 +110,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
 
     private function createArticle(PageDocument $page, $title = 'Test-Article', $template = 'page_tree_route')
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             [
@@ -128,7 +127,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
             ]
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

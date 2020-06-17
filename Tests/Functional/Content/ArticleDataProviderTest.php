@@ -12,7 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
@@ -20,7 +20,7 @@ use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleDataProviderTest extends SuluTestCase
+class ArticleDataProviderTest extends BaseTestCase
 {
     /**
      * {@inheritdoc}
@@ -495,14 +495,13 @@ class ArticleDataProviderTest extends SuluTestCase
             $data['additionalWebspaces'] = $additionalWebspaces;
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             $data
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $response);
 
         return json_decode($response->getContent(), true);

@@ -13,9 +13,9 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 
-class ArticleTeaserProviderTest extends SuluTestCase
+class ArticleTeaserProviderTest extends BaseTestCase
 {
     /**
      * {@inheritdoc}
@@ -75,13 +75,12 @@ class ArticleTeaserProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 }

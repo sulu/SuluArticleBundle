@@ -16,11 +16,11 @@ use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\BrowserKit\Client;
 
-class ArticleIndexerTest extends SuluTestCase
+class ArticleIndexerTest extends BaseTestCase
 {
     /**
      * @var Client
@@ -53,8 +53,6 @@ class ArticleIndexerTest extends SuluTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
         $this->purgeDatabase();

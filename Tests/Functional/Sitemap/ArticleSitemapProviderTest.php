@@ -13,11 +13,11 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Sitemap;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
 use Symfony\Component\BrowserKit\Client;
 
-class ArticleSitemapProviderTest extends SuluTestCase
+class ArticleSitemapProviderTest extends BaseTestCase
 {
     /**
      * @var Client
@@ -35,8 +35,6 @@ class ArticleSitemapProviderTest extends SuluTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 

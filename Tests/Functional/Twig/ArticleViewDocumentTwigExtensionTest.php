@@ -14,12 +14,12 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Twig;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
+class ArticleViewDocumentTwigExtensionTest extends BaseTestCase
 {
     const LOCALE = 'de';
 
@@ -100,14 +100,13 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
             $data['additionalWebspaces'] = $additionalWebspaces;
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=' . self::LOCALE . '&action=publish',
             $data
         );
 
-        $respone = $client->getResponse();
+        $respone = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $respone);
 
         return json_decode($respone->getContent(), true);

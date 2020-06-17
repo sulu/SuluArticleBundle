@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Contact\ContactManager;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
@@ -32,14 +33,13 @@ use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Entity\Tag;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\BrowserKit\Client;
 
 /**
  * Functional testcases for Article API.
  */
-class ArticleControllerTest extends SuluTestCase
+class ArticleControllerTest extends BaseTestCase
 {
     use ArticleViewDocumentIdTrait;
 
@@ -76,7 +76,6 @@ class ArticleControllerTest extends SuluTestCase
         $this->purgeDatabase();
         $this->purgeIndex();
 
-        $this->client = $this->createAuthenticatedClient();
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
 
         $this->userManager = $this->getContainer()->get('sulu_security.user_manager');
