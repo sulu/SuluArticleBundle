@@ -47,7 +47,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * @var KernelBrowser
      */
-    protected $client;
+    private $client;
 
     /**
      * @var DocumentManagerInterface

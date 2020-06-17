@@ -21,7 +21,7 @@ class ArticleTeaserProviderTest extends SuluTestCase
     /**
      * @var KernelBrowser
      */
-    protected $client;
+    private $client;
 
     /**
      * {@inheritdoc}

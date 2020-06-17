@@ -34,7 +34,7 @@ class VersionControllerTest extends SuluTestCase
     /**
      * @var KernelBrowser
      */
-    protected $client;
+    private $client;
 
     public function setUp(): void
     {
