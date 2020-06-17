@@ -17,9 +17,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Document\LocalizationState;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 

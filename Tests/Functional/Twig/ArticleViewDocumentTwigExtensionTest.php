@@ -13,8 +13,8 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Twig;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +28,6 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
      * @var KernelBrowser
      */
     protected $client;
-
 
     /**
      * {@inheritdoc}

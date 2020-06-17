@@ -12,8 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Teaser;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleTeaserProviderTest extends SuluTestCase
@@ -22,7 +22,6 @@ class ArticleTeaserProviderTest extends SuluTestCase
      * @var KernelBrowser
      */
     protected $client;
-
 
     /**
      * {@inheritdoc}

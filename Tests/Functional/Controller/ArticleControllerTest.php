@@ -19,7 +19,6 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Contact\ContactManager;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
@@ -33,6 +32,7 @@ use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Bundle\TagBundle\Entity\Tag;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 /**
