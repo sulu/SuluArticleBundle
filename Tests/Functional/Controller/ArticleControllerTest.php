@@ -19,7 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Contact\ContactManager;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
@@ -38,11 +38,16 @@ use Sulu\Component\DocumentManager\DocumentManagerInterface;
 /**
  * Functional testcases for Article API.
  */
-class ArticleControllerTest extends BaseTestCase
+class ArticleControllerTest extends SuluTestCase
 {
     use ArticleViewDocumentIdTrait;
 
     private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
+
+    /**
+     * @var KernelBrowser
+     */
+    protected $client;
 
     /**
      * @var DocumentManagerInterface
@@ -65,6 +70,7 @@ class ArticleControllerTest extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
         $this->purgeDatabase();

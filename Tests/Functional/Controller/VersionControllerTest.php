@@ -12,13 +12,14 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Functional testcases for article version API.
  */
-class VersionControllerTest extends BaseTestCase
+class VersionControllerTest extends SuluTestCase
 {
     /**
      * @var DocumentManager
@@ -30,9 +31,15 @@ class VersionControllerTest extends BaseTestCase
      */
     protected $locale = 'de';
 
+    /**
+     * @var KernelBrowser
+     */
+    protected $client;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         if (!$this->getContainer()->getParameter('sulu_document_manager.versioning.enabled')) {
             $this->markTestSkipped('Versioning is not enabled');

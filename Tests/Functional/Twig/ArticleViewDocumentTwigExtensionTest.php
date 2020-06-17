@@ -13,15 +13,22 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Twig;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleViewDocumentTwigExtensionTest extends BaseTestCase
+class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
 {
     const LOCALE = 'de';
+
+    /**
+     * @var KernelBrowser
+     */
+    protected $client;
+
 
     /**
      * {@inheritdoc}
@@ -29,6 +36,7 @@ class ArticleViewDocumentTwigExtensionTest extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 

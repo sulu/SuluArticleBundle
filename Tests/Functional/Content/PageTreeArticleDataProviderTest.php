@@ -15,19 +15,26 @@ use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\DatasourceItem;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-class PageTreeArticleDataProviderTest extends BaseTestCase
+class PageTreeArticleDataProviderTest extends SuluTestCase
 {
+    /**
+     * @var KernelBrowser
+     */
+    protected $client;
+
     /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 

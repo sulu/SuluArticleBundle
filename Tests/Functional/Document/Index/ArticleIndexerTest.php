@@ -15,11 +15,12 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
-class ArticleIndexerTest extends BaseTestCase
+class ArticleIndexerTest extends SuluTestCase
 {
     /**
      * @var string
@@ -42,11 +43,17 @@ class ArticleIndexerTest extends BaseTestCase
     private $indexer;
 
     /**
+     * @var KernelBrowser
+     */
+    protected $client;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
         $this->purgeDatabase();

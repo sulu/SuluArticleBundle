@@ -12,22 +12,29 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\ArticleBundle\Tests\Functional\BaseTestCase;
+use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ArticleDataProviderTest extends BaseTestCase
+class ArticleDataProviderTest extends SuluTestCase
 {
+    /**
+     * @var KernelBrowser
+     */
+    protected $client;
+
     /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
