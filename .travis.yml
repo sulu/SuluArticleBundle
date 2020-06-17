@@ -29,7 +29,7 @@ matrix:
         - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - DATABASE_CHARSET=UTF8
         - DATABASE_COLLATE=UTF8_BIN
-    - php: 7.3
+    - php: 7.4
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
