@@ -15,19 +15,19 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Bundle\WebsiteBundle\Sitemap\SitemapUrl;
-use Symfony\Component\BrowserKit\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleSitemapProviderTest extends SuluTestCase
 {
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var ArticleSitemapProvider
      */
     protected $articleSitemapProvider;
+
+    /**
+     * @var KernelBrowser
+     */
+    private $client;
 
     /**
      * {@inheritdoc}
@@ -35,7 +35,6 @@ class ArticleSitemapProviderTest extends SuluTestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();

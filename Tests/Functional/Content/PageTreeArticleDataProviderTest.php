@@ -11,23 +11,30 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
-use Ferrandini\Urlizer;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider;
+use Sulu\Bundle\DocumentManagerBundle\Slugifier\Urlizer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\DatasourceItem;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class PageTreeArticleDataProviderTest extends SuluTestCase
 {
+    /**
+     * @var KernelBrowser
+     */
+    private $client;
+
     /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -110,8 +117,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
 
     private function createArticle(PageDocument $page, $title = 'Test-Article', $template = 'page_tree_route')
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             [
@@ -128,7 +134,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
             ]
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

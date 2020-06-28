@@ -17,17 +17,24 @@ use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArticleDataProviderTest extends SuluTestCase
 {
     /**
+     * @var KernelBrowser
+     */
+    private $client;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -495,14 +502,13 @@ class ArticleDataProviderTest extends SuluTestCase
             $data['additionalWebspaces'] = $additionalWebspaces;
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             $data
         );
 
-        $response = $client->getResponse();
+        $response = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $response);
 
         return json_decode($response->getContent(), true);

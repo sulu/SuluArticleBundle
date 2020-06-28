@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Functional testcases for article version API.
@@ -30,8 +31,16 @@ class VersionControllerTest extends SuluTestCase
      */
     protected $locale = 'de';
 
+    /**
+     * @var KernelBrowser
+     */
+    private $client;
+
     public function setUp(): void
     {
+        parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
+
         if (!$this->getContainer()->getParameter('sulu_document_manager.versioning.enabled')) {
             $this->markTestSkipped('Versioning is not enabled');
         }
@@ -57,15 +66,13 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $client = $this->createAuthenticatedClient();
-
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles/' . $article->getUuid() . '/versions/1_0?action=restore&locale=' . $this->locale
         );
 
-        $this->assertHttpStatusCode(200, $client->getResponse());
-        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals('first title', $response['title']);
     }
 
@@ -80,14 +87,12 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $client = $this->createAuthenticatedClient();
-
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles/' . $article->getUuid() . '/versions/2_0?action=restore&locale=' . $this->locale
         );
 
-        $this->assertHttpStatusCode(404, $client->getResponse());
+        $this->assertHttpStatusCode(404, $this->client->getResponse());
     }
 
     public function testCGet()
@@ -107,15 +112,13 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $client = $this->createAuthenticatedClient();
-
-        $client->request(
+        $this->client->request(
             'GET',
             '/api/articles/' . $article->getUuid() . '/versions?locale=' . $this->locale
         );
 
-        $this->assertHttpStatusCode(200, $client->getResponse());
-        $response = json_decode($client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
 

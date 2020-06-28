@@ -14,15 +14,22 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Teaser;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\PageBundle\Teaser\Provider\TeaserProviderInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleTeaserProviderTest extends SuluTestCase
 {
+    /**
+     * @var KernelBrowser
+     */
+    private $client;
+
     /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -75,13 +82,12 @@ class ArticleTeaserProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($client->getResponse()->getContent(), true);
+        return json_decode($this->client->getResponse()->getContent(), true);
     }
 }

@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Twig\ArticleViewDocumentTwigExtension;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -24,11 +25,17 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
     const LOCALE = 'de';
 
     /**
+     * @var KernelBrowser
+     */
+    private $client;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
 
@@ -100,14 +107,13 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
             $data['additionalWebspaces'] = $additionalWebspaces;
         }
 
-        $client = $this->createAuthenticatedClient();
-        $client->request(
+        $this->client->request(
             'POST',
             '/api/articles?locale=' . self::LOCALE . '&action=publish',
             $data
         );
 
-        $respone = $client->getResponse();
+        $respone = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $respone);
 
         return json_decode($respone->getContent(), true);

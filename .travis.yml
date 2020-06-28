@@ -29,17 +29,22 @@ matrix:
         - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         - DATABASE_CHARSET=UTF8
         - DATABASE_COLLATE=UTF8_BIN
-    - php: 7.3
+    - php: 7.4
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
+        - PECL_INSTALL=imagick
         - ES_VERSION="6.5.4"
         - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
         # Code coverage currently disabled takes a very long time
         # - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
+  - |
+    if [[ $PECL_INSTALL ]]; then
+        printf "\n" | pecl install $PECL_INSTALL
+    fi
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update

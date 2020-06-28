@@ -18,15 +18,10 @@ use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
-use Symfony\Component\BrowserKit\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleIndexerTest extends SuluTestCase
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
     /**
      * @var string
      */
@@ -48,12 +43,16 @@ class ArticleIndexerTest extends SuluTestCase
     private $indexer;
 
     /**
+     * @var KernelBrowser
+     */
+    private $client;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
     {
         parent::setUp();
-
         $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();

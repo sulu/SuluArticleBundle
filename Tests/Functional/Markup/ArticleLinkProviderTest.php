@@ -14,19 +14,19 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Markup;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Sulu\Bundle\ArticleBundle\Markup\ArticleLinkProvider;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
-use Symfony\Component\BrowserKit\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleLinkProviderTest extends SuluTestCase
 {
     /**
-     * @var Client
-     */
-    private $client;
-
-    /**
      * @var ArticleLinkProvider
      */
     private $articleLinkProvider;
+
+    /**
+     * @var KernelBrowser
+     */
+    private $client;
 
     /**
      * {@inheritdoc}
@@ -34,7 +34,6 @@ class ArticleLinkProviderTest extends SuluTestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $this->client = $this->createAuthenticatedClient();
 
         $this->initPhpcr();
