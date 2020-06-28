@@ -1,7 +1,7 @@
-## Installation using ElasticSearch ^2.2
+# Installation using ElasticSearch ^2.2
 
 ```bash
-composer require ongr/elasticsearch-bundle:^1.2
+composer require handcraftedinthealps/elasticsearch-bundle:^1.2
 ```
 
 ## Configure the bundles:

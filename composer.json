@@ -6,8 +6,8 @@
     "require": {
         "php": "^5.5 || ^7.0",
         "sulu/sulu": "^1.6.8",
-        "ongr/elasticsearch-bundle": "^1.2.10 || ^5.2",
-        "ongr/elasticsearch-dsl": "^2.2.2 || ~5.0",
+        "handcraftedinthealps/elasticsearch-bundle": "^1.2.10.1 || ^5.2.6.1",
+        "handcraftedinthealps/elasticsearch-dsl": "^2.2.2.1 || ^5.0.7.1",
         "jackalope/jackalope": "^1.2.8 || >=1.3.3",
         "jms/serializer-bundle": "^1.1 || ^2.0"
     },

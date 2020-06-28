@@ -1,7 +1,7 @@
 # Installation using ElasticSearch ^5.0
 
 ```bash
-composer require ongr/elasticsearch-bundle:^5.0
+composer require handcraftedinthealps/elasticsearch-bundle:^5.0
 ```
 
 ## Configure the bundles:
