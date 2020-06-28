@@ -2,13 +2,14 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0` or `^6.0`.
+The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
 
 For elasticsearch `^2.0` see the [1.0.x](https://github.com/sulu/SuluArticleBundle/tree/release/1.0) version of the bundle.
 
-## Install the bundle
+## Install dependencies
 
 ```bash
+composer require elasticsearch/elasticsearch:^7.0 # use matching elasticsearch version
 composer require sulu/article-bundle
 ```
 

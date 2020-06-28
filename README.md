@@ -20,7 +20,7 @@ Additional features included:
 * Composer
 * PHP `^5.5 || ^7.0`
 * Sulu `^1.6`
-* Elasticsearch `^5.0 || ^6.0`
+* Elasticsearch `^5.0 || ^6.0 || ^7.0`
 
 For detailed requirements see [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/composer.json).
 
