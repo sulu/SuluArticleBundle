@@ -55,7 +55,7 @@
             </params>
         </property>
 
-        <property name="additionalWebspace" type="select" colspan="6" spaceAfter="6" disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
+        <property name="additionalWebspaces" type="select" colspan="6" spaceAfter="6" disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
             <meta>
                 <title>sulu_article.additional_webspace</title>
             </meta>

@@ -2,23 +2,13 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0`.
+The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
 
-## Install the bundle
+## Install dependencies
 
 ```bash
+composer require elasticsearch/elasticsearch:^7.0 # use matching elasticsearch version
 composer require sulu/article-bundle
-```
-
-### Add bundles to AbstractKernel
-
-The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
-
-```php
-/* config/bundles.php */
-
-Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
-ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
 
 ### Configure SuluArticleBundle and sulu core
@@ -202,4 +192,18 @@ sulu_article:
         - excerpt.seo.description
         - excerpt.seo.keywords
         - teaser_description
+```
+
+## Troubleshooting
+
+### Add bundles to AbstractKernel
+
+The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`. This should be done
+automatically by Symfony Flex, if that fails for some reason you have to do it manually:
+
+```php		
+/* config/bundles.php */
+       	
+Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
+ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```

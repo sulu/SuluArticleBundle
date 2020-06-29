@@ -3,9 +3,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/php:7.2-node-browsers
+      - image: circleci/php:7.3-node-browsers
         environment:
-          - ES_VERSION=6.5.4
           - ARTICLE_TEST_CASE=extend
       - image: circleci/mysql:5.7
         environment:
@@ -13,6 +12,14 @@ jobs:
           - MYSQL_PASSWORD=
           - MYSQL_ALLOW_EMPTY_PASSWORD=true
           - MYSQL_DATABASE=circle_test
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
+        environment:
+          - cluster.name: es-test-cluster
+          - xpack.security.enabled: false
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
     steps:
       - checkout
       - run:
@@ -20,12 +27,6 @@ jobs:
           command: |
             sudo apt-get install -y libpng-dev
             sudo docker-php-ext-install pdo_mysql gd
-          parallel: true
-      - run:
-          name: Install Elasticsearch
-          command: |
-            curl -L -o elasticsearch.zip https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip
-            unzip elasticsearch.zip
           parallel: true
       - run: echo -e "memory_limit=2G" | sudo tee /usr/local/etc/php/php.ini > /dev/null
       - run: sudo composer self-update
@@ -39,11 +40,6 @@ jobs:
           paths:
             - vendor
             - ~/.composer/cache
-      - run:
-          name: Run Elasticsearch
-          command: |
-            ES_JAVA_OPTS="-Xms512m -Xmx1024m" ./elasticsearch-${ES_VERSION}/bin/elasticsearch
-          background: true
       - run:
           name: Test Elasticsearch
           command: |
