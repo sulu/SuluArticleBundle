@@ -30,6 +30,10 @@ class StructureValidatorCompilerPass implements CompilerPassInterface
         $defaultTypes = $container->getParameter('sulu.content.structure.default_types');
         $structureFactory = $container->get('sulu_page.structure.factory');
 
+        if (!isset($defaultTypes[$type])) {
+            return null;
+        }
+
         try {
             $structureFactory->getStructureMetadata($type, $defaultTypes[$type]);
         } catch (StructureTypeNotFoundException $exception) {

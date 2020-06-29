@@ -28,12 +28,6 @@ sulu_route:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
                 parent: "{object.getParent().getRoutePath()}"
 
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "default"
-
 sulu_article:
     index_name: su_articles
     hosts: ['127.0.0.1:9200']

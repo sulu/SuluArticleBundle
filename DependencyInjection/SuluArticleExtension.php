@@ -51,10 +51,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                                     'type' => 'article_page',
                                 ],
                             ],
-                            'default_type' => [
-                                'article' => 'default',
-                                'article_page' => 'default',
-                            ],
                             'type_map' => [
                                 'article' => ArticleBridge::class,
                                 'article_page' => ArticlePageBridge::class,
@@ -339,8 +335,10 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $container->setParameter('sulu.content.structure.paths', $paths);
 
         $defaultTypes = $container->getParameter('sulu.content.structure.default_types');
-        $defaultTypes['article_page'] = $defaultTypes['article'];
-        $container->setParameter('sulu.content.structure.default_types', $defaultTypes);
+        if (isset($defaultTypes['article'])) {
+            $defaultTypes['article_page'] = $defaultTypes['article'];
+            $container->setParameter('sulu.content.structure.default_types', $defaultTypes);
+        }
     }
 
     /**
