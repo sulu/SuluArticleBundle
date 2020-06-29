@@ -59,7 +59,7 @@ class WebspaceResolver
             return [];
         }
 
-        if ($document->getAdditionalWebspaces()) {
+        if (null !== $document->getAdditionalWebspaces()) {
             return $document->getAdditionalWebspaces();
         }
 
