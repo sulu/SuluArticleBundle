@@ -17,6 +17,7 @@ use Sulu\Bundle\ArticleBundle\Content\PageTreeArticleDataProvider;
 use Sulu\Bundle\DocumentManagerBundle\Slugifier\Urlizer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Component\HttpKernel\SuluKernel;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\DatasourceItem;
 
@@ -101,6 +102,38 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
         $this->assertEquals($page->getTitle(), $result->getTitle());
     }
 
+    public function testResolveDataItemsUnpublished()
+    {
+        $page = $this->createPage('Test Page', '/page', 'de', false);
+
+        $articles = [
+            $this->createArticle($page, 'Test 1'),
+            $this->createArticle($page, 'Test 2'),
+        ];
+
+        $this->ensureKernelShutdown();
+        self::bootKernel(['sulu.context' => SuluKernel::CONTEXT_WEBSITE]);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
+        $result = $dataProvider->resolveDataItems(['dataSource' => $page->getUuid()], [], ['locale' => 'de']);
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(2, $result->getItems());
+    }
+
+    public function testResolveDataSourceUnpublished()
+    {
+        $page = $this->createPage('Test Page', '/page', 'de', false);
+
+        $this->ensureKernelShutdown();
+        self::bootKernel(['sulu.context' => SuluKernel::CONTEXT_WEBSITE]);
+
+        $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
+        $result = $dataProvider->resolveDatasource($page->getUuid(), [], ['locale' => 'de']);
+
+        $this->assertNull($result);
+    }
+
     public function testResolveDataSourceNull()
     {
         $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
@@ -137,10 +170,11 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
      * @param string $title
      * @param string $resourceSegment
      * @param string $locale
+     * @param bool $published
      *
      * @return PageDocument
      */
-    private function createPage($title, $resourceSegment, $locale = 'de')
+    private function createPage($title, $resourceSegment, $locale = 'de', $published = true)
     {
         $documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $sessionManager = $this->getContainer()->get('sulu.phpcr.session');
@@ -157,7 +191,11 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
         $page->setResourceSegment($resourceSegment);
 
         $documentManager->persist($page, $locale);
-        $documentManager->publish($page, $locale);
+
+        if ($published) {
+            $documentManager->publish($page, $locale);
+        }
+
         $documentManager->flush();
 
         return $page;
