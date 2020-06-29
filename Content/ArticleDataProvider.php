@@ -234,8 +234,14 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     private function hasNextPage(\Countable $queryResult, $limit, $page, $pageSize)
     {
         $count = $queryResult->count();
-        if ($limit && $limit < $count) {
-            $count = $limit;
+
+        if (null === $pageSize || $pageSize > $this->defaultLimit) {
+            $pageSize = $this->defaultLimit;
+        }
+
+        $offset = ($page - 1) * $pageSize;
+        if ($limit && $offset + $pageSize > $limit) {
+            return false;
         }
 
         return $count > ($page * $pageSize);
@@ -427,22 +433,18 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     private function addPagination(Search $search, $pageSize, $page, $limit)
     {
-        $offset = 0;
-        if ($pageSize) {
-            $pageSize = intval($pageSize);
-            $offset = ($page - 1) * $pageSize;
+        if (null === $pageSize || $pageSize > $this->defaultLimit) {
+            $pageSize = $this->defaultLimit;
         }
 
-        if (null === $limit) {
-            $limit = $this->defaultLimit;
-        }
+        $offset = ($page - 1) * $pageSize;
 
-        if (null === $pageSize || $offset + $pageSize > $limit) {
+        if ($limit && $offset + $pageSize > $limit) {
             $pageSize = $limit - $offset;
+        }
 
-            if ($pageSize < 0) {
-                $pageSize = 0;
-            }
+        if ($pageSize < 0) {
+            $pageSize = 0;
         }
 
         $search->setFrom($offset);
