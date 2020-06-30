@@ -1,6 +1,5 @@
-sudo: false
+os: linux
 dist: trusty
-
 language: php
 
 services:
@@ -20,7 +19,7 @@ cache:
     - "downloads"
     - "$HOME/.composer/cache/files"
 
-matrix:
+jobs:
   include:
     - php: 7.2
       env:
