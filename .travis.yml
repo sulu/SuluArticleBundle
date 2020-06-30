@@ -26,6 +26,7 @@ jobs:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
         - ES_VERSION="5.6.14"
         - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.14.tar.gz"
+        - COMPOSER_PACKAGE_VERSION=true
         - DATABASE_CHARSET=UTF8
         - DATABASE_COLLATE=UTF8_BIN
     - php: 7.4
@@ -46,10 +47,11 @@ before_install:
     fi
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
-  - composer self-update
+  - composer self-update --snapshot
 
 install:
-  - if [[ $PHPSTAN == 'true' ]]; then composer require --dev phpstan/phpstan:^0.12 --no-update $COMPOSER_FLAGS ; fi
+  - if [[ $PHPSTAN == 'true' ]]; then composer require --dev phpstan/phpstan:^0.12 --no-update ; fi
+  - if [[ $COMPOSER_PACKAGE_VERSION == 'true' ]]; then composer require --dev composer/package-versions-deprecated --no-update ; fi
   - composer update $COMPOSER_FLAGS
   - composer info -i
   - java -version
