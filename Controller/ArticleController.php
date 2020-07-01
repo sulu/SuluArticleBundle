@@ -243,8 +243,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 $query = new BoolQuery();
 
                 foreach ($types as $type) {
-                    $query->add(new TermQuery('type', $type));
+                    $query->add(new TermQuery('type', $type), BoolQuery::SHOULD);
                 }
+
+                $search->addQuery($query);
             } elseif ($types[0]) {
                 $search->addQuery(new TermQuery('type', $types[0]));
             }

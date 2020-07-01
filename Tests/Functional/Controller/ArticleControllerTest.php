@@ -43,7 +43,7 @@ class ArticleControllerTest extends SuluTestCase
 {
     use ArticleViewDocumentIdTrait;
 
-    private static $typeMap = ['default' => 'blog', 'simple' => 'video'];
+    private static $typeMap = ['default' => 'blog', 'simple' => 'video', 'default_fallback' => 'other'];
 
     /**
      * @var Client
@@ -934,6 +934,22 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertContains([$article2['id'], $article2['title']], $items);
+    }
+
+    public function testCGetMultipleTypes()
+    {
+        $article1 = $this->testPost('Sulu', 'default');
+        $article2 = $this->testPost('Sulu is awesome', 'simple');
+        $article3 = $this->testPost('Sulu is great', 'default_fallback');
+        $this->flush();
+
+        $this->client->request('GET', '/api/articles?locale=de&types=blog,video&fields=title');
+
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
     }
 
     public function testCGetFilterByContactId()
