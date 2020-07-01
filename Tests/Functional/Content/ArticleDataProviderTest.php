@@ -209,6 +209,34 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertFalse($result->getHasNextPage());
     }
 
+    public function testResolveResourceItemsPaginationWithPageSizeSmallerThanDefaultLimit()
+    {
+        $items = [
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+            $this->createArticle(),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $reflectionClass = new \ReflectionClass($dataProvider);
+        $reflectionProperty = $reflectionClass->getProperty('defaultLimit');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($dataProvider, 3);
+
+        $pageSize = 20; // need to be bigger as default limit and should have no effect then
+
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 1, $pageSize);
+        $this->assertCount(3, $result->getItems());
+        $this->assertTrue($result->getHasNextPage());
+
+        $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], null, 2, $pageSize);
+        $this->assertCount(1, $result->getItems());
+        $this->assertFalse($result->getHasNextPage());
+    }
+
     public function testResolveResourceItemsPaginationWithLimit()
     {
         $items = [
@@ -224,6 +252,7 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 1, 2);
         $this->assertCount(2, $result->getItems());
         $this->assertTrue($result->getHasNextPage());
+
         $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
