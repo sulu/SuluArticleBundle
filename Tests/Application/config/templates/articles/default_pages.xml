@@ -10,9 +10,7 @@
     <cacheLifetime>2400</cacheLifetime>
 
     <properties>
-        <property name="title" type="text_line" mandatory="true">
-            <tag name="sulu_article.article_title"/>
-        </property>
+        <property name="title" type="text_line" mandatory="true"/>
 
         <property name="routePath" type="route">
             <tag name="sulu_article.article_route"/>
