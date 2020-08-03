@@ -14,4 +14,4 @@ parameters:
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
     ignoreErrors:
-        - '#Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch()#'
+        - '#Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\)#'
