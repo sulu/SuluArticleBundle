@@ -656,6 +656,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
+
+        // is only available for sulu 2.1
+        unset($response['ext']['excerpt']['segment']);
+
         $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
     }
 

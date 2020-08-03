@@ -2,6 +2,12 @@
 <container xmlns="http://symfony.com/schema/dic/services"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter key="sulu_article.export.article.formats" type="collection">
+            <parameter key="1.2.xliff">@SuluArticle/Export/Article/1.2.xliff.twig</parameter>
+        </parameter>
+    </parameters>
+
     <services>
         <service id="sulu_article.reindex_command" class="Sulu\Bundle\ArticleBundle\Command\ReindexCommand">
             <argument type="service" id="sulu_core.webspace.webspace_manager" />
@@ -453,6 +459,23 @@
             <argument type="service" id="sulu_article.resolver.webspaces"/>
 
             <tag name="kernel.event_subscriber" />
+        </service>
+
+        <!-- Export -->
+        <service id="sulu_article.export.command" class="Sulu\Bundle\ArticleBundle\Command\ArticleExportCommand">
+            <argument type="service" id="sulu_article.export.exporter"/>
+
+            <tag name="console.command"/>
+        </service>
+
+        <service id="sulu_article.export.exporter" class="Sulu\Bundle\ArticleBundle\Export\ArticleExport">
+            <argument type="service" id="twig"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.document_inspector"/>
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_page.extension.manager"/>
+            <argument type="service" id="sulu_page.export.manager"/>
+            <argument>%sulu_article.export.article.formats%</argument>
         </service>
     </services>
 </container>

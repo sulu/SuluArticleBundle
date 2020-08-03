@@ -14,3 +14,4 @@ This documentation covers basic-topics to install and use this bundle.
 * [Author](author.md)
 * [Article Types](article-types.md)
 * [Multi Webspaces](multi-webspaces.md)
+* [XLIFF Export / Import](xliff.md)
