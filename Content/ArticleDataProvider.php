@@ -261,6 +261,20 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $search->addQuery($webspaceQuery);
         }
 
+        $segmentKey = $filters['segmentKey'] ?? null;
+        if ($segmentKey && $webspaceKey) {
+            $matchingSegmentQuery = new TermQuery('excerpt.segments.assignment_key', $webspaceKey . '#' . $segmentKey);
+
+            $noSegmentQuery = new BoolQuery();
+            $noSegmentQuery->add(new TermQuery('excerpt.segments.webspace_key', $webspaceKey), BoolQuery::MUST_NOT);
+
+            $segmentQuery = new BoolQuery();
+            $segmentQuery->add($matchingSegmentQuery, BoolQuery::SHOULD);
+            $segmentQuery->add($noSegmentQuery, BoolQuery::SHOULD);
+
+            $search->addQuery($segmentQuery);
+        }
+
         return $repository->findDocuments($search);
     }
 
