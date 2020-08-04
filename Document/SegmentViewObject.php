@@ -19,41 +19,26 @@ use ONGR\ElasticsearchBundle\Annotation\Property;
  *
  * @ObjectType
  */
-class CategoryViewObject
+class SegmentViewObject
 {
-    /**
-     * @var int
-     *
-     * @Property(type="integer")
-     */
-    public $id;
-
     /**
      * @var string
      *
-     * @Property(
-     *     type="text",
-     *     options={
-     *        "fields"={
-     *            "raw"={"type"="keyword"},
-     *            "value"={"type"="text"}
-     *        }
-     *    }
-     * )
+     * @Property(type="keyword")
      */
-    public $name;
+    public $assignmentKey;
 
     /**
      * @var string
      *
      * @Property(type="keyword")
      */
-    public $key;
+    public $webspaceKey;
 
     /**
-     * @var string[]
+     * @var string
      *
-     * @Property(type="text")
+     * @Property(type="keyword")
      */
-    public $keywords = [];
+    public $segmentKey;
 }
