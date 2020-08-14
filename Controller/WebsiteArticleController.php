@@ -17,7 +17,9 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Resolver\ArticleContentResolverInterface;
 use Sulu\Bundle\HttpCacheBundle\Cache\SuluHttpCache;
 use Sulu\Bundle\PreviewBundle\Preview\Preview;
+use Sulu\Bundle\WebsiteBundle\Resolver\ParameterResolverInterface;
 use Sulu\Bundle\WebsiteBundle\Resolver\TemplateAttributeResolverInterface;
+use Sulu\Component\Webspace\Analyzer\RequestAnalyzerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,8 +64,12 @@ class WebsiteArticleController extends AbstractController
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $templateAttributeResolver = $this->getTemplateAttributeResolver();
-        $data = $templateAttributeResolver->resolve(array_merge($content, $attributes));
+        $data = $this->get('sulu_website.resolver.parameter')->resolve(
+            array_merge($content, $attributes),
+            $this->get('sulu_core.webspace.request_analyzer'),
+            null,
+            $preview
+        );
 
         try {
             if ($partial) {
@@ -200,6 +206,8 @@ class WebsiteArticleController extends AbstractController
         $subscribedServices['twig'] = Environment::class;
         $subscribedServices['sulu_website.resolver.template_attribute'] = TemplateAttributeResolverInterface::class;
         $subscribedServices['sulu_article.article_content_resolver'] = ArticleContentResolverInterface::class;
+        $subscribedServices['sulu_website.resolver.parameter'] = ParameterResolverInterface::class;
+        $subscribedServices['sulu_core.webspace.request_analyzer'] = RequestAnalyzerInterface::class;
 
         return $subscribedServices;
     }
