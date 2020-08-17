@@ -630,6 +630,7 @@ class ArticleControllerTest extends SuluTestCase
                     'ids' => [1],
                 ],
                 'audience_targeting_groups' => [],
+                'segments' => [],
             ],
         ]
     ) {
