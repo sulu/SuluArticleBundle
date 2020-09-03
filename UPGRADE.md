@@ -16,7 +16,7 @@ composer remove ongr/elasticsearch-dsl --no-update
 composer require elasticsearch/elasticsearch:"^7" --no-update
 
 # Update article bundle to newest version:
-composer require sulu/article-bundle:"^1.2" --with-dependencies
+composer require sulu/article-bundle:"^2.1" --with-dependencies
 
 # Reindex your articles when upgrading elasticsearch version:
 bin/adminconsole ongr:es:index:create --manager default
