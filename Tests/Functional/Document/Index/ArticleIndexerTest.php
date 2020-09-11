@@ -358,6 +358,9 @@ class ArticleIndexerTest extends SuluTestCase
      */
     private function findViewDocument($uuid, $locale = null)
     {
-        return $this->manager->find(ArticleViewDocument::class, $uuid . '-' . ($locale ? $locale : $this->locale));
+        return $this->manager->find(
+            $this->getContainer()->getParameter('sulu_article.view_document.article.class'),
+            $uuid . '-' . ($locale ? $locale : $this->locale)
+        );
     }
 }

@@ -48,7 +48,7 @@ use ONGR\ElasticsearchBundle\Annotation\Property;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument as SuluArticleViewDocument;
 
 /**
- * @Document(type="app_article")
+ * @Document(type="article")
  */
 class ArticleViewDocument extends SuluArticleViewDocument
 {

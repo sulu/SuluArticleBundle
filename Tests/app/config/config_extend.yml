@@ -19,3 +19,17 @@ sulu_route:
             options:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
                 parent: "{object.getParent().getRoutePath()}"
+
+ongr_elasticsearch:
+    managers:
+        default:
+            mappings:
+                - TestExtendBundle
+        live:
+            mappings:
+                - TestExtendBundle
+
+sulu_article:
+    documents:
+        article:
+            view: Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticleViewDocument
