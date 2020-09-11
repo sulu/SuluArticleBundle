@@ -434,7 +434,6 @@
             <tag name="massive_build.builder" />
         </service>
 
-
         <!-- webspace settings resolver -->
         <service id="sulu_bundle_article.webspace_settings_configuration_resolver"
                  class="Sulu\Bundle\ArticleBundle\DependencyInjection\WebspaceSettingsConfigurationResolver">
@@ -453,6 +452,14 @@
             <argument type="service" id="sulu_article.resolver.webspaces"/>
 
             <tag name="kernel.event_subscriber" />
+        </service>
+
+        <!-- annotation reader -->
+        <service id="sulu_article.annotations.cached_reader"
+                 decorates="es.annotations.cached_reader"
+                 class="Sulu\Bundle\ArticleBundle\Elasticsearch\AnnotationReader">
+            <argument type="service" id="sulu_article.annotations.cached_reader.inner"/>
+            <argument type="string">%sulu_article.view_document.article.class%</argument>
         </service>
     </services>
 </container>

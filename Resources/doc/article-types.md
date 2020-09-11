@@ -24,8 +24,7 @@ sulu_article:
             translation_key: "app.article_types.my_article_type"
 ```
 
-This key can the be used to translate the key with the 
-[Sulu translation system](http://docs.sulu.io/en/latest/developer/contributing/adding-translations.html).
+This key can the be used to translate the key by adding a Translation File `translations/admin.en.json`.
 
 ## Usage in Content-Types
 
