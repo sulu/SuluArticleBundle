@@ -657,7 +657,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
 
-        // is only available for sulu 2.1
+        // segment is only returned for sulu versions >= 2.2
         unset($response['ext']['excerpt']['segment']);
 
         $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
@@ -1679,7 +1679,10 @@ class ArticleControllerTest extends SuluTestCase
         /** @var Manager $manager */
         $manager = $this->getContainer()->get('es.manager.default');
 
-        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+        return $manager->find(
+            $this->getContainer()->getParameter('sulu_article.view_document.article.class'),
+            $this->getViewDocumentId($uuid, $locale)
+        );
     }
 
     /**
