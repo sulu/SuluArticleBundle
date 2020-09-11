@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Content;
 
 use ONGR\ElasticsearchDSL\Query\TermLevel\PrefixQuery;
 use ONGR\ElasticsearchDSL\Search;
+use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\SmartContent\DatasourceItem;
 
 /**
@@ -41,6 +42,10 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
 
         $document = $this->documentManager->find($datasource, $options['locale']);
 
+        if (!$document instanceof BasePageDocument) {
+            return null;
+        }
+
         return new DatasourceItem($document->getUuid(), $document->getTitle(), $document->getResourceSegment());
     }
 
@@ -56,7 +61,8 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
         }
 
         $document = $this->documentManager->find($filters['dataSource'], $locale);
-        if ($document) {
+
+        if ($document instanceof BasePageDocument && $document->getResourceSegment()) {
             // the selected data-source could be removed
             $search->addQuery(new PrefixQuery('route_path.raw', $document->getResourceSegment()));
         }

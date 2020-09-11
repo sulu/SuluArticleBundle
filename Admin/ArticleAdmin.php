@@ -276,7 +276,6 @@ class ArticleAdmin extends Admin
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_EXCERPT . '_' . $typeKey, '/excerpt')
                     ->setResourceKey('articles')
                     ->setFormKey('page_excerpt')
-                    ->setBackView(static::LIST_VIEW)
                     ->setTabTitle('sulu_page.excerpt')
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
@@ -285,7 +284,6 @@ class ArticleAdmin extends Admin
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SETTINGS . '_' . $typeKey, '/settings')
                     ->setResourceKey('articles')
                     ->setFormKey('article_settings')
-                    ->setBackView(static::LIST_VIEW)
                     ->setTabTitle('sulu_page.settings')
                     ->setTabPriority(512)
                     ->addToolbarActions($formToolbarActionsWithoutType)
@@ -307,18 +305,10 @@ class ArticleAdmin extends Admin
      */
     public function getSecurityContexts()
     {
-        $types = [];
         $securityContext = [];
 
-        /** @var StructureBridge $structure */
-        foreach ($this->structureManager->getStructures('article') as $structure) {
-            $type = $this->getType($structure->getStructure());
-            if (!array_key_exists($type, $types)) {
-                $types[$type] = [
-                    'type' => $structure->getKey(),
-                ];
-            }
-            $securityContext[static::SECURITY_CONTEXT . '_' . $type] = [
+        foreach ($this->getTypes() as $typeKey => $type) {
+            $securityContext[static::SECURITY_CONTEXT . '_' . $typeKey] = [
                 PermissionTypes::VIEW,
                 PermissionTypes::ADD,
                 PermissionTypes::EDIT,
@@ -347,11 +337,16 @@ class ArticleAdmin extends Admin
     {
         $types = [];
 
+        // prefill array with keys from configuration to keep order of configuration for tabs
+        foreach ($this->articleTypeConfigurations as $typeKey => $articleTypeConfiguration) {
+            $types[$typeKey] = [];
+        }
+
         /** @var StructureBridge $structure */
         foreach ($this->structureManager->getStructures('article') as $structure) {
             $type = $this->getType($structure->getStructure(), null);
             $typeKey = $type ?: 'default';
-            if (!array_key_exists($typeKey, $types)) {
+            if (empty($types[$typeKey])) {
                 $types[$typeKey] = [
                     'type' => $type,
                     'default' => $structure->getKey(),

@@ -1,6 +1,27 @@
 # Upgrade
 
-## dev-develop
+## dev-release/2.0
+
+### Mapping of index changed
+
+Because the length of the indexed formats of the MediaViewObject the type has been changed to `binary`.
+
+To upgrade it run following commands:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
+### Teaser Migrations
+
+Run the following command to migrate the teaser provider in the articles.
+
+```bash
+bin/console phpcr:migrations:migrate
+```
+
+## 2.0.0
 
 ### Routing changed
 
@@ -26,6 +47,29 @@ The filter for article types has changed from `?type=blog` to `?types=blog`
 ### ElasticSearchFieldDescriptor constructor changed
 
 The ElasticSearchFieldDescriptor changed see FieldDescriptor update in the UPGRADE.md of sulu/sulu.
+
+## 1.2.0
+
+We now use an own fork of the elasticsearch packages to provide Elasticsearch 7 support.
+For upgrading you can use the following commands:
+
+```bash
+# Remove ongr packages:
+composer remove ongr/elasticsearch-bundle --no-update
+composer remove ongr/elasticsearch-dsl --no-update
+
+# Use your matching elasticsearch version here ( ^5, ^6 or ^7 ):
+composer require elasticsearch/elasticsearch:”^7” --no-update
+
+# Update article bundle to newest version:
+composer require sulu/article-bundle:”^1.2” --with-dependencies
+
+# Reindex your articles when upgrading elasticsearch version:
+bin/adminconsole ongr:es:index:create --manager default
+bin/adminconsole ongr:es:index:create --manager live
+bin/adminconsole sulu:article:reindex
+bin/websiteconsole sulu:article:reindex
+```
 
 ## 1.1.1
 

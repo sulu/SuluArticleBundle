@@ -1,6 +1,5 @@
-sudo: false
+os: linux
 dist: trusty
-
 language: php
 
 services:
@@ -20,26 +19,31 @@ cache:
     - "downloads"
     - "$HOME/.composer/cache/files"
 
-matrix:
+jobs:
   include:
     - php: 7.2
       env:
         - COMPOSER_FLAGS="--prefer-lowest --prefer-dist --no-interaction"
         - ES_VERSION="5.6.14"
-        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
+        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.14.tar.gz"
         - DATABASE_CHARSET=UTF8
         - DATABASE_COLLATE=UTF8_BIN
-    - php: 7.3
+    - php: 7.4
       env:
         - COMPOSER_FLAGS="--prefer-dist --no-interaction"
         - PHPCR_TRANSPORT=jackrabbit
         - PHPSTAN=true
-        - ES_VERSION="6.5.4"
-        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.zip"
+        - PECL_INSTALL=imagick
+        - ES_VERSION="7.5.2"
+        - ES_DOWNLOAD_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.5.2-linux-x86_64.tar.gz"
         # Code coverage currently disabled takes a very long time
         # - CODE_COVERAGE="--coverage-clover=coverage.clover"
 
 before_install:
+  - |
+    if [[ $PECL_INSTALL ]]; then
+        printf "\n" | pecl install $PECL_INSTALL
+    fi
   - if [[ -z $CODE_COVERAGE ]]; then phpenv config-rm xdebug.ini ; fi
   - phpenv config-add Tests/travis.php.ini
   - composer self-update
@@ -58,9 +62,11 @@ install:
         fi
         java -jar downloads/jackrabbit-standalone-$JACKRABBIT_VERSION.jar &
     fi
-  - curl -L -o elasticsearch.zip ${ES_DOWNLOAD_URL}
-  - unzip elasticsearch.zip
-  - ./elasticsearch-*/bin/elasticsearch -d
+  - wget ${ES_DOWNLOAD_URL}
+  - tar xvzf elasticsearch-*.tar.gz
+  - cd ./elasticsearch-*
+  - bin/elasticsearch -d
+  - cd ..
   - wget --waitretry=10 --retry-connrefused -v http://127.0.0.1:9200/
   - composer bootstrap-test-env
 

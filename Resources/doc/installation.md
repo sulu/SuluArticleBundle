@@ -2,50 +2,13 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0`.
+The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
 
-Before installing the Article Bundle by running the require you will need to configure the Elasticsearch Bundle, as
-this will be added by composer to the `config/bundles.php` automatically and then break the installation process.
-
-```yml
-# config/packages/ongr_elasticsearch.yaml
-
-ongr_elasticsearch:
-    analysis:
-        tokenizer:
-            pathTokenizer:
-                type: path_hierarchy
-        analyzer:
-            pathAnalyzer:
-                tokenizer: pathTokenizer
-    managers:
-        default:
-            index:
-                index_name: 'su_articles'
-                hosts:
-                    - 'user:password@127.0.0.1:9200'
-        live:
-            index:
-                index_name: 'su_articles_live'
-                hosts:
-                    - 'user:password@127.0.0.1:9200'
-```
-
-## Install the bundle
+## Install dependencies
 
 ```bash
+composer require elasticsearch/elasticsearch:^7.0 # use matching elasticsearch version
 composer require sulu/article-bundle
-```
-
-### Add bundles to AbstractKernel
-
-The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`.
-
-```php
-/* config/bundles.php */
-
-Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
-ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
 
 ### Configure SuluArticleBundle and sulu core
@@ -64,12 +27,6 @@ sulu_route:
             options:
                 route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
                 parent: "{object.getParent().getRoutePath()}"
-
-sulu_core:
-    content:
-        structure:
-            default_type:
-                article: "default"
 
 sulu_article:
     index_name: su_articles
@@ -160,7 +117,7 @@ Add xml template for structure in configured folder:
 ```
 
 Example is located in Bundle
-[article.xml](article.xml).
+[default.xml](default.xml).
 
 Add template for article type in configured folder:
 
@@ -169,7 +126,7 @@ Add template for article type in configured folder:
 ```
 
 Example is located in Bundle
-[article.html.twig](article.html.twig).
+[default.html.twig](default.html.twig).
 
 ## Initialize bundle
 
@@ -229,4 +186,18 @@ sulu_article:
         - excerpt.seo.description
         - excerpt.seo.keywords
         - teaser_description
+```
+
+## Troubleshooting
+
+### Add bundles to AbstractKernel
+
+The bundle need to be registered after the `SuluCoreBundle` and `SuluDocumentManagerBundle`. This should be done
+automatically by Symfony Flex, if that fails for some reason you have to do it manually:
+
+```php		
+/* config/bundles.php */
+       	
+Sulu\Bundle\ArticleBundle\SuluArticleBundle::class => ['all' => true],
+ONGR\ElasticsearchBundle\ONGRElasticsearchBundle::class => ['all' => true],
 ```
