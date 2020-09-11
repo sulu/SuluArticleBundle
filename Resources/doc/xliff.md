@@ -9,13 +9,16 @@ __Export:__
 
 ```bash
 $ bin/adminconsole sulu:article:export export.xliff en
+
 Article Language Export
 =======================
+
 Options
 Target: export.xliff
 Locale: en
 Format: 1.2.xliff
 ---------------
+
 Continue with this options?(y/n) y
 Continue!
 Loading Data…
