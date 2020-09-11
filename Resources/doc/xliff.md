@@ -29,5 +29,22 @@ Render Xliff…
 __Import:__
 
 ```bash
-TODO ...
+$ bin/adminconsole sulu:article:import export.xliff de --overrideSettings
+Language Import
+===============
+
+Options
+Locale: de
+Format: 1.2.xliff
+Override Setting: YES
+---------------
+
+Continue with this options? Be careful! (y/n) y
+Continue!
+ 1/1 [============================] 100% 2 secs/2 secs 54.5 MiB
+
+Import Result
+===============
+1 Documents imported.
+0 Documents ignored.
 ```

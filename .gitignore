@@ -37,3 +37,4 @@ npm-debug.log
 # tests
 /Tests/Application/config/parameters.yml
 /Tests/Application/var
+/Tests/Functional/Import/export.test.xliff

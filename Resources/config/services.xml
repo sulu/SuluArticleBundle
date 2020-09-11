@@ -477,5 +477,24 @@
             <argument type="service" id="sulu_page.export.manager"/>
             <argument>%sulu_article.export.article.formats%</argument>
         </service>
+
+        <!-- Import -->
+        <service id="sulu_article.import.command" class="Sulu\Bundle\ArticleBundle\Command\ArticleImportCommand">
+            <argument type="service" id="sulu_article.import.importer"/>
+
+            <tag name="console.command"/>
+        </service>
+
+        <service id="sulu_article.import.importer" class="Sulu\Bundle\ArticleBundle\Import\ArticleImport">
+            <argument type="service" id="sulu_document_manager.document_manager" />
+            <argument type="service" id="sulu_document_manager.document_inspector" />
+            <argument type="service" id="sulu_document_manager.document_registry" />
+            <argument type="service" id="sulu_page.compat.structure.legacy_property_factory" />
+            <argument type="service" id="sulu.content.structure_manager" />
+            <argument type="service" id="sulu_page.extension.manager" />
+            <argument type="service" id="sulu_page.import.manager" />
+            <argument type="service" id="sulu_page.import.webspace.xliff12" />
+            <argument type="service" id="logger" on-invalid="null"/>
+        </service>
     </services>
 </container>
