@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\IndexerInterface;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
@@ -414,7 +413,10 @@ class ArticlePageControllerTest extends SuluTestCase
         /** @var Manager $manager */
         $manager = $this->getContainer()->get('es.manager.default');
 
-        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+        return $manager->find(
+            $this->getContainer()->getParameter('sulu_article.view_document.article.class'),
+            $this->getViewDocumentId($uuid, $locale)
+        );
     }
 
     private function getRoute($title, $page)

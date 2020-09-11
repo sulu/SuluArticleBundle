@@ -19,7 +19,8 @@ use ONGR\ElasticsearchBundle\Annotation\Property;
 /**
  * Indexable document for articles.
  *
- * @Document(type="article")
+ * Following annotation will be set by the annotation reader if this document is used for mapping.
+ * Document(type="article")
  */
 class ArticleViewDocument implements ArticleViewDocumentInterface
 {

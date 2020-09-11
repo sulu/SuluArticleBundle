@@ -656,7 +656,12 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
-        $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
+
+        // segment is only returned for sulu versions >= 2.2
+        $responseExcerpt = $response['ext']['excerpt'];
+        unset($response['segment']);
+
+        $this->assertEquals($extensions['excerpt'], $responseExcerpt);
     }
 
     public function testPutDifferentTemplate($title = 'Sulu', $description = 'Sulu is awesome')
@@ -1675,7 +1680,10 @@ class ArticleControllerTest extends SuluTestCase
         /** @var Manager $manager */
         $manager = $this->getContainer()->get('es.manager.default');
 
-        return $manager->find(ArticleViewDocument::class, $this->getViewDocumentId($uuid, $locale));
+        return $manager->find(
+            $this->getContainer()->getParameter('sulu_article.view_document.article.class'),
+            $this->getViewDocumentId($uuid, $locale)
+        );
     }
 
     /**
