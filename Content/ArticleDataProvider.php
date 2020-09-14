@@ -21,6 +21,7 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
+use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -263,7 +264,10 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
         $segmentKey = $filters['segmentKey'] ?? null;
         if ($segmentKey && $webspaceKey) {
-            $matchingSegmentQuery = new TermQuery('excerpt.segments.assignment_key', $webspaceKey . '#' . $segmentKey);
+            $matchingSegmentQuery = new TermQuery(
+                'excerpt.segments.assignment_key',
+                $webspaceKey . SegmentSelect::SEPARATOR . $segmentKey
+            );
 
             $noSegmentQuery = new BoolQuery();
             $noSegmentQuery->add(new TermQuery('excerpt.segments.webspace_key', $webspaceKey), BoolQuery::MUST_NOT);
