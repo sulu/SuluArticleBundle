@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
@@ -260,6 +261,10 @@ class ArticleDataProviderTest extends SuluTestCase
 
     public function testResolveResourceItemsWithSegments()
     {
+        if (!class_exists(SegmentSelect::class)) {
+            $this->markTestSkipped('Segments did not exist in Sulu <2.2.');
+        }
+
         $items = [
             $this->createArticle('Test Article 1', 'default', 'test', null, ['test' => 's']),
             $this->createArticle('Test Article 2', 'default', 'test', null, ['test' => 'w']),
