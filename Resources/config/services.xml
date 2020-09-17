@@ -150,6 +150,9 @@
             <argument type="service" id="sulu_media.media_manager"/>
         </service>
 
+        <service id="sulu_article.elastic_search.factory.segment_collection"
+                 class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\SegmentCollectionFactory"/>
+
         <service id="sulu_article.elastic_search.factory.tag_collection"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\Factory\TagCollectionFactory">
             <argument type="service" id="sulu_tag.tag_manager"/>
@@ -165,6 +168,7 @@
             <argument type="service" id="sulu_article.elastic_search.factory.category_collection"/>
             <argument type="service" id="sulu_article.elastic_search.factory.tag_collection"/>
             <argument type="service" id="sulu_article.elastic_search.factory.media_collection"/>
+            <argument type="service" id="sulu_article.elastic_search.factory.segment_collection"/>
         </service>
 
         <!-- document -->

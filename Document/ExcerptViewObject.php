@@ -83,6 +83,13 @@ class ExcerptViewObject
     public $tags;
 
     /**
+     * @var SegmentViewObject[]|Collection
+     *
+     * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\SegmentViewObject", multiple=true)
+     */
+    public $segments;
+
+    /**
      * @var MediaViewObject[]|Collection
      *
      * @Embedded(class="Sulu\Bundle\ArticleBundle\Document\MediaViewObject", multiple=true)
@@ -100,6 +107,7 @@ class ExcerptViewObject
     {
         $this->tags = new Collection();
         $this->categories = new Collection();
+        $this->segments = new Collection();
         $this->icon = new Collection();
         $this->images = new Collection();
     }

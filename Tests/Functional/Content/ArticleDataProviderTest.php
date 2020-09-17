@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\SmartContent\DataProviderInterface;
@@ -256,6 +257,42 @@ class ArticleDataProviderTest extends SuluTestCase
         $result = $dataProvider->resolveResourceItems([], [], ['locale' => 'de', 'webspaceKey' => 'sulu_io'], 3, 2, 2);
         $this->assertCount(1, $result->getItems());
         $this->assertFalse($result->getHasNextPage());
+    }
+
+    public function testResolveResourceItemsWithSegments()
+    {
+        if (!class_exists(SegmentSelect::class)) {
+            $this->markTestSkipped('Segments did not exist in Sulu <2.2.');
+        }
+
+        $items = [
+            $this->createArticle('Test Article 1', 'default', 'test', null, ['test' => 's']),
+            $this->createArticle('Test Article 2', 'default', 'test', null, ['test' => 'w']),
+            $this->createArticle('Test Article 3', 'default', 'test'),
+        ];
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        $result = $dataProvider->resolveResourceItems(
+            ['segmentKey' => 's'],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'test']
+        );
+        $items = $result->getItems();
+        $this->assertCount(2, $items);
+        $this->assertEquals('Test Article 1', $items[0]->getTitle());
+        $this->assertEquals('Test Article 3', $items[1]->getTitle());
+
+        $result = $dataProvider->resolveResourceItems(
+            ['segmentKey' => 'w'],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'test']
+        );
+        $items = $result->getItems();
+        $this->assertCount(2, $items);
+        $this->assertEquals('Test Article 2', $items[0]->getTitle());
+        $this->assertEquals('Test Article 3', $items[1]->getTitle());
     }
 
     public function testResolveResourceItemsPagination()
@@ -516,7 +553,8 @@ class ArticleDataProviderTest extends SuluTestCase
         $title = 'Test-Article',
         $template = 'default',
         $mainWebspace = null,
-        $additionalWebspaces = null
+        $additionalWebspaces = null,
+        $segments = null
     ) {
         $data = [
             'title' => $title,
@@ -529,6 +567,10 @@ class ArticleDataProviderTest extends SuluTestCase
 
         if ($additionalWebspaces) {
             $data['additionalWebspaces'] = $additionalWebspaces;
+        }
+
+        if ($segments) {
+            $data['ext'] = ['excerpt' => ['segments' => $segments]];
         }
 
         $this->client->request(

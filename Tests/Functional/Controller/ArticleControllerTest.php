@@ -28,6 +28,7 @@ use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
@@ -630,6 +631,7 @@ class ArticleControllerTest extends SuluTestCase
                     'ids' => [1],
                 ],
                 'audience_targeting_groups' => [],
+                'segments' => [],
             ],
         ]
     ) {
@@ -657,8 +659,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
 
-        // segment is only returned for sulu versions >= 2.2
-        unset($response['ext']['excerpt']['segment']);
+        if (!class_exists(SegmentSelect::class)) {
+            // segment is only returned for sulu versions >= 2.2
+            unset($extensions['excerpt']['segments']);
+        }
 
         $this->assertEquals($extensions['excerpt'], $response['ext']['excerpt']);
     }

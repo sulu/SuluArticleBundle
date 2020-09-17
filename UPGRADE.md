@@ -1,5 +1,17 @@
 # Upgrade
 
+## unreleased
+
+### Index mapping changed
+
+The mapping of the `CategoryViewObject` and `ExcerptViewObject` changed, therefore a reindex is
+necessary:
+
+```bash
+bin/websiteconsole sulu:article:reindex --drop
+bin/adminconsole sulu:article:reindex --drop
+``` 
+
 ## 2.1.0
 
 ### Elasticsearch Upgrade

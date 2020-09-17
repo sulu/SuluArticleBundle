@@ -34,16 +34,23 @@ class ExcerptFactory
     private $mediaCollectionFactory;
 
     /**
+     * @var SegmentCollectionFactory
+     */
+    private $segmentCollectionFactory;
+
+    /**
      * ExcerptIndexerFactory constructor.
      */
     public function __construct(
         CategoryCollectionFactory $categoryCollectionFactory,
         TagCollectionFactory $tagCollectionFactory,
-        MediaCollectionFactory $mediaCollectionFactory
+        MediaCollectionFactory $mediaCollectionFactory,
+        SegmentCollectionFactory $segmentCollectionFactory
     ) {
         $this->categoryCollectionFactory = $categoryCollectionFactory;
         $this->tagCollectionFactory = $tagCollectionFactory;
         $this->mediaCollectionFactory = $mediaCollectionFactory;
+        $this->segmentCollectionFactory = $segmentCollectionFactory;
     }
 
     /**
@@ -62,6 +69,7 @@ class ExcerptFactory
         $excerpt->description = $data['description'];
         $excerpt->tags = $this->tagCollectionFactory->create($data['tags']);
         $excerpt->categories = $this->categoryCollectionFactory->create($data['categories'], $locale);
+        $excerpt->segments = $this->segmentCollectionFactory->create($data['segments'] ?? []);
         $excerpt->icon = $this->mediaCollectionFactory->create($data['icon'] ?? [], $locale);
         $excerpt->images = $this->mediaCollectionFactory->create($data['images'] ?? [], $locale);
 
