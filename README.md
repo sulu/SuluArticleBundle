@@ -48,10 +48,11 @@ the [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/compos
 
 ## 🚀&nbsp; Installation and Documentation
 
-Execute the following [composer](https://getcomposer.org/) command to add the bundle to the dependencies of your 
+Execute the following [composer](https://getcomposer.org/) commands to add the bundle to the dependencies of your 
 project:
 
 ```bash
+composer require elasticsearch/elasticsearch:^7.9 # should match version of your elasticsearch installation
 composer require sulu/article-bundle
 ```
 

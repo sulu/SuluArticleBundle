@@ -28,27 +28,14 @@ class StructureValidatorCompilerPass implements CompilerPassInterface
     {
         $types = ['article', 'article_page'];
         $defaultTypes = $container->getParameter('sulu.content.structure.default_types');
-        $newDefaultTypes = $defaultTypes;
         /** @var StructureMetadataFactory $structureFactory */
         $structureFactory = $container->get('sulu_page.structure.factory');
 
         foreach ($types as $type) {
             $defaultType = $defaultTypes[$type] ?? null;
 
-            // this should be removed when is released https://github.com/sulu/sulu/pull/5381
-            // see https://github.com/sulu/SuluArticleBundle/pull/498 for more information
             if (!$defaultType) {
-                $metadatas = $structureFactory->getStructures($type);
-
-                foreach ($metadatas as $metadata) {
-                    $defaultType = $metadata->getName();
-
-                    break;
-                }
-
-                unset($defaultTypes[$type]);
-                $container->setParameter('sulu.content.structure.default_types', $defaultTypes);
-                $newDefaultTypes[$type] = $defaultType;
+                continue;
             }
 
             try {
@@ -57,10 +44,5 @@ class StructureValidatorCompilerPass implements CompilerPassInterface
                 throw new DefaultArticleTypeNotFoundException($type, $defaultType, $exception);
             }
         }
-
-        // this should be removed when is released https://github.com/sulu/sulu/pull/5381
-        // see https://github.com/sulu/SuluArticleBundle/pull/498 for more information
-        $definition = $container->getDefinition('sulu_page.structure.factory');
-        $definition->setArgument(2, $newDefaultTypes);
     }
 }
