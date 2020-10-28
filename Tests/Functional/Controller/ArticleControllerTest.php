@@ -1167,7 +1167,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNull($this->findViewDocument($article2['id'], 'de'));
     }
 
-    public function testCopyLocale()
+    public function testCopyLocaleWithoutSource()
     {
         // prepare vars
         $locale = 'de';
@@ -1175,7 +1175,9 @@ class ArticleControllerTest extends SuluTestCase
 
         // create article in default locale
         $article1 = $this->testPost('Sulu ist toll - Artikel 1');
+        $this->publish($article1['id']);
         $article2 = $this->testPost('Sulu ist toll - Artikel 2');
+        $this->publish($article2['id']);
         $this->flush();
 
         // get all articles in default locale
@@ -1212,7 +1214,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article1['id'], $article1['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
         $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
 
-        // request copy-locale post action for article1
+        // request copy-locale post action for article1 (published de locale should be returned)
         $this->client->request(
             'POST',
             '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&dest=' . $destLocale . '&action=copy-locale'
@@ -1221,7 +1223,86 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
         $this->assertEquals($article1['id'], $response['id']);
+        $this->assertEquals(true, $response['publishedState']);
         $this->assertEquals([$locale, $destLocale], $response['contentLocales']);
+
+        // get all articles in dest locale (now only one should be a ghost)
+        $this->client->request('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function($item) {
+                return [$item['id'], $item['title'], $item['localizationState']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $article1['title'], ['state' => 'localized']], $items);
+        $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
+    }
+
+    public function testCopyLocaleWithSource()
+    {
+        // prepare vars
+        $locale = 'en';
+        $srclocale = 'de';
+        $destLocale = 'en';
+
+        // create article in default locale
+        $article1 = $this->testPost('Sulu ist toll - Artikel 1');
+        $this->publish($article1['id']);
+        $article2 = $this->testPost('Sulu ist toll - Artikel 2');
+        $this->publish($article2['id']);
+        $this->flush();
+
+        // get all articles in default locale
+        $this->client->request('GET', '/api/articles?locale=' . $srclocale . '&types=blog&fields=title');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function($item) {
+                return [$item['id'], $item['title']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $article1['title']], $items);
+        $this->assertContains([$article2['id'], $article2['title']], $items);
+
+        // get all articles in dest locale (both should be ghosts)
+        $this->client->request('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertEquals(2, $response['total']);
+        $this->assertCount(2, $response['_embedded']['articles']);
+
+        $items = array_map(
+            function($item) {
+                return [$item['id'], $item['title'], $item['localizationState']];
+            },
+            $response['_embedded']['articles']
+        );
+
+        $this->assertContains([$article1['id'], $article1['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
+        $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
+
+        // request copy-locale post action for article1 (unpublished en locale should be returned)
+        $this->client->request(
+            'POST',
+            '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&src=' . $srclocale . '&dest=' . $destLocale . '&action=copy-locale'
+        );
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+
+        $this->assertEquals($article1['id'], $response['id']);
+        $this->assertEquals(false, $response['publishedState']);
+        $this->assertEquals([$srclocale, $destLocale], $response['contentLocales']);
 
         // get all articles in dest locale (now only one should be a ghost)
         $this->client->request('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
