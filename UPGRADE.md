@@ -1,6 +1,6 @@
 # Upgrade
 
-## unreleased
+## 2.2.0
 
 ### Index mapping changed
 
