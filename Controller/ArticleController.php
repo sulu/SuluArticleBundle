@@ -528,6 +528,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 
                     break;
                 case 'copy-locale':
+                    $srcLocale = $this->getRequestParameter($request, 'src', false, $locale);
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
                     $destLocales = explode(',', $destLocales);
 
@@ -538,7 +539,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                         );
                     }
 
-                    $this->contentMapper->copyLanguage($id, $userId, null, $locale, $destLocales);
+                    $this->contentMapper->copyLanguage($id, $userId, null, $srcLocale, $destLocales);
 
                     $data = $this->documentManager->find($id, $locale);
 
