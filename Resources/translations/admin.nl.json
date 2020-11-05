@@ -1,0 +1,14 @@
+{
+    "sulu_article.articles": "Artikelen",
+    "sulu_article.article": "Artikel",
+    "sulu_article.no_article_selected": "Geen artikel geselecteerd",
+    "sulu_article.single_selection_overlay_title": "Kies een artikel",
+    "sulu_article.selection_overlay_title": "Kies artikelen",
+    "sulu_article.selection_label": "{count} artikelen geselecteerd",
+    "sulu_article.webspace_settings": "Webspace instellingen",
+    "sulu_article.customize_webspace_settings": "Bewerken",
+    "sulu_article.main_webspace": "Hoofdwebspace",
+    "sulu_article.additional_webspace": "Aanvullende webspaces",
+    "sulu_article.shadow_article": "Schaduwartikel",
+    "sulu_article.enable_shadow_article": "Schaduwartikel inschakelen"
+}
