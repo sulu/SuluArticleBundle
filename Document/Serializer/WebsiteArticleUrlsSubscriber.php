@@ -19,6 +19,7 @@ use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -37,10 +38,19 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
      */
     private $routeRepository;
 
-    public function __construct(RequestStack $requestStack, RouteRepositoryInterface $routeRepository)
-    {
+    /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    public function __construct(
+        RequestStack $requestStack,
+        RouteRepositoryInterface $routeRepository,
+        WebspaceManagerInterface $webspaceManager
+    ) {
         $this->requestStack = $requestStack;
         $this->routeRepository = $routeRepository;
+        $this->webspaceManager = $webspaceManager;
     }
 
     /**
@@ -94,7 +104,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
             $urls[$locale] = $path;
             $localizations[$locale] = [
                 'locale' => $locale,
-                'url' => $path,
+                'url' => $this->webspaceManager->findUrlByResourceLocator($path, null, $locale),
             ];
         }
 

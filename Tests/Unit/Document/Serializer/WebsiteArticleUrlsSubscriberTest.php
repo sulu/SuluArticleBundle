@@ -24,6 +24,7 @@ use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -41,6 +42,11 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     private $routeRepository;
 
     /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
      * @var WebsiteArticleUrlsSubscriber
      */
     private $urlsSubscriber;
@@ -52,10 +58,12 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     {
         $this->requestStack = $this->prophesize(RequestStack::class);
         $this->routeRepository = $this->prophesize(RouteRepository::class);
+        $this->webspaceManager = $this->prophesize(WebspaceManagerInterface::class);
 
         $this->urlsSubscriber = new WebsiteArticleUrlsSubscriber(
             $this->requestStack->reveal(),
-            $this->routeRepository->reveal()
+            $this->routeRepository->reveal(),
+            $this->webspaceManager->reveal()
         );
 
         $webspace = new Webspace();
@@ -88,10 +96,12 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $deRoute = $this->prophesize(RouteInterface::class);
         $deRoute->getPath()->willReturn('/seite');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
+        $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
 
         $enRoute = $this->prophesize(RouteInterface::class);
         $enRoute->getPath()->willReturn('/page');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn($enRoute->reveal());
+        $this->webspaceManager->findUrlByResourceLocator('/page', null, 'en')->willReturn('http://sulu.io/page');
 
         $visitor->visitProperty(
             Argument::that(function(StaticPropertyMetadata $metadata) {
@@ -105,8 +115,8 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => '/seite'],
-                'en' => ['locale' => 'en', 'url' => '/page'],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite'],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page'],
             ]
         )->shouldBeCalled();
 
