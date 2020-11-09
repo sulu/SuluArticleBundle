@@ -85,16 +85,20 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         }
 
         $urls = [];
+        $localizations = [];
         foreach ($webspace->getAllLocalizations() as $localization) {
             $locale = $localization->getLocale();
             $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
+            $path = $route ? $route->getPath() : '/';
 
-            $urls[$locale] = '/';
-            if ($route) {
-                $urls[$locale] = $route->getPath();
-            }
+            $urls[$locale] = $path;
+            $localizations[$locale] = [
+                'locale' => $locale,
+                'url' => $path,
+            ];
         }
 
         $visitor->visitProperty(new StaticPropertyMetadata('', 'urls', $urls), $urls);
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'localizations', $localizations), $localizations);
     }
 }

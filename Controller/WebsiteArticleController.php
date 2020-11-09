@@ -64,12 +64,13 @@ class WebsiteArticleController extends AbstractController
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $data = $this->get('sulu_website.resolver.parameter')->resolve(
-            array_merge($content, $attributes),
+        $parameters = $this->get('sulu_website.resolver.parameter')->resolve(
+            [],
             $this->get('sulu_core.webspace.request_analyzer'),
             null,
             $preview
         );
+        $data = array_merge($parameters, $content, $attributes);
 
         try {
             if ($partial) {
