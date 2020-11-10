@@ -24,6 +24,7 @@ use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -41,6 +42,11 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     private $routeRepository;
 
     /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
      * @var WebsiteArticleUrlsSubscriber
      */
     private $urlsSubscriber;
@@ -52,10 +58,12 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     {
         $this->requestStack = $this->prophesize(RequestStack::class);
         $this->routeRepository = $this->prophesize(RouteRepository::class);
+        $this->webspaceManager = $this->prophesize(WebspaceManagerInterface::class);
 
         $this->urlsSubscriber = new WebsiteArticleUrlsSubscriber(
             $this->requestStack->reveal(),
-            $this->routeRepository->reveal()
+            $this->routeRepository->reveal(),
+            $this->webspaceManager->reveal()
         );
 
         $webspace = new Webspace();
@@ -83,19 +91,34 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $event->getVisitor()->willReturn($visitor->reveal());
         $event->getContext()->willReturn($context->reveal());
 
-        $expected = ['de' => '/seite', 'en' => '/page'];
-
         $entityClass = get_class($article->reveal());
-        foreach ($expected as $locale => $path) {
-            $route = $this->prophesize(RouteInterface::class);
-            $route->getPath()->willReturn($path);
 
-            $this->routeRepository->findByEntity($entityClass, $entityId, $locale)->willReturn($route->reveal());
-        }
+        $deRoute = $this->prophesize(RouteInterface::class);
+        $deRoute->getPath()->willReturn('/seite');
+        $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
+        $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
 
-        $visitor->visitProperty(Argument::that(function(StaticPropertyMetadata $metadata) {
-            return 'urls' === $metadata->name;
-        }), $expected)->shouldBeCalled();
+        $enRoute = $this->prophesize(RouteInterface::class);
+        $enRoute->getPath()->willReturn('/page');
+        $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn($enRoute->reveal());
+        $this->webspaceManager->findUrlByResourceLocator('/page', null, 'en')->willReturn('http://sulu.io/page');
+
+        $visitor->visitProperty(
+            Argument::that(function(StaticPropertyMetadata $metadata) {
+                return 'urls' === $metadata->name;
+            }),
+            ['de' => '/seite', 'en' => '/page']
+        )->shouldBeCalled();
+
+        $visitor->visitProperty(
+            Argument::that(function(StaticPropertyMetadata $metadata) {
+                return 'localizations' === $metadata->name;
+            }),
+            [
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite'],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page'],
+            ]
+        )->shouldBeCalled();
 
         $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
     }
