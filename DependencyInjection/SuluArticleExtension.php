@@ -130,6 +130,17 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             );
         }
 
+        if ($container->hasExtension('fos_js_routing')) {
+            $container->prependExtensionConfig(
+                'fos_js_routing',
+                [
+                    'routes_to_expose' => [
+                        'sulu_article.post_article_version_trigger',
+                    ],
+                ]
+            );
+        }
+
         if ($container->hasExtension('fos_rest')) {
             $container->prependExtensionConfig(
                 'fos_rest',
@@ -188,6 +199,12 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                             'routes' => [
                                 'list' => 'sulu_article.get_articles',
                                 'detail' => 'sulu_article.get_article',
+                            ],
+                        ],
+                        'article_versions' => [
+                            'routes' => [
+                                'list' => 'sulu_article.get_article_versions',
+                                'detail' => 'sulu_article.post_article_version_trigger',
                             ],
                         ],
                     ],

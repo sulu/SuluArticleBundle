@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <form xmlns="http://schemas.sulu.io/template/template"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/form-1.0.xsd"
 >
     <key>article_settings</key>
 
@@ -11,13 +11,13 @@
                 <anyOf>
                     <schema>
                         <properties>
-                            <property name="shadowOn" value="true" />
-                            <property name="shadowBaseLanguage" mandatory="true" />
+                            <property name="shadowOn" value="true"/>
+                            <property name="shadowBaseLanguage" mandatory="true"/>
                         </properties>
                     </schema>
                     <schema>
                         <properties>
-                            <property name="shadowOn" value="false" />
+                            <property name="shadowOn" value="false"/>
                         </properties>
                     </schema>
                 </anyOf>
@@ -41,7 +41,8 @@
             </params>
         </property>
 
-        <property name="mainWebspace" type="single_select" colspan="6" spaceAfter="6" disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
+        <property name="mainWebspace" type="single_select" colspan="6" spaceAfter="6"
+                  disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
             <meta>
                 <title>sulu_article.main_webspace</title>
             </meta>
@@ -55,7 +56,8 @@
             </params>
         </property>
 
-        <property name="additionalWebspaces" type="select" colspan="6" spaceAfter="6" disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
+        <property name="additionalWebspaces" type="select" colspan="6" spaceAfter="6"
+                  disabledCondition="!customizeWebspaceSettings" visibleCondition="shadowOn == false">
             <meta>
                 <title>sulu_article.additional_webspace</title>
             </meta>
@@ -81,7 +83,7 @@
                         <info_text>sulu_page.enable_shadow_page_info_text</info_text>
                     </meta>
                     <params>
-                        <param name="type" value="toggler" />
+                        <param name="type" value="toggler"/>
                         <param name="label">
                             <meta>
                                 <title>sulu_article.enable_shadow_article</title>
@@ -121,6 +123,14 @@
                     <meta>
                         <title>sulu_page.changelog</title>
                     </meta>
+                </property>
+
+                <property name="versions" type="settings_versions" onInvalid="ignore">
+                    <params>
+                        <param name="resource_key" type="string" value="article_versions"/>
+                        <param name="list_key" type="string" value="article_versions"/>
+                        <param name="user_settings_key" type="string" value="article_versions"/>
+                    </params>
                 </property>
             </properties>
         </section>

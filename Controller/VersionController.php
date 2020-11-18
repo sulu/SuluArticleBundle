@@ -70,11 +70,11 @@ class VersionController extends AbstractRestController implements ClassResourceI
     /**
      * Returns the versions for the article with the given UUID.
      */
-    public function cgetAction(Request $request, string $uuid): Response
+    public function cgetAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
 
-        $document = $this->documentManager->find($uuid, $request->query->get('locale'));
+        $document = $this->documentManager->find($id, $request->query->get('locale'));
         $versions = array_reverse(
             array_filter(
                 $document->getVersions(),
@@ -122,10 +122,10 @@ class VersionController extends AbstractRestController implements ClassResourceI
 
         $versionCollection = new ListRepresentation(
             $versionData,
-            'versions',
+            'article_versions',
             $request->attributes->get('_route'),
             [
-                'uuid' => $uuid,
+                'uuid' => $id,
                 'locale' => $locale,
             ],
             $this->restHelper->getPage(),
@@ -137,18 +137,18 @@ class VersionController extends AbstractRestController implements ClassResourceI
     }
 
     /**
-     * @Post("/articles/{uuid}/versions/{version}")
+     * @Post("/articles/{id}/versions/{version}")
      *
      * @throws RestException
      */
-    public function postTriggerAction(Request $request, string $uuid, string $version): Response
+    public function postTriggerAction(Request $request, string $id, string $version): Response
     {
         $action = $this->getRequestParameter($request, 'action', true);
         $locale = $this->getLocale($request);
 
         switch ($action) {
             case 'restore':
-                $document = $this->documentManager->find($uuid, $locale);
+                $document = $this->documentManager->find($id, $locale);
 
                 $this->documentManager->restore(
                     $document,
@@ -157,7 +157,7 @@ class VersionController extends AbstractRestController implements ClassResourceI
                 );
                 $this->documentManager->flush();
 
-                $data = $this->documentManager->find($uuid, $locale);
+                $data = $this->documentManager->find($id, $locale);
                 $view = $this->view($data, null !== $data ? Response::HTTP_OK : Response::HTTP_NO_CONTENT);
 
                 $context = new Context();
