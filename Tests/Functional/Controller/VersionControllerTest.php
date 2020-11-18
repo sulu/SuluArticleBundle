@@ -122,7 +122,7 @@ class VersionControllerTest extends SuluTestCase
 
         $this->assertEquals(2, $response['total']);
 
-        $versions = $response['_embedded']['versions'];
+        $versions = $response['_embedded']['article_versions'];
         $this->assertEquals('1_1', $versions[0]['id']);
         $this->assertEquals($this->locale, $versions[0]['locale']);
         $this->assertEquals('1_0', $versions[1]['id']);
