@@ -52,7 +52,7 @@ Execute the following [composer](https://getcomposer.org/) commands to add the b
 project:
 
 ```bash
-composer require elasticsearch/elasticsearch:7.9.* # should match version of your elasticsearch installation
+composer require "elasticsearch/elasticsearch:7.9.*" # should match version of your elasticsearch installation
 composer require sulu/article-bundle
 ```
 
@@ -95,4 +95,3 @@ on the the [sulu/SuluArticleBundle](https://github.com/sulu/SuluArticleBundle) r
 ## 📘&nbsp; License
 
 The Sulu content management system is released under the under terms of the [MIT License](LICENSE).
-
