@@ -28,3 +28,166 @@ jobs:
               run: curl "https://cs.symfony.com/download/php-cs-fixer-v2.phar" --output ${{ steps.php-cs-fixer-path.outputs.path }} && chmod +x ${{ steps.php-cs-fixer-path.outputs.path }}
             - name: Run php-cs-fixer
               run: ./${{ steps.php-cs-fixer-path.outputs.path }} fix --dry-run --diff
+
+    test:
+        name: "Run tests with php ${{ matrix.php-version }} (${{ matrix.phpcr-transport }})"
+        runs-on: ubuntu-latest
+
+        env:
+            SYMFONY__DATABASE_DRIVER: pdo_mysql
+            SYMFONY__DATABASE_VERSION: 5.7
+            SYMFONY__DATABASE_HOST: 127.0.0.1
+            SYMFONY__DATABASE_PORT: 3306
+            SYMFONY__DATABASE_NAME: sulu_test
+            SYMFONY__DATABASE_USER: root
+            SYMFONY__DATABASE_PASSWORD: root
+
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - php-version: '5.6'
+                      elasticsearch-version: '5'
+                      code-coverage: false
+                      test-flags: ''
+                      phpcr-transport: doctrinedbal
+                      composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
+                      php-extensions: 'ctype, iconv, mysql, gd'
+                      tools: 'composer:v1'
+                      phpstan: false
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: disabled
+                          SYMFONY__PHPCR__TRANSPORT: doctrinedbal
+                          SYMFONY__ELASTICSEARCH_HOST: '127.0.0.1:9201'
+
+                    - php-version: '7.4'
+                      elasticsearch-version: '7'
+                      code-coverage: true
+                      test-flags: '--coverage-clover=clover.xml'
+                      phpcr-transport: jackrabbit
+                      composer-flags: '--prefer-dist --no-interaction'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      phpstan: true
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          SYMFONY__PHPCR__TRANSPORT: jackrabbit
+                          SYMFONY__ELASTICSEARCH_HOST: '127.0.0.1:9202'
+
+        services:
+            mysql:
+                image: mysql:5.7
+                env:
+                    MYSQL_ROOT_PASSWORD: root
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+            jackrabbit:
+                image: sulu/jackrabbit:2.18
+                env:
+                    DATABASE_HOST: mysql
+                    DATABASE_PORT: 3306
+                    DATABASE_NAME: sulu_test_jackrabbit
+                    DATABASE_USER: root
+                    DATABASE_PASS: root
+                    LOG_LEVEL: WARN
+                ports:
+                    - 8080:8080
+
+            elasticsearch5:
+                image: elasticsearch:5.6
+                ports:
+                    - 9201:9200
+                env:
+                    discovery.type: 'single-node'
+                    xpack.security.enabled: 'false'
+                options: --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=5
+
+            elasticsearch7:
+                image: elasticsearch:7.9.3
+                ports:
+                    - 9202:9200
+                env:
+                    discovery.type: 'single-node'
+                    xpack.security.enabled: 'false'
+                options: --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=5
+
+        steps:
+            - name: Checkout project
+              uses: actions/checkout@v2
+
+            - name: Install and configure PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+                  extensions: ${{ matrix.php-extensions }}
+                  tools: ${{ matrix.tools }}
+                  coverage: xdebug
+
+            - name: Get composer cache directory
+              id: composer-cache-dir
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v2
+              id: composer-cache
+              with:
+                  path: ${{ steps.composer-cache-dir.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-composer-
+
+            - name: Require elasticsearch dependency
+              run: composer require --dev elasticsearch/elasticsearch:"^${{ matrix.elasticsearch-version }}" --no-interaction --no-update
+
+            - name: Require phpstan dependency
+              if: ${{ matrix.phpstan }}
+              run: composer require --dev phpstan/phpstan --no-interaction --no-update
+
+            - name: Install dependencies
+              run: |
+                  composer validate
+                  composer update ${{ matrix.composer-flags }}
+
+            - name: Override parameters.yml file
+              run: echo "parameters:" > Tests/app/config/parameters.yml
+
+            - name: Create database and elasticsearch indices
+              run: |
+                  Tests/app/console doctrine:database:create
+                  Tests/app/console doctrine:schema:update --force
+                  Tests/app/console sulu:document:initialize
+                  Tests/app/console ongr:es:index:create -m default
+                  Tests/app/console ongr:es:index:create -m live
+              env: ${{ matrix.env }}
+
+            - name: Run tests
+              run: time vendor/bin/phpunit ${{ matrix.test-flags }}
+              env: ${{ matrix.env }}
+
+            - name: PHPStan
+              if: ${{ matrix.phpstan }}
+              run: vendor/bin/phpstan analyze . --level 1 -c phpstan.neon
+              env: ${{ matrix.env }}
+
+            - name: Cache ocular runnable
+              uses: actions/cache@v2
+              id: ocular-cache
+              if: ${{ matrix.code-coverage }}
+              with:
+                  path: downloads
+                  key: ${{ runner.os }}-ocular
+
+            - name: Download ocular
+              if: ${{ matrix.code-coverage && steps.ocular-cache.outputs.cache-hit != 'true' }}
+              run: |
+                  mkdir downloads
+                  cd downloads
+                  wget https://scrutinizer-ci.com/ocular.phar
+                  cd -
+
+            - name: Upload coverage report
+              if: ${{ matrix.code-coverage }}
+              run: |
+                  php downloads/ocular.phar code-coverage:upload --format=php-clover clover.xml
