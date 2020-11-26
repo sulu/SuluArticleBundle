@@ -75,11 +75,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     protected $defaultLimit;
 
     /**
-     * @var bool
-     */
-    private $hasAudienceTargeting;
-
-    /**
      * @var FormMetadataProvider|null
      */
     private $formMetadataProvider;
@@ -97,7 +92,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ArticleResourceItemFactory $articleResourceItemFactory,
         string $articleDocumentClass,
         int $defaultLimit,
-        bool $hasAudienceTargeting = false,
         FormMetadataProvider $formMetadataProvider = null,
         TokenStorageInterface $tokenStorage = null
     ) {
@@ -108,7 +102,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
-        $this->hasAudienceTargeting = $hasAudienceTargeting;
         $this->formMetadataProvider = $formMetadataProvider;
         $this->tokenStorage = $tokenStorage;
     }
@@ -126,13 +119,12 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected function getConfigurationBuilder(): BuilderInterface
     {
-        return Builder::create()
+        $builder = Builder::create()
             ->enableTags()
             ->enableCategories()
             ->enableLimit()
             ->enablePagination()
             ->enablePresentAs()
-            ->enableTypes($this->getTypes())
             ->enableSorting(
                 [
                     ['column' => 'published', 'title' => 'sulu_admin.published'],
@@ -142,6 +134,12 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                     ['column' => 'author_full_name.raw', 'title' => 'sulu_admin.author'],
                 ]
             );
+
+        if (method_exists($builder, 'enableTypes')) {
+            $builder->enableTypes($this->getTypes());
+        }
+
+        return $builder;
     }
 
     /**
