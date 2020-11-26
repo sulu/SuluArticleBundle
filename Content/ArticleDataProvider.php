@@ -164,6 +164,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $page = 1,
         $pageSize = null
     ) {
+        // there are two different kinds of types in the context of the article bundle: template-type and article-type
+        // filtering by article-type is possible via the types xml param
+        // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
+        // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
+        // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
         $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
@@ -192,6 +197,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $page = 1,
         $pageSize = null
     ) {
+        // there are two different kinds of types in the context of the article bundle: template-type and article-type
+        // filtering by article-type is possible via the types xml param
+        // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
+        // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
+        // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
         $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
