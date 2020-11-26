@@ -190,6 +190,45 @@ class ArticleDataProviderTest extends SuluTestCase
         $this->assertCount(0, $result->getItems());
     }
 
+    public function testResolveDataItemsStructureTypeFromSmartContentFiltering()
+    {
+        $item1 = $this->createArticle();
+        $item2 = $this->createArticle('Test', 'simple');
+
+        /** @var DataProviderInterface $dataProvider */
+        $dataProvider = $this->getContainer()->get('sulu_article.content.data_provider');
+
+        // get all articles with structureType default_fallback
+        $result = $dataProvider->resolveDataItems(
+            ['types' => ['simple']],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(1, $result->getItems());
+
+        // get all articles with structureType default_fallback
+        $result = $dataProvider->resolveDataItems(
+            ['types' => ['default']],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(1, $result->getItems());
+
+        // get all articles with structureType default_fallback
+        $result = $dataProvider->resolveDataItems(
+            ['types' => ['default', 'simple']],
+            [],
+            ['locale' => 'de', 'webspaceKey' => 'sulu_io']
+        );
+
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(2, $result->getItems());
+    }
+
     public function testResolveDataItemsPagination()
     {
         $items = [
