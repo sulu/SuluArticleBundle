@@ -19,17 +19,21 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Sulu\Bundle\AdminBundle\Metadata\FormMetadata\FormMetadataProvider;
+use Sulu\Bundle\AdminBundle\Metadata\FormMetadata\TypedFormMetadata;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
+use Sulu\Component\Security\Authentication\UserInterface;
 use Sulu\Component\SmartContent\Configuration\Builder;
 use Sulu\Component\SmartContent\Configuration\BuilderInterface;
 use Sulu\Component\SmartContent\DataProviderAliasInterface;
 use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Introduces articles in smart-content.
@@ -71,6 +75,16 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected $defaultLimit;
 
+    /**
+     * @var FormMetadataProvider|null
+     */
+    private $formMetadataProvider;
+
+    /**
+     * @var TokenStorageInterface|null
+     */
+    private $tokenStorage;
+
     public function __construct(
         Manager $searchManager,
         DocumentManagerInterface $documentManager,
@@ -78,7 +92,9 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ReferenceStoreInterface $referenceStore,
         ArticleResourceItemFactory $articleResourceItemFactory,
         string $articleDocumentClass,
-        int $defaultLimit
+        int $defaultLimit,
+        FormMetadataProvider $formMetadataProvider = null,
+        TokenStorageInterface $tokenStorage = null
     ) {
         $this->searchManager = $searchManager;
         $this->documentManager = $documentManager;
@@ -87,6 +103,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->articleResourceItemFactory = $articleResourceItemFactory;
         $this->articleDocumentClass = $articleDocumentClass;
         $this->defaultLimit = $defaultLimit;
+        $this->formMetadataProvider = $formMetadataProvider;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -102,7 +120,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected function getConfigurationBuilder(): BuilderInterface
     {
-        return Builder::create()
+        $builder = Builder::create()
             ->enableTags()
             ->enableCategories()
             ->enableLimit()
@@ -117,6 +135,12 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                     ['column' => 'author_full_name.raw', 'title' => 'sulu_admin.author'],
                 ]
             );
+
+        if (method_exists($builder, 'enableTypes')) {
+            $builder->enableTypes($this->getTypes());
+        }
+
+        return $builder;
     }
 
     /**
@@ -141,8 +165,13 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $page = 1,
         $pageSize = null
     ) {
+        // there are two different kinds of types in the context of the article bundle: template-type and article-type
+        // filtering by article-type is possible via the types xml param
+        // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
+        // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
+        // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
+        $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
-        $filters['structureTypes'] = $this->getStructureTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
         $locale = $options['locale'];
@@ -169,8 +198,13 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $page = 1,
         $pageSize = null
     ) {
+        // there are two different kinds of types in the context of the article bundle: template-type and article-type
+        // filtering by article-type is possible via the types xml param
+        // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
+        // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
+        // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
+        $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
-        $filters['structureTypes'] = $this->getStructureTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
         $locale = $options['locale'];
@@ -343,8 +377,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filterTypes = [];
 
         if (array_key_exists('types', $propertyParameter)
-            && null !== ($types = explode(',', $propertyParameter['types']->getValue()))
-        ) {
+            && !empty($value = $propertyParameter['types']->getValue())) {
+            $types = is_array($value) ? $value : explode(',', $value);
             foreach ($types as $type) {
                 $filterTypes[] = $type;
             }
@@ -457,6 +491,30 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         }
 
         return $default;
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function getTypes(): array
+    {
+        $types = [];
+        if ($this->tokenStorage && null !== $this->tokenStorage->getToken() && $this->formMetadataProvider) {
+            $user = $this->tokenStorage->getToken()->getUser();
+
+            if (!$user instanceof UserInterface) {
+                return $types;
+            }
+
+            /** @var TypedFormMetadata $metadata */
+            $metadata = $this->formMetadataProvider->getMetadata('article', $user->getLocale(), []);
+
+            foreach ($metadata->getForms() as $form) {
+                $types[] = ['type' => $form->getName(), 'title' => $form->getTitle()];
+            }
+        }
+
+        return $types;
     }
 
     /**

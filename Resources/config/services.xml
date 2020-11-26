@@ -333,6 +333,8 @@
             <argument type="service" id="sulu_article.factory.resource_item"/>
             <argument type="string">%sulu_article.view_document.article.class%</argument>
             <argument type="string">%sulu_article.smart_content.default_limit%</argument>
+            <argument type="service" id="sulu_admin.form_metadata_provider" on-invalid="null"/>
+            <argument type="service" id="security.token_storage" on-invalid="null"/>
 
             <tag name="sulu.smart_content.data_provider" alias="articles"/>
         </service>
