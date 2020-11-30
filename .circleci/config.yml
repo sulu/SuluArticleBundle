@@ -2,16 +2,14 @@ version: 2
 
 jobs:
   build:
+    environment:
+      DATABASE_URL: mysql://root@127.0.0.1:3306/su_articles_test?serverVersion=5.7
+      ARTICLE_TEST_CASE: extend
     docker:
       - image: circleci/php:7.3-node-browsers
-        environment:
-          - ARTICLE_TEST_CASE=extend
       - image: circleci/mysql:5.7
         environment:
-          - MYSQL_USER=root
-          - MYSQL_PASSWORD=
-          - MYSQL_ALLOW_EMPTY_PASSWORD=true
-          - MYSQL_DATABASE=circle_test
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
       - image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2
         environment:
           - cluster.name: es-test-cluster

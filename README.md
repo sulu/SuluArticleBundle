@@ -16,11 +16,14 @@
     <a href="https://github.com/sulu/SuluArticleBundle/actions" target="_blank">
         <img src="https://img.shields.io/github/workflow/status/sulu/SuluArticleBundle/Test%20application/master.svg?label=github-actions" alt="GitHub actions status">
     </a>
-    <a href="https://travis-ci.org/sulu/SuluArticleBundle/branches" target="_blank">
-        <img src="https://img.shields.io/travis/sulu/SuluArticleBundle/master.svg?label=travis" alt="Travis build">
-    </a>
     <a href="https://circleci.com/gh/sulu/SuluArticleBundle/tree/master" target="_blank">
         <img src="https://img.shields.io/circleci/build/github/sulu/SuluArticleBundle/master.svg?label=circleci" alt="CircleCI build">
+    </a>
+    <a href="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle?b=master" target="_blank">
+        <img src="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/quality-score.png?b=master" alt="Scrutinizer code quality">
+    </a>
+    <a href="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle?b=master" target="_blank">
+        <img src="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/coverage.png?b=master" alt="Code coverage">
     </a>
     <a href="https://github.com/sulu/sulu/releases" target="_blank">
         <img src="https://img.shields.io/badge/sulu%20compatibility-%3E=2.0-52b6ca.svg" alt="Sulu compatibility">
