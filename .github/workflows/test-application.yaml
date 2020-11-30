@@ -1,6 +1,11 @@
 name: Test application
 
-on: pull_request
+on:
+    pull_request:
+    push:
+        branches:
+            - master
+            - '[0-9]+.[0-9]+'
 
 jobs:
     php-cs-fixer:
@@ -30,7 +35,7 @@ jobs:
               run: ./${{ steps.php-cs-fixer-path.outputs.path }} fix --dry-run --diff
 
     test:
-        name: "Run tests with php ${{ matrix.php-version }} (${{ matrix.phpcr-transport }})"
+        name: "Run tests with php ${{ matrix.php-version }} and elasticsearch ${{ matrix.elasticsearch-version }} (${{ matrix.phpcr-transport }})"
         runs-on: ubuntu-latest
 
         env:
@@ -61,7 +66,7 @@ jobs:
                           SYMFONY__ELASTICSEARCH_HOST: '127.0.0.1:9201'
 
                     - php-version: '7.4'
-                      elasticsearch-version: '7'
+                      elasticsearch-version: '7.9'
                       code-coverage: true
                       test-flags: '--coverage-clover=clover.xml'
                       phpcr-transport: jackrabbit
@@ -150,7 +155,7 @@ jobs:
                   composer validate
                   composer update ${{ matrix.composer-flags }}
 
-            - name: Override parameters.yml file
+            - name: Clear parameters.yml file to use environment variables
               run: echo "parameters:" > Tests/app/config/parameters.yml
 
             - name: Create database and elasticsearch indices
