@@ -52,7 +52,8 @@ jobs:
             matrix:
                 include:
                     - php-version: '5.6'
-                      elasticsearch-version: '5'
+                      elasticsearch-version: '5.6'
+                      elasticsearch-package-constraint: '~5.5'
                       code-coverage: false
                       test-flags: ''
                       phpcr-transport: doctrinedbal
@@ -67,6 +68,7 @@ jobs:
 
                     - php-version: '7.4'
                       elasticsearch-version: '7.9'
+                      elasticsearch-package-constraint: '~7.9.0'
                       code-coverage: true
                       test-flags: '--coverage-clover=clover.xml'
                       phpcr-transport: jackrabbit
@@ -144,7 +146,7 @@ jobs:
                       ${{ runner.os }}-composer-
 
             - name: Require elasticsearch dependency
-              run: composer require --dev elasticsearch/elasticsearch:"^${{ matrix.elasticsearch-version }}" --no-interaction --no-update
+              run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
             - name: Require phpstan dependency
               if: ${{ matrix.phpstan }}
