@@ -155,7 +155,7 @@ jobs:
             - name: Require elasticsearch dependency
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
-            - name: Require elasticsearch dependency
+            - name: Require package-versions-deprecated dependency
               if: ${{ matrix.composer-package-versions-deprecated }}
               run: composer require --dev composer/package-versions-deprecated --no-interaction --no-update
 
