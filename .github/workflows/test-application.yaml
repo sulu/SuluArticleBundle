@@ -59,7 +59,6 @@ jobs:
                       test-flags: ''
                       phpcr-transport: doctrinedbal
                       composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
-                      composer-package-versions-deprecated: true
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
                       phpstan: false
@@ -78,7 +77,6 @@ jobs:
                       test-flags: '--coverage-clover=clover.xml'
                       phpcr-transport: jackrabbit
                       composer-flags: '--prefer-dist --no-interaction'
-                      composer-package-versions-deprecated: false
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: true
@@ -154,10 +152,6 @@ jobs:
 
             - name: Require elasticsearch dependency
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
-
-            - name: Require package-versions-deprecated dependency
-              if: ${{ matrix.composer-package-versions-deprecated }}
-              run: composer require --dev composer/package-versions-deprecated --no-interaction --no-update
 
             - name: Install dependencies
               run: |
