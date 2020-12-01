@@ -181,13 +181,13 @@ jobs:
             - name: Cache ocular runnable
               uses: actions/cache@v2
               id: ocular-cache
-              if: ${{ matrix.code-coverage }}
+              if: ${{ always() && matrix.code-coverage }}
               with:
                   path: downloads
                   key: ${{ runner.os }}-ocular
 
             - name: Download ocular
-              if: ${{ matrix.code-coverage && steps.ocular-cache.outputs.cache-hit != 'true' }}
+              if: ${{ always() && matrix.code-coverage && steps.ocular-cache.outputs.cache-hit != 'true' }}
               run: |
                   mkdir downloads
                   cd downloads
@@ -195,6 +195,5 @@ jobs:
                   cd -
 
             - name: Upload coverage report
-              if: ${{ matrix.code-coverage }}
-              run: |
-                  php downloads/ocular.phar code-coverage:upload --format=php-clover clover.xml
+              if: ${{ always() && matrix.code-coverage }}
+              run: php downloads/ocular.phar code-coverage:upload --format=php-clover clover.xml
