@@ -47,8 +47,6 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
     {
         parent::registerContainerConfiguration($loader);
 
-        $loader->load(__DIR__ . '/config/config.php');
-
         if ('jackrabbit' === getenv('PHPCR_TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
