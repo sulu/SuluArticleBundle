@@ -70,7 +70,7 @@ jobs:
                       elasticsearch-version: '7.9'
                       elasticsearch-package-constraint: '~7.9.0'
                       code-coverage: true
-                      test-flags: '--coverage-clover=clover.xml'
+                      test-flags: '--coverage-clover=coverage.clover'
                       phpcr-transport: jackrabbit
                       composer-flags: '--prefer-dist --no-interaction'
                       php-extensions: 'ctype, iconv, mysql, imagick'
@@ -196,4 +196,6 @@ jobs:
 
             - name: Upload coverage report
               if: ${{ always() && matrix.code-coverage }}
-              run: php downloads/ocular.phar code-coverage:upload --format=php-clover clover.xml
+              run: |
+                  ls -lAh
+                  php downloads/ocular.phar code-coverage:upload --format=php-clover coverage.clover
