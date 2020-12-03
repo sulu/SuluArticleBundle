@@ -612,7 +612,7 @@ class ArticleDataProviderTest extends SuluTestCase
             $data['ext'] = ['excerpt' => ['segments' => $segments]];
         }
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             $data

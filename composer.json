@@ -60,6 +60,11 @@
             "Sulu\\Bundle\\ArticleBundle\\": ""
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Sulu\\Bundle\\ArticleBundle\\Tests\\Application\\": "./Tests/Application/src"
+        }
+    },
     "scripts": {
         "bootstrap-test-environment": [
             "Tests/Application/bin/adminconsole doctrine:database:create --if-not-exists --env test",

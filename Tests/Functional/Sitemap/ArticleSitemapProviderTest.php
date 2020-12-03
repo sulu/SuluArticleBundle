@@ -88,7 +88,7 @@ class ArticleSitemapProviderTest extends SuluTestCase
             'additionalWebspaces' => $additionalWebspaces,
         ];
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])

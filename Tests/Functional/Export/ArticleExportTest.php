@@ -116,7 +116,7 @@ EOT;
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = []): array
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])

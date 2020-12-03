@@ -75,7 +75,7 @@ class ArticleImportTest extends SuluTestCase
         string $template = 'default',
         array $data = []
     ): array {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=en&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])
@@ -86,7 +86,7 @@ class ArticleImportTest extends SuluTestCase
 
     private function getArticle(string $id, string $locale = 'de'): array
     {
-        $this->client->request('GET', '/api/articles/' . $id . '?locale=' . $locale);
+        $this->client->jsonRequest('GET', '/api/articles/' . $id . '?locale=' . $locale);
 
         return json_decode($this->client->getResponse()->getContent(), true);
     }
