@@ -122,7 +122,7 @@ class ArticleLinkProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de',
             array_merge($data, ['title' => $title, 'template' => $template])
@@ -133,7 +133,7 @@ class ArticleLinkProviderTest extends SuluTestCase
 
     private function createAndPublishArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])

@@ -66,7 +66,7 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles/' . $article->getUuid() . '/versions/1_0?action=restore&locale=' . $this->locale
         );
@@ -87,7 +87,7 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles/' . $article->getUuid() . '/versions/2_0?action=restore&locale=' . $this->locale
         );
@@ -112,7 +112,7 @@ class VersionControllerTest extends SuluTestCase
         $this->documentManager->publish($article, $this->locale);
         $this->documentManager->flush();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             '/api/articles/' . $article->getUuid() . '/versions?locale=' . $this->locale
         );
