@@ -82,7 +82,7 @@ class ArticleTeaserProviderTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default', $data = [])
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             array_merge($data, ['title' => $title, 'template' => $template])

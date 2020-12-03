@@ -107,7 +107,7 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
             $data['additionalWebspaces'] = $additionalWebspaces;
         }
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=' . self::LOCALE . '&action=publish',
             $data

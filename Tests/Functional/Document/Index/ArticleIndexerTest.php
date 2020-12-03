@@ -253,7 +253,7 @@ class ArticleIndexerTest extends SuluTestCase
      */
     private function createArticle(array $data = [], $title = 'Test Article', $template = 'default')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=' . $this->locale . '&action=publish',
             array_merge(['title' => $title, 'template' => $template], $data)
@@ -289,7 +289,7 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData['template'] = $template;
         }
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $uuid . '?locale=' . ($locale ? $locale : $this->locale) . '&action=publish',
             $requestData
@@ -314,7 +314,7 @@ class ArticleIndexerTest extends SuluTestCase
         $pageTitle = 'Test-Page',
         $template = 'default_pages'
     ) {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles/' . $article['id'] . '/pages?locale=' . $this->locale . '&action=publish',
             array_merge(['pageTitle' => $pageTitle, 'template' => $template], $data)

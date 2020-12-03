@@ -52,7 +52,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
     private function createArticle($title = 'Test-Article', $template = 'default_pages', $locale = 'de')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=' . $locale,
             [
@@ -70,7 +70,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
     private function createArticleLocale($article, $title = 'Test-Article', $template = 'default_pages', $locale = 'en')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=' . $locale,
             [
@@ -88,7 +88,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
     private function createArticleShadow($article, $locale = 'en', $shadowLocale = 'de')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $article['id'] . '?locale=' . $locale,
             [
@@ -104,7 +104,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
     private function getArticle($uuid, $locale = 'de')
     {
-        $this->client->request('GET', '/api/articles/' . $uuid . '?locale=' . $locale);
+        $this->client->jsonRequest('GET', '/api/articles/' . $uuid . '?locale=' . $locale);
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
@@ -113,7 +113,7 @@ class ArticlePageControllerTest extends SuluTestCase
 
     private function post($article, $pageTitle = 'Test-Page', $template = 'default_pages', $locale = 'de')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles/' . $article['id'] . '/pages?locale=' . $locale,
             [
@@ -196,7 +196,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle($title, $template);
         $page = $this->post($article, $pageTitle);
 
-        $this->client->request('GET', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de');
+        $this->client->jsonRequest('GET', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de');
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
@@ -213,7 +213,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle($title, $template);
         $page = $this->post($article);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de',
             [
@@ -244,7 +244,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle($title, $template);
         $page = $this->post($article);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de&action=publish',
             [
@@ -275,7 +275,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle();
         $page = $this->post($article);
 
-        $this->client->request('DELETE', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de');
+        $this->client->jsonRequest('DELETE', '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=de');
 
         $this->assertHttpStatusCode(204, $this->client->getResponse());
 
@@ -292,7 +292,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $article = $this->createArticle();
         $page = $this->post($article);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'PUT',
             '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
             [
@@ -319,7 +319,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $articleEN = $this->createArticleLocale($articleDE, 'Sulu is great');
 
         // page 1 should exists with empty pageTitle
-        $this->client->request('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page1['id'] . '?locale=en');
+        $this->client->jsonRequest('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page1['id'] . '?locale=en');
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
@@ -344,7 +344,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('Sulu ist toll', $articleShadow['title']);
 
         // load second page
-        $this->client->request('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page2['id'] . '?locale=en');
+        $this->client->jsonRequest('GET', '/api/articles/' . $articleEN['id'] . '/pages/' . $page2['id'] . '?locale=en');
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
@@ -381,7 +381,7 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertEquals('Sulu is great', $articleShadow['title']);
 
         // load second page
-        $this->client->request('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page2['id'] . '?locale=de');
+        $this->client->jsonRequest('GET', '/api/articles/' . $articleDE['id'] . '/pages/' . $page2['id'] . '?locale=de');
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 

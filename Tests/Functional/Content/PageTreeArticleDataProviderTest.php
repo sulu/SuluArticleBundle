@@ -150,7 +150,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
 
     private function createArticle(PageDocument $page, $title = 'Test-Article', $template = 'page_tree_route')
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
             [
