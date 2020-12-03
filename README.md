@@ -1,9 +1,8 @@
 # SuluArticleBundle
 
-![Test application](https://github.com/sulu/SuluArticleBundle/workflows/Test%20application/badge.svg?branch=1.2)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/quality-score.png?b=1.2)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/?branch=1.2)
-[![Code Coverage](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/badges/coverage.png?b=1.2)](https://scrutinizer-ci.com/g/sulu/SuluArticleBundle/?branch=1.2)
-[![CircleCI](https://circleci.com/gh/sulu/SuluArticleBundle/tree/1.2.svg?style=svg)](https://circleci.com/gh/circleci/circleci-docs/tree/1.2)
+![Test application](https://img.shields.io/github/workflow/status/sulu/SuluArticleBundle/Test%20application/1.2.svg?label=github-actions)
+[![CircleCI](https://img.shields.io/circleci/build/github/sulu/SuluArticleBundle/1.2?label=circleci)](https://circleci.com/gh/circleci/circleci-docs/tree/1.2)
+
 
 The SuluArticleBundle adds support for managing articles in Sulu. Articles can be used in a lot of different ways to
 manage unstructured data with an own URL in an admin-list. Most of the features, which can be used in pages, can also
