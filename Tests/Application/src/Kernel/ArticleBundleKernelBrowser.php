@@ -14,8 +14,20 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Application\Kernel;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * @deprecated This class has only be introduced to keep BC between Symfony 5.2 and previous versions.
+ *
+ * Will be removed, as soon as the min-requirement of sulu/sulu is high enough for the `SuluKernelBrowser` to be always available.
+ *
+ * @internal
+ */
 class ArticleBundleKernelBrowser extends KernelBrowser
 {
+    /**
+     * @deprecated Copied from `SuluKernelBrowser` to keep BC for Symfony <5.2
+     *
+     * Will be removed, as soon as the min-requirement of sulu/sulu is high enough for the `SuluKernelBrowser` to be always available.
+     */
     public function jsonRequest(
         string $method,
         string $uri,

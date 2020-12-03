@@ -70,6 +70,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $container->getDefinition('sulu_article.elastic_search.article_indexer')
             ->setPublic(true);
 
+        // Will be removed, as soon as the min-requirement of sulu/sulu is high enough for the `SuluKernelBrowser` to be always available.
         if ($container->hasDefinition('test.client')) {
             $definition = $container->getDefinition('test.client');
 
