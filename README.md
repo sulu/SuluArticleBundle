@@ -19,12 +19,6 @@
     <a href="https://circleci.com/gh/sulu/SuluArticleBundle/tree/master" target="_blank">
         <img src="https://img.shields.io/circleci/build/github/sulu/SuluArticleBundle/master.svg?label=circleci" alt="CircleCI build">
     </a>
-    <a href="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle" target="_blank">
-        <img src="https://img.shields.io/scrutinizer/quality/g/sulu/SuluArticleBundle/master?label=scrutinizer" alt="Scrutinizer code quality">
-    </a>
-    <a href="https://scrutinizer-ci.com/g/sulu/SuluArticleBundle" target="_blank">
-        <img src="https://img.shields.io/scrutinizer/coverage/g/sulu/SuluArticleBundle/master?label=coverage" alt="Scrutinizer coverage">
-    </a>
     <a href="https://github.com/sulu/sulu/releases" target="_blank">
         <img src="https://img.shields.io/badge/sulu%20compatibility-%3E=2.0-52b6ca.svg" alt="Sulu compatibility">
     </a>
