@@ -39,8 +39,7 @@ use Sulu\Component\DocumentManager\Version;
 /**
  * Represents an article in phpcr.
  */
-class ArticleDocument implements
-    UuidBehavior,
+class ArticleDocument implements UuidBehavior,
     NodeNameBehavior,
     AutoNameBehavior,
     PathBehavior,

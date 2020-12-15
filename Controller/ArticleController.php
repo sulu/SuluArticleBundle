@@ -59,8 +59,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 {
     const DOCUMENT_TYPE = 'article';
 
-    use RequestParametersTrait;
     use ArticleViewDocumentIdTrait;
+    use RequestParametersTrait;
 
     /**
      * @var DocumentManagerInterface

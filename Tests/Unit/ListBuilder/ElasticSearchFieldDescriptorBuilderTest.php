@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Factory;
+namespace Sulu\Bundle\ArticleBundle\Tests\Unit\ListBuilder;
 
 use PHPUnit\Framework\TestCase;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
