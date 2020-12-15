@@ -13,7 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Application;
 
 use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
-use Sulu\Bundle\ArticleBundle\Tests\Application\Kernel\ArticleBundleKernelBrowser;
+use Sulu\Bundle\ArticleBundle\Tests\Application\Testing\ArticleBundleKernelBrowser;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;

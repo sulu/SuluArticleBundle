@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Application\Kernel;
+namespace Sulu\Bundle\ArticleBundle\Tests\Application\Testing;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DomCrawler\Crawler;
