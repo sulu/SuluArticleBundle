@@ -7,5 +7,3 @@
 .php_cs.dist export-ignore
 .phpstan.neon export-ignore
 .phpunit.xml.dist export-ignore
-README.md export-ignore
-UPGRADE.md export-ignore
