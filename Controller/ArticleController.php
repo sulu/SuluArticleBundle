@@ -484,12 +484,18 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     /**
      * Deletes multiple documents.
      */
-    public function deleteAction(string $id): Response
+    public function deleteAction(Request $request, string $id): Response
     {
-        $documentManager = $this->documentManager;
-        $document = $documentManager->find($id);
-        $documentManager->remove($document);
-        $documentManager->flush();
+        $locale = $this->getLocale($request);
+        $deleteLocale = $this->getBooleanRequestParameter($request, 'deleteLocale', false, false);
+
+        $document = $this->documentManager->find($id);
+        if ($deleteLocale) {
+            $this->documentManager->removeLocale($document, $locale);
+        } else {
+            $this->documentManager->remove($document);
+        }
+        $this->documentManager->flush();
 
         return $this->handleView($this->view(null));
     }

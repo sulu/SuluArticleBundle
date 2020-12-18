@@ -30,6 +30,7 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\RemoveLocaleEvent;
 use Sulu\Component\DocumentManager\Event\ReorderEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
@@ -115,6 +116,10 @@ class ArticleSubscriber implements EventSubscriberInterface
                 ['handleRemove', -500],
                 ['handleRemoveLive', -500],
                 ['handleRemovePage', -500],
+            ],
+            EVENTS::REMOVE_LOCALE => [
+                ['handleRemoveLocale', -500],
+                ['handleRemoveLocaleLive', -500],
             ],
             Events::PUBLISH => [
                 ['handleScheduleIndexLive', 0],
@@ -457,6 +462,20 @@ class ArticleSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Removes localized article-document.
+     */
+    public function handleRemoveLocale(RemoveLocaleEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->indexer->removeLocale($document, $event->getLocale());
+        $this->indexer->flush();
+    }
+
+    /**
      * Removes article-document.
      *
      * @param RemoveEvent|UnpublishEvent $event
@@ -469,6 +488,20 @@ class ArticleSubscriber implements EventSubscriberInterface
         }
 
         $this->liveIndexer->remove($document);
+        $this->liveIndexer->flush();
+    }
+
+    /**
+     * Removes localized article-document from live index.
+     */
+    public function handleRemoveLocaleLive(RemoveLocaleEvent $event)
+    {
+        $document = $event->getDocument();
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->liveIndexer->removeLocale($document, $event->getLocale());
         $this->liveIndexer->flush();
     }
 

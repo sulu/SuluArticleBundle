@@ -28,7 +28,7 @@ interface IndexerInterface
      * Sets state of document to unpublished.
      * Clear published and sets published state to false.
      */
-    public function setUnpublished(string $uuid, string $locale): ArticleViewDocumentInterface;
+    public function setUnpublished(string $uuid, string $locale): ?ArticleViewDocumentInterface;
 
     /**
      * Indexes given document.
@@ -39,6 +39,11 @@ interface IndexerInterface
      * Removes document from index.
      */
     public function remove(ArticleDocument $document): void;
+
+    /**
+     * Removes specific document locale from the index.
+     */
+    public function removeLocale(ArticleDocument $document, string $locale): void;
 
     /**
      * Flushes index.
