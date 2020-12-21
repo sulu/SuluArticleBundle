@@ -187,7 +187,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
      */
     private function getArticleViewDocuments(array $articleDocuments)
     {
-        return  array_map(
+        return array_map(
             function($articleDocument) {
                 $articleViewDocument = new ArticleViewDocument($articleDocument->getUuid());
                 $articleViewDocument->setLocale($articleDocument->getLocale());
