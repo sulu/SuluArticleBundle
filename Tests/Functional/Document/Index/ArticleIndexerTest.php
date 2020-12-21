@@ -67,6 +67,12 @@ class ArticleIndexerTest extends SuluTestCase
 
     public function testDeleteLocale()
     {
+        if ((new \ReflectionClass(DocumentManagerInterface::class))->hasMethod('deleteLocale')) {
+            $this->markTestSkipped('Test is only viable on Sulu ^2.3');
+
+            return;
+        }
+
         $article = $this->createArticle(
             [
                 'article' => 'Test content',
