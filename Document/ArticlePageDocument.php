@@ -28,8 +28,7 @@ use Sulu\Component\DocumentManager\Behavior\Path\AutoNameBehavior;
 /**
  * Represents an article-page in phpcr.
  */
-class ArticlePageDocument implements
-    UuidBehavior,
+class ArticlePageDocument implements UuidBehavior,
     LocalizedTitleBehavior,
     ParentBehavior,
     AutoNameBehavior,
