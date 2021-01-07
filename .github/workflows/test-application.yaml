@@ -8,32 +8,6 @@ on:
             - '[0-9]+.[0-9]+'
 
 jobs:
-    php-cs-fixer:
-        name: Run php-cs-fixer
-        runs-on: ubuntu-18.04
-        steps:
-            - name: Checkout project
-              uses: actions/checkout@v1
-            - name: Create downloads directory
-              run: mkdir downloads
-            - name: Get downloads path
-              id: php-cs-fixer-dir
-              run: echo "::set-output name=dir::downloads"
-            - name: Get php-cs-fixer path
-              id: php-cs-fixer-path
-              run: echo "::set-output name=path::${{ steps.php-cs-fixer-dir.outputs.dir }}/php-cs-fixer.phar"
-            - name: Cache php-cs-fixer
-              id: php-cs-fixer-cache
-              uses: actions/cache@v1
-              with:
-                  path: ${{ steps.php-cs-fixer-dir.outputs.dir }}
-                  key: php-cs-fixer
-            - name: Download php-cs-fixer
-              if: steps.php-cs-fixer-cache.outputs.cache-hit != 'true'
-              run: curl "https://cs.symfony.com/download/php-cs-fixer-v2.phar" --output ${{ steps.php-cs-fixer-path.outputs.path }} && chmod +x ${{ steps.php-cs-fixer-path.outputs.path }}
-            - name: Run php-cs-fixer
-              run: ./${{ steps.php-cs-fixer-path.outputs.path }} fix --dry-run --diff
-
     test:
         name: "Run tests with php ${{ matrix.php-version }} and elasticsearch ${{ matrix.elasticsearch-version }} (${{ matrix.phpcr-transport }})"
         runs-on: ubuntu-latest
@@ -58,6 +32,7 @@ jobs:
                       composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
+                      php-cs-fixer: false
                       phpstan: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
@@ -71,6 +46,7 @@ jobs:
                       composer-flags: '--prefer-dist --no-interaction'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
+                      php-cs-fixer: true
                       phpstan: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
@@ -141,12 +117,15 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-composer-
 
+            -   name: Run php-cs-fixer
+                if: ${{ matrix.php-cs-fixer }}
+                run: |
+                    composer global require friendsofphp/php-cs-fixer --prefer-dist --no-interaction
+                    GLOBAL_BIN_DIR=$(composer global config bin-dir --absolute --quiet)
+                    $GLOBAL_BIN_DIR/php-cs-fixer fix --dry-run --diff
+
             - name: Require elasticsearch dependency
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
-
-            - name: Require phpstan dependency
-              if: ${{ matrix.phpstan }}
-              run: composer require --dev phpstan/phpstan --no-interaction --no-update
 
             - name: Install dependencies
               run: |
@@ -169,7 +148,10 @@ jobs:
               run: time vendor/bin/phpunit
               env: ${{ matrix.env }}
 
-            - name: PHPStan
+            - name: Run PHPStan
               if: ${{ matrix.phpstan }}
-              run: vendor/bin/phpstan analyze . --level 1 -c phpstan.neon
+              run: |
+                  composer global require phpstan/phpstan --prefer-dist --no-interaction
+                  GLOBAL_BIN_DIR=$(composer global config bin-dir --absolute --quiet)
+                  $GLOBAL_BIN_DIR/phpstan analyze . --level 1 -c phpstan.neon
               env: ${{ matrix.env }}
