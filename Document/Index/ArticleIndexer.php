@@ -45,9 +45,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ArticleIndexer implements IndexerInterface
 {
-    use StructureTagTrait;
     use ArticleViewDocumentIdTrait;
     use PageTreeTrait;
+    use StructureTagTrait;
 
     /**
      * @var StructureMetadataFactoryInterface
