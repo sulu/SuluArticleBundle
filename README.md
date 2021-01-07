@@ -7,17 +7,17 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/sulu/SuluArticleBundle/blob/master/LICENSE" target="_blank">
+    <a href="https://github.com/sulu/SuluArticleBundle/blob/2.x/LICENSE" target="_blank">
         <img src="https://img.shields.io/github/license/sulu/SuluArticleBundle.svg" alt="GitHub license">
     </a>
     <a href="https://github.com/sulu/SuluArticleBundle/releases" target="_blank">
         <img src="https://img.shields.io/github/tag/sulu/SuluArticleBundle.svg" alt="GitHub tag (latest SemVer)">
     </a>
     <a href="https://github.com/sulu/SuluArticleBundle/actions" target="_blank">
-        <img src="https://img.shields.io/github/workflow/status/sulu/SuluArticleBundle/Test%20application/master.svg?label=github-actions" alt="GitHub actions status">
+        <img src="https://img.shields.io/github/workflow/status/sulu/SuluArticleBundle/Test%20application.svg?label=test-workflow" alt="Test workflow status">
     </a>
-    <a href="https://circleci.com/gh/sulu/SuluArticleBundle/tree/master" target="_blank">
-        <img src="https://img.shields.io/circleci/build/github/sulu/SuluArticleBundle/master.svg?label=circleci" alt="CircleCI build">
+    <a href="https://app.circleci.com/pipelines/github/sulu/SuluArticleBundle" target="_blank">
+        <img src="https://img.shields.io/circleci/build/github/sulu/SuluArticleBundle.svg?label=circleci" alt="CircleCI build">
     </a>
     <a href="https://github.com/sulu/sulu/releases" target="_blank">
         <img src="https://img.shields.io/badge/sulu%20compatibility-%3E=2.0-52b6ca.svg" alt="Sulu compatibility">
@@ -39,7 +39,7 @@ administration interface.
 <br/>
 
 The SuluArticleBundle is compatible with Sulu **starting from version 2.0**. Have a look at the `require` section in 
-the [composer.json](https://github.com/sulu/SuluArticleBundle/blob/master/composer.json) to find an 
+the [composer.json](https://github.com/sulu/SuluArticleBundle/blob/2.x/composer.json) to find an 
 **up-to-date list of the requirements** of the bundle.
 
 
@@ -53,7 +53,7 @@ composer require "elasticsearch/elasticsearch:7.9.*" # should match version of y
 composer require sulu/article-bundle
 ```
 
-Afterwards, visit the [bundle documentation](https://github.com/sulu/SuluArticleBundle/blob/master/Resources/doc) to 
+Afterwards, visit the [bundle documentation](https://github.com/sulu/SuluArticleBundle/blob/2.x/Resources/doc) to 
 find out **how to set up and configure the SuluArticleBundle** to your specific needs.
 
 
