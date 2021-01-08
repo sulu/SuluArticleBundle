@@ -59,8 +59,7 @@ jobs:
                       composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
-                      phpstan: false
-                      lint-container: false
+                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
                           PHPCR_TRANSPORT: doctrinedbal
@@ -76,7 +75,7 @@ jobs:
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: true
-                      lint-container: true
+                      lint: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           PHPCR_TRANSPORT: jackrabbit
@@ -150,35 +149,17 @@ jobs:
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
             - name: Install dependencies
-              run: |
-                  composer validate
-                  composer update ${{ matrix.composer-flags }}
+              run: composer update ${{ matrix.composer-flags }}
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
               env: ${{ matrix.env }}
 
-            - name: PHPStan
-              if: ${{ matrix.phpstan }}
-              run: |
-                  Tests/Application/bin/adminconsole cache:clear --env dev
-                  Tests/Application/bin/websiteconsole cache:clear --env dev
-                  composer phpstan
+            - name: Lint code
+              if: ${{ matrix.lint }}
+              run: composer lint
               env: ${{ matrix.env }}
 
-            - name: Lint container
-              if: ${{ matrix.lint-container }}
-              run: |
-                  Tests/Application/bin/adminconsole lint:container --env dev
-                  Tests/Application/bin/websiteconsole lint:container --env dev
-                  Tests/Application/bin/adminconsole lint:container --env test
-                  Tests/Application/bin/websiteconsole lint:container --env test
-                  Tests/Application/bin/adminconsole lint:container --env stage
-                  Tests/Application/bin/websiteconsole lint:container --env stage
-                  Tests/Application/bin/adminconsole lint:container --env prod
-                  Tests/Application/bin/websiteconsole lint:container --env prod
-              env: ${{ matrix.env }}
-
-            - name: Run tests
+            - name: Execute test cases
               run: time vendor/bin/phpunit
               env: ${{ matrix.env }}
