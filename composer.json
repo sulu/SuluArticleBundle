@@ -87,6 +87,7 @@
             "@lint-doctrine"
         ],
         "test": [
+            "Composer\\Config::disableProcessTimeout",
             "@phpunit"
         ],
         "phpunit": "vendor/bin/phpunit",
