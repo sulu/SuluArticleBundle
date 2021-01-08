@@ -35,6 +35,7 @@
     },
     "require-dev": {
         "doctrine/data-fixtures": "^1.1",
+        "friendsofphp/php-cs-fixer": "^2.17",
         "handcraftedinthealps/zendsearch": "^2.0",
         "jackalope/jackalope-doctrine-dbal": "^1.3.4",
         "jackalope/jackalope-jackrabbit": "^1.3",
@@ -77,17 +78,36 @@
             "Tests/Application/bin/adminconsole ongr:es:index:create --manager=live --if-not-exists --env test"
         ],
         "lint": [
-            "@phpstan"
+            "@phpstan",
+            "@php-cs",
+            "@lint-container",
+            "@lint-composer",
+            "@lint-doctrine"
         ],
         "test": [
             "@phpunit"
         ],
-        "phpunit": [
-            "Composer\\Config::disableProcessTimeout",
-            "vendor/bin/phpunit"
-        ],
+        "phpunit": "vendor/bin/phpunit",
         "phpstan": [
-            "vendor/bin/phpstan analyse -c phpstan.neon"
+            "Tests/Application/bin/adminconsole cache:warmup --env=dev",
+            "vendor/bin/phpstan analyse"
+        ],
+        "php-cs": "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
+        "php-cs-fix": "vendor/bin/php-cs-fixer fix",
+        "lint-composer": "@composer validate --strict",
+        "lint-container": [
+            "Tests/Application/bin/adminconsole lint:container --env dev",
+            "Tests/Application/bin/websiteconsole lint:container --env dev",
+            "Tests/Application/bin/adminconsole lint:container --env test",
+            "Tests/Application/bin/websiteconsole lint:container --env test",
+            "Tests/Application/bin/adminconsole lint:container --env stage",
+            "Tests/Application/bin/websiteconsole lint:container --env stage",
+            "Tests/Application/bin/adminconsole lint:container --env prod",
+            "Tests/Application/bin/websiteconsole lint:container --env prod"
+        ],
+        "lint-doctrine": [
+            "Tests/Application/bin/adminconsole doctrine:ensure-production-settings --env prod",
+            "Tests/Application/bin/adminconsole doctrine:schema:validate"
         ]
     },
     "config": {
