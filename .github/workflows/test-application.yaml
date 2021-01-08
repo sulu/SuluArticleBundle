@@ -8,39 +8,6 @@ on:
             - '[0-9]+.[0-9]+'
 
 jobs:
-    php-cs-fixer:
-        name: Run php-cs-fixer
-        runs-on: ubuntu-18.04
-
-        steps:
-            - name: Checkout project
-              uses: actions/checkout@v1
-
-            - name: Create downloads directory
-              run: mkdir downloads
-
-            - name: Get downloads path
-              id: php-cs-fixer-dir
-              run: echo "::set-output name=dir::downloads"
-
-            - name: Get php-cs-fixer path
-              id: php-cs-fixer-path
-              run: echo "::set-output name=path::${{ steps.php-cs-fixer-dir.outputs.dir }}/php-cs-fixer.phar"
-
-            - name: Cache php-cs-fixer
-              id: php-cs-fixer-cache
-              uses: actions/cache@v1
-              with:
-                  path: ${{ steps.php-cs-fixer-dir.outputs.dir }}
-                  key: php-cs-fixer
-
-            - name: Download php-cs-fixer
-              if: steps.php-cs-fixer-cache.outputs.cache-hit != 'true'
-              run: curl "https://cs.symfony.com/download/php-cs-fixer-v2.phar" --output ${{ steps.php-cs-fixer-path.outputs.path }} && chmod +x ${{ steps.php-cs-fixer-path.outputs.path }}
-
-            - name: Run php-cs-fixer
-              run: ./${{ steps.php-cs-fixer-path.outputs.path }} fix --dry-run --diff
-
     test:
         name: "Run tests with php ${{ matrix.php-version }} and elasticsearch ${{ matrix.elasticsearch-version }} (${{ matrix.phpcr-transport }})"
         runs-on: ubuntu-latest
@@ -59,8 +26,7 @@ jobs:
                       composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
-                      phpstan: false
-                      lint-container: false
+                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
                           PHPCR_TRANSPORT: doctrinedbal
@@ -76,7 +42,7 @@ jobs:
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: true
-                      lint-container: true
+                      lint: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           PHPCR_TRANSPORT: jackrabbit
@@ -150,35 +116,17 @@ jobs:
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
             - name: Install dependencies
-              run: |
-                  composer validate
-                  composer update ${{ matrix.composer-flags }}
+              run: composer update ${{ matrix.composer-flags }}
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
               env: ${{ matrix.env }}
 
-            - name: PHPStan
-              if: ${{ matrix.phpstan }}
-              run: |
-                  Tests/Application/bin/adminconsole cache:clear --env dev
-                  Tests/Application/bin/websiteconsole cache:clear --env dev
-                  composer phpstan
+            - name: Lint code
+              if: ${{ matrix.lint }}
+              run: composer lint
               env: ${{ matrix.env }}
 
-            - name: Lint container
-              if: ${{ matrix.lint-container }}
-              run: |
-                  Tests/Application/bin/adminconsole lint:container --env dev
-                  Tests/Application/bin/websiteconsole lint:container --env dev
-                  Tests/Application/bin/adminconsole lint:container --env test
-                  Tests/Application/bin/websiteconsole lint:container --env test
-                  Tests/Application/bin/adminconsole lint:container --env stage
-                  Tests/Application/bin/websiteconsole lint:container --env stage
-                  Tests/Application/bin/adminconsole lint:container --env prod
-                  Tests/Application/bin/websiteconsole lint:container --env prod
-              env: ${{ matrix.env }}
-
-            - name: Run tests
-              run: time vendor/bin/phpunit
+            - name: Execute test cases
+              run: time composer test
               env: ${{ matrix.env }}
