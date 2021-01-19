@@ -35,9 +35,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class ArticlePageController extends AbstractRestController implements ClassResourceInterface, SecuredControllerInterface
 {
-    const DOCUMENT_TYPE = 'article_page';
-
     use RequestParametersTrait;
+
+    const DOCUMENT_TYPE = 'article_page';
 
     /**
      * @var DocumentManagerInterface
