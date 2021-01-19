@@ -32,9 +32,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ArticlePageController extends RestController implements ClassResourceInterface, SecuredControllerInterface
 {
-    const DOCUMENT_TYPE = 'article_page';
-
     use RequestParametersTrait;
+
+    const DOCUMENT_TYPE = 'article_page';
 
     /**
      * Returns single article-page.

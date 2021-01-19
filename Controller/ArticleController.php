@@ -49,10 +49,10 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ArticleController extends RestController implements ClassResourceInterface, SecuredControllerInterface
 {
-    const DOCUMENT_TYPE = 'article';
-
     use RequestParametersTrait;
     use ArticleViewDocumentIdTrait;
+
+    const DOCUMENT_TYPE = 'article';
 
     /**
      * Create field-descriptor array.
