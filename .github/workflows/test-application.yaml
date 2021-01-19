@@ -9,7 +9,7 @@ on:
 
 jobs:
     test:
-        name: "Run tests with php ${{ matrix.php-version }} and elasticsearch ${{ matrix.elasticsearch-version }} (${{ matrix.phpcr-transport }})"
+        name: "PHP ${{ matrix.php-version }} (elasticsearch ${{ matrix.elasticsearch-version }}, ${{ matrix.phpcr-transport }}, ${{ matrix.dependency-versions }})"
         runs-on: ubuntu-latest
 
         env:
@@ -29,7 +29,7 @@ jobs:
                       elasticsearch-version: '5.6'
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
-                      composer-options: '--prefer-dist --prefer-lowest'
+                      dependency-versions: 'lowest'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
                       php-cs-fixer: false
@@ -43,7 +43,7 @@ jobs:
                       elasticsearch-version: '7.9'
                       elasticsearch-package-constraint: '~7.9.0'
                       phpcr-transport: jackrabbit
-                      composer-options: '--prefer-dist'
+                      dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       php-cs-fixer: true
@@ -107,11 +107,10 @@ jobs:
             - name: Require elasticsearch dependency
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
-            - name: Install dependencies
-              uses: "ramsey/composer-install@v1"
+            - name: Install composer dependencies
+              uses: ramsey/composer-install@v1
               with:
-                  dependency-versions: 'highest' # run "composer update" instead of "composer install"
-                  composer-options: ${{ matrix.composer-options }}
+                  dependency-versions: ${{matrix.dependency-versions}}
 
             - name: Run php-cs-fixer
               if: ${{ matrix.php-cs-fixer }}
