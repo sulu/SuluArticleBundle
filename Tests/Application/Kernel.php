@@ -79,4 +79,16 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
             }
         }
     }
+
+    protected function getKernelParameters()
+    {
+        $parameters = parent::getKernelParameters();
+
+        $reflection = new \ReflectionClass(\Gedmo\Exception::class);
+        $gedmoDirectory = \dirname($reflection->getFileName());
+
+        $parameters['gedmo_directory'] = $gedmoDirectory;
+
+        return $parameters;
+    }
 }
