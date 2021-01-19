@@ -9,7 +9,7 @@ on:
 
 jobs:
     test:
-        name: "Run tests with php ${{ matrix.php-version }} and elasticsearch ${{ matrix.elasticsearch-version }} (${{ matrix.phpcr-transport }})"
+        name: "PHP ${{ matrix.php-version }} (elasticsearch ${{ matrix.elasticsearch-version }}, ${{ matrix.phpcr-transport }}, ${{ matrix.dependency-versions }})"
         runs-on: ubuntu-latest
 
         env:
@@ -23,7 +23,7 @@ jobs:
                       elasticsearch-version: '5.6'
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
-                      composer-flags: '--prefer-lowest --prefer-dist --no-interaction'
+                      dependency-versions: 'lowest'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
                       lint: false
@@ -38,7 +38,7 @@ jobs:
                       elasticsearch-version: '7.9'
                       elasticsearch-package-constraint: '~7.9.0'
                       phpcr-transport: jackrabbit
-                      composer-flags: '--prefer-dist --no-interaction'
+                      dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: true
@@ -99,24 +99,13 @@ jobs:
                   tools: ${{ matrix.tools }}
                   coverage: none
 
-            - name: Get composer cache directory
-              id: composer-cache-dir
-              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-            - name: Cache dependencies
-              uses: actions/cache@v2
-              id: composer-cache
-              with:
-                  path: ${{ steps.composer-cache-dir.outputs.dir }}
-                  key: ${{ runner.os }}-composer-${{ hashFiles('composer.json', 'composer.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-composer-
-
             - name: Require elasticsearch dependency
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
-            - name: Install dependencies
-              run: composer update ${{ matrix.composer-flags }}
+            - name: Install composer dependencies
+              uses: ramsey/composer-install@v1
+              with:
+                  dependency-versions: ${{matrix.dependency-versions}}
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
