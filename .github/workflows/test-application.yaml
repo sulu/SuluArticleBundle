@@ -131,6 +131,9 @@ jobs:
                   Tests/app/console ongr:es:index:create -m live
               env: ${{ matrix.env }}
 
+            - name: Lint code
+              run: composer validate
+
             - name: Run tests
               run: time vendor/bin/phpunit
               env: ${{ matrix.env }}
