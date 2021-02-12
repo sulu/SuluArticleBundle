@@ -48,6 +48,21 @@ jobs:
                           PHPCR_TRANSPORT: jackrabbit
                           ELASTICSEARCH_HOST: '127.0.0.1:9202'
 
+                    - php-version: '8.0'
+                      elasticsearch-version: '7.11'
+                      elasticsearch-package-constraint: '~7.11.0'
+                      phpcr-transport: jackrabbit
+                      dependency-versions: 'highest'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      composer-options: '--ignore-platform-reqs'
+                      phpstan: false
+                      lint: false
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          PHPCR_TRANSPORT: jackrabbit
+                          ELASTICSEARCH_HOST: '127.0.0.1:9202'
+
         services:
             mysql:
                 image: mysql:5.7
@@ -106,6 +121,7 @@ jobs:
               uses: ramsey/composer-install@v1
               with:
                   dependency-versions: ${{matrix.dependency-versions}}
+                  composer-options: ${{ matrix.composer-options }}
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
