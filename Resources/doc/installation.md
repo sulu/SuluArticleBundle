@@ -16,23 +16,26 @@ composer require sulu/article-bundle
 ```yml
 # config/packages/sulu_article.yaml
 
+sulu_article:
+    index_name: '%env(resolve:ELASTICSEARCH_INDEX)%'
+    hosts:
+        - '%env(resolve:ELASTICSEARCH_HOST)%'
+    types:
+        article:
+            translation_key: "sulu_article.article"
+
 sulu_route:
     mappings:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: "schema"
+            generator: schema
             options:
-                route_schema: "/articles/{object.getTitle()}"
+                route_schema: '/articles/{object.getTitle()}'
         Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
-            generator: "article_page"
+            generator: article_page
             options:
-                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
-                parent: "{object.getParent().getRoutePath()}"
+                route_schema: '{translator.trans("page")}-{object.getPageNumber()}'
+                parent: '{object.getParent().getRoutePath()}'
 
-sulu_article:
-    index_name: su_articles
-    hosts: ['127.0.0.1:9200']
-
-# config/packages/ongr_elasticsearch.yaml
 ongr_elasticsearch:
     analysis:
         tokenizer:
@@ -41,6 +44,17 @@ ongr_elasticsearch:
         analyzer:
             pathAnalyzer:
                 tokenizer: pathTokenizer
+```
+
+### Create env variables
+
+As the elasticsearch index and host could be different between system we create
+environment variables for them.
+
+```
+# .env
+ELASTICSEARCH_HOST=127.0.0.1:9200
+ELASTICSEARCH_INDEX=su_myproject
 ```
 
 ### Configure the routing
