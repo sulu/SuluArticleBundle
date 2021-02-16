@@ -2,7 +2,7 @@
 
 The SuluArticleBundle provides 3 ways to include articles into another page (or article).
 
-1. Direct assignment: `article_selection`
+1. Direct assignment: `article_selection` or `single_article_selection`
 2. Smart-Content: `articles` or `articles_page_tree` 
 2. Teaser-Selection: `article` 
 
