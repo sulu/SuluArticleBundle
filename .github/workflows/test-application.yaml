@@ -21,6 +21,7 @@ jobs:
                 include:
                     - php-version: '7.2'
                       elasticsearch-version: '5.6'
+                      elasticsearch-image: 'elasticsearch'
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
                       dependency-versions: 'lowest'
@@ -36,6 +37,7 @@ jobs:
 
                     - php-version: '7.4'
                       elasticsearch-version: '7.9.3'
+                      elasticsearch-image: 'docker.elastic.co/elasticsearch/elasticsearch'
                       elasticsearch-package-constraint: '~7.9.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
@@ -49,7 +51,8 @@ jobs:
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
                     - php-version: '8.0'
-                      elasticsearch-version: '7.10.1' # 7.11 not released yet on docker: https://hub.docker.com/_/elasticsearch?tab=tags
+                      elasticsearch-version: '7.11.1'
+                      elasticsearch-image: 'docker.elastic.co/elasticsearch/elasticsearch'
                       elasticsearch-package-constraint: '~7.11.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
@@ -85,7 +88,7 @@ jobs:
                     - 8080:8080
 
             elasticsearch:
-                image: elasticsearch:${{ matrix.elasticsearch-version }}
+                image: ${{ matrix.elasticsearch-image }}:${{ matrix.elasticsearch-version }}
                 ports:
                     - 9200:9200
                 env:
