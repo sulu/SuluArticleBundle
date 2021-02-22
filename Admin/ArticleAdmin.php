@@ -27,6 +27,7 @@ use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -198,7 +199,33 @@ class ArticleAdmin extends Admin
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::DELETE)
                 && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::DELETE)) {
-                $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.delete');
+                // TODO remove when ArticleBundle requires Sulu ^2.3
+                if ((new \ReflectionClass(DocumentManagerInterface::class))->hasMethod('removeLocale')) {
+                    $formToolbarActionsWithType[] = new DropdownToolbarAction(
+                        'sulu_admin.delete',
+                        'su-trash-alt',
+                        [
+                            new ToolbarAction(
+                                'sulu_admin.delete',
+                                [
+                                    'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
+                                    'router_attributes_to_back_view' => ['webspace'],
+                                ]
+                            ),
+                            new ToolbarAction(
+                                'sulu_admin.delete',
+                                [
+                                    'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
+                                    'router_attributes_to_back_view' => ['webspace'],
+                                    'delete_locale' => true,
+                                ]
+                            ),
+                        ]
+                    );
+                } else {
+                    $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.delete');
+                }
+
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.delete');
             }
 

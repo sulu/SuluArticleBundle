@@ -41,6 +41,11 @@ interface IndexerInterface
     public function remove(ArticleDocument $document): void;
 
     /**
+     * Removes specific document locale from the index.
+     */
+    public function removeLocale(ArticleDocument $document, string $locale): void;
+
+    /**
      * Flushes index.
      */
     public function flush(): void;

@@ -421,6 +421,15 @@ class ArticleIndexer implements IndexerInterface
         }
     }
 
+    public function removeLocale(ArticleDocument $document, string $locale): void
+    {
+        // overwrite removed locale with properties from original locale
+        $article = $this->createOrUpdateArticle($document, $locale);
+        $article->setLocalizationState(new LocalizationStateViewObject(LocalizationState::GHOST, $document->getOriginalLocale()));
+
+        $this->manager->persist($article);
+    }
+
     /**
      * {@inheritdoc}
      */
