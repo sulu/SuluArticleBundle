@@ -167,7 +167,7 @@ class ArticleIndexer implements IndexerInterface
         ArticleDocument $document,
         string $locale,
         string $localizationState = LocalizationState::LOCALIZED
-    ): ArticleViewDocumentInterface {
+    ): ?ArticleViewDocumentInterface {
         $article = $this->findOrCreateViewDocument($document, $locale, $localizationState);
         if (!$article) {
             return null;
@@ -257,7 +257,7 @@ class ArticleIndexer implements IndexerInterface
         ArticleDocument $document,
         string $locale,
         string $localizationState
-    ): ArticleViewDocumentInterface {
+    ): ?ArticleViewDocumentInterface {
         $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
         /** @var ArticleViewDocumentInterface $article */
         $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
@@ -348,6 +348,15 @@ class ArticleIndexer implements IndexerInterface
         }
     }
 
+    public function removeLocale(ArticleDocument $document, string $locale): void
+    {
+        // overwrite removed locale with properties from original locale
+        $article = $this->createOrUpdateArticle($document, $locale);
+        $article->setLocalizationState(new LocalizationStateViewObject(LocalizationState::GHOST, $document->getOriginalLocale()));
+
+        $this->manager->persist($article);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -383,7 +392,7 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function setUnpublished(string $uuid, string $locale): ArticleViewDocumentInterface
+    public function setUnpublished(string $uuid, string $locale): ?ArticleViewDocumentInterface
     {
         $articleId = $this->getViewDocumentId($uuid, $locale);
         /** @var ArticleViewDocumentInterface|null $article */

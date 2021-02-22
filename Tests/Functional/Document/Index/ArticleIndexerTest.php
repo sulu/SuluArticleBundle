@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
@@ -62,6 +63,51 @@ class ArticleIndexerTest extends SuluTestCase
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
         $this->indexer->clear();
+    }
+
+    public function testDeleteLocale()
+    {
+        if ((new \ReflectionClass(DocumentManagerInterface::class))->hasMethod('deleteLocale')) {
+            $this->markTestSkipped('Test is only viable on Sulu ^2.3');
+
+            return;
+        }
+
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+
+        $secondLocale = 'de';
+
+        // now add second locale
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+
+        /** @var ArticleDocument $articleDocument */
+        $articleDocument = $this->documentManager->find($article['id']);
+        $this->indexer->removeLocale($articleDocument, 'de');
+        $this->indexer->flush();
+
+        $documentDE = $this->findViewDocument($articleDocument->getUuid(), 'de');
+        $documentEN = $this->findViewDocument($articleDocument->getUuid(), 'en');
+
+        $this->assertSame('Test Article', $documentDE->getTitle());
+        $this->assertSame('ghost', $documentDE->getLocalizationState()->state);
+        $this->assertSame('en', $documentDE->getLocalizationState()->locale);
+
+        $this->assertSame('Test Article', $documentEN->getTitle());
     }
 
     public function testIndexDefaultWithRoute()
