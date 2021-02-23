@@ -20,8 +20,7 @@ jobs:
             matrix:
                 include:
                     - php-version: '7.2'
-                      elasticsearch-version: '5.6'
-                      elasticsearch-image: 'elasticsearch'
+                      elasticsearch-version: '5.6.14'
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
                       dependency-versions: 'lowest'
@@ -37,7 +36,6 @@ jobs:
 
                     - php-version: '7.4'
                       elasticsearch-version: '7.9.3'
-                      elasticsearch-image: 'docker.elastic.co/elasticsearch/elasticsearch'
                       elasticsearch-package-constraint: '~7.9.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
@@ -52,13 +50,11 @@ jobs:
 
                     - php-version: '8.0'
                       elasticsearch-version: '7.11.1'
-                      elasticsearch-image: 'docker.elastic.co/elasticsearch/elasticsearch'
                       elasticsearch-package-constraint: '~7.11.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
-                      composer-options: '--ignore-platform-reqs'
                       phpstan: false
                       lint: false
                       env:
@@ -88,7 +84,7 @@ jobs:
                     - 8080:8080
 
             elasticsearch:
-                image: ${{ matrix.elasticsearch-image }}:${{ matrix.elasticsearch-version }}
+                image: docker.elastic.co/elasticsearch/elasticsearch:${{ matrix.elasticsearch-version }}
                 ports:
                     - 9200:9200
                 env:
