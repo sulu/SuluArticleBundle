@@ -36,6 +36,37 @@ The `content` and `view` property is represented by a proxy to avoid resolving d
 To extend the indexed data you can extend the `ArticleViewDocument`. This can be achieved by performing the following
 steps. The same steps can also be used to extend the `ArticlePageViewObject`.
 
+### 0. Create a Bundle Class
+
+Unfortunately, the ElasticsearchBundle allows to overwrite document classes only if an `AppBundle` is registered in the 
+application. If you do not have registered such a bundle yet, you need to add it to your `src` directory and enable it
+in the `config/bundles.php` file.
+
+```php
+<?php
+
+// src/AppBundle.php
+
+namespace App;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class AppBundle extends Bundle
+{
+}
+```
+
+```php
+<?php
+
+// config/bundles.php
+
+return [
+    // ...
+    \App\AppBundle::class => ['all' => true],
+]
+```
+
 #### 1. Create custom class
 
 ```php
@@ -124,24 +155,4 @@ class ArticleIndexListener
 <service id="app.sulu_article.index_listener" class="App\EventListener\ArticleIndexListener">
     <tag name="kernel.event_listener" event="sulu_article.index" method="onIndex"/>
 </service>
-```
-
-### Troubleshooting
-
-Unfortunately, the ElasticsearchBundle allows to overwrite document classes only if an `AppBundle` is registered in the 
-application. If you do not have registered such a bundle yet, you need to add it to your `src` directory and enable it
-in the `config/bundles.php` file.
-
-```
-<?php
-
-// src/AppBundle.php
-
-namespace App;
-
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-
-class AppBundle extends Bundle
-{
-}
 ```

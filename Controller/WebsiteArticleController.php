@@ -190,8 +190,13 @@ class WebsiteArticleController extends AbstractController
         return $this->container->get('twig');
     }
 
+    /**
+     * @deprecated
+     */
     protected function getTemplateAttributeResolver(): TemplateAttributeResolverInterface
     {
+        @\trigger_error(__METHOD__ . '() is deprecated since version 2.2 and will be removed in 3.0. If you need the service, you can inject it by yourself instead.', \E_USER_DEPRECATED);
+
         return $this->container->get('sulu_website.resolver.template_attribute');
     }
 

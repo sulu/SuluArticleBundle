@@ -20,7 +20,7 @@ jobs:
             matrix:
                 include:
                     - php-version: '7.2'
-                      elasticsearch-version: '5.6'
+                      elasticsearch-version: '5.6.14'
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
                       dependency-versions: 'lowest'
@@ -30,12 +30,12 @@ jobs:
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
                           PHPCR_TRANSPORT: doctrinedbal
-                          ELASTICSEARCH_HOST: '127.0.0.1:9201'
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
                           DATABASE_CHARSET: UTF8
                           DATABASE_COLLATE: UTF8_BIN
 
                     - php-version: '7.4'
-                      elasticsearch-version: '7.9'
+                      elasticsearch-version: '7.9.3'
                       elasticsearch-package-constraint: '~7.9.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
@@ -46,7 +46,21 @@ jobs:
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           PHPCR_TRANSPORT: jackrabbit
-                          ELASTICSEARCH_HOST: '127.0.0.1:9202'
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
+
+                    - php-version: '8.0'
+                      elasticsearch-version: '7.11.1'
+                      elasticsearch-package-constraint: '~7.11.0'
+                      phpcr-transport: jackrabbit
+                      dependency-versions: 'highest'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      phpstan: false
+                      lint: false
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          PHPCR_TRANSPORT: jackrabbit
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
         services:
             mysql:
@@ -69,19 +83,10 @@ jobs:
                 ports:
                     - 8080:8080
 
-            elasticsearch5:
-                image: elasticsearch:5.6
+            elasticsearch:
+                image: docker.elastic.co/elasticsearch/elasticsearch:${{ matrix.elasticsearch-version }}
                 ports:
-                    - 9201:9200
-                env:
-                    discovery.type: 'single-node'
-                    xpack.security.enabled: 'false'
-                options: --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=5
-
-            elasticsearch7:
-                image: elasticsearch:7.9.3
-                ports:
-                    - 9202:9200
+                    - 9200:9200
                 env:
                     discovery.type: 'single-node'
                     xpack.security.enabled: 'false'
@@ -106,6 +111,7 @@ jobs:
               uses: ramsey/composer-install@v1
               with:
                   dependency-versions: ${{matrix.dependency-versions}}
+                  composer-options: ${{ matrix.composer-options }}
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
