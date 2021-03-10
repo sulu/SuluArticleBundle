@@ -82,6 +82,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('types')
                     ->useAttributeAsKey('name')
+                    ->normalizeKeys(false)
                     ->prototype('array')
                         ->children()
                             ->scalarNode('translation_key')->end()
