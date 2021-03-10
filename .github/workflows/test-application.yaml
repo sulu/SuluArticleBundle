@@ -14,6 +14,7 @@ jobs:
 
         env:
             DATABASE_URL: mysql://root:root@127.0.0.1:3306/sulu_test?serverVersion=5.7
+            PHPCR_TRANSPORT: ${{ matrix.phpcr-transport }}
 
         strategy:
             fail-fast: false
@@ -29,7 +30,6 @@ jobs:
                       lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
-                          PHPCR_TRANSPORT: doctrinedbal
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
                           DATABASE_CHARSET: UTF8
                           DATABASE_COLLATE: UTF8_BIN
@@ -45,7 +45,6 @@ jobs:
                       lint: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
-                          PHPCR_TRANSPORT: jackrabbit
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
                     - php-version: '8.0'
@@ -59,7 +58,6 @@ jobs:
                       lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
-                          PHPCR_TRANSPORT: jackrabbit
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
         services:
