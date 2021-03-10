@@ -20,6 +20,7 @@ jobs:
             SYMFONY__DATABASE_NAME: sulu_test
             SYMFONY__DATABASE_USER: root
             SYMFONY__DATABASE_PASSWORD: root
+            SYMFONY__PHPCR__TRANSPORT: ${{ matrix.phpcr-transport }}
 
         strategy:
             fail-fast: false
@@ -36,7 +37,6 @@ jobs:
                       phpstan: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
-                          SYMFONY__PHPCR__TRANSPORT: doctrinedbal
                           SYMFONY__ELASTICSEARCH_HOST: '127.0.0.1:9201'
 
                     - php-version: '7.4'
@@ -50,7 +50,6 @@ jobs:
                       phpstan: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
-                          SYMFONY__PHPCR__TRANSPORT: jackrabbit
                           SYMFONY__ELASTICSEARCH_HOST: '127.0.0.1:9202'
 
         services:
