@@ -40,7 +40,7 @@
         "elasticsearch/elasticsearch": "^5.0 || ^6.0 || ^7.0",
         "friendsofphp/php-cs-fixer": "^2.17",
         "handcraftedinthealps/elasticsearch-bundle": "^5.2.6.4",
-        "handcraftedinthealps/elasticsearch-dsl": "^6.2.0.1",
+        "handcraftedinthealps/elasticsearch-dsl": "^5.0.7.1 || ^6.2.0.1 || ^7.2.0.1",
         "handcraftedinthealps/zendsearch": "^2.0",
         "jackalope/jackalope-doctrine-dbal": "^1.3.4",
         "jackalope/jackalope-jackrabbit": "^1.3",
@@ -59,12 +59,15 @@
         "thecodingmachine/phpstan-strict-rules": "^0.12.0"
     },
     "conflict": {
-        "elasticsearch/elasticsearch": "<5.0 >=8.0",
-        "handcraftedinthealps/elasticsearch-bundle": "<5.2.6.4 >= 6.0",
-        "handcraftedinthealps/elasticsearch-dsl": "<5.0.7.1 || <6.2.0.1 || <7.2.0.1 >=8.0"
+        "elasticsearch/elasticsearch": "<5.0 || >=8.0",
+        "handcraftedinthealps/elasticsearch-bundle": "<5.2.6.4 || >=6.0",
+        "handcraftedinthealps/elasticsearch-dsl": "<5.0.7.1 || 6.0 - 6.2.0 || 7.0 - 7.2.0 || >=8.0"
     },
     "suggest": {
-        "sulu/automation-bundle": "Allows to outsource long-running route update processes."
+        "elasticsearch/elasticsearch": "Required for the default article phpcr storage.",
+        "handcraftedinthealps/elasticsearch-bundle": "Required for the default article phpcr storage.",
+        "sulu/automation-bundle": "Allows publish automation and outsource long-running route update processes.",
+        "sulu/content-bundle": "Allows to use the experimental article storage."
     },
     "autoload": {
         "psr-4": {
