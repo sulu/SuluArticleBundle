@@ -393,15 +393,14 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $isPHPCRStorage = Configuration::ARTICLE_STORAGE_PHPCR === $storage;
         $isExperimentalStorage = Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage;
 
-        $container->setParameter('sulu_article.default_main_webspace', $config['default_main_webspace']);
-        $container->setParameter('sulu_article.default_additional_webspaces', $config['default_additional_webspaces']);
-        $container->setParameter('sulu_article.types', $config['types']);
-        $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
-        $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
-        $container->setParameter('sulu_article.search_fields', $config['search_fields']);
-
         if ($isPHPCRStorage) {
             // can be removed when phpcr storage is removed
+            $container->setParameter('sulu_article.default_main_webspace', $config['default_main_webspace']);
+            $container->setParameter('sulu_article.default_additional_webspaces', $config['default_additional_webspaces']);
+            $container->setParameter('sulu_article.types', $config['types']);
+            $container->setParameter('sulu_article.display_tab_all', $config['display_tab_all']);
+            $container->setParameter('sulu_article.smart_content.default_limit', $config['smart_content']['default_limit']);
+            $container->setParameter('sulu_article.search_fields', $config['search_fields']);
             $container->setParameter('sulu_article.documents', $config['documents']);
             $container->setParameter('sulu_article.view_document.article.class', $config['documents']['article']['view']);
         }
