@@ -25,7 +25,6 @@ jobs:
                       elasticsearch-package-constraint: '~5.5'
                       phpcr-transport: doctrinedbal
                       dependency-versions: 'lowest'
-                      composer-options: "--prefer-stable"
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
                       lint: false
