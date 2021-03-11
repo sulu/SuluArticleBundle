@@ -47,7 +47,10 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
     {
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
-        $bundles[] = new ONGRElasticsearchBundle();
+
+        if ('phpcr' === $this->config) {
+            $bundles[] = new ONGRElasticsearchBundle();
+        }
 
         if ('extend' === getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();
