@@ -16,6 +16,7 @@ use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
 use Sulu\Bundle\ArticleBundle\Tests\Application\Testing\ArticleBundleKernelBrowser;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
+use Sulu\Component\HttpKernel\SuluKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,13 +27,30 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class Kernel extends SuluTestKernel implements CompilerPassInterface
 {
     /**
+     * @var string|null
+     */
+    private $config = 'phpcr_storage';
+
+    public function __construct(string $environment, bool $debug, string $suluContext = SuluKernel::CONTEXT_ADMIN)
+    {
+        $environmentParts = explode('_', $environment, 2);
+        $environment = $environmentParts[0];
+        $this->config = $environmentParts[1] ?? $this->config;
+
+        parent::__construct($environment, $debug, $suluContext);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function registerBundles()
     {
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
-        $bundles[] = new ONGRElasticsearchBundle();
+
+        if ('phpcr_storage' === $this->config) {
+            $bundles[] = new ONGRElasticsearchBundle();
+        }
 
         if ('extend' === getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();
@@ -53,6 +71,8 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         }
 
         $loader->load(__DIR__ . '/config/config.yml');
+        $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
+
         $type = 'default';
         if (getenv('ARTICLE_TEST_CASE')) {
             $type = getenv('ARTICLE_TEST_CASE');

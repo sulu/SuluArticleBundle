@@ -1,20 +1,5 @@
 # Doctrine Configuration
 doctrine:
-    dbal:
-        driver: pdo_mysql
-        host: 127.0.0.1
-        port: 3306
-        dbname: su_articles_test
-        user: root
-        password:
-        server_version: '5.7'
-        url: '%env(DATABASE_URL)%'
-
-        charset: '%env(DATABASE_CHARSET)%'
-        default_table_options:
-            charset: '%env(DATABASE_CHARSET)%'
-            collate: '%env(DATABASE_COLLATE)%'
-
     orm:
         mappings:
             gedmo_tree:
@@ -23,30 +8,3 @@ doctrine:
                 dir: "%gedmo_directory%/Tree/Entity"
                 alias: GedmoTree
                 is_bundle: false
-
-# Sulu Routing
-sulu_route:
-    mappings:
-        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: "schema"
-            options:
-                route_schema: "/articles/{object.getTitle()}"
-        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
-            generator: "article_page"
-            options:
-                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
-                parent: "{object.getParent().getRoutePath()}"
-
-sulu_article:
-    index_name: "su_articles_tests"
-    hosts: ["%env(ELASTICSEARCH_HOST)%"]
-    default_main_webspace: 'sulu_io'
-
-ongr_elasticsearch:
-    analysis:
-        tokenizer:
-            pathTokenizer:
-                type: path_hierarchy
-        analyzer:
-            pathAnalyzer:
-                tokenizer: pathTokenizer

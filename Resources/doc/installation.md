@@ -8,6 +8,7 @@ The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
 
 ```bash
 composer require "elasticsearch/elasticsearch:7.9.*" # should match version of your elasticsearch installation
+composer require "handcraftedinthealps/elasticsearch-bundle:^5.2"
 composer require sulu/article-bundle
 ```
 

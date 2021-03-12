@@ -41,7 +41,6 @@ jobs:
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
-                      phpstan: true
                       lint: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
@@ -54,7 +53,6 @@ jobs:
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
-                      phpstan: false
                       lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak

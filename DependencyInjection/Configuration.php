@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
+use Sulu\Bundle\ArticleBundle\Article\Domain\Model\Article;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -21,6 +22,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    public const ARTICLE_STORAGE_PHPCR = 'phpcr';
+    public const ARTICLE_STORAGE_EXPERIMENTAL = 'experimental';
+
     /**
      * {@inheritdoc}
      */
@@ -31,7 +35,27 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('index_name')->isRequired()->end()
+                ->arrayNode('article')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->enumNode('storage')
+                            ->values([self::ARTICLE_STORAGE_PHPCR, self::ARTICLE_STORAGE_EXPERIMENTAL])
+                            ->defaultValue(self::ARTICLE_STORAGE_PHPCR)
+                        ->end()
+                        ->arrayNode('objects')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('article')
+                                    ->addDefaultsIfNotSet()
+                                    ->children()
+                                        ->scalarNode('model')->defaultValue(Article::class)->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->scalarNode('index_name')->end()
                 ->arrayNode('hosts')
                     ->prototype('scalar')->end()
                 ->end()

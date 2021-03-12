@@ -1,5 +1,16 @@
 # Upgrade
 
+## 2.x
+
+### Elasticsearch Bundle need to be required
+
+The SuluArticleBundle defines not longer its dependency to `handcraftedinthealps/elasticsearch-bundle` because
+of the new `experimental` storage. If you update you need to require the bundle in your `composer.json`.
+
+```bash
+composer require "handcraftedinthealps/elasticsearch-bundle:^5.2"
+```
+
 ## 2.2.0
 
 ### Index mapping changed
