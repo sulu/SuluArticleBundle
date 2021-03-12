@@ -29,7 +29,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
     /**
      * @var string|null
      */
-    private $config = 'phpcr';
+    private $config = 'phpcr_storage';
 
     public function __construct(string $environment, bool $debug, string $suluContext = SuluKernel::CONTEXT_ADMIN)
     {
@@ -48,7 +48,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
 
-        if ('phpcr' === $this->config) {
+        if ('phpcr_storage' === $this->config) {
             $bundles[] = new ONGRElasticsearchBundle();
         }
 

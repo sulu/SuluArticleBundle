@@ -41,27 +41,43 @@ class SuluArticleBundle extends Bundle implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        $interfaces = [];
-
-        if (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $container->getParameter('sulu_article.article_storage')) {
-            $interfaces = \array_merge($interfaces, [
-                ArticleInterface::class => 'sulu.model.article.class',
-            ]);
-        }
+        $storage = $container->getParameter('sulu_article.article_storage');
 
         $compilerPasses = [];
-        if (0 < \count($interfaces)) {
-            $compilerPasses[] = new ResolveTargetEntitiesPass($interfaces);
-        }
 
-        if (Configuration::ARTICLE_STORAGE_PHPCR === $container->getParameter('sulu_article.article_storage')) {
-            // can be removed when phpcr storage is removed
-            $compilerPasses[] = new RouteEnhancerCompilerPass();
-            $compilerPasses[] = new ConverterCompilerPass();
+        if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
+            $compilerPasses = $this->getPHPCRStorageCompilerPasses($container);
+        } elseif (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage) {
+            $compilerPasses = $this->getExperimentalStorageCompilerPasses($container);
         }
 
         foreach ($compilerPasses as $compilerPass) {
             $compilerPass->process($container);
         }
+    }
+
+    /**
+     * @return CompilerPassInterface[]
+     */
+    private function getExperimentalStorageCompilerPasses(ContainerBuilder $container): array
+    {
+        return [
+            new ResolveTargetEntitiesPass([
+                ArticleInterface::class => 'sulu.model.article.class',
+            ]),
+        ];
+    }
+
+    /**
+     * @return compilerPassInterface[]
+     *
+     * Can be removed when phpcr storage is removed
+     */
+    private function getPHPCRStorageCompilerPasses(ContainerBuilder $container): array
+    {
+        return [
+            new RouteEnhancerCompilerPass(),
+            new ConverterCompilerPass(),
+        ];
     }
 }
