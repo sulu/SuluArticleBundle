@@ -10,5 +10,11 @@
         <id name="id" type="string" column="id">
             <generator strategy="NONE"/>
         </id>
+
+        <one-to-many field="dimensionContents" target-entity="Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContentInterface" mapped-by="article">
+            <cascade>
+                <cascade-persist/>
+            </cascade>
+        </one-to-many>
     </mapped-superclass>
 </doctrine-mapping>

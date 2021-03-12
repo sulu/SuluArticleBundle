@@ -12,6 +12,8 @@
 namespace Sulu\Bundle\ArticleBundle\Article\Domain\Model;
 
 use Ramsey\Uuid\Uuid;
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\ContentRichEntityTrait;
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\DimensionContentInterface;
 use Sulu\Component\Persistence\Model\AuditableTrait;
 
 /**
@@ -19,12 +21,13 @@ use Sulu\Component\Persistence\Model\AuditableTrait;
  */
 class Article implements ArticleInterface
 {
+    use ContentRichEntityTrait;
     use AuditableTrait;
 
     /**
      * @var string
      */
-    private $id;
+    protected $id;
 
     public function __construct(
         ?string $id = null
@@ -35,5 +38,13 @@ class Article implements ArticleInterface
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @return ArticleDimensionContentInterface
+     */
+    public function createDimensionContent(): DimensionContentInterface
+    {
+        return new ArticleDimensionContent($this);
     }
 }

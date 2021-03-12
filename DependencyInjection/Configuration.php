@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
 use Sulu\Bundle\ArticleBundle\Article\Domain\Model\Article;
+use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContent;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -49,6 +50,12 @@ class Configuration implements ConfigurationInterface
                                     ->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('model')->defaultValue(Article::class)->end()
+                                    ->end()
+                                ->end()
+                                ->arrayNode('article_content')
+                                    ->addDefaultsIfNotSet()
+                                    ->children()
+                                        ->scalarNode('model')->defaultValue(ArticleDimensionContent::class)->end()
                                     ->end()
                                 ->end()
                             ->end()
