@@ -1,4 +1,3 @@
 sulu_article:
     article:
         storage: 'experimental'
-    default_main_webspace: 'sulu_io'

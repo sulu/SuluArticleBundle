@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle;
 
+use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContentInterface;
 use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
@@ -64,6 +65,7 @@ class SuluArticleBundle extends Bundle implements CompilerPassInterface
         return [
             new ResolveTargetEntitiesPass([
                 ArticleInterface::class => 'sulu.model.article.class',
+                ArticleDimensionContentInterface::class => 'sulu.model.article_content.class',
             ]),
         ];
     }

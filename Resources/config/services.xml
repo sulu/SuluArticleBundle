@@ -3,9 +3,11 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <!--
+        @internal this file should not be referenced inside your project
+
         NOTE: this are the service definitions when using the "phpcr" storage
-        The service definitions when using the "content_bundle" storage can
-        be found in the other xml files in this directory.
+        The service definitions when using the "experimental" storage can
+        be found in the "experimental.xml" file in this directory.
     -->
 
     <parameters>

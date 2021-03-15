@@ -11,12 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\Article\Domain\Model;
 
+use Sulu\Bundle\ContentBundle\Content\Domain\Model\ContentRichEntityInterface;
 use Sulu\Component\Persistence\Model\AuditableInterface;
 
 /**
  * @experimental
  */
-interface ArticleInterface extends AuditableInterface
+interface ArticleInterface extends AuditableInterface, ContentRichEntityInterface
 {
     public const TEMPLATE_TYPE = 'article';
     public const RESOURCE_KEY = 'article';

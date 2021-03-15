@@ -418,6 +418,8 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
     private function loadExperimentalStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
     {
         $this->configurePersistence($config['article']['objects'], $container);
+
+        $loader->load('experimental.xml');
     }
 
     /**
