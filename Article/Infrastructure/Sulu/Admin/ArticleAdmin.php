@@ -25,8 +25,8 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 
 /**
  * @internal This class is internal and should not be extended or overwritten.
- *           Create an own admin class to extend the view or navigation
- *           by getting the the instance from the collection.
+ *           You can create a separate admin class in your project and get the 
+ *           respective object from the collection to extend a navigation item or a view
  *
  * @experimental
  */
