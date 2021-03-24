@@ -433,7 +433,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -451,7 +451,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -525,7 +525,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(3, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -544,7 +544,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(3, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
@@ -719,7 +719,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -920,7 +920,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(1, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -939,7 +939,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(1, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -1191,7 +1191,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title']];
             },
             $response['_embedded']['articles']
@@ -1208,7 +1208,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']
@@ -1236,7 +1236,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(2, $response['_embedded']['articles']);
 
         $items = array_map(
-            function($item) {
+            function ($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
             $response['_embedded']['articles']

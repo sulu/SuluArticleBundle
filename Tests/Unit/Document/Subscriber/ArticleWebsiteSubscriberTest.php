@@ -121,7 +121,7 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
         $object->getStructureType()->willReturn('default');
         $object->getChildren()->willReturn(
             array_map(
-                function($child) {
+                function ($child) {
                     return $child->reveal();
                 },
                 $children
@@ -167,7 +167,7 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
         $object->getStructureType()->shouldNotBeCalled();
         $object->getChildren()->willReturn(
             array_map(
-                function($child) {
+                function ($child) {
                     return $child->reveal();
                 },
                 $children
@@ -212,7 +212,7 @@ class ArticleWebsiteSubscriberTest extends \PHPUnit_Framework_TestCase
         $object->getStructureType()->shouldNotBeCalled();
         $object->getChildren()->willReturn(
             array_map(
-                function($child) {
+                function ($child) {
                     return $child->reveal();
                 },
                 $children

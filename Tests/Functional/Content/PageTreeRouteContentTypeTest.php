@@ -257,7 +257,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $route->getPath()->willReturn('/test-article');
 
         $route->setPath('/test-page/test-article')->shouldBeCalled()->will(
-            function() use ($route) {
+            function () use ($route) {
                 $route->getPath()->willReturn('/test-page/test-article');
             }
         );
@@ -307,7 +307,7 @@ class PageTreeRouteContentTypeTest extends \PHPUnit_Framework_TestCase
         $route->getPath()->willReturn('/test-article');
 
         $route->setPath('/test-article')->shouldBeCalled()->will(
-            function() use ($route) {
+            function () use ($route) {
                 $route->getPath()->willReturn('/test-article');
             }
         );

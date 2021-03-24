@@ -226,7 +226,7 @@ class ArticleController extends RestController implements ClassResourceInterface
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,
-                function(FieldDescriptorInterface $fieldDescriptor) use ($fields) {
+                function (FieldDescriptorInterface $fieldDescriptor) use ($fields) {
                     return in_array($fieldDescriptor->getName(), $fields);
                 }
             );

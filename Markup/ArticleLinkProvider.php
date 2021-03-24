@@ -94,7 +94,7 @@ class ArticleLinkProvider implements LinkProviderInterface
         $tabs = null;
         if (1 < count($this->types)) {
             $tabs = array_map(
-                function($type) {
+                function ($type) {
                     return ['title' => $type['translation_key']];
                 },
                 $this->types

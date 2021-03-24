@@ -139,7 +139,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
 
-        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
+        $this->repository->findDocuments(Argument::that(function (Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
             $this->assertEquals($limit, $search->getSize());
             $this->assertCount(0, $search->getSorts());
@@ -216,7 +216,7 @@ class ArticleViewDocumentRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $documentIterator = $this->prophesize(DocumentIterator::class);
 
-        $this->repository->findDocuments(Argument::that(function(Search $search) use ($expectedSearch, $limit) {
+        $this->repository->findDocuments(Argument::that(function (Search $search) use ($expectedSearch, $limit) {
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
             $this->assertEquals($limit, $search->getSize());
             $this->assertCount(1, $search->getSorts());

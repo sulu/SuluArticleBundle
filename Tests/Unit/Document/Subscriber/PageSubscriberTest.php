@@ -193,7 +193,7 @@ class PageSubscriberTest extends \PHPUnit_Framework_TestCase
         $parentNode = $this->prophesize(NodeInterface::class);
         $parentNode->getNodes()->willReturn(
             array_map(
-                function($item) {
+                function ($item) {
                     return $item->reveal();
                 },
                 $nodes

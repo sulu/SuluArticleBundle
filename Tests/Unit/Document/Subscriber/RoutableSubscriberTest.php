@@ -122,7 +122,7 @@ class RoutableSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->node->getIdentifier()->willReturn('123-123-123');
 
         $this->conflictResolver->resolve(Argument::type(RouteInterface::class))->will(
-            function(array $arguments) {
+            function (array $arguments) {
                 return $arguments[0];
             }
         );
