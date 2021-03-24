@@ -97,7 +97,7 @@ class ArticleObjectProviderTest extends TestCase
             $object->reveal(),
             'json',
             Argument::that(
-                function(SerializationContext $context) {
+                function (SerializationContext $context) {
                     return $context->shouldSerializeNull()
                            && $context->getAttribute('groups') === ['preview'];
                 }
@@ -125,7 +125,7 @@ class ArticleObjectProviderTest extends TestCase
             $article->reveal(),
             'json',
             Argument::that(
-                function(SerializationContext $context) {
+                function (SerializationContext $context) {
                     return $context->shouldSerializeNull()
                            && $context->getAttribute('groups') === ['preview'];
                 }
@@ -147,7 +147,7 @@ class ArticleObjectProviderTest extends TestCase
             ArticleDocument::class,
             'json',
             Argument::that(
-                function(DeserializationContext $context) {
+                function (DeserializationContext $context) {
                     return $context->getAttribute('groups') === ['preview'];
                 }
             )
@@ -176,7 +176,7 @@ class ArticleObjectProviderTest extends TestCase
             ArticleDocument::class,
             'json',
             Argument::that(
-                function(DeserializationContext $context) {
+                function (DeserializationContext $context) {
                     return $context->getAttribute('groups') === ['preview'];
                 }
             )

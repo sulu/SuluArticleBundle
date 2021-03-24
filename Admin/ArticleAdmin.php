@@ -148,7 +148,7 @@ class ArticleAdmin extends Admin
 
         $locales = array_values(
             array_map(
-                function(Localization $localization) {
+                function (Localization $localization) {
                     return $localization->getLocale();
                 },
                 $this->localizationManager->getLocalizations()

@@ -58,7 +58,7 @@ class ArticleResourceItemFactory
     {
         return $this->proxyFactory->createProxy(
             ArticleDocument::class,
-            function(
+            function (
                 &$wrappedObject,
                 LazyLoadingInterface $proxy,
                 $method,
