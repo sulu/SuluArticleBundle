@@ -104,14 +104,14 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $this->webspaceManager->findUrlByResourceLocator('/page', null, 'en')->willReturn('http://sulu.io/page');
 
         $visitor->visitProperty(
-            Argument::that(function(StaticPropertyMetadata $metadata) {
+            Argument::that(function (StaticPropertyMetadata $metadata) {
                 return 'urls' === $metadata->name;
             }),
             ['de' => '/seite', 'en' => '/page']
         )->shouldBeCalled();
 
         $visitor->visitProperty(
-            Argument::that(function(StaticPropertyMetadata $metadata) {
+            Argument::that(function (StaticPropertyMetadata $metadata) {
                 return 'localizations' === $metadata->name;
             }),
             [

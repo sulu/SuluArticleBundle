@@ -194,7 +194,7 @@ class PageSubscriberTest extends TestCase
         $parentNode = $this->prophesize(NodeInterface::class);
         $parentNode->getNodes()->willReturn(
             array_map(
-                function($item) {
+                function ($item) {
                     return $item->reveal();
                 },
                 $nodes

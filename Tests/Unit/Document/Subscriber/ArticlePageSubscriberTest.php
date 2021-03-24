@@ -100,12 +100,12 @@ class ArticlePageSubscriberTest extends TestCase
         $this->factory->getStructureMetadata('article_page', 'default')->willReturn($this->metadata->reveal());
 
         $this->slugifier->slugify(Argument::type('string'))->will(
-            function($arguments) {
+            function ($arguments) {
                 return Urlizer::urlize($arguments[0]);
             }
         );
         $this->nameResolver->resolveName(Argument::type(NodeInterface::class), Argument::type('string'))->will(
-            function($arguments) {
+            function ($arguments) {
                 return $arguments[1];
             }
         );

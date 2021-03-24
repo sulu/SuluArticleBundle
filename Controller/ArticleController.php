@@ -313,7 +313,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             );
             $fieldDescriptors = array_filter(
                 $fieldDescriptors,
-                function(FieldDescriptorInterface $fieldDescriptor) use ($fields) {
+                function (FieldDescriptorInterface $fieldDescriptor) use ($fields) {
                     return in_array($fieldDescriptor->getName(), $fields);
                 }
             );
