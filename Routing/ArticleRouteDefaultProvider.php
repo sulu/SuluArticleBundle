@@ -118,7 +118,13 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
      */
     public function isPublished($entityClass, $id, $locale)
     {
-        $object = $this->documentManager->find($id, $locale);
+        $object = $this->documentManager->find(
+            $id,
+            $locale,
+            [
+                'load_ghost_content' => false,
+            ]
+        );
 
         if (!$object instanceof ArticleInterface || WorkflowStage::PUBLISHED !== $object->getWorkflowStage()) {
             return false;

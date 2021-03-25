@@ -130,7 +130,13 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
             $this->webspaceResolver->resolveAdditionalWebspaces($document)->willReturn($documentAdditionalWebspaces);
         }
 
-        $this->documentManager->find($this->entityId, $this->locale)->willReturn($document);
+        $this->documentManager->find(
+            $this->entityId,
+            $this->locale,
+            [
+                'load_ghost_content' => false,
+            ]
+        )->willReturn($document);
 
         $webspace = $this->prophesize(Webspace::class);
         $webspace->getKey()->willReturn($webspaceKey);
