@@ -100,9 +100,11 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
     public function publishedDataProvider()
     {
         $articleDocument = new ArticleDocument();
+	$articleDocument->setLocale($this->locale);
         $articleDocument->setWorkflowStage(WorkflowStage::TEST);
 
         $articleDocumentPublished = new ArticleDocument();
+	$articleDocumentPublished->setLocale($this->locale);
         $articleDocumentPublished->setWorkflowStage(WorkflowStage::PUBLISHED);
 
         $unknownDocument = new UnknownDocument();
