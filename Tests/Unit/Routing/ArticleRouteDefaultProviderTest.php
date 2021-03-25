@@ -100,11 +100,9 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
     public function publishedDataProvider()
     {
         $articleDocument = new ArticleDocument();
-        $articleDocument->setLocale($this->locale);
         $articleDocument->setWorkflowStage(WorkflowStage::TEST);
 
         $articleDocumentPublished = new ArticleDocument();
-        $articleDocumentPublished->setLocale($this->locale);
         $articleDocumentPublished->setWorkflowStage(WorkflowStage::PUBLISHED);
 
         $unknownDocument = new UnknownDocument();
@@ -132,7 +130,13 @@ class ArticleRouteDefaultProviderTest extends \PHPUnit_Framework_TestCase
             $this->webspaceResolver->resolveAdditionalWebspaces($document)->willReturn($documentAdditionalWebspaces);
         }
 
-        $this->documentManager->find($this->entityId, $this->locale)->willReturn($document);
+        $this->documentManager->find(
+            $this->entityId,
+            $this->locale,
+            [
+                'load_ghost_content' => false,
+            ]
+        )->willReturn($document);
 
         $webspace = $this->prophesize(Webspace::class);
         $webspace->getKey()->willReturn($webspaceKey);
