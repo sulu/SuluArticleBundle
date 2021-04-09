@@ -55,7 +55,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles
@@ -80,7 +80,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles
@@ -109,7 +109,7 @@ class ArticleLinkProviderTest extends SuluTestCase
         ];
 
         $uuids = array_map(
-            function (array $data) {
+            function(array $data) {
                 return $data['id'];
             },
             $articles

@@ -78,7 +78,7 @@ class VersionController extends AbstractRestController implements ClassResourceI
         $versions = array_reverse(
             array_filter(
                 $document->getVersions(),
-                function ($version) use ($locale) {
+                function($version) use ($locale) {
                     /** @var Version $version */
                     return $version->getLocale() === $locale;
                 }
@@ -92,7 +92,7 @@ class VersionController extends AbstractRestController implements ClassResourceI
 
         $userIds = array_unique(
             array_map(
-                function ($version) {
+                function($version) {
                     /** @var Version $version */
                     return $version->getAuthor();
                 },
