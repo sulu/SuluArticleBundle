@@ -74,7 +74,7 @@ class AutomationPageTreeUpdaterTest extends \PHPUnit_Framework_TestCase
 
         $this->taskManager->create(
             Argument::that(
-                function (TaskInterface $task) {
+                function(TaskInterface $task) {
                     return BasePageDocument::class === $task->getEntityClass()
                         && '123-123-123' === $task->getEntityId()
                         && 'de' === $task->getLocale()
