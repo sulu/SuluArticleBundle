@@ -385,7 +385,7 @@ class ArticleControllerTest extends SuluTestCase
         $response = $this->get($article['id'], 'en');
         $this->assertEquals($title, $response['title']);
         $customizeWebspaceSettings = $response['customizeWebspaceSettings'];
-        $this->assertEquals($mainWebspace !== null, $customizeWebspaceSettings);
+        $this->assertEquals(null !== $mainWebspace, $customizeWebspaceSettings);
         $this->assertEquals($mainWebspace ?? 'sulu_io', $response['mainWebspace']);
         $this->assertEquals($customizeWebspaceSettings ? $additionalWebspaces : ($additionalWebspaces ?? []), $response['additionalWebspaces']);
 
