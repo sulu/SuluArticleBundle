@@ -329,9 +329,10 @@ class ArticleControllerTest extends SuluTestCase
         // check response
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals(null !== $mainWebspace, $response['customizeWebspaceSettings']);
+        $customizeWebspaceSettings = $response['customizeWebspaceSettings'];
+        $this->assertEquals(null !== $mainWebspace, $customizeWebspaceSettings);
         $this->assertEquals($mainWebspace ?? 'sulu_io', $response['mainWebspace']);
-        $this->assertEquals($additionalWebspaces ?? [], $response['additionalWebspaces']);
+        $this->assertEquals($customizeWebspaceSettings ? $additionalWebspaces : ($additionalWebspaces ?? []), $response['additionalWebspaces']);
 
         // check if phpcr document is correct
         $this->documentManager->clear();
@@ -383,8 +384,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = $this->get($article['id'], 'en');
         $this->assertEquals($title, $response['title']);
+        $customizeWebspaceSettings = $response['customizeWebspaceSettings'];
+        $this->assertEquals($mainWebspace !== null, $customizeWebspaceSettings);
         $this->assertEquals($mainWebspace ?? 'sulu_io', $response['mainWebspace']);
-        $this->assertEquals($additionalWebspaces ?? [], $response['additionalWebspaces']);
+        $this->assertEquals($customizeWebspaceSettings ? $additionalWebspaces : ($additionalWebspaces ?? []), $response['additionalWebspaces']);
 
         /** @var ArticleViewDocument $viewDocument */
         $viewDocument = $this->findViewDocument($response['id'], 'en');
