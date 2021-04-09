@@ -330,8 +330,8 @@ class ArticleControllerTest extends SuluTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals(null !== $mainWebspace, $response['customizeWebspaceSettings']);
-        $this->assertEquals($mainWebspace ?: 'sulu_io', $response['mainWebspace']);
-        $this->assertEquals($additionalWebspaces, $response['additionalWebspaces']);
+        $this->assertEquals($mainWebspace ?? 'sulu_io', $response['mainWebspace']);
+        $this->assertEquals($additionalWebspaces ?? [], $response['additionalWebspaces']);
 
         // check if phpcr document is correct
         $this->documentManager->clear();
@@ -346,14 +346,14 @@ class ArticleControllerTest extends SuluTestCase
         /** @var ArticleViewDocument $viewDocument */
         $viewDocument = $this->findViewDocument($response['id'], 'de');
         $this->assertNotNull($viewDocument);
-        $this->assertEquals($mainWebspace ?: 'sulu_io', $viewDocument->getMainWebspace());
-        $this->assertEquals($additionalWebspaces ?: [], $viewDocument->getAdditionalWebspaces());
+        $this->assertEquals($mainWebspace ?? 'sulu_io', $viewDocument->getMainWebspace());
+        $this->assertEquals($additionalWebspaces ?? [], $viewDocument->getAdditionalWebspaces());
 
         // test that ghost do not serve default webspace settings
         $response = $this->get($article['id'], 'en');
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('sulu_io', $response['mainWebspace']);
-        $this->assertNull($response['additionalWebspaces']);
+        $this->assertEquals([], $response['additionalWebspaces']);
 
         $viewDocument = $this->findViewDocument($response['id'], 'en');
         $this->assertNotNull($viewDocument);
@@ -383,14 +383,14 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = $this->get($article['id'], 'en');
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals($mainWebspace ?: 'sulu_io', $response['mainWebspace']);
-        $this->assertEquals($additionalWebspaces, $response['additionalWebspaces']);
+        $this->assertEquals($mainWebspace ?? 'sulu_io', $response['mainWebspace']);
+        $this->assertEquals($additionalWebspaces ?? [], $response['additionalWebspaces']);
 
         /** @var ArticleViewDocument $viewDocument */
         $viewDocument = $this->findViewDocument($response['id'], 'en');
         $this->assertNotNull($viewDocument);
-        $this->assertEquals($mainWebspace ?: 'sulu_io', $viewDocument->getMainWebspace());
-        $this->assertEquals($additionalWebspaces ?: [], $viewDocument->getAdditionalWebspaces());
+        $this->assertEquals($mainWebspace ?? 'sulu_io', $viewDocument->getMainWebspace());
+        $this->assertEquals($additionalWebspaces ?? [], $viewDocument->getAdditionalWebspaces());
     }
 
     public function testGetGhost()
