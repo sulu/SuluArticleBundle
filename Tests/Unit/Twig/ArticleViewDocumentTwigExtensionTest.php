@@ -170,7 +170,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
         $ids = ['123-123-123', '321-321-321', '111-111-111'];
 
         return array_map(
-            function ($id) {
+            function($id) {
                 $articleDocument = new ArticleDocument();
                 $articleDocument->setUuid($id);
                 $articleDocument->setLocale('de');
@@ -188,7 +188,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     private function getArticleViewDocuments(array $articleDocuments)
     {
         return array_map(
-            function ($articleDocument) {
+            function($articleDocument) {
                 $articleViewDocument = new ArticleViewDocument($articleDocument->getUuid());
                 $articleViewDocument->setLocale($articleDocument->getLocale());
                 $articleViewDocument->setStructureType($articleDocument->getStructureType());
@@ -223,10 +223,10 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
         $documentIterator = $this->prophesize(DocumentIterator::class);
         $documentIterator->rewind()->willReturn(0);
         $documentIterator->next()->willReturn($documentIteratorCount);
-        $documentIterator->current()->will(function () use (&$documentIteratorCount, $articleViewDocuments) {
+        $documentIterator->current()->will(function() use (&$documentIteratorCount, $articleViewDocuments) {
             return $articleViewDocuments[$documentIteratorCount++];
         });
-        $documentIterator->valid()->will(function () use (&$documentIteratorCount, $articleViewDocuments) {
+        $documentIterator->valid()->will(function() use (&$documentIteratorCount, $articleViewDocuments) {
             if (array_key_exists($documentIteratorCount, $articleViewDocuments)) {
                 return true;
             }

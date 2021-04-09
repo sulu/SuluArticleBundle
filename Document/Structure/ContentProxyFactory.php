@@ -58,7 +58,7 @@ class ContentProxyFactory
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
-            function (
+            function(
                 &$wrappedObject,
                 LazyLoadingInterface $proxy,
                 $method,
@@ -102,7 +102,7 @@ class ContentProxyFactory
     {
         return $this->proxyFactory->createProxy(
             \ArrayObject::class,
-            function (
+            function(
                 &$wrappedObject,
                 LazyLoadingInterface $proxy,
                 $method,
