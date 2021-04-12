@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of Sulu.
  *
@@ -512,12 +514,10 @@ interface ArticleViewDocumentInterface
     /**
      * @return string[]
      */
-    public function getContentFields();
+    public function getContentFields(): array;
 
     /**
      * @param string[] $searchableContent
-     *
-     * @return $this
      */
-    public function setContentFields(array $contentFields);
+    public function setContentFields(array $searchableContent): self;
 }
