@@ -143,7 +143,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $additionalWebspace = $this->webspaceResolver->resolveAdditionalWebspaces($article);
         $visitor->visitProperty(
-            new StaticPropertyMetadata('', 'additionalWebspace', $additionalWebspace),
+            new StaticPropertyMetadata('', 'additionalWebspaces', $additionalWebspace),
             $additionalWebspace
         );
     }
