@@ -512,7 +512,7 @@ interface ArticleViewDocumentInterface
     /**
      * @return string[]
      */
-    public function getContentFields(): array;
+    public function getContentFields();
 
     /**
      * @param string[] $searchableContent

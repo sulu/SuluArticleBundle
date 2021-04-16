@@ -180,7 +180,7 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertFalse($viewDocument->getPublishedState());
     }
 
-    public function testIndexTaggedProperties(): void
+    public function testIndexTaggedProperties()
     {
         $data = [
             'title' => 'Test Article Title',

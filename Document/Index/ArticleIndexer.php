@@ -281,7 +281,10 @@ class ArticleIndexer implements IndexerInterface
         return $contentFields;
     }
 
-    private function getBlockContentFieldsRecursive(array $blocks, ArticleDocument $document, $blockMetaData, string $tag): array
+    /**
+     * @return string[]
+     */
+    private function getBlockContentFieldsRecursive(array $blocks, ArticleDocument $document, $blockMetaData, $tag)
     {
         $contentFields = [];
         foreach ($blockMetaData->getComponents() as $component) {
