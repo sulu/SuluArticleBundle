@@ -516,6 +516,8 @@ interface ArticleViewDocumentInterface
 
     /**
      * @param string[] $searchableContent
+     *
+     * @return $this
      */
-    public function setContentFields(array $contentFields): self;
+    public function setContentFields(array $contentFields);
 }

@@ -192,8 +192,8 @@ class ArticleIndexerTest extends SuluTestCase
                     'type' => 'title-with-article',
                     'title' => 'Test Title in Block',
                     'article' => '<p>Test Article in Block</p>',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');

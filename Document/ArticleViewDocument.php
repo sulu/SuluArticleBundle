@@ -887,7 +887,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setContentFields(array $contentFields): ArticleViewDocumentInterface
+    public function setContentFields(array $contentFields)
     {
         $this->contentFields = $contentFields;
 
