@@ -232,9 +232,9 @@ class ArticleIndexerTest extends SuluTestCase
     {
         $data = [
             'title' => 'Test Article',
+            'routePath' => '/test-article',
             'pageTitle' => 'Test Page Title',
             'article' => 'Test Article',
-            'routePath' => '/test-article',
         ];
 
         $article = $this->createArticle($data, $data['title'], 'default_pages');
@@ -258,9 +258,9 @@ class ArticleIndexerTest extends SuluTestCase
             $this->assertProxies(
                 [
                     'title' => 'Test Article',
+                    'routePath' => '/test-article/page-2',
                     'pageTitle' => 'Test-Page',
                     'article' => '',
-                    'routePath' => '/test-article/page-2',
                 ],
                 $page->content,
                 $page->view
@@ -478,11 +478,11 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertContains('Example Point Title', $contentFields);
         $this->assertContains('Example Point description', $contentFields);
         $this->assertContains('Example Block Title_1', $contentFields);
-        $this->assertContains('<p>Example Editor Text_1_1</p>', $contentFields);
-        $this->assertContains('<p>Example Editor Text_1_2</p>', $contentFields);
+        $this->assertContains('Example Editor Text_1_1', $contentFields);
+        $this->assertContains('Example Editor Text_1_2', $contentFields);
         $this->assertContains('Example Block Title_2', $contentFields);
-        $this->assertContains('<p>Example Editor Text_2_1</p>', $contentFields);
-        $this->assertContains('<p>Example Editor Text_2_2</p>', $contentFields);
+        $this->assertContains('Example Editor Text_2_1', $contentFields);
+        $this->assertContains('Example Editor Text_2_2', $contentFields);
     }
 
     private function assertProxies(array $data, $contentProxy, $viewProxy)
@@ -551,7 +551,7 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData
         );
 
-        $this->assertSame('200', $this->client->getResponse()->getStatusCode());
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
 
         return json_decode($this->client->getResponse()->getContent(), true);
     }

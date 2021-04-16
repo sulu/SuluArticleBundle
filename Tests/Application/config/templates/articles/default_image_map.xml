@@ -3,7 +3,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://schemas.sulu.io/template/template http://schemas.sulu.io/template/template-1.0.xsd">
 
-    <key>default</key>
+    <key>default_image_map</key>
 
     <view>::default</view>
     <controller>SuluWebsiteBundle:Default:index</controller>
@@ -45,7 +45,7 @@
                     </meta>
                     <properties>
                         <property name="media" type="single_media_selection"/>
-                        <block name="blocks_1">
+                        <block name="blocks_1" default-type="text-with-image">
                             <types>
                                 <type name="text-with-image">
                                     <properties>
@@ -53,7 +53,7 @@
                                         <property name="title" type="text_line">
                                             <tag name="sulu.search.field"/>
                                         </property>
-                                        <block name="blocks_2">
+                                        <block name="blocks_2" default-type="article">
                                             <types>
                                                 <type name="text-editor">
                                                     <properties>
