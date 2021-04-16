@@ -53,7 +53,7 @@
                                         <property name="title" type="text_line">
                                             <tag name="sulu.search.field"/>
                                         </property>
-                                        <block name="blocks_2" default-type="article">
+                                        <block name="blocks_2" default-type="text-editor">
                                             <types>
                                                 <type name="text-editor">
                                                     <properties>

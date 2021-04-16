@@ -271,10 +271,18 @@ class ArticleIndexerTest extends SuluTestCase
     public function testIndexTaggedProperties(): void
     {
         $data = [
-            'title' => 'Test Article',
+            'title' => 'Test Article Title',
             'pageTitle' => 'Test Page Title',
             'article' => '<p>Test Article</p>',
             'article_2' => '<p>should not be indexed</p>',
+            'blocks' => [
+                [
+                    'type' => 'title-with-article',
+                    'settings' => [],
+                    'title' => 'Test Title in Block',
+                    'article' => '<p>Test Article in Block</p>',
+                ],
+            ],
         ];
 
         $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
@@ -290,10 +298,12 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertSame($article['id'], $viewDocument->getUuid());
         $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
 
-        $this->assertCount(3, $contentFields);
-        $this->assertContains('Test Article', $contentFields);
+        $this->assertCount(5, $contentFields);
+        $this->assertContains('Test Article Title', $contentFields);
         $this->assertContains('Test Page Title', $contentFields);
-        $this->assertContains('<p>Test Article</p>', $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Test Title in Block', $contentFields);
+        $this->assertContains('Test Article in Block', $contentFields);
     }
 
     public function testIndexTaggedPropertiesBlocksInBlocks(): void
@@ -383,6 +393,10 @@ class ArticleIndexerTest extends SuluTestCase
 
     public function testIndexTaggedPropertiesImageMap(): void
     {
+        if (!class_exists('Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType')) {
+            $this->markTestSkipped('Only for Sulu > 2.2.0');
+        }
+
         $data = [
             'title' => 'Test Article',
             'imageMap' => [
