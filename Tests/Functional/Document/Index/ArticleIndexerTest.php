@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of Sulu.
  *
@@ -80,11 +82,11 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->index($document);
 
         $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertEquals($document->getUuid(), $viewDocument->getUuid());
-        $this->assertEquals('/articles/test-article', $viewDocument->getRoutePath());
+        $this->assertSame($document->getUuid(), $viewDocument->getUuid());
+        $this->assertSame('/articles/test-article', $viewDocument->getRoutePath());
         $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
         $this->assertTrue($viewDocument->getPublishedState());
-        $this->assertEquals('localized', $viewDocument->getLocalizationState()->state);
+        $this->assertSame('localized', $viewDocument->getLocalizationState()->state);
         $this->assertNull($viewDocument->getLocalizationState()->locale);
     }
 
@@ -127,17 +129,17 @@ class ArticleIndexerTest extends SuluTestCase
 
         $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
 
-        $this->assertEquals($article['id'], $viewDocument->getUuid());
-        $this->assertEquals('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
         $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
         $this->assertTrue($viewDocument->getPublishedState());
-        $this->assertEquals('shadow', $viewDocument->getLocalizationState()->state);
-        $this->assertEquals($this->locale, $viewDocument->getLocalizationState()->locale);
-        $this->assertEquals($secondLocale, $viewDocument->getLocale());
-        $this->assertEquals('Test Article', $viewDocument->getTitle());
+        $this->assertSame('shadow', $viewDocument->getLocalizationState()->state);
+        $this->assertSame($this->locale, $viewDocument->getLocalizationState()->locale);
+        $this->assertSame($secondLocale, $viewDocument->getLocale());
+        $this->assertSame('Test Article', $viewDocument->getTitle());
 
         $contentData = json_decode($viewDocument->getContentData(), true);
-        $this->assertEquals($contentData['article'], 'Test content');
+        $this->assertSame($contentData['article'], 'Test content');
 
         // now update the source locale
         // the shadow should be update also
@@ -153,10 +155,10 @@ class ArticleIndexerTest extends SuluTestCase
         );
 
         $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
-        $this->assertEquals('Test Article - CHANGED!', $viewDocument->getTitle());
+        $this->assertSame('Test Article - CHANGED!', $viewDocument->getTitle());
 
         $contentData = json_decode($viewDocument->getContentData(), true);
-        $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
+        $this->assertSame($contentData['article'], 'Test content - CHANGED!');
     }
 
     public function testIndexPageTreeRoute()
@@ -177,7 +179,7 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->index($document);
 
         $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertEquals($page->getUuid(), $viewDocument->getParentPageUuid());
+        $this->assertSame($page->getUuid(), $viewDocument->getParentPageUuid());
     }
 
     public function testSetUnpublished()
@@ -246,8 +248,8 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->flush();
 
         $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertEquals($article['id'], $viewDocument->getUuid());
-        $this->assertEquals($data, json_decode($viewDocument->getContentData(), true));
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
 
         $this->assertProxies($data, $viewDocument->getContent(), $viewDocument->getView());
 
@@ -266,6 +268,223 @@ class ArticleIndexerTest extends SuluTestCase
         }
     }
 
+    public function testIndexTaggedProperties(): void
+    {
+        $data = [
+            'title' => 'Test Article',
+            'pageTitle' => 'Test Page Title',
+            'article' => '<p>Test Article</p>',
+            'article_2' => '<p>should not be indexed</p>',
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $contentFields = $viewDocument->getContentFields();
+
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertCount(3, $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Test Page Title', $contentFields);
+        $this->assertContains('<p>Test Article</p>', $contentFields);
+    }
+
+    public function testIndexTaggedPropertiesBlocksInBlocks(): void
+    {
+        $data = [
+            'title' => 'Test Article',
+            'blocks' => [
+                [
+                    'type' => 'text-with-blocks',
+                    'settings' => [],
+                    'text_1' => 'Level 1 Text_1',
+                    'blocks_1' => [
+                        [
+                            'type' => 'article-with-blocks',
+                            'settings' => [],
+                            'article_2' => 'Level 2 Article_1',
+                            'blocks_2' => [
+                                [
+                                    'type' => 'area-with-blocks',
+                                    'settings' => [],
+                                    'area_3' => 'Level 3 Area_1',
+                                    'blocks_3' => [
+                                        [
+                                            'type' => 'article',
+                                            'settings' => [],
+                                            'article_4' => 'Level 4 Article_1',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'text-with-blocks',
+                    'settings' => [],
+                    'text_1' => 'Level 1 Text_2',
+                    'blocks_1' => [
+                        [
+                            'type' => 'article-with-blocks',
+                            'settings' => [],
+                            'article_2' => 'Level 2 Article_2',
+                            'blocks_2' => [
+                                [
+                                    'type' => 'area-with-blocks',
+                                    'settings' => [],
+                                    'area_3' => 'Level 3 Area_2',
+                                    'blocks_3' => [
+                                        [
+                                            'type' => 'article',
+                                            'settings' => [],
+                                            'article_4' => 'Level 4 Article_2',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_blocks_in_blocks');
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $contentFields = $viewDocument->getContentFields();
+
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertCount(9, $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Level 1 Text_1', $contentFields);
+        $this->assertContains('Level 2 Article_1', $contentFields);
+        $this->assertContains('Level 3 Area_1', $contentFields);
+        $this->assertContains('Level 4 Article_1', $contentFields);
+        $this->assertContains('Level 1 Text_2', $contentFields);
+        $this->assertContains('Level 2 Article_2', $contentFields);
+        $this->assertContains('Level 3 Area_2', $contentFields);
+        $this->assertContains('Level 4 Article_2', $contentFields);
+    }
+
+    public function testIndexTaggedPropertiesImageMap(): void
+    {
+        $data = [
+            'title' => 'Test Article',
+            'imageMap' => [
+                'imageId' => 1,
+                'hotspots' => [
+                    [
+                        'type' => 'basic',
+                        'hotspot' => [
+                            'type' => 'point',
+                            'left' => 1,
+                            'top' => 1,
+                            'radius' => 0,
+                        ],
+                        'title' => 'Example Point Title',
+                        'description' => 'Example Point description',
+                    ],
+                    [
+                        'type' => 'advanced',
+                        'hotspot' => [
+                            'type' => 'rectangle',
+                            'width' => 1,
+                            'height' => 2,
+                            'left' => 1,
+                            'top' => 1,
+                        ],
+                        'media' => [
+                            'id' => 1,
+                        ],
+                        'blocks_1' => [
+                            [
+                                'type' => 'text-with-image',
+                                'settings' => [],
+                                'image' => [
+                                    'displayOption' => null,
+                                    'id' => 1,
+                                ],
+                                'title' => 'Example Block Title_1',
+                                'blocks_2' => [
+                                    [
+                                        'type' => 'text-editor',
+                                        'settings' => [],
+                                        'article' => '<p>Example Editor Text_1_1</p>',
+                                    ],
+                                    [
+                                        'type' => 'text-editor',
+                                        'settings' => [],
+                                        'article' => '<p>Example Editor Text_1_2</p>',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'text-with-image',
+                                'settings' => [],
+                                'image' => [
+                                    'displayOption' => null,
+                                    'id' => 1,
+                                ],
+                                'title' => 'Example Block Title_2',
+                                'blocks_2' => [
+                                    [
+                                        'type' => 'text-editor',
+                                        'settings' => [],
+                                        'article' => '<p>Example Editor Text_2_1</p>',
+                                    ],
+                                    [
+                                        'type' => 'text-editor',
+                                        'settings' => [],
+                                        'article' => '<p>Example Editor Text_2_2</p>',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_image_map');
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $contentFields = $viewDocument->getContentFields();
+
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertCount(9, $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Example Point Title', $contentFields);
+        $this->assertContains('Example Point description', $contentFields);
+        $this->assertContains('Example Block Title_1', $contentFields);
+        $this->assertContains('<p>Example Editor Text_1_1</p>', $contentFields);
+        $this->assertContains('<p>Example Editor Text_1_2</p>', $contentFields);
+        $this->assertContains('Example Block Title_2', $contentFields);
+        $this->assertContains('<p>Example Editor Text_2_1</p>', $contentFields);
+        $this->assertContains('<p>Example Editor Text_2_2</p>', $contentFields);
+    }
+
     private function assertProxies(array $data, $contentProxy, $viewProxy)
     {
         $this->assertInstanceOf(\ArrayObject::class, $contentProxy);
@@ -274,7 +493,7 @@ class ArticleIndexerTest extends SuluTestCase
         $content = iterator_to_array($contentProxy);
         $view = iterator_to_array($viewProxy);
 
-        $this->assertEquals($data, $content);
+        $this->assertSame($data, $content);
         foreach ($data as $key => $value) {
             $this->assertArrayHasKey($key, $view);
         }
@@ -332,7 +551,7 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData
         );
 
-        $this->assertEquals('200', $this->client->getResponse()->getStatusCode());
+        $this->assertSame('200', $this->client->getResponse()->getStatusCode());
 
         return json_decode($this->client->getResponse()->getContent(), true);
     }
