@@ -296,7 +296,6 @@ class ArticleIndexerTest extends SuluTestCase
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
 
         $this->assertCount(5, $contentFields);
         $this->assertContains('Test Article Title', $contentFields);
@@ -377,7 +376,6 @@ class ArticleIndexerTest extends SuluTestCase
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
 
         $this->assertCount(9, $contentFields);
         $this->assertContains('Test Article', $contentFields);
@@ -389,114 +387,6 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertContains('Level 2 Article_2', $contentFields);
         $this->assertContains('Level 3 Area_2', $contentFields);
         $this->assertContains('Level 4 Article_2', $contentFields);
-    }
-
-    public function testIndexTaggedPropertiesImageMap(): void
-    {
-        if (!class_exists('Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType')) {
-            $this->markTestSkipped('Only for Sulu > 2.2.0');
-        }
-
-        $data = [
-            'title' => 'Test Article',
-            'imageMap' => [
-                'imageId' => 1,
-                'hotspots' => [
-                    [
-                        'type' => 'basic',
-                        'hotspot' => [
-                            'type' => 'point',
-                            'left' => 1,
-                            'top' => 1,
-                            'radius' => 0,
-                        ],
-                        'title' => 'Example Point Title',
-                        'description' => 'Example Point description',
-                    ],
-                    [
-                        'type' => 'advanced',
-                        'hotspot' => [
-                            'type' => 'rectangle',
-                            'width' => 1,
-                            'height' => 2,
-                            'left' => 1,
-                            'top' => 1,
-                        ],
-                        'media' => [
-                            'id' => 1,
-                        ],
-                        'blocks_1' => [
-                            [
-                                'type' => 'text-with-image',
-                                'settings' => [],
-                                'image' => [
-                                    'displayOption' => null,
-                                    'id' => 1,
-                                ],
-                                'title' => 'Example Block Title_1',
-                                'blocks_2' => [
-                                    [
-                                        'type' => 'text-editor',
-                                        'settings' => [],
-                                        'article' => '<p>Example Editor Text_1_1</p>',
-                                    ],
-                                    [
-                                        'type' => 'text-editor',
-                                        'settings' => [],
-                                        'article' => '<p>Example Editor Text_1_2</p>',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'type' => 'text-with-image',
-                                'settings' => [],
-                                'image' => [
-                                    'displayOption' => null,
-                                    'id' => 1,
-                                ],
-                                'title' => 'Example Block Title_2',
-                                'blocks_2' => [
-                                    [
-                                        'type' => 'text-editor',
-                                        'settings' => [],
-                                        'article' => '<p>Example Editor Text_2_1</p>',
-                                    ],
-                                    [
-                                        'type' => 'text-editor',
-                                        'settings' => [],
-                                        'article' => '<p>Example Editor Text_2_2</p>',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        $article = $this->createArticle($data, $data['title'], 'default_image_map');
-        $this->documentManager->clear();
-
-        $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
-
-        $viewDocument = $this->findViewDocument($article['id']);
-        $contentFields = $viewDocument->getContentFields();
-
-        $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
-
-        $this->assertCount(9, $contentFields);
-        $this->assertContains('Test Article', $contentFields);
-        $this->assertContains('Example Point Title', $contentFields);
-        $this->assertContains('Example Point description', $contentFields);
-        $this->assertContains('Example Block Title_1', $contentFields);
-        $this->assertContains('Example Editor Text_1_1', $contentFields);
-        $this->assertContains('Example Editor Text_1_2', $contentFields);
-        $this->assertContains('Example Block Title_2', $contentFields);
-        $this->assertContains('Example Editor Text_2_1', $contentFields);
-        $this->assertContains('Example Editor Text_2_2', $contentFields);
     }
 
     private function assertProxies(array $data, $contentProxy, $viewProxy)
