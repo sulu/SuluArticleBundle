@@ -39,6 +39,7 @@ node_modules/
 npm-debug.log
 
 # tests
+.env.*.local
 /Tests/Application/config/parameters.yml
 /Tests/Application/var
 /Tests/Functional/Import/export.test.xliff
