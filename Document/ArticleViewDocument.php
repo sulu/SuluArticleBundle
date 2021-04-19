@@ -290,6 +290,13 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $targetWebspace;
 
     /**
+     * @var string[]
+     *
+     * @Property(type="text")
+     */
+    protected $contentFields;
+
+    /**
      * @param string $uuid
      */
     public function __construct($uuid = null)
@@ -865,6 +872,24 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setTargetWebspace($targetWebspace)
     {
         $this->targetWebspace = $targetWebspace;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContentFields()
+    {
+        return $this->contentFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContentFields(array $contentFields)
+    {
+        $this->contentFields = $contentFields;
 
         return $this;
     }

@@ -28,8 +28,27 @@ is requested (content-types, smart-content, ...).
 | targetWebspace | string | Recommended webspace key |
 | mainWebspace | string | Configured main webspace |
 | additionalWebspaces | string[] | Configured additional webspaces |
+| contentFields | string[] | Contains content properties tagged with `sulu.search.field` |
 
 The `content` and `view` property is represented by a proxy to avoid resolving data where it is not needed.
+
+### ContentFields
+
+The content of the property `contentFields` can be customized. All properties which are tagged with
+`sulu.search.field` in the xml configuration, are automatically added to this field. The main purpose of this field
+is to give the developer enough data and flexibility to implement search functionality via e.g. a `SearchController`.
+
+Example:
+```xml
+    <property name="text" type="text_editor" mandatory="true">
+        <meta>
+            <title lang="en">Text</title>
+            <title lang="de">Text</title>
+        </meta>
+    
+        <tag name="sulu.search.field"/>
+    </property>
+```
 
 ## How to extend?
 

@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
+use Metadata\PropertyMetadata;
 use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
@@ -34,6 +35,7 @@ use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\DocumentManager\Exception\DocumentManagerException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -246,6 +248,7 @@ class ArticleIndexer implements IndexerInterface
             }
         }
 
+        $article->setContentFields($this->getContentFields($structureMetadata, $document));
         $article->setContentData(json_encode($document->getStructure()->toArray()));
 
         $article->setMainWebspace($this->webspaceResolver->resolveMainWebspace($document));
@@ -254,6 +257,76 @@ class ArticleIndexer implements IndexerInterface
         $this->mapPages($document, $article);
 
         return $article;
+    }
+
+    protected function getContentFields(StructureMetadata $structure, ArticleDocument $document)
+    {
+        $tag = 'sulu.search.field';
+        $contentFields = [];
+        foreach ($structure->getProperties() as $property) {
+            if (method_exists($property, 'getComponents') && \count($property->getComponents()) > 0) {
+                $blocks = $document->getStructure()->getProperty($property->getName())->getValue();
+                if (isset($blocks['hotspots'])) {
+                    $blocks = $blocks['hotspots'];
+                }
+                $contentFields = array_merge($contentFields, $this->getBlockContentFieldsRecursive($blocks, $document, $property, $tag));
+            } elseif ($property->hasTag($tag)) {
+                $value = $document->getStructure()->getProperty($property->getName())->getValue();
+                if (is_string($value) && '' !== $value) {
+                    $contentFields[] = strip_tags($value);
+                }
+            }
+        }
+
+        return $contentFields;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getBlockContentFieldsRecursive(array $blocks, ArticleDocument $document, $blockMetaData, $tag)
+    {
+        $contentFields = [];
+        foreach ($blockMetaData->getComponents() as $component) {
+            /** @var PropertyMetadata $componentProperty */
+            foreach ($component->getChildren() as $componentProperty) {
+                if (method_exists($componentProperty, 'getComponents') && \count($componentProperty->getComponents()) > 0) {
+                    $filteredBlocks = array_filter($blocks, function($block) use ($component) {
+                        return $block['type'] === $component->getName();
+                    });
+
+                    foreach ($filteredBlocks as $filteredBlock) {
+                        if (isset($filteredBlock['hotspots'])) {
+                            $filteredBlock = $filteredBlock['hotspots'];
+                        }
+                        $contentFields = array_merge(
+                            $contentFields,
+                            $this->getBlockContentFieldsRecursive(
+                                $filteredBlock[$componentProperty->getName()],
+                                $document,
+                                $componentProperty,
+                                $tag
+                            )
+                        );
+                    }
+                }
+
+                if (false === $componentProperty->hasTag($tag)) {
+                    continue;
+                }
+
+                foreach ($blocks as $block) {
+                    if ($block['type'] === $component->getName()) {
+                        $blockValue = $block[$componentProperty->getName()];
+                        if (\is_string($blockValue) && '' !== $blockValue) {
+                            $contentFields[] = strip_tags($blockValue);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $contentFields;
     }
 
     /**

@@ -23,8 +23,8 @@ class TemplateControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $client->getResponse());
 
         $response = json_decode($client->getResponse()->getContent(), true);
-        $this->assertEquals(2, $response['total']);
-        $this->assertCount(2, $response['_embedded']);
+        $this->assertEquals(3, $response['total']);
+        $this->assertCount(3, $response['_embedded']);
         $this->assertContains(
             [
                 'internal' => false,
