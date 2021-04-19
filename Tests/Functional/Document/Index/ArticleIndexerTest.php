@@ -18,6 +18,7 @@ use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
+use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -307,6 +308,10 @@ class ArticleIndexerTest extends SuluTestCase
 
     public function testIndexTaggedPropertiesBlocksInBlocks(): void
     {
+        if (!method_exists(RouteRepositoryInterface::class, 'remove')) {
+            $this->markTestSkipped('Only for Sulu > 2.1.0 (requires nested blocks)');
+        }
+
         $data = [
             'title' => 'Test Article',
             'blocks' => [
