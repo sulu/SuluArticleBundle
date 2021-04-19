@@ -189,6 +189,43 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertFalse($viewDocument->getPublishedState());
     }
 
+    public function testIndexTaggedProperties()
+    {
+        $data = [
+            'title' => 'Test Article Title',
+            'pageTitle' => 'Test Page Title',
+            'article' => '<p>Test Article</p>',
+            'article_2' => '<p>should not be indexed</p>',
+            'blocks' => [
+                [
+                    'type' => 'title-with-article',
+                    'title' => 'Test Title in Block',
+                    'article' => '<p>Test Article in Block</p>',
+                ],
+            ],
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $contentFields = $viewDocument->getContentFields();
+
+        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertCount(5, $contentFields);
+        $this->assertContains('Test Article Title', $contentFields);
+        $this->assertContains('Test Page Title', $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Test Title in Block', $contentFields);
+        $this->assertContains('Test Article in Block', $contentFields);
+    }
+
     public function testIndexContentData()
     {
         $data = [
