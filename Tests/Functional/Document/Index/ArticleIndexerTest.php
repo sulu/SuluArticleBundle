@@ -15,7 +15,9 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
+use Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
+use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -196,14 +198,26 @@ class ArticleIndexerTest extends SuluTestCase
             'pageTitle' => 'Test Page Title',
             'article' => '<p>Test Article</p>',
             'article_2' => '<p>should not be indexed</p>',
-            'blocks' => [
+        ];
+
+        if (class_exists(ImageMapContentType::class)) {
+            $data['blocks'] = [
+                [
+                    'type' => 'title-with-article',
+                    'settings' => [],
+                    'title' => 'Test Title in Block',
+                    'article' => '<p>Test Article in Block</p>',
+                ],
+            ];
+        } else {
+            $data['blocks'] = [
                 [
                     'type' => 'title-with-article',
                     'title' => 'Test Title in Block',
                     'article' => '<p>Test Article in Block</p>',
                 ],
-            ],
-        ];
+            ];
+        }
 
         $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
         $this->documentManager->clear();
@@ -226,13 +240,101 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertContains('Test Article in Block', $contentFields);
     }
 
+    public function testIndexTaggedPropertiesBlocksInBlocks(): void
+    {
+        if (!method_exists(RouteRepositoryInterface::class, 'remove')) {
+            $this->markTestSkipped('Only for Sulu > 2.1.0 (requires nested blocks)');
+        }
+
+        $data = [
+            'title' => 'Test Article',
+            'blocks' => [
+                [
+                    'type' => 'text-with-blocks',
+                    'settings' => [],
+                    'text_1' => 'Level 1 Text_1',
+                    'blocks_1' => [
+                        [
+                            'type' => 'article-with-blocks',
+                            'settings' => [],
+                            'article_2' => 'Level 2 Article_1',
+                            'blocks_2' => [
+                                [
+                                    'type' => 'area-with-blocks',
+                                    'settings' => [],
+                                    'area_3' => 'Level 3 Area_1',
+                                    'blocks_3' => [
+                                        [
+                                            'type' => 'article',
+                                            'settings' => [],
+                                            'article_4' => 'Level 4 Article_1',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'type' => 'text-with-blocks',
+                    'settings' => [],
+                    'text_1' => 'Level 1 Text_2',
+                    'blocks_1' => [
+                        [
+                            'type' => 'article-with-blocks',
+                            'settings' => [],
+                            'article_2' => 'Level 2 Article_2',
+                            'blocks_2' => [
+                                [
+                                    'type' => 'area-with-blocks',
+                                    'settings' => [],
+                                    'area_3' => 'Level 3 Area_2',
+                                    'blocks_3' => [
+                                        [
+                                            'type' => 'article',
+                                            'settings' => [],
+                                            'article_4' => 'Level 4 Article_2',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_blocks_in_blocks');
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $contentFields = $viewDocument->getContentFields();
+
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
+
+        $this->assertCount(9, $contentFields);
+        $this->assertContains('Test Article', $contentFields);
+        $this->assertContains('Level 1 Text_1', $contentFields);
+        $this->assertContains('Level 2 Article_1', $contentFields);
+        $this->assertContains('Level 3 Area_1', $contentFields);
+        $this->assertContains('Level 4 Article_1', $contentFields);
+        $this->assertContains('Level 1 Text_2', $contentFields);
+        $this->assertContains('Level 2 Article_2', $contentFields);
+        $this->assertContains('Level 3 Area_2', $contentFields);
+        $this->assertContains('Level 4 Article_2', $contentFields);
+    }
+
     public function testIndexContentData()
     {
         $data = [
             'title' => 'Test Article',
+            'routePath' => '/test-article',
             'pageTitle' => 'Test Page Title',
             'article' => 'Test Article',
-            'routePath' => '/test-article',
         ];
 
         $article = $this->createArticle($data, $data['title'], 'default_pages');
@@ -256,9 +358,9 @@ class ArticleIndexerTest extends SuluTestCase
             $this->assertProxies(
                 [
                     'title' => 'Test Article',
+                    'routePath' => '/test-article/page-2',
                     'pageTitle' => 'Test-Page',
                     'article' => '',
-                    'routePath' => '/test-article/page-2',
                 ],
                 $page->content,
                 $page->view
@@ -332,7 +434,7 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData
         );
 
-        $this->assertEquals('200', $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         return json_decode($this->client->getResponse()->getContent(), true);
     }

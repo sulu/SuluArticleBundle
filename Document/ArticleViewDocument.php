@@ -883,7 +883,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentFields()
+    public function getContentFields(): array
     {
         return $this->contentFields;
     }
@@ -891,7 +891,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     /**
      * {@inheritdoc}
      */
-    public function setContentFields(array $contentFields)
+    public function setContentFields(array $contentFields): ArticleViewDocumentInterface
     {
         $this->contentFields = $contentFields;
 
