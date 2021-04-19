@@ -508,4 +508,16 @@ interface ArticleViewDocumentInterface
      * @return $this
      */
     public function setTargetWebspace($targetWebspace);
+
+    /**
+     * @return string[]
+     */
+    public function getContentFields();
+
+    /**
+     * @param string[] $searchableContent
+     *
+     * @return $this
+     */
+    public function setContentFields(array $contentFields);
 }
