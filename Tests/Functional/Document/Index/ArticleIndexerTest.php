@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of Sulu.
  *
@@ -17,6 +15,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
+use Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
@@ -83,11 +82,11 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->index($document);
 
         $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertSame($document->getUuid(), $viewDocument->getUuid());
-        $this->assertSame('/articles/test-article', $viewDocument->getRoutePath());
+        $this->assertEquals($document->getUuid(), $viewDocument->getUuid());
+        $this->assertEquals('/articles/test-article', $viewDocument->getRoutePath());
         $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
         $this->assertTrue($viewDocument->getPublishedState());
-        $this->assertSame('localized', $viewDocument->getLocalizationState()->state);
+        $this->assertEquals('localized', $viewDocument->getLocalizationState()->state);
         $this->assertNull($viewDocument->getLocalizationState()->locale);
     }
 
@@ -130,17 +129,17 @@ class ArticleIndexerTest extends SuluTestCase
 
         $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
 
-        $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
+        $this->assertEquals('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
         $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
         $this->assertTrue($viewDocument->getPublishedState());
-        $this->assertSame('shadow', $viewDocument->getLocalizationState()->state);
-        $this->assertSame($this->locale, $viewDocument->getLocalizationState()->locale);
-        $this->assertSame($secondLocale, $viewDocument->getLocale());
-        $this->assertSame('Test Article', $viewDocument->getTitle());
+        $this->assertEquals('shadow', $viewDocument->getLocalizationState()->state);
+        $this->assertEquals($this->locale, $viewDocument->getLocalizationState()->locale);
+        $this->assertEquals($secondLocale, $viewDocument->getLocale());
+        $this->assertEquals('Test Article', $viewDocument->getTitle());
 
         $contentData = json_decode($viewDocument->getContentData(), true);
-        $this->assertSame($contentData['article'], 'Test content');
+        $this->assertEquals($contentData['article'], 'Test content');
 
         // now update the source locale
         // the shadow should be update also
@@ -156,10 +155,10 @@ class ArticleIndexerTest extends SuluTestCase
         );
 
         $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
-        $this->assertSame('Test Article - CHANGED!', $viewDocument->getTitle());
+        $this->assertEquals('Test Article - CHANGED!', $viewDocument->getTitle());
 
         $contentData = json_decode($viewDocument->getContentData(), true);
-        $this->assertSame($contentData['article'], 'Test content - CHANGED!');
+        $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
     }
 
     public function testIndexPageTreeRoute()
@@ -180,7 +179,7 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->index($document);
 
         $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertSame($page->getUuid(), $viewDocument->getParentPageUuid());
+        $this->assertEquals($page->getUuid(), $viewDocument->getParentPageUuid());
     }
 
     public function testSetUnpublished()
@@ -199,92 +198,26 @@ class ArticleIndexerTest extends SuluTestCase
             'pageTitle' => 'Test Page Title',
             'article' => '<p>Test Article</p>',
             'article_2' => '<p>should not be indexed</p>',
-            'blocks' => [
-                [
-                    'type' => 'title-with-article',
-                    'title' => 'Test Title in Block',
-                    'article' => '<p>Test Article in Block</p>',
-                ],
-            ],
         ];
 
-        $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
-        $this->documentManager->clear();
-
-        $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
-
-        $viewDocument = $this->findViewDocument($article['id']);
-        $contentFields = $viewDocument->getContentFields();
-
-        $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
-
-        $this->assertCount(5, $contentFields);
-        $this->assertContains('Test Article Title', $contentFields);
-        $this->assertContains('Test Page Title', $contentFields);
-        $this->assertContains('Test Article', $contentFields);
-        $this->assertContains('Test Title in Block', $contentFields);
-        $this->assertContains('Test Article in Block', $contentFields);
-    }
-
-    public function testIndexContentData()
-    {
-        $data = [
-            'title' => 'Test Article',
-            'routePath' => '/test-article',
-            'pageTitle' => 'Test Page Title',
-            'article' => 'Test Article',
-        ];
-
-        $article = $this->createArticle($data, $data['title'], 'default_pages');
-        $this->documentManager->clear();
-
-        $this->createArticlePage($article);
-        $this->documentManager->clear();
-
-        $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
-
-        $viewDocument = $this->findViewDocument($article['id']);
-        $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
-
-        $this->assertProxies($data, $viewDocument->getContent(), $viewDocument->getView());
-
-        $this->assertCount(1, $viewDocument->getPages());
-        foreach ($viewDocument->getPages() as $page) {
-            $this->assertProxies(
-                [
-                    'title' => 'Test Article',
-                    'routePath' => '/test-article/page-2',
-                    'pageTitle' => 'Test-Page',
-                    'article' => '',
-                ],
-                $page->content,
-                $page->view
-            );
-        }
-    }
-
-    public function testIndexTaggedProperties(): void
-    {
-        $data = [
-            'title' => 'Test Article Title',
-            'pageTitle' => 'Test Page Title',
-            'article' => '<p>Test Article</p>',
-            'article_2' => '<p>should not be indexed</p>',
-            'blocks' => [
+        if (class_exists(ImageMapContentType::class)) {
+            $data['blocks'] = [
                 [
                     'type' => 'title-with-article',
                     'settings' => [],
                     'title' => 'Test Title in Block',
                     'article' => '<p>Test Article in Block</p>',
                 ],
-            ],
-        ];
+            ];
+        } else {
+            $data['blocks'] = [
+                [
+                    'type' => 'title-with-article',
+                    'title' => 'Test Title in Block',
+                    'article' => '<p>Test Article in Block</p>',
+                ],
+            ];
+        }
 
         $article = $this->createArticle($data, $data['title'], 'default_with_search_tags');
         $this->documentManager->clear();
@@ -297,6 +230,7 @@ class ArticleIndexerTest extends SuluTestCase
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
 
         $this->assertCount(5, $contentFields);
         $this->assertContains('Test Article Title', $contentFields);
@@ -380,7 +314,7 @@ class ArticleIndexerTest extends SuluTestCase
         $viewDocument = $this->findViewDocument($article['id']);
         $contentFields = $viewDocument->getContentFields();
 
-        $this->assertSame($article['id'], $viewDocument->getUuid());
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
 
         $this->assertCount(9, $contentFields);
         $this->assertContains('Test Article', $contentFields);
@@ -394,6 +328,46 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertContains('Level 4 Article_2', $contentFields);
     }
 
+    public function testIndexContentData()
+    {
+        $data = [
+            'title' => 'Test Article',
+            'routePath' => '/test-article',
+            'pageTitle' => 'Test Page Title',
+            'article' => 'Test Article',
+        ];
+
+        $article = $this->createArticle($data, $data['title'], 'default_pages');
+        $this->documentManager->clear();
+
+        $this->createArticlePage($article);
+        $this->documentManager->clear();
+
+        $document = $this->documentManager->find($article['id'], $this->locale);
+        $this->indexer->index($document);
+        $this->indexer->flush();
+
+        $viewDocument = $this->findViewDocument($article['id']);
+        $this->assertEquals($article['id'], $viewDocument->getUuid());
+        $this->assertEquals($data, json_decode($viewDocument->getContentData(), true));
+
+        $this->assertProxies($data, $viewDocument->getContent(), $viewDocument->getView());
+
+        $this->assertCount(1, $viewDocument->getPages());
+        foreach ($viewDocument->getPages() as $page) {
+            $this->assertProxies(
+                [
+                    'title' => 'Test Article',
+                    'routePath' => '/test-article/page-2',
+                    'pageTitle' => 'Test-Page',
+                    'article' => '',
+                ],
+                $page->content,
+                $page->view
+            );
+        }
+    }
+
     private function assertProxies(array $data, $contentProxy, $viewProxy)
     {
         $this->assertInstanceOf(\ArrayObject::class, $contentProxy);
@@ -402,7 +376,7 @@ class ArticleIndexerTest extends SuluTestCase
         $content = iterator_to_array($contentProxy);
         $view = iterator_to_array($viewProxy);
 
-        $this->assertSame($data, $content);
+        $this->assertEquals($data, $content);
         foreach ($data as $key => $value) {
             $this->assertArrayHasKey($key, $view);
         }
@@ -460,7 +434,7 @@ class ArticleIndexerTest extends SuluTestCase
             $requestData
         );
 
-        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
         return json_decode($this->client->getResponse()->getContent(), true);
     }
