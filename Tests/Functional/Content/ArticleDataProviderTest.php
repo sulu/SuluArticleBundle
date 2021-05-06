@@ -320,8 +320,14 @@ class ArticleDataProviderTest extends SuluTestCase
         );
         $items = $result->getItems();
         $this->assertCount(2, $items);
-        $this->assertEquals('Test Article 1', $items[0]->getTitle());
-        $this->assertEquals('Test Article 3', $items[1]->getTitle());
+
+        $titles = [
+            $items[0]->getTitle(),
+            $items[1]->getTitle(),
+        ];
+
+        $this->assertContains('Test Article 1', $titles);
+        $this->assertContains('Test Article 3', $titles);
 
         $result = $dataProvider->resolveResourceItems(
             ['segmentKey' => 'w'],
@@ -330,8 +336,14 @@ class ArticleDataProviderTest extends SuluTestCase
         );
         $items = $result->getItems();
         $this->assertCount(2, $items);
-        $this->assertEquals('Test Article 2', $items[0]->getTitle());
-        $this->assertEquals('Test Article 3', $items[1]->getTitle());
+
+        $titles = [
+            $items[0]->getTitle(),
+            $items[1]->getTitle(),
+        ];
+
+        $this->assertContains('Test Article 2', $titles);
+        $this->assertContains('Test Article 3', $titles);
     }
 
     public function testResolveResourceItemsPagination()

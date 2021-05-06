@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
+use Doctrine\Persistence\ObjectRepository;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -22,6 +23,8 @@ use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Contact\ContactManager;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\DocumentManagerBundle\Slugifier\Urlizer;
+use Sulu\Bundle\EventLogBundle\Domain\Event\DomainEvent;
+use Sulu\Bundle\EventLogBundle\Domain\Model\EventRecord;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
@@ -67,6 +70,11 @@ class ArticleControllerTest extends SuluTestCase
     private $contactManager;
 
     /**
+     * @var ObjectRepository<EventRecord>
+     */
+    private $eventRepository;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
@@ -82,6 +90,8 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->userManager = $this->getContainer()->get('sulu_security.user_manager');
         $this->contactManager = $this->getContainer()->get('sulu_contact.contact_manager');
+
+        $this->eventRepository = $this->getEntityManager()->getRepository(EventRecord::class);
 
         $collectionTypes = new LoadCollectionTypes();
         $collectionTypes->load($this->getEntityManager());
@@ -142,6 +152,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertFalse($response['customizeWebspaceSettings']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        /** @var DomainEvent $event */
+        $event = $this->eventRepository->findOneBy(['eventType' => 'created']);
+        $this->assertNotNull($event);
 
         return $response;
     }
@@ -234,6 +248,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
+        /** @var DomainEvent $event */
+        $event = $this->eventRepository->findOneBy(['eventType' => 'modified']);
+        $this->assertSame((string) $article['id'], $event->getResourceId());
+
         return $article;
     }
 
@@ -277,6 +295,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        /** @var DomainEvent $event */
+        $event = $this->eventRepository->findOneBy(['eventType' => 'translation_added']);
+        $this->assertSame((string) $article['id'], $event->getResourceId());
     }
 
     public function provideCustomWebspaceSettings()
@@ -1146,6 +1168,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(0, $response['_embedded']['articles']);
 
         $this->assertNull($this->findViewDocument($article['id'], 'de'));
+
+        /** @var DomainEvent $event */
+        $event = $this->eventRepository->findOneBy(['eventType' => 'removed']);
+        $this->assertSame((string) $article['id'], $event->getResourceId());
     }
 
     public function testCDelete()
@@ -1323,6 +1349,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertContains([$article1['id'], $article1['title'], ['state' => 'localized']], $items);
         $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
+
+        /** @var DomainEvent $event */
+        $event = $this->eventRepository->findOneBy(['eventType' => 'translation_copied']);
+        $this->assertSame((string) $article1['id'], $event->getResourceId());
     }
 
     public function testCgetFilterByCategory()

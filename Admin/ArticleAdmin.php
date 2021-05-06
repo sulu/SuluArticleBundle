@@ -18,6 +18,7 @@ use Sulu\Bundle\AdminBundle\Admin\View\DropdownToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
@@ -218,8 +219,8 @@ class ArticleAdmin extends Admin
 
             $viewCollection->add(
                 $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW . '_' . $typeKey, '/:locale/' . $typeKey)
-                    ->setResourceKey('articles')
-                    ->setListKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
+                    ->setListKey(ArticleDocument::LIST_KEY)
                     ->setTabTitle($typeConfig['title'])
                     ->addListAdapters(['table'])
                     ->addLocales($locales)
@@ -233,13 +234,13 @@ class ArticleAdmin extends Admin
 
             $viewCollection->add(
                 $this->viewBuilderFactory->createResourceTabViewBuilder(static::ADD_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/add')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->addLocales($locales)
                     ->setBackView(static::LIST_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createFormViewBuilder(self::ADD_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->addMetadataRequestParameters($metadataRequestParameters)
                     ->setFormKey('article')
                     ->setTabTitle('sulu_admin.details')
@@ -249,14 +250,14 @@ class ArticleAdmin extends Admin
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/:id')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->addLocales($locales)
                     ->setBackView(static::LIST_VIEW . '_' . $typeKey)
                     ->setTitleProperty('title')
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->addMetadataRequestParameters($metadataRequestParameters)
                     ->setFormKey('article')
                     ->setTabTitle('sulu_admin.details')
@@ -266,7 +267,7 @@ class ArticleAdmin extends Admin
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SEO . '_' . $typeKey, '/seo')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->setFormKey('page_seo')
                     ->setTabTitle('sulu_page.seo')
                     ->addToolbarActions($formToolbarActionsWithoutType)
@@ -282,7 +283,7 @@ class ArticleAdmin extends Admin
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_SETTINGS . '_' . $typeKey, '/settings')
-                    ->setResourceKey('articles')
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->setFormKey('article_settings')
                     ->setTabTitle('sulu_page.settings')
                     ->setTabPriority(512)
