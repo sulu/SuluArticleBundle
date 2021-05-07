@@ -58,6 +58,10 @@ class ArticleDocument implements UuidBehavior,
     ShadowLocaleBehavior,
     WebspaceBehavior
 {
+    const RESOURCE_KEY = 'articles';
+
+    const LIST_KEY = 'articles';
+
     /**
      * @var string
      */

@@ -11,8 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 
+use Doctrine\Persistence\ObjectRepository;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
+use Sulu\Bundle\ActivityBundle\Domain\Model\Activity;
+use Sulu\Bundle\ActivityBundle\Domain\Model\ActivityInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
@@ -67,6 +70,11 @@ class ArticleControllerTest extends SuluTestCase
     private $contactManager;
 
     /**
+     * @var ObjectRepository<ActivityInterface>
+     */
+    private $activityRespository;
+
+    /**
      * {@inheritdoc}
      */
     public function setUp(): void
@@ -82,6 +90,8 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->userManager = $this->getContainer()->get('sulu_security.user_manager');
         $this->contactManager = $this->getContainer()->get('sulu_contact.contact_manager');
+
+        $this->activityRespository = $this->getEntityManager()->getRepository(Activity::class);
 
         $collectionTypes = new LoadCollectionTypes();
         $collectionTypes->load($this->getEntityManager());
@@ -142,6 +152,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertFalse($response['customizeWebspaceSettings']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'created']);
+        $this->assertNotNull($activity);
 
         return $response;
     }
@@ -234,6 +248,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'modified']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
+
         return $article;
     }
 
@@ -277,6 +295,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
+
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'translation_added']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
     }
 
     public function provideCustomWebspaceSettings()
@@ -1146,6 +1168,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertCount(0, $response['_embedded']['articles']);
 
         $this->assertNull($this->findViewDocument($article['id'], 'de'));
+
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'removed']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
     }
 
     public function testCDelete()
@@ -1323,6 +1349,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertContains([$article1['id'], $article1['title'], ['state' => 'localized']], $items);
         $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
+
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'translation_copied']);
+        $this->assertSame((string) $article1['id'], $activity->getResourceId());
     }
 
     public function testCgetFilterByCategory()
