@@ -260,6 +260,7 @@ class ArticleAdmin extends Admin
                     ->addMetadataRequestParameters($metadataRequestParameters)
                     ->setFormKey('article')
                     ->setTabTitle('sulu_admin.details')
+                    ->setTabCondition('shadowOn == false')
                     ->setTabPriority(1024)
                     ->addToolbarActions($formToolbarActionsWithType)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
@@ -269,6 +270,7 @@ class ArticleAdmin extends Admin
                     ->setResourceKey('articles')
                     ->setFormKey('page_seo')
                     ->setTabTitle('sulu_page.seo')
+                    ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
@@ -277,6 +279,7 @@ class ArticleAdmin extends Admin
                     ->setResourceKey('articles')
                     ->setFormKey('page_excerpt')
                     ->setTabTitle('sulu_page.excerpt')
+                    ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
