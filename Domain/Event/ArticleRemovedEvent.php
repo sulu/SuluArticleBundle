@@ -11,9 +11,9 @@
 
 namespace Sulu\Bundle\ArticleBundle\Domain\Event;
 
+use Sulu\Bundle\ActivityBundle\Domain\Event\DomainEvent;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\EventLogBundle\Domain\Event\DomainEvent;
 
 class ArticleRemovedEvent extends DomainEvent
 {

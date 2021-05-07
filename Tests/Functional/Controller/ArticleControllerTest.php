@@ -14,6 +14,8 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Functional\Controller;
 use Doctrine\Persistence\ObjectRepository;
 use ONGR\ElasticsearchBundle\Service\Manager;
 use Ramsey\Uuid\Uuid;
+use Sulu\Bundle\ActivityBundle\Domain\Model\Activity;
+use Sulu\Bundle\ActivityBundle\Domain\Model\ActivityInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
@@ -23,8 +25,6 @@ use Sulu\Bundle\CategoryBundle\Entity\Category;
 use Sulu\Bundle\ContactBundle\Contact\ContactManager;
 use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\DocumentManagerBundle\Slugifier\Urlizer;
-use Sulu\Bundle\EventLogBundle\Domain\Event\DomainEvent;
-use Sulu\Bundle\EventLogBundle\Domain\Model\EventRecord;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadCollectionTypes;
 use Sulu\Bundle\MediaBundle\DataFixtures\ORM\LoadMediaTypes;
 use Sulu\Bundle\MediaBundle\Entity\Collection;
@@ -70,9 +70,9 @@ class ArticleControllerTest extends SuluTestCase
     private $contactManager;
 
     /**
-     * @var ObjectRepository<EventRecord>
+     * @var ObjectRepository<ActivityInterface>
      */
-    private $eventRepository;
+    private $activityRespository;
 
     /**
      * {@inheritdoc}
@@ -91,7 +91,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->userManager = $this->getContainer()->get('sulu_security.user_manager');
         $this->contactManager = $this->getContainer()->get('sulu_contact.contact_manager');
 
-        $this->eventRepository = $this->getEntityManager()->getRepository(EventRecord::class);
+        $this->activityRespository = $this->getEntityManager()->getRepository(Activity::class);
 
         $collectionTypes = new LoadCollectionTypes();
         $collectionTypes->load($this->getEntityManager());
@@ -153,9 +153,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
-        /** @var DomainEvent $event */
-        $event = $this->eventRepository->findOneBy(['eventType' => 'created']);
-        $this->assertNotNull($event);
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'created']);
+        $this->assertNotNull($activity);
 
         return $response;
     }
@@ -248,9 +248,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
-        /** @var DomainEvent $event */
-        $event = $this->eventRepository->findOneBy(['eventType' => 'modified']);
-        $this->assertSame((string) $article['id'], $event->getResourceId());
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'modified']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
 
         return $article;
     }
@@ -296,9 +296,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
 
-        /** @var DomainEvent $event */
-        $event = $this->eventRepository->findOneBy(['eventType' => 'translation_added']);
-        $this->assertSame((string) $article['id'], $event->getResourceId());
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'translation_added']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
     }
 
     public function provideCustomWebspaceSettings()
@@ -1169,9 +1169,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertNull($this->findViewDocument($article['id'], 'de'));
 
-        /** @var DomainEvent $event */
-        $event = $this->eventRepository->findOneBy(['eventType' => 'removed']);
-        $this->assertSame((string) $article['id'], $event->getResourceId());
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'removed']);
+        $this->assertSame((string) $article['id'], $activity->getResourceId());
     }
 
     public function testCDelete()
@@ -1350,9 +1350,9 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertContains([$article1['id'], $article1['title'], ['state' => 'localized']], $items);
         $this->assertContains([$article2['id'], $article2['title'], ['state' => 'ghost', 'locale' => 'de']], $items);
 
-        /** @var DomainEvent $event */
-        $event = $this->eventRepository->findOneBy(['eventType' => 'translation_copied']);
-        $this->assertSame((string) $article1['id'], $event->getResourceId());
+        /** @var ActivityInterface $activity */
+        $activity = $this->activityRespository->findOneBy(['type' => 'translation_copied']);
+        $this->assertSame((string) $article1['id'], $activity->getResourceId());
     }
 
     public function testCgetFilterByCategory()
