@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Routing;
 
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Exception\RouteSchemaNotFoundException;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\RouteBundle\Generator\RouteGeneratorInterface;
@@ -35,6 +36,8 @@ class ArticleRouteGeneratorByTemplate implements RouteGeneratorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param ArticleDocument $entity
      */
     public function generate($entity, array $options)
     {

@@ -544,7 +544,12 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                         );
                     }
 
-                    $this->contentMapper->copyLanguage($id, $userId, null, $srcLocale, $destLocales);
+                    $document = $this->documentManager->find($id, $srcLocale);
+                    foreach ($destLocales as $destLocale) {
+                        $this->documentManager->copyLocale($document, $srcLocale, $destLocale);
+                    }
+
+                    $this->documentManager->flush();
 
                     $data = $this->documentManager->find($id, $locale);
 

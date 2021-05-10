@@ -518,5 +518,15 @@
             <argument type="service" id="sulu_page.import.webspace.xliff12" />
             <argument type="service" id="logger" on-invalid="null"/>
         </service>
+
+        <!-- domain events -->
+        <service id="sulu_article.document_manager.event_subscriber"
+                 class="Sulu\Bundle\ArticleBundle\EventListener\DomainEventSubscriber">
+            <argument type="service" id="sulu_document_manager.document_domain_event_collector"/>
+            <argument type="service" id="sulu_document_manager.document_manager"/>
+            <argument type="service" id="sulu_document_manager.property_encoder"/>
+
+            <tag name="sulu_document_manager.event_subscriber" />
+        </service>
     </services>
 </container>
