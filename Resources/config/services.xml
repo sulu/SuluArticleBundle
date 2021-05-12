@@ -26,6 +26,7 @@
             <argument type="service" id="sulu.content.structure_manager"/>
             <argument>%kernel.bundles%</argument>
             <argument>%sulu_article.types%</argument>
+            <argument>%sulu_document_manager.versioning.enabled%</argument>
 
             <tag name="sulu.admin"/>
             <tag name="sulu.context" context="admin"/>

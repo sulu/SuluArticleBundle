@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\Admin;
 
+use Sulu\Bundle\ActivityBundle\Domain\Model\ActivityInterface;
 use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
@@ -60,6 +61,8 @@ class ArticleAdmin extends Admin
 
     const EDIT_FORM_VIEW_AUTOMATION = 'sulu_article.edit_form.automation';
 
+    const EDIT_FORM_ACTIVITY_VERSION_TAB_VIEW = 'sulu_article.article_edit_form.activity_version_tab';
+
     /**
      * @var ViewBuilderFactoryInterface
      */
@@ -90,13 +93,19 @@ class ArticleAdmin extends Admin
      */
     private $articleTypeConfigurations;
 
+    /**
+     * @var bool
+     */
+    private $versioningEnabled;
+
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
         LocalizationManagerInterface $localizationManager,
         StructureManagerInterface $structureManager,
         array $kernelBundles,
-        array $articleTypeConfigurations
+        array $articleTypeConfigurations,
+        bool $versioningEnabled
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
@@ -104,6 +113,7 @@ class ArticleAdmin extends Admin
         $this->structureManager = $structureManager;
         $this->kernelBundles = $kernelBundles;
         $this->articleTypeConfigurations = $articleTypeConfigurations;
+        $this->versioningEnabled = $versioningEnabled;
     }
 
     /**
@@ -292,6 +302,39 @@ class ArticleAdmin extends Admin
                     ->setTabPriority(512)
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+            );
+
+            $viewCollection->add(
+                $this->viewBuilderFactory
+                    ->createResourceTabViewBuilder(static::EDIT_FORM_ACTIVITY_VERSION_TAB_VIEW, '/activity')
+                    ->setTitleProperty('') // is necessary because the previous title is routed to all child-tabs
+                    ->setResourceKey(ArticleDocument::RESOURCE_KEY)
+                    ->setTabOrder(2048)
+                    ->setTabTitle($this->versioningEnabled ? 'sulu_admin.activity_versions' : 'sulu_admin.activity')
+                    ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+            );
+
+            $viewCollection->add(
+                $this->viewBuilderFactory
+                    ->createListViewBuilder(static::EDIT_FORM_ACTIVITY_VERSION_TAB_VIEW . '.activity', '/activity')
+                    ->setTabTitle('sulu_admin.activity')
+                    ->setResourceKey(ActivityInterface::RESOURCE_KEY)
+                    ->setListKey('activities')
+                    ->addListAdapters(['table'])
+                    ->addAdapterOptions([
+                        'table' => [
+                            'skin' => 'flat',
+                            'show_header' => false,
+                        ],
+                    ])
+                    ->disableTabGap()
+                    ->disableSearching()
+                    ->disableSelection()
+                    ->disableColumnOptions()
+                    ->disableFiltering()
+                    ->addResourceStorePropertiesToListRequest(['id' => 'resourceId'])
+                    ->addRequestParameters(['resourceKey' => ArticleDocument::RESOURCE_KEY])
+                    ->setParent(static::EDIT_FORM_ACTIVITY_VERSION_TAB_VIEW)
             );
 
             if (isset($this->kernelBundles['SuluAutomationBundle'])) {
