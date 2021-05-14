@@ -23,6 +23,7 @@ use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleTranslationAddedEvent;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleTranslationCopiedEvent;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleTranslationRemovedEvent;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleUnpublishedEvent;
+use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleVersionRestoredEvent;
 use Sulu\Bundle\DocumentManagerBundle\Collector\DocumentDomainEventCollectorInterface;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\Subscriber\SecuritySubscriber;
@@ -36,6 +37,7 @@ use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
 use Sulu\Component\DocumentManager\Event\RemoveLocaleEvent;
+use Sulu\Component\DocumentManager\Event\RestoreEvent;
 use Sulu\Component\DocumentManager\Event\UnpublishEvent;
 use Sulu\Component\DocumentManager\Events;
 use Sulu\Component\DocumentManager\PropertyEncoder;
@@ -105,6 +107,7 @@ class DomainEventSubscriber implements EventSubscriberInterface
             Events::PUBLISH => ['handlePublish', -10000],
             Events::UNPUBLISH => ['handleUnpublish', -10000],
             Events::REMOVE_DRAFT => ['handleRemoveDraft', -10000],
+            Events::RESTORE => ['handleRestore', -10000],
         ];
     }
 
@@ -350,6 +353,25 @@ class DomainEventSubscriber implements EventSubscriberInterface
             new ArticleDraftRemovedEvent(
                 $document,
                 $locale
+            )
+        );
+    }
+
+    public function handleRestore(RestoreEvent $event): void
+    {
+        $document = $event->getDocument();
+        $locale = $event->getLocale();
+        $version = $event->getVersion();
+
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->domainEventCollector->collect(
+            new ArticleVersionRestoredEvent(
+                $document,
+                $locale,
+                $version
             )
         );
     }
