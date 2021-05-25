@@ -115,8 +115,56 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite'],
-                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page'],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page', 'alternate' => true],
+            ]
+        )->shouldBeCalled();
+
+        $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
+    }
+
+    public function testAddUrlsOnPostSerializeNonExistLocale()
+    {
+        $article = $this->prophesize(ArticleDocument::class);
+        $visitor = $this->prophesize(SerializationVisitorInterface::class);
+
+        $context = $this->prophesize(SerializationContext::class);
+        $context->hasAttribute('urls')->willReturn(true);
+
+        $entityId = '123-123-123';
+        $article->getUuid()->willReturn($entityId);
+
+        $event = $this->prophesize(ObjectEvent::class);
+        $event->getObject()->willReturn($article->reveal());
+        $event->getVisitor()->willReturn($visitor->reveal());
+        $event->getContext()->willReturn($context->reveal());
+
+        $entityClass = get_class($article->reveal());
+
+        $deRoute = $this->prophesize(RouteInterface::class);
+        $deRoute->getPath()->willReturn('/seite');
+        $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
+        $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
+
+        $enRoute = $this->prophesize(RouteInterface::class);
+        $enRoute->getPath()->willReturn('/page');
+        $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn(null);
+        $this->webspaceManager->findUrlByResourceLocator('/', null, 'en')->willReturn('http://sulu.io/');
+
+        $visitor->visitProperty(
+            Argument::that(function(StaticPropertyMetadata $metadata) {
+                return 'urls' === $metadata->name;
+            }),
+            ['de' => '/seite', 'en' => '/']
+        )->shouldBeCalled();
+
+        $visitor->visitProperty(
+            Argument::that(function(StaticPropertyMetadata $metadata) {
+                return 'localizations' === $metadata->name;
+            }),
+            [
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/', 'alternate' => false],
             ]
         )->shouldBeCalled();
 

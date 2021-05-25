@@ -100,11 +100,13 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
             $locale = $localization->getLocale();
             $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
             $path = $route ? $route->getPath() : '/';
+            $alternate = (bool) $route;
 
             $urls[$locale] = $path;
             $localizations[$locale] = [
                 'locale' => $locale,
                 'url' => $this->webspaceManager->findUrlByResourceLocator($path, null, $locale),
+                'alternate' => $alternate,
             ];
         }
 
