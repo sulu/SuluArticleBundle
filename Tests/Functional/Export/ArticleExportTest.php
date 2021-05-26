@@ -114,6 +114,28 @@ EOT;
         $this->assertRegExp('/' . $expected . '/', $result);
     }
 
+    public function testExportGhostArticles(): void
+    {
+        $this->createArticle('Test-Article', 'default', [
+            'mainWebspace' => 'sulu_io',
+            'additionalWebspaces' => ['sulu_io_blog'],
+            'ext' => [
+                'seo' => [
+                    'title' => 'Seo Title',
+                ],
+                'excerpt' => [
+                    'title' => 'Excerpt Title',
+                ],
+            ],
+        ]);
+
+        $exporter = $this->getContainer()->get('sulu_article.export.exporter');
+
+        $result = $exporter->export('en');
+
+        $this->assertStringNotContainsString('trans-unit', $result);
+    }
+
     private function createArticle($title = 'Test-Article', $template = 'default', $data = []): array
     {
         $this->client->jsonRequest(

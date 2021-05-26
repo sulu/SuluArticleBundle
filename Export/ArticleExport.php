@@ -183,9 +183,23 @@ class ArticleExport extends Export implements ArticleExportInterface
 
     protected function getDocuments(string $locale): QueryResultCollection
     {
-        $query = $this->documentManager->createQuery(
-            'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article"',
+        $where = [];
+
+        // only snippets
+        $where[] = '[jcr:mixinTypes] = "sulu:article"';
+
+        // filter by webspace key
+        $where[] = 'ISDESCENDANTNODE("/cmf/articles")';
+
+        // filter by locale
+        $where[] = \sprintf(
+            '[i18n:%s-template] IS NOT NULL',
             $locale
+        );
+
+        $query = $this->documentManager->createQuery(
+            'SELECT * FROM [nt:unstructured] AS a WHERE ' . \implode(' AND ', $where),
+            $this->exportLocale
         );
 
         return $query->execute();
