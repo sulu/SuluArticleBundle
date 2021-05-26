@@ -185,10 +185,10 @@ class ArticleExport extends Export implements ArticleExportInterface
     {
         $where = [];
 
-        // only snippets
+        // only articles
         $where[] = '[jcr:mixinTypes] = "sulu:article"';
 
-        // filter by webspace key
+        // filter by path
         $where[] = 'ISDESCENDANTNODE("/cmf/articles")';
 
         // filter by locale
