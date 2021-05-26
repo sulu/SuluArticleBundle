@@ -191,7 +191,7 @@ class ArticleExport extends Export implements ArticleExportInterface
         // filter by path
         $where[] = 'ISDESCENDANTNODE("/cmf/articles")';
 
-        // filter by locale
+        // do not load ghost articles
         $where[] = \sprintf(
             '[i18n:%s-template] IS NOT NULL',
             $locale
