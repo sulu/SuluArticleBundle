@@ -199,7 +199,7 @@ class ArticleExport extends Export implements ArticleExportInterface
 
         $query = $this->documentManager->createQuery(
             'SELECT * FROM [nt:unstructured] AS a WHERE ' . \implode(' AND ', $where),
-            $this->exportLocale
+            $locale
         );
 
         return $query->execute();
