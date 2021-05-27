@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/sulu/SuluArticleBundle/blob/2.x/LICENSE" target="_blank">
+    <a href="LICENSE" target="_blank">
         <img src="https://img.shields.io/github/license/sulu/SuluArticleBundle.svg" alt="GitHub license">
     </a>
     <a href="https://github.com/sulu/SuluArticleBundle/releases" target="_blank">
@@ -39,7 +39,7 @@ administration interface.
 <br/>
 
 The SuluArticleBundle is compatible with Sulu **starting from version 2.0**. Have a look at the `require` section in 
-the [composer.json](https://github.com/sulu/SuluArticleBundle/blob/2.x/composer.json) to find an 
+the [composer.json](composer.json) to find an 
 **up-to-date list of the requirements** of the bundle.
 
 
@@ -53,7 +53,7 @@ composer require "elasticsearch/elasticsearch:7.9.*" # should match version of y
 composer require sulu/article-bundle
 ```
 
-Afterwards, visit the [bundle documentation](https://github.com/sulu/SuluArticleBundle/blob/2.x/Resources/doc) to 
+Afterwards, visit the [bundle documentation](Resources/doc) to 
 find out **how to set up and configure the SuluArticleBundle** to your specific needs.
 
 

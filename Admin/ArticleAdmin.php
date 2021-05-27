@@ -17,6 +17,7 @@ use Sulu\Bundle\AdminBundle\Admin\Admin;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItem;
 use Sulu\Bundle\AdminBundle\Admin\Navigation\NavigationItemCollection;
 use Sulu\Bundle\AdminBundle\Admin\View\DropdownToolbarAction;
+use Sulu\Bundle\AdminBundle\Admin\View\ListItemAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ToolbarAction;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
@@ -63,7 +64,7 @@ class ArticleAdmin extends Admin
 
     const EDIT_FORM_VIEW_AUTOMATION = 'sulu_article.edit_form.automation';
 
-    const EDIT_FORM_VIEW_ACTIVITY_VERSION_TAB = 'sulu_article.edit_form.activity_version_tab';
+    const EDIT_FORM_VIEW_ACTIVITY = 'sulu_article.edit_form.activity';
 
     /**
      * @var ViewBuilderFactoryInterface
@@ -290,6 +291,7 @@ class ArticleAdmin extends Admin
                 $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_FORM_VIEW . '_' . $typeKey, '/articles/:locale/' . $typeKey . '/:id')
                     ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                     ->addLocales($locales)
+                    ->setTitleProperty('title')
                     ->setBackView(static::LIST_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -310,6 +312,7 @@ class ArticleAdmin extends Admin
                     ->setTabTitle('sulu_page.seo')
                     ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->setTitleVisible(true)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -319,6 +322,7 @@ class ArticleAdmin extends Admin
                     ->setTabTitle('sulu_page.excerpt')
                     ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->setTitleVisible(true)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -328,22 +332,31 @@ class ArticleAdmin extends Admin
                     ->setTabTitle('sulu_page.settings')
                     ->setTabPriority(512)
                     ->addToolbarActions($formToolbarActionsWithoutType)
+                    ->setTitleVisible(true)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
+
+            if (isset($this->kernelBundles['SuluAutomationBundle'])) {
+                $viewCollection->add(
+                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
+                        ->setEntityClass(BasePageDocument::class)
+                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                );
+            }
 
             if ($this->securityChecker->hasPermission(ActivityAdmin::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
                 $viewCollection->add(
                     $this->viewBuilderFactory
-                        ->createResourceTabViewBuilder(static::EDIT_FORM_VIEW_ACTIVITY_VERSION_TAB . '_' . $typeKey, '/activity')
-                        ->setTitleProperty('title')
+                        ->createResourceTabViewBuilder(static::EDIT_FORM_VIEW_ACTIVITY . '_' . $typeKey, '/activity')
                         ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                         ->setTabTitle($this->versioningEnabled ? 'sulu_admin.activity_versions' : 'sulu_admin.activity')
+                        ->setTitleProperty('')
                         ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
                 );
 
                 $viewCollection->add(
                     $this->viewBuilderFactory
-                        ->createListViewBuilder(static::EDIT_FORM_VIEW_ACTIVITY_VERSION_TAB . '_' . $typeKey . '.activity', '/activity')
+                        ->createListViewBuilder(static::EDIT_FORM_VIEW_ACTIVITY . '_' . $typeKey . '.activity', '/activity')
                         ->setTabTitle('sulu_admin.activity')
                         ->setResourceKey(ActivityInterface::RESOURCE_KEY)
                         ->setListKey('activities')
@@ -361,16 +374,34 @@ class ArticleAdmin extends Admin
                         ->disableFiltering()
                         ->addResourceStorePropertiesToListRequest(['id' => 'resourceId'])
                         ->addRequestParameters(['resourceKey' => ArticleDocument::RESOURCE_KEY])
-                        ->setParent(static::EDIT_FORM_VIEW_ACTIVITY_VERSION_TAB . '_' . $typeKey)
+                        ->setParent(static::EDIT_FORM_VIEW_ACTIVITY . '_' . $typeKey)
                 );
-            }
 
-            if (isset($this->kernelBundles['SuluAutomationBundle'])) {
-                $viewCollection->add(
-                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
-                        ->setEntityClass(BasePageDocument::class)
-                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-                );
+                if ($this->versioningEnabled) {
+                    $viewCollection->add(
+                        $this->viewBuilderFactory
+                            ->createListViewBuilder(static::EDIT_FORM_VIEW_ACTIVITY . '_' . $typeKey . '.versions', '/versions')
+                            ->setTabTitle('sulu_admin.versions')
+                            ->setResourceKey('article_versions')
+                            ->setListKey('article_versions')
+                            ->addListAdapters(['table'])
+                            ->addAdapterOptions([
+                                'table' => [
+                                    'skin' => 'flat',
+                                ],
+                            ])
+                            ->disableTabGap()
+                            ->disableSearching()
+                            ->disableSelection()
+                            ->disableColumnOptions()
+                            ->disableFiltering()
+                            ->addRouterAttributesToListRequest(['id', 'webspace'])
+                            ->addItemActions([
+                                new ListItemAction('restore_version', ['success_view' => static::EDIT_FORM_VIEW . '_' . $typeKey]),
+                            ])
+                            ->setParent(static::EDIT_FORM_VIEW_ACTIVITY . '_' . $typeKey)
+                    );
+                }
             }
         }
     }
