@@ -19,8 +19,8 @@ use ONGR\ElasticsearchDSL\Search;
 use ONGR\ElasticsearchDSL\Sort\FieldSort;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Sulu\Bundle\AdminBundle\Metadata\FormMetadata\FormMetadataProvider;
 use Sulu\Bundle\AdminBundle\Metadata\FormMetadata\TypedFormMetadata;
+use Sulu\Bundle\AdminBundle\Metadata\MetadataProviderInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\PageBundle\Content\Types\SegmentSelect;
@@ -76,7 +76,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     protected $defaultLimit;
 
     /**
-     * @var FormMetadataProvider|null
+     * @var MetadataProviderInterface|null
      */
     private $formMetadataProvider;
 
@@ -93,7 +93,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ArticleResourceItemFactory $articleResourceItemFactory,
         string $articleDocumentClass,
         int $defaultLimit,
-        FormMetadataProvider $formMetadataProvider = null,
+        MetadataProviderInterface $formMetadataProvider = null,
         TokenStorageInterface $tokenStorage = null
     ) {
         $this->searchManager = $searchManager;
