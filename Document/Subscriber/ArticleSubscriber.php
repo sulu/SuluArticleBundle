@@ -103,7 +103,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        $subscribedEvents = [
+        return [
             Events::HYDRATE => [
                 ['hydratePageData', -2000],
             ],
@@ -130,16 +130,8 @@ class ArticleSubscriber implements EventSubscriberInterface
             Events::FLUSH => [['handleFlush', -2048], ['handleFlushLive', -2048]],
             Events::COPY => ['handleCopy'],
             Events::METADATA_LOAD => ['handleMetadataLoad'],
+            EVENTS::REMOVE_LOCALE => [['handleRemoveLocale', -500], ['handleRemoveLocaleLive', -500]],
         ];
-
-        if (defined(Events::class . '::REMOVE_LOCALE')) {
-            $subscribedEvents[EVENTS::REMOVE_LOCALE] = [
-                ['handleRemoveLocale', -500],
-                ['handleRemoveLocaleLive', -500],
-            ];
-        }
-
-        return $subscribedEvents;
     }
 
     /**
