@@ -91,7 +91,9 @@ return [
 ```php
 <?php
 
-namespace AppBundle\Document;
+// src/Document/ArticleViewDocument.php
+
+namespace App\Document;
 
 use ONGR\ElasticsearchBundle\Annotation\Document;
 use ONGR\ElasticsearchBundle\Annotation\Property;
@@ -114,7 +116,7 @@ class ArticleViewDocument extends SuluArticleViewDocument
      *    }
      * )
      */
-    public $article;
+    public $myCustomProperty;
 }
 ```
 
@@ -149,6 +151,8 @@ sulu_article:
 ```php
 <?php
 
+// src/EventListener/ArticleIndexListener.php
+
 namespace App\EventListener;
 
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
@@ -161,11 +165,11 @@ class ArticleIndexListener
         $viewDocument = $event->getViewDocument();
         $data = $document->getStructure()->toArray();
 
-        if (!array_key_exists('article', $data)) {
+        if (!array_key_exists('myCustomProperty', $data)) {
             return;
         }
 
-        $viewDocument->article = $data['article'];
+        $viewDocument->myCustomProperty = $data['myCustomProperty'];
     }
 }
 ```
