@@ -331,11 +331,13 @@ class ArticleAdmin extends Admin
             );
 
             if (isset($this->kernelBundles['SuluAutomationBundle'])) {
-                $viewCollection->add(
-                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
-                        ->setEntityClass(BasePageDocument::class)
-                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
-                );
+                if (class_exists(AutomationViewBuilder::class)) {
+                    $viewCollection->add(
+                        (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
+                            ->setEntityClass(BasePageDocument::class)
+                            ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                    );
+                }
             }
 
             if ($this->securityChecker->hasPermission(ActivityAdmin::SECURITY_CONTEXT, PermissionTypes::VIEW)) {
