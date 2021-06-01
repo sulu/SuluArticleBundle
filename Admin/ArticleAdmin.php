@@ -23,7 +23,8 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
-use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
+use Sulu\Bundle\AutomationBundle\Admin\AutomationAdmin;
+use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilderFactoryInterface;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -100,6 +101,11 @@ class ArticleAdmin extends Admin
      */
     private $versioningEnabled;
 
+    /**
+     * @var AutomationViewBuilderFactoryInterface|null
+     */
+    private $automationViewBuilderFactory;
+
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
@@ -107,7 +113,8 @@ class ArticleAdmin extends Admin
         StructureManagerInterface $structureManager,
         array $kernelBundles,
         array $articleTypeConfigurations,
-        bool $versioningEnabled
+        bool $versioningEnabled,
+        ?AutomationViewBuilderFactoryInterface $automationViewBuilderFactory = null
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
@@ -116,6 +123,7 @@ class ArticleAdmin extends Admin
         $this->kernelBundles = $kernelBundles;
         $this->articleTypeConfigurations = $articleTypeConfigurations;
         $this->versioningEnabled = $versioningEnabled;
+        $this->automationViewBuilderFactory = $automationViewBuilderFactory;
     }
 
     /**
@@ -330,11 +338,15 @@ class ArticleAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
 
-            if (isset($this->kernelBundles['SuluAutomationBundle'])) {
+            if ($this->automationViewBuilderFactory
+                && $this->securityChecker->hasPermission(AutomationAdmin::SECURITY_CONTEXT, PermissionTypes::EDIT)
+            ) {
                 $viewCollection->add(
-                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
-                        ->setEntityClass(BasePageDocument::class)
-                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                    $this->automationViewBuilderFactory->createTaskListViewBuilder(
+                        static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey,
+                        '/automation',
+                        BasePageDocument::class
+                    )->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
                 );
             }
 
