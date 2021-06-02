@@ -23,11 +23,11 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
-use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilder;
+use Sulu\Bundle\AutomationBundle\Admin\AutomationAdmin;
+use Sulu\Bundle\AutomationBundle\Admin\View\AutomationViewBuilderFactoryInterface;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
-use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Localization\Manager\LocalizationManagerInterface;
 use Sulu\Component\Security\Authorization\PermissionTypes;
@@ -101,6 +101,11 @@ class ArticleAdmin extends Admin
      */
     private $versioningEnabled;
 
+    /**
+     * @var AutomationViewBuilderFactoryInterface|null
+     */
+    private $automationViewBuilderFactory;
+
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
         SecurityCheckerInterface $securityChecker,
@@ -108,7 +113,8 @@ class ArticleAdmin extends Admin
         StructureManagerInterface $structureManager,
         array $kernelBundles,
         array $articleTypeConfigurations,
-        bool $versioningEnabled
+        bool $versioningEnabled,
+        ?AutomationViewBuilderFactoryInterface $automationViewBuilderFactory = null
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
@@ -117,6 +123,7 @@ class ArticleAdmin extends Admin
         $this->kernelBundles = $kernelBundles;
         $this->articleTypeConfigurations = $articleTypeConfigurations;
         $this->versioningEnabled = $versioningEnabled;
+        $this->automationViewBuilderFactory = $automationViewBuilderFactory;
     }
 
     /**
@@ -199,32 +206,27 @@ class ArticleAdmin extends Admin
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::DELETE)
                 && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::DELETE)) {
-                // TODO remove when ArticleBundle requires Sulu ^2.3
-                if ((new \ReflectionClass(DocumentManagerInterface::class))->hasMethod('removeLocale')) {
-                    $formToolbarActionsWithType[] = new DropdownToolbarAction(
-                        'sulu_admin.delete',
-                        'su-trash-alt',
-                        [
-                            new ToolbarAction(
-                                'sulu_admin.delete',
-                                [
-                                    'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
-                                    'router_attributes_to_back_view' => ['webspace'],
-                                ]
-                            ),
-                            new ToolbarAction(
-                                'sulu_admin.delete',
-                                [
-                                    'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
-                                    'router_attributes_to_back_view' => ['webspace'],
-                                    'delete_locale' => true,
-                                ]
-                            ),
-                        ]
-                    );
-                } else {
-                    $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.delete');
-                }
+                $formToolbarActionsWithType[] = new DropdownToolbarAction(
+                    'sulu_admin.delete',
+                    'su-trash-alt',
+                    [
+                        new ToolbarAction(
+                            'sulu_admin.delete',
+                            [
+                                'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
+                                'router_attributes_to_back_view' => ['webspace'],
+                            ]
+                        ),
+                        new ToolbarAction(
+                            'sulu_admin.delete',
+                            [
+                                'visible_condition' => '(!_permissions || _permissions.delete) && url != "/"',
+                                'router_attributes_to_back_view' => ['webspace'],
+                                'delete_locale' => true,
+                            ]
+                        ),
+                    ]
+                );
 
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.delete');
             }
@@ -336,11 +338,15 @@ class ArticleAdmin extends Admin
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
 
-            if (isset($this->kernelBundles['SuluAutomationBundle'])) {
+            if ($this->automationViewBuilderFactory
+                && $this->securityChecker->hasPermission(AutomationAdmin::SECURITY_CONTEXT, PermissionTypes::EDIT)
+            ) {
                 $viewCollection->add(
-                    (new AutomationViewBuilder(static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey, '/automation'))
-                        ->setEntityClass(BasePageDocument::class)
-                        ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
+                    $this->automationViewBuilderFactory->createTaskListViewBuilder(
+                        static::EDIT_FORM_VIEW_AUTOMATION . '_' . $typeKey,
+                        '/automation',
+                        BasePageDocument::class
+                    )->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
                 );
             }
 

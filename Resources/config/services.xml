@@ -35,6 +35,7 @@
             <argument>%kernel.bundles%</argument>
             <argument>%sulu_article.types%</argument>
             <argument>%sulu_document_manager.versioning.enabled%</argument>
+            <argument type="service" id="sulu_automation.automation_view_builder_factory" on-invalid="null"/>
 
             <tag name="sulu.admin"/>
             <tag name="sulu.context" context="admin"/>

@@ -13,7 +13,6 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Application;
 
 use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
-use Sulu\Bundle\ArticleBundle\Tests\Application\Testing\ArticleBundleKernelBrowser;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\ContentBundle\SuluContentBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
@@ -94,15 +93,6 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
 
         $container->getDefinition('sulu_article.elastic_search.article_indexer')
             ->setPublic(true);
-
-        // Will be removed, as soon as the min-requirement of sulu/sulu is high enough for the `SuluKernelBrowser` to be always available.
-        if ($container->hasDefinition('test.client')) {
-            $definition = $container->getDefinition('test.client');
-
-            if (\Sulu\Bundle\TestBundle\Kernel\SuluKernelBrowser::class !== $definition->getClass()) {
-                $definition->setClass(ArticleBundleKernelBrowser::class);
-            }
-        }
     }
 
     protected function getKernelParameters()
