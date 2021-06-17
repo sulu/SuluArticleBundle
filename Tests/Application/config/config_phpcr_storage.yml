@@ -11,8 +11,7 @@ sulu_route:
                 parent: "{object.getParent().getRoutePath()}"
 
 sulu_article:
-    article:
-        storage: 'phpcr'
+    storage: 'phpcr'
     index_name: "su_articles_tests"
     hosts: ["%env(ELASTICSEARCH_HOST)%"]
     default_main_webspace: 'sulu_io'

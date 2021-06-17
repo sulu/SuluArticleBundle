@@ -9,13 +9,13 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Article\Domain\Model;
+namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Domain\Model;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContent;
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContentInterface;
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleInterface;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleDimensionContent;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleDimensionContentInterface;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface;
 
 class ArticleDimensionContentTest extends TestCase
 {

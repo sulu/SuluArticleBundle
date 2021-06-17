@@ -11,10 +11,10 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\Article;
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContent;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
+use Sulu\Bundle\ArticleBundle\Domain\Model\Article;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleDimensionContent;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -36,28 +36,23 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('article')
+                ->enumNode('storage')
+                    ->values([self::ARTICLE_STORAGE_PHPCR, self::ARTICLE_STORAGE_EXPERIMENTAL])
+                    ->defaultValue(self::ARTICLE_STORAGE_PHPCR)
+                ->end()
+                ->arrayNode('objects')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->enumNode('storage')
-                            ->values([self::ARTICLE_STORAGE_PHPCR, self::ARTICLE_STORAGE_EXPERIMENTAL])
-                            ->defaultValue(self::ARTICLE_STORAGE_PHPCR)
-                        ->end()
-                        ->arrayNode('objects')
+                        ->arrayNode('article')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->arrayNode('article')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('model')->defaultValue(Article::class)->end()
-                                    ->end()
-                                ->end()
-                                ->arrayNode('article_content')
-                                    ->addDefaultsIfNotSet()
-                                    ->children()
-                                        ->scalarNode('model')->defaultValue(ArticleDimensionContent::class)->end()
-                                    ->end()
-                                ->end()
+                                ->scalarNode('model')->defaultValue(Article::class)->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('article_content')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('model')->defaultValue(ArticleDimensionContent::class)->end()
                             ->end()
                         ->end()
                     ->end()

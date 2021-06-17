@@ -11,7 +11,7 @@
     -->
 
     <services>
-        <service id="sulu_article.article_admin" class="Sulu\Bundle\ArticleBundle\Article\Infrastructure\Sulu\Admin\ArticleAdmin">
+        <service id="sulu_article.article_admin" class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Admin\ArticleAdmin">
             <!-- @internal this service is internal and should not be used by your project -->
 
             <argument type="service" id="sulu_admin.view_builder_factory" />

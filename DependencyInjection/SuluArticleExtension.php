@@ -11,13 +11,13 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Bundle\PersistenceBundle\DependencyInjection\PersistenceExtensionTrait;
@@ -46,7 +46,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $configs = $resolvingBag->resolveValue($configs);
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $storage = $config['article']['storage'];
+        $storage = $config['storage'];
 
         if ($container->hasExtension('jms_serializer')) {
             $container->prependExtensionConfig(
@@ -325,7 +325,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         'mappings' => [
                             'SuluBundleArticle' => [
                                 'type' => 'xml',
-                                'prefix' => 'Sulu\Bundle\ArticleBundle\Article\Domain\Model',
+                                'prefix' => 'Sulu\Bundle\ArticleBundle\Domain\Model',
                                 'dir' => \dirname(__DIR__) . '/Resources/config/doctrine/Article',
                                 'alias' => 'SuluArticleBundle',
                                 'is_bundle' => false,
@@ -405,7 +405,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        $storage = $config['article']['storage'];
+        $storage = $config['storage'];
         $container->setParameter('sulu_article.article_storage', $storage);
 
         if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
@@ -417,7 +417,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     private function loadExperimentalStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
     {
-        $this->configurePersistence($config['article']['objects'], $container);
+        $this->configurePersistence($config['objects'], $container);
 
         $loader->load('experimental.xml');
     }

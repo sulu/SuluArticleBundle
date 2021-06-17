@@ -1,3 +1,2 @@
 sulu_article:
-    article:
-        storage: 'experimental'
+    storage: 'experimental'
