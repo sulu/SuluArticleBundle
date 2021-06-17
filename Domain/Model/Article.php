@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Article\Domain\Model;
+namespace Sulu\Bundle\ArticleBundle\Domain\Model;
 
 use Ramsey\Uuid\Uuid;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\ContentRichEntityTrait;

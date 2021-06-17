@@ -11,12 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle;
 
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleDimensionContentInterface;
-use Sulu\Bundle\ArticleBundle\Article\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\Configuration;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\ConverterCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\RouteEnhancerCompilerPass;
 use Sulu\Bundle\ArticleBundle\DependencyInjection\StructureValidatorCompilerPass;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleDimensionContentInterface;
+use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface;
 use Sulu\Bundle\PersistenceBundle\DependencyInjection\Compiler\ResolveTargetEntitiesPass;
 use Sulu\Bundle\PersistenceBundle\PersistenceBundleTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
