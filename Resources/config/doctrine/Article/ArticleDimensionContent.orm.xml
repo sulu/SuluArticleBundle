@@ -12,7 +12,7 @@
 
         <many-to-one field="article" target-entity="Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface" inversed-by="dimensionContents">
             <join-columns>
-                <join-column name="articleId" referenced-column-name="id" on-delete="CASCADE" nullable="false"/>
+                <join-column name="articleUuid" referenced-column-name="uuid" on-delete="CASCADE" nullable="false"/>
             </join-columns>
         </many-to-one>
     </entity>

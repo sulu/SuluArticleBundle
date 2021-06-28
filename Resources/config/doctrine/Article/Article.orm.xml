@@ -7,7 +7,7 @@
         table="ar_articles"
         repository-class="Sulu\Component\Persistence\Repository\ORM\EntityRepository"
     >
-        <id name="id" type="string" column="id">
+        <id name="uuid" type="string" column="uuid">
             <generator strategy="NONE"/>
         </id>
 

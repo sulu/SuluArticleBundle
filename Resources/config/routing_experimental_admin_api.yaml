@@ -1,0 +1,4 @@
+sulu_article.admin_article_api:
+    type: rest
+    resource: sulu_article.admin_article_controller
+    name_prefix: sulu_article.

@@ -77,22 +77,26 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $loader->load(__DIR__ . '/config/config.yml');
         $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
 
-        $type = 'default';
-        if (getenv('ARTICLE_TEST_CASE')) {
-            $type = getenv('ARTICLE_TEST_CASE');
-        }
+        if ($this->config === 'phpcr_storage') {
+            $type = 'default';
+            if (getenv('ARTICLE_TEST_CASE')) {
+                $type = getenv('ARTICLE_TEST_CASE');
+            }
 
-        $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
+            $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
+        }
     }
 
     public function process(ContainerBuilder $container)
     {
-        // Make some services which were inlined in optimization
-        $container->getDefinition('sulu_article.content.page_tree_data_provider')
-            ->setPublic(true);
+        if ($this->config === 'phpcr_storage') {
+            // Make some services which were inlined in optimization
+            $container->getDefinition('sulu_article.content.page_tree_data_provider')
+                ->setPublic(true);
 
-        $container->getDefinition('sulu_article.elastic_search.article_indexer')
-            ->setPublic(true);
+            $container->getDefinition('sulu_article.elastic_search.article_indexer')
+                ->setPublic(true);
+        }
     }
 
     protected function getKernelParameters()
@@ -103,5 +107,15 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $parameters['gedmo_directory'] = \dirname($gedmoReflection->getFileName());
 
         return $parameters;
+    }
+
+    public function getCacheDir()
+    {
+        return parent::getCacheDir() . '/' . $this->config;
+    }
+
+    public function getCommonCacheDir()
+    {
+        return parent::getCommonCacheDir() . '/' . $this->config;
     }
 }

@@ -11,6 +11,7 @@
     -->
 
     <services>
+        <!-- Sulu Integration -->
         <service id="sulu_article.article_admin" class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Admin\ArticleAdmin">
             <!-- @internal this service is internal and should not be used by your project -->
 
@@ -21,6 +22,20 @@
 
             <tag name="sulu.context" context="admin"/>
             <tag name="sulu.admin" />
+        </service>
+
+        <!-- Repositories -->
+        <service id="sulu_article.article_repository" class="Sulu\Bundle\ArticleBundle\Infrastructure\Doctrine\Repository\ArticleRepository">
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="sulu_content.dimension_content_query_enhancer"/>
+        </service>
+
+        <service id="Sulu\Bundle\ArticleBundle\Domain\Repository\ArticleRepositoryInterface" class="sulu_article.article_repository" />
+
+        <!-- Controllers -->
+        <service id="sulu_article.admin_article_controller" class="Sulu\Bundle\ArticleBundle\UserInterface\Controller\Admin\ArticleController" public="true">
+            <argument type="service" id="sulu_article.article_repository" />
+            <argument type="service" id="fos_rest.view_handler" />
         </service>
     </services>
 </container>
