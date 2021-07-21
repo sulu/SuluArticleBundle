@@ -82,12 +82,12 @@ class ArticleController extends RestController implements ClassResourceInterface
                 ->setSortField('authorFullName.raw')
                 ->build(),
             'created' => ElasticSearchFieldDescriptor::create('created', 'public.created')
-                ->setSortField('authored')
+                ->setSortField('created')
                 ->setType('datetime')
                 ->setDisabled(true)
                 ->build(),
             'changed' => ElasticSearchFieldDescriptor::create('changed', 'public.changed')
-                ->setSortField('authored')
+                ->setSortField('changed')
                 ->setType('datetime')
                 ->setDisabled(true)
                 ->build(),
@@ -211,6 +211,10 @@ class ArticleController extends RestController implements ClassResourceInterface
         ) {
             $search->addSort(
                 new FieldSort($sortField, $restHelper->getSortOrder())
+            );
+        } else {
+            $search->addSort(
+                new FieldSort('created', 'ASC')
             );
         }
 
