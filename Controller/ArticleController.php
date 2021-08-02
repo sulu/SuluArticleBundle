@@ -171,12 +171,12 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 ->setSortField('authorFullName.raw')
                 ->build(),
             'created' => ElasticSearchFieldDescriptor::create('created', 'public.created')
-                ->setSortField('authored')
+                ->setSortField('created')
                 ->setType('datetime')
                 ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
             'changed' => ElasticSearchFieldDescriptor::create('changed', 'public.changed')
-                ->setSortField('authored')
+                ->setSortField('changed')
                 ->setType('datetime')
                 ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
                 ->build(),
@@ -298,6 +298,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         ) {
             $search->addSort(
                 new FieldSort($sortField, $this->restHelper->getSortOrder())
+            );
+        } else {
+            $search->addSort(
+                new FieldSort('created', 'ASC')
             );
         }
 
