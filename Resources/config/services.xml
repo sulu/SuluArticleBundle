@@ -273,6 +273,7 @@
             <argument type="service" id="request_stack"/>
             <argument type="service" id="sulu.repository.route"/>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="sulu_article.routing.default_provider"/>
 
             <tag name="jms_serializer.event_subscriber"/>
         </service>

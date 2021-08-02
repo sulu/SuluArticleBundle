@@ -17,7 +17,9 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
@@ -43,14 +45,28 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
      */
     private $webspaceManager;
 
+    /**
+     * @var ArticleRouteDefaultProvider|null
+     */
+    private $articleRouteDefaultsProvider;
+
     public function __construct(
         RequestStack $requestStack,
         RouteRepositoryInterface $routeRepository,
-        WebspaceManagerInterface $webspaceManager
+        WebspaceManagerInterface $webspaceManager,
+        ArticleRouteDefaultProvider $articleRouteDefaultsProvider = null
     ) {
         $this->requestStack = $requestStack;
         $this->routeRepository = $routeRepository;
         $this->webspaceManager = $webspaceManager;
+        $this->articleRouteDefaultsProvider = $articleRouteDefaultsProvider;
+
+        if (null === $this->articleRouteDefaultsProvider) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $articleRouteDefaultsProvider argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
     }
 
     /**
@@ -99,18 +115,35 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         foreach ($webspace->getAllLocalizations() as $localization) {
             $locale = $localization->getLocale();
             $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
-            $path = $route ? $route->getPath() : '/';
-            $alternate = (bool) $route;
+            $published = $this->isPublished($route);
+            $path = $route && $published ? $route->getPath() : '/';
 
             $urls[$locale] = $path;
             $localizations[$locale] = [
                 'locale' => $locale,
                 'url' => $this->webspaceManager->findUrlByResourceLocator($path, null, $locale),
-                'alternate' => $alternate,
+                'alternate' => $published,
             ];
         }
 
         $visitor->visitProperty(new StaticPropertyMetadata('', 'urls', $urls), $urls);
         $visitor->visitProperty(new StaticPropertyMetadata('', 'localizations', $localizations), $localizations);
+    }
+
+    private function isPublished(?RouteInterface $route): bool
+    {
+        if (!$route) {
+            return false;
+        }
+
+        if (null === $this->articleRouteDefaultsProvider) {
+            return true;
+        }
+
+        return $this->articleRouteDefaultsProvider->isPublished(
+            $route->getEntityClass(),
+            $route->getEntityId(),
+            $route->getLocale()
+        );
     }
 }
