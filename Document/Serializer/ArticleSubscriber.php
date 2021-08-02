@@ -129,10 +129,10 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $customizeWebspaceSettings = (null !== $article->getMainWebspace());
+        $hasCustomizedWebspaceSettings = $this->webspaceResolver->hasCustomizedWebspaceSettings($article);
         $visitor->visitProperty(
-            new StaticPropertyMetadata('', 'customizeWebspaceSettings', $customizeWebspaceSettings),
-            $customizeWebspaceSettings
+            new StaticPropertyMetadata('', 'customizeWebspaceSettings', $hasCustomizedWebspaceSettings),
+            $hasCustomizedWebspaceSettings
         );
         if ($article->getMainWebspace()) {
             return;
@@ -141,10 +141,10 @@ class ArticleSubscriber implements EventSubscriberInterface
         $mainWebspace = $this->webspaceResolver->resolveMainWebspace($article);
         $visitor->visitProperty(new StaticPropertyMetadata('', 'mainWebspace', $mainWebspace), $mainWebspace);
 
-        $additionalWebspace = $this->webspaceResolver->resolveAdditionalWebspaces($article);
+        $additionalWebspaces = $this->webspaceResolver->resolveAdditionalWebspaces($article);
         $visitor->visitProperty(
-            new StaticPropertyMetadata('', 'additionalWebspaces', $additionalWebspace),
-            $additionalWebspace
+            new StaticPropertyMetadata('', 'additionalWebspaces', $additionalWebspaces),
+            $additionalWebspaces
         );
     }
 
