@@ -166,6 +166,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($articleIds));
+        $search->setSize(\count($articleIds));
 
         $result = [];
         foreach ($repository->findDocuments($search) as $item) {
