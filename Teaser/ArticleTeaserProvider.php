@@ -166,6 +166,7 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($articleIds));
+        $search->setSize(\count($articleIds));
 
         $result = [];
         foreach ($repository->findDocuments($search) as $item) {
@@ -182,6 +183,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 $this->getAttributes($item)
             );
         }
+
+        $idPositions = array_flip($ids);
+        usort($result, function(Teaser $a, Teaser $b) use ($idPositions) {
+            return $idPositions[$a->getId()] - $idPositions[$b->getId()];
+        });
 
         return $result;
     }
