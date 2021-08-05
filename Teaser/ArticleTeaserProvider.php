@@ -184,6 +184,11 @@ class ArticleTeaserProvider implements TeaserProviderInterface
             );
         }
 
+        $idPositions = array_flip($ids);
+        usort($result, function(Teaser $a, Teaser $b) use ($idPositions) {
+            return $idPositions[$a->getId()] - $idPositions[$b->getId()];
+        });
+
         return $result;
     }
 
