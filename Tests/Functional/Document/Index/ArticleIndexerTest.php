@@ -67,7 +67,7 @@ class ArticleIndexerTest extends SuluTestCase
         $this->indexer->clear();
     }
 
-    public function testDeleteLocale()
+    public function testRemove()
     {
         $article = $this->createArticle(
             [
@@ -93,7 +93,73 @@ class ArticleIndexerTest extends SuluTestCase
 
         /** @var ArticleDocument $articleDocument */
         $articleDocument = $this->documentManager->find($article['id']);
-        $this->indexer->removeLocale($articleDocument, 'de');
+        $this->indexer->remove($articleDocument);
+        $this->indexer->flush();
+
+        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'de'));
+        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'en'));
+    }
+
+    public function testRemoveLocale()
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+
+        $secondLocale = 'de';
+
+        // now add second locale
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+
+        /** @var ArticleDocument $articleDocument */
+        $articleDocument = $this->documentManager->find($article['id']);
+        $this->indexer->remove($articleDocument, 'en');
+        $this->indexer->flush();
+
+        self::assertNotNull($this->findViewDocument($articleDocument->getUuid(), 'de'));
+        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'en'));
+    }
+
+    public function testReplaceWithGhostData()
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+
+        $secondLocale = 'de';
+
+        // now add second locale
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+
+        /** @var ArticleDocument $articleDocument */
+        $articleDocument = $this->documentManager->find($article['id']);
+        $this->indexer->replaceWithGhostData($articleDocument, 'de');
         $this->indexer->flush();
 
         $documentDE = $this->findViewDocument($articleDocument->getUuid(), 'de');
