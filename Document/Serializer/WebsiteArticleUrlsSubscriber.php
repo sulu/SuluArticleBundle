@@ -17,9 +17,9 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
-use Sulu\Bundle\RouteBundle\Model\RouteInterface;
+use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
@@ -46,24 +46,24 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
     private $webspaceManager;
 
     /**
-     * @var ArticleRouteDefaultProvider|null
+     * @var DocumentInspector|null
      */
-    private $articleRouteDefaultsProvider;
+    private $documentInspector;
 
     public function __construct(
         RequestStack $requestStack,
         RouteRepositoryInterface $routeRepository,
         WebspaceManagerInterface $webspaceManager,
-        ArticleRouteDefaultProvider $articleRouteDefaultsProvider = null
+        DocumentInspector $documentInspector = null
     ) {
         $this->requestStack = $requestStack;
         $this->routeRepository = $routeRepository;
         $this->webspaceManager = $webspaceManager;
-        $this->articleRouteDefaultsProvider = $articleRouteDefaultsProvider;
+        $this->documentInspector = $documentInspector;
 
-        if (null === $this->articleRouteDefaultsProvider) {
+        if (null === $this->documentInspector) {
             @\trigger_error(
-                'Instantiating the WebsiteArticleUrlsSubscriber without the $articleRouteDefaultsProvider argument is deprecated!',
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $documentInspector argument is deprecated!',
                 \E_USER_DEPRECATED
             );
         }
@@ -112,17 +112,27 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
 
         $urls = [];
         $localizations = [];
-        foreach ($webspace->getAllLocalizations() as $localization) {
-            $locale = $localization->getLocale();
-            $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
-            $published = $this->isPublished($route);
-            $path = $route && $published ? $route->getPath() : '/';
+        $publishedLocales = $this->getPublishedLocales($article, $webspace);
+
+        foreach ($this->getWebspaceLocales($webspace) as $locale) {
+            $published = in_array($locale, $publishedLocales, true);
+            $path = '/';
+            $alternate = false;
+
+            if ($published) {
+                $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
+
+                if ($route) {
+                    $path = $route->getPath();
+                    $alternate = true;
+                }
+            }
 
             $urls[$locale] = $path;
             $localizations[$locale] = [
                 'locale' => $locale,
                 'url' => $this->webspaceManager->findUrlByResourceLocator($path, null, $locale),
-                'alternate' => $published,
+                'alternate' => $alternate,
             ];
         }
 
@@ -130,20 +140,29 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         $visitor->visitProperty(new StaticPropertyMetadata('', 'localizations', $localizations), $localizations);
     }
 
-    private function isPublished(?RouteInterface $route): bool
+    /**
+     * @return string[]
+     */
+    private function getWebspaceLocales(Webspace $webspace): array
     {
-        if (!$route) {
-            return false;
-        }
-
-        if (null === $this->articleRouteDefaultsProvider) {
-            return true;
-        }
-
-        return $this->articleRouteDefaultsProvider->isPublished(
-            $route->getEntityClass(),
-            $route->getEntityId(),
-            $route->getLocale()
+        return \array_map(
+            function(Localization $localization) {
+                return $localization->getLocale();
+            },
+            $webspace->getAllLocalizations()
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getPublishedLocales(ArticleDocument $article, Webspace $webspace): array
+    {
+        if (null === $this->documentInspector) {
+            // BC layer
+            return $this->getWebspaceLocales($webspace);
+        }
+
+        return $this->documentInspector->getPublishedLocales($article);
     }
 }

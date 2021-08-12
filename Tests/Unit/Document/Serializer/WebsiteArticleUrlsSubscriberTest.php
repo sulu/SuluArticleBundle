@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Serializer\WebsiteArticleUrlsSubscriber;
-use Sulu\Bundle\ArticleBundle\Routing\ArticleRouteDefaultProvider;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepository;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\RouteBundle\Model\RouteInterface;
@@ -48,9 +48,9 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
     private $webspaceManager;
 
     /**
-     * @var ArticleRouteDefaultProvider
+     * @var DocumentInspector
      */
-    private $articleRouteDefaultsProvider;
+    private $documentInspector;
 
     /**
      * @var WebsiteArticleUrlsSubscriber
@@ -65,13 +65,13 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $this->requestStack = $this->prophesize(RequestStack::class);
         $this->routeRepository = $this->prophesize(RouteRepository::class);
         $this->webspaceManager = $this->prophesize(WebspaceManagerInterface::class);
-        $this->articleRouteDefaultsProvider = $this->prophesize(ArticleRouteDefaultProvider::class);
+        $this->documentInspector = $this->prophesize(DocumentInspector::class);
 
         $this->urlsSubscriber = new WebsiteArticleUrlsSubscriber(
             $this->requestStack->reveal(),
             $this->routeRepository->reveal(),
             $this->webspaceManager->reveal(),
-            $this->articleRouteDefaultsProvider->reveal()
+            $this->documentInspector->reveal()
         );
 
         $webspace = new Webspace();
@@ -101,23 +101,17 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
 
         $entityClass = get_class($article->reveal());
 
+        $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['en', 'de']);
+
         $deRoute = $this->prophesize(RouteInterface::class);
         $deRoute->getPath()->willReturn('/seite');
-        $deRoute->getEntityClass()->willReturn($entityClass);
-        $deRoute->getEntityId()->willReturn($entityId);
-        $deRoute->getLocale()->willReturn('de');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
         $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'de')->willReturn(true);
 
         $enRoute = $this->prophesize(RouteInterface::class);
         $enRoute->getPath()->willReturn('/page');
-        $enRoute->getEntityClass()->willReturn($entityClass);
-        $enRoute->getEntityId()->willReturn($entityId);
-        $enRoute->getLocale()->willReturn('en');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn($enRoute->reveal());
         $this->webspaceManager->findUrlByResourceLocator('/page', null, 'en')->willReturn('http://sulu.io/page');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'en')->willReturn(true);
 
         $visitor->visitProperty(
             Argument::that(function(StaticPropertyMetadata $metadata) {
@@ -139,7 +133,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $this->urlsSubscriber->addUrlsOnPostSerialize($event->reveal());
     }
 
-    public function testAddUrlsOnPostSerializeNonExistLocale()
+    public function testAddUrlsOnPostSerializeNonExistingRoute()
     {
         $article = $this->prophesize(ArticleDocument::class);
         $visitor = $this->prophesize(SerializationVisitorInterface::class);
@@ -157,23 +151,17 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
 
         $entityClass = get_class($article->reveal());
 
+        $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['en', 'de']);
+
         $deRoute = $this->prophesize(RouteInterface::class);
         $deRoute->getPath()->willReturn('/seite');
-        $deRoute->getEntityClass()->willReturn($entityClass);
-        $deRoute->getEntityId()->willReturn($entityId);
-        $deRoute->getLocale()->willReturn('de');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
         $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'de')->willReturn(true);
 
         $enRoute = $this->prophesize(RouteInterface::class);
         $enRoute->getPath()->willReturn('/page');
-        $enRoute->getEntityClass()->willReturn($entityClass);
-        $enRoute->getEntityId()->willReturn($entityId);
-        $enRoute->getLocale()->willReturn('en');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn(null);
         $this->webspaceManager->findUrlByResourceLocator('/', null, 'en')->willReturn('http://sulu.io/');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'en')->shouldNotBeCalled();
 
         $visitor->visitProperty(
             Argument::that(function(StaticPropertyMetadata $metadata) {
@@ -213,23 +201,15 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
 
         $entityClass = get_class($article->reveal());
 
+        $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['de']);
+
         $deRoute = $this->prophesize(RouteInterface::class);
         $deRoute->getPath()->willReturn('/seite');
-        $deRoute->getEntityClass()->willReturn($entityClass);
-        $deRoute->getEntityId()->willReturn($entityId);
-        $deRoute->getLocale()->willReturn('de');
         $this->routeRepository->findByEntity($entityClass, $entityId, 'de')->willReturn($deRoute->reveal());
         $this->webspaceManager->findUrlByResourceLocator('/seite', null, 'de')->willReturn('http://sulu.io/de/seite');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'de')->willReturn(true);
 
-        $enRoute = $this->prophesize(RouteInterface::class);
-        $enRoute->getPath()->willReturn('/page');
-        $enRoute->getEntityClass()->willReturn($entityClass);
-        $enRoute->getEntityId()->willReturn($entityId);
-        $enRoute->getLocale()->willReturn('en');
-        $this->routeRepository->findByEntity($entityClass, $entityId, 'en')->willReturn($enRoute->reveal());
+        $this->routeRepository->findByEntity(Argument::any())->shouldNotBeCalled();
         $this->webspaceManager->findUrlByResourceLocator('/', null, 'en')->willReturn('http://sulu.io/');
-        $this->articleRouteDefaultsProvider->isPublished($entityClass, $entityId, 'en')->willReturn(false);
 
         $visitor->visitProperty(
             Argument::that(function(StaticPropertyMetadata $metadata) {
