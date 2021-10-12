@@ -137,7 +137,7 @@ class ArticleAdmin extends Admin
 
         $hasArticleTypeWithEditPermissions = false;
         foreach ($this->getTypes() as $typeKey => $typeConfig) {
-            if (!$this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::EDIT)) {
+            if (!$this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::EDIT)) {
                 continue;
             }
 
@@ -180,7 +180,7 @@ class ArticleAdmin extends Admin
         );
 
         foreach ($this->getTypes() as $typeKey => $typeConfig) {
-            if (!$this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::EDIT)) {
+            if (!$this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::EDIT)) {
                 continue;
             }
 
@@ -189,12 +189,12 @@ class ArticleAdmin extends Admin
             $listToolbarActions = [];
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::ADD)
-                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::ADD)) {
+                && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::ADD)) {
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.add');
             }
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::LIVE)
-                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::LIVE)) {
+                && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::LIVE)) {
                 $formToolbarActionsWithoutType[] = new ToolbarAction('sulu_admin.save_with_publishing');
                 $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.save_with_publishing');
             } else {
@@ -205,7 +205,7 @@ class ArticleAdmin extends Admin
             $formToolbarActionsWithType[] = new ToolbarAction('sulu_admin.type');
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::DELETE)
-                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::DELETE)) {
+                && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::DELETE)) {
                 $formToolbarActionsWithType[] = new DropdownToolbarAction(
                     'sulu_admin.delete',
                     'su-trash-alt',
@@ -232,7 +232,7 @@ class ArticleAdmin extends Admin
             }
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::LIVE)
-                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::LIVE)) {
+                && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::LIVE)) {
                 $formToolbarActionsWithType[] = new DropdownToolbarAction(
                     'sulu_admin.edit',
                     'su-pen',
@@ -244,7 +244,7 @@ class ArticleAdmin extends Admin
             }
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::VIEW)
-                && $this->securityChecker->hasPermission(static::SECURITY_CONTEXT . '_' . $typeKey, PermissionTypes::VIEW)) {
+                && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::VIEW)) {
                 $listToolbarActions[] = new ToolbarAction('sulu_admin.export');
             }
 
@@ -420,7 +420,7 @@ class ArticleAdmin extends Admin
         $securityContext = [];
 
         foreach ($this->getTypes() as $typeKey => $type) {
-            $securityContext[static::SECURITY_CONTEXT . '_' . $typeKey] = [
+            $securityContext[static::getArticleSecurityContext($typeKey)] = [
                 PermissionTypes::VIEW,
                 PermissionTypes::ADD,
                 PermissionTypes::EDIT,
@@ -482,5 +482,15 @@ class ArticleAdmin extends Admin
         }
 
         return $this->articleTypeConfigurations[$type]['translation_key'];
+    }
+
+    /**
+     * Returns security context for pages in given webspace.
+     *
+     * @final
+     */
+    public static function getArticleSecurityContext(string $typeKey): string
+    {
+        return \sprintf('%s_%s', static::SECURITY_CONTEXT, $typeKey);
     }
 }
