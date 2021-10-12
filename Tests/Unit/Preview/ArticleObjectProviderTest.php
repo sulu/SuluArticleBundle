@@ -16,23 +16,32 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
+use Prophecy\Prophecy\ObjectProphecy;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider;
 use Sulu\Component\Content\Document\Structure\Structure;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
+use Sulu\Component\Content\Metadata\StructureMetadata;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 class ArticleObjectProviderTest extends TestCase
 {
     /**
-     * @var DocumentManagerInterface
+     * @var DocumentManagerInterface|ObjectProphecy
      */
     private $documentManager;
 
     /**
-     * @var SerializerInterface
+     * @var SerializerInterface|ObjectProphecy
      */
     private $serializer;
+
+    /**
+     * @var StructureMetadataFactoryInterface|ObjectProphecy
+     */
+    private $structureMetadataFactory;
 
     /**
      * @var ArticleObjectProvider
@@ -45,11 +54,13 @@ class ArticleObjectProviderTest extends TestCase
 
         $this->documentManager = $this->prophesize(DocumentManagerInterface::class);
         $this->serializer = $this->prophesize(SerializerInterface::class);
+        $this->structureMetadataFactory = $this->prophesize(StructureMetadataFactoryInterface::class);
 
         $this->provider = new ArticleObjectProvider(
             $this->documentManager->reveal(),
             $this->serializer->reveal(),
-            ArticleDocument::class
+            ArticleDocument::class,
+            $this->structureMetadataFactory->reveal()
         );
     }
 
@@ -192,6 +203,42 @@ class ArticleObjectProviderTest extends TestCase
                 '{"pageNumber":2,"object":"{\"title\": \"test\"}"}',
                 get_class($object->reveal())
             )
+        );
+    }
+
+    public function testGetSecurityContext(): void
+    {
+        $metadata = $this->prophesize(StructureMetadata::class);
+        $metadata->hasTag(ArticleAdmin::STRUCTURE_TAG_TYPE)->willReturn(true);
+        $metadata->getTag(ArticleAdmin::STRUCTURE_TAG_TYPE)->willReturn([
+            'attributes' => ['type' => 'test-type'],
+        ]);
+
+        $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn($metadata->reveal());
+
+        $object = $this->prophesize(ArticleDocument::class);
+        $object->getStructureType()->willReturn('default');
+        $this->documentManager->find('123-123-213', 'en', Argument::any())
+            ->willReturn($object->reveal());
+
+        $this->assertSame(
+            ArticleAdmin::getArticleSecurityContext('test-type'),
+            $this->provider->getSecurityContext('123-123-213', 'en')
+        );
+    }
+
+    public function testGetSecurityContextNoMetadata(): void
+    {
+        $this->structureMetadataFactory->getStructureMetadata('article', 'default')->willReturn(null);
+
+        $object = $this->prophesize(ArticleDocument::class);
+        $object->getStructureType()->willReturn('default');
+        $this->documentManager->find('123-123-213', 'en', Argument::any())
+            ->willReturn($object->reveal());
+
+        $this->assertSame(
+            ArticleAdmin::SECURITY_CONTEXT,
+            $this->provider->getSecurityContext('123-123-213', 'en')
         );
     }
 }

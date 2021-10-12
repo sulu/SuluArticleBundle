@@ -14,9 +14,12 @@ namespace Sulu\Bundle\ArticleBundle\Preview;
 use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
+use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Bundle\PreviewBundle\Preview\Object\PreviewObjectProviderInterface;
+use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -25,6 +28,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class ArticleObjectProvider implements PreviewObjectProviderInterface
 {
+    use StructureTagTrait;
+
     /**
      * @var DocumentManagerInterface
      */
@@ -40,14 +45,21 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
      */
     private $articleDocumentClass;
 
+    /**
+     * @var StructureMetadataFactoryInterface
+     */
+    private $structureMetadataFactory;
+
     public function __construct(
         DocumentManagerInterface $documentManager,
         SerializerInterface $serializer,
-        string $articleDocumentClass
+        string $articleDocumentClass,
+        StructureMetadataFactoryInterface $structureMetadataFactory
     ) {
         $this->documentManager = $documentManager;
         $this->serializer = $serializer;
         $this->articleDocumentClass = $articleDocumentClass;
+        $this->structureMetadataFactory = $structureMetadataFactory;
     }
 
     /**
@@ -167,5 +179,31 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
         $object = $children[$result['pageNumber'] - 2];
 
         return $object;
+    }
+
+    public function getSecurityContext($id, $locale): ?string
+    {
+        /** @var ArticleDocument $object */
+        $object = $this->getObject($id, $locale);
+        $articleType = $this->getArticleType($object);
+        if (!$articleType) {
+            return ArticleAdmin::SECURITY_CONTEXT;
+        }
+
+        return ArticleAdmin::getArticleSecurityContext($articleType);
+    }
+
+    private function getArticleType(ArticleDocument $articleDocument): ?string
+    {
+        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
+            'article',
+            $articleDocument->getStructureType()
+        );
+
+        if (!$structureMetadata) {
+            return null;
+        }
+
+        return $this->getType($structureMetadata);
     }
 }

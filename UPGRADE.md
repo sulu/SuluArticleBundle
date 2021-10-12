@@ -1,5 +1,11 @@
 # Upgrade
 
+## 2.3.0
+
+### Changed constructor of ArticleObjectProvider
+
+Added `StructureMetadataFactoryInterface $structureMetadataFactory` to constructor of `Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider`.
+
 ## 2.2.0
 
 ### Index mapping changed
