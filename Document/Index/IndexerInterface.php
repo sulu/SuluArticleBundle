@@ -16,6 +16,8 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 
 /**
  * Interface for article-indexer.
+ *
+ * @method void remove(ArticleDocument $document, ?string $locale)
  */
 interface IndexerInterface
 {
@@ -38,12 +40,18 @@ interface IndexerInterface
     /**
      * Removes document from index.
      */
-    public function remove(ArticleDocument $document): void;
+    public function remove(ArticleDocument $document/*, ?string $locale = null*/): void;
 
     /**
-     * Removes specific document locale from the index.
+     * @deprecated
+     * @see IndexerInterface::replaceWithGhostData
      */
     public function removeLocale(ArticleDocument $document, string $locale): void;
+
+    /**
+     * Reindexes the document in given locale with the data of the originalLocale.
+     */
+    public function replaceWithGhostData(ArticleDocument $document, string $locale): void;
 
     /**
      * Flushes index.

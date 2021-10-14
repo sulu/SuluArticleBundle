@@ -26,6 +26,7 @@ use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
 use Sulu\Bundle\ArticleBundle\Event\IndexEvent;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
+use Sulu\Bundle\ContactBundle\Entity\Contact;
 use Sulu\Bundle\ContactBundle\Entity\ContactRepository;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\PageTree\PageTreeTrait;
@@ -187,8 +188,11 @@ class ArticleIndexer implements IndexerInterface
         $article->setCreated($document->getCreated());
         $article->setAuthored($document->getAuthored());
         if ($document->getAuthor() && $author = $this->contactRepository->find($document->getAuthor())) {
-            $article->setAuthorFullName($author->getFullName());
             $article->setAuthorId($author->getId());
+
+            if ($author instanceof Contact) {
+                $article->setAuthorFullName($author->getFullName());
+            }
         }
         if ($document->getChanger() && $changer = $this->userManager->getUserById($document->getChanger())) {
             $article->setChangerFullName($changer->getFullName());
@@ -410,18 +414,36 @@ class ArticleIndexer implements IndexerInterface
     /**
      * {@inheritdoc}
      */
-    public function remove(ArticleDocument $document): void
+    public function remove(ArticleDocument $document/*, ?string $locale = null*/): void
     {
+        $locale = func_num_args() >= 2 ? func_get_arg(1) : null;
+
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
             ->addQuery(new TermQuery('uuid', $document->getUuid()))
             ->setSize(1000);
+
+        if ($locale) {
+            $search->addQuery(new TermQuery('locale', $locale));
+        }
+
         foreach ($repository->findDocuments($search) as $viewDocument) {
             $this->manager->remove($viewDocument);
         }
     }
 
+    /**
+     * @deprecated
+     * @see ArticleIndexer::replaceWithGhostData
+     */
     public function removeLocale(ArticleDocument $document, string $locale): void
+    {
+        @trigger_error('Calling ArticleIndexer::removeLocale() is deprecated and will be removed in future. Use ArticleIndexer::replaceWithGhostData() instead.', \E_USER_DEPRECATED);
+
+        $this->replaceWithGhostData($document, $locale);
+    }
+
+    public function replaceWithGhostData(ArticleDocument $document, string $locale): void
     {
         // overwrite removed locale with properties from original locale
         $article = $this->createOrUpdateArticle($document, $locale);

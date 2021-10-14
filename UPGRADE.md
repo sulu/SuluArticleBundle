@@ -11,6 +11,12 @@ of the new `experimental` storage. If you update you need to require the bundle 
 composer require "handcraftedinthealps/elasticsearch-bundle:^5.2"
 ```
 
+## 2.3.0
+
+### Changed constructor of ArticleObjectProvider
+
+Added `StructureMetadataFactoryInterface $structureMetadataFactory` to constructor of `Sulu\Bundle\ArticleBundle\Preview\ArticleObjectProvider`.
+
 ## 2.2.0
 
 ### Index mapping changed

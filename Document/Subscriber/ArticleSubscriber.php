@@ -420,7 +420,8 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->liveIndexer->remove($document);
+        /** @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3779 */
+        $this->liveIndexer->remove($document, $event->getLocale());
         $this->liveIndexer->flush();
 
         $this->indexer->setUnpublished($document->getUuid(), $event->getLocale());
@@ -468,7 +469,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->indexer->removeLocale($document, $event->getLocale());
+        $this->indexer->replaceWithGhostData($document, $event->getLocale());
         $this->indexer->flush();
     }
 
@@ -498,7 +499,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->liveIndexer->removeLocale($document, $event->getLocale());
+        $this->liveIndexer->replaceWithGhostData($document, $event->getLocale());
         $this->liveIndexer->flush();
     }
 

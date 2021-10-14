@@ -383,6 +383,7 @@
             <argument type="service" id="sulu_document_manager.document_manager"/>
             <argument type="service" id="jms_serializer"/>
             <argument type="string">%sulu_article.article_document.class%</argument>
+            <argument type="service" id="sulu_page.structure.factory"/>
 
             <tag name="sulu_preview.object_provider" provider-key="articles"/>
         </service>
