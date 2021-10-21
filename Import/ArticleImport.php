@@ -182,7 +182,11 @@ class ArticleImport extends Import implements ArticleImportInterface
 
             // save document
             $this->documentManager->persist($document, $locale);
-            $this->documentManager->publish($document, $locale);
+            
+            if (2 == $data['workflowStage']['value']){
+                $this->documentManager->publish($document, $locale);
+            }
+
             $this->documentManager->flush();
             $this->documentRegistry->clear();
         } catch (\Exception $e) {
