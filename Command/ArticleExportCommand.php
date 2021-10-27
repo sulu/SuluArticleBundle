@@ -40,7 +40,7 @@ class ArticleExportCommand extends Command
         $this->addArgument('target', InputArgument::REQUIRED, 'export.xliff')
             ->addArgument('locale', InputArgument::REQUIRED)
             ->addOption('format', 'f', InputOption::VALUE_REQUIRED, '', '1.2.xliff')
-            ->setDescription('Export Articles');
+            ->setDescription('Export article translations from given language into xliff file for translating into a new language.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
