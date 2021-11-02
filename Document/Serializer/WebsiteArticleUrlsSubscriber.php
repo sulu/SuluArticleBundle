@@ -17,7 +17,12 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Component\DocumentManager\DocumentRegistry;
+use Sulu\Component\DocumentManager\Exception\DocumentNotFoundException;
+use Sulu\Component\DocumentManager\NodeManager;
+use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Sulu\Component\Webspace\Webspace;
@@ -43,14 +48,56 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
      */
     private $webspaceManager;
 
+    /**
+     * @var DocumentInspector|null
+     */
+    private $documentInspector;
+
+    /**
+     * @var DocumentRegistry|null
+     */
+    private $documentRegistry;
+
+    /**
+     * @var NodeManager|null
+     */
+    private $nodeManager;
+
     public function __construct(
         RequestStack $requestStack,
         RouteRepositoryInterface $routeRepository,
-        WebspaceManagerInterface $webspaceManager
+        WebspaceManagerInterface $webspaceManager,
+        DocumentInspector $documentInspector = null,
+        DocumentRegistry $documentRegistry = null,
+        NodeManager $nodeManager = null
     ) {
         $this->requestStack = $requestStack;
         $this->routeRepository = $routeRepository;
         $this->webspaceManager = $webspaceManager;
+        $this->documentInspector = $documentInspector;
+        $this->documentRegistry = $documentRegistry;
+        $this->nodeManager = $nodeManager;
+
+        if (null === $this->documentInspector) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $documentInspector argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
+
+        if (null === $this->documentRegistry) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $documentRegistry argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
+
+        if (null === $this->nodeManager) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $nodeManager argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
     }
 
     /**
@@ -96,11 +143,21 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
 
         $urls = [];
         $localizations = [];
-        foreach ($webspace->getAllLocalizations() as $localization) {
-            $locale = $localization->getLocale();
-            $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
-            $path = $route ? $route->getPath() : '/';
-            $alternate = (bool) $route;
+        $publishedLocales = $this->getPublishedLocales($article, $webspace);
+
+        foreach ($this->getWebspaceLocales($webspace) as $locale) {
+            $published = in_array($locale, $publishedLocales, true);
+            $path = '/';
+            $alternate = false;
+
+            if ($published) {
+                $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
+
+                if ($route) {
+                    $path = $route->getPath();
+                    $alternate = true;
+                }
+            }
 
             $urls[$locale] = $path;
             $localizations[$locale] = [
@@ -112,5 +169,45 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
 
         $visitor->visitProperty(new StaticPropertyMetadata('', 'urls', $urls), $urls);
         $visitor->visitProperty(new StaticPropertyMetadata('', 'localizations', $localizations), $localizations);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getWebspaceLocales(Webspace $webspace): array
+    {
+        return \array_map(
+            function(Localization $localization) {
+                return $localization->getLocale();
+            },
+            $webspace->getAllLocalizations()
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getPublishedLocales(ArticleDocument $document, Webspace $webspace): array
+    {
+        if (null === $this->documentInspector || null === $this->documentRegistry || null === $this->nodeManager) {
+            // BC layer
+            return $this->getWebspaceLocales($webspace);
+        }
+
+        // In the preview, the ArticleDocument is not registered in the DocumentRegistry, because this usually
+        // happens automatically when calling DocumentManager::find(), which is not done for the preview, but the
+        // DocumentInspector::getPublishedLocales() requires it to be registered.
+        // Therefore we need to register it manually in that case.
+        if (!$this->documentRegistry->hasDocument($document)) {
+            try {
+                $node = $this->nodeManager->find($document->getUuid());
+            } catch (DocumentNotFoundException $e) {
+                return [];
+            }
+
+            $this->documentRegistry->registerDocument($document, $node, $document->getLocale());
+        }
+
+        return $this->documentInspector->getPublishedLocales($document);
     }
 }
