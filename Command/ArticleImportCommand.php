@@ -52,7 +52,7 @@ class ArticleImportCommand extends Command
             ->addOption('format', 'f', InputOption::VALUE_REQUIRED, '', '1.2.xliff')
             ->addOption('uuid', 'u', InputOption::VALUE_REQUIRED)
             ->addOption('overrideSettings', 'o', InputOption::VALUE_NONE, 'Override Settings-Tab')
-            ->setDescription('Import Articles');
+            ->setDescription('Import article translations from xliff file into a specific language.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
