@@ -19,6 +19,9 @@ use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Component\DocumentManager\DocumentRegistry;
+use Sulu\Component\DocumentManager\Exception\DocumentNotFoundException;
+use Sulu\Component\DocumentManager\NodeManager;
 use Sulu\Component\Localization\Localization;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
 use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
@@ -50,20 +53,48 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
      */
     private $documentInspector;
 
+    /**
+     * @var DocumentRegistry|null
+     */
+    private $documentRegistry;
+
+    /**
+     * @var NodeManager|null
+     */
+    private $nodeManager;
+
     public function __construct(
         RequestStack $requestStack,
         RouteRepositoryInterface $routeRepository,
         WebspaceManagerInterface $webspaceManager,
-        DocumentInspector $documentInspector = null
+        DocumentInspector $documentInspector = null,
+        DocumentRegistry $documentRegistry = null,
+        NodeManager $nodeManager = null
     ) {
         $this->requestStack = $requestStack;
         $this->routeRepository = $routeRepository;
         $this->webspaceManager = $webspaceManager;
         $this->documentInspector = $documentInspector;
+        $this->documentRegistry = $documentRegistry;
+        $this->nodeManager = $nodeManager;
 
         if (null === $this->documentInspector) {
             @\trigger_error(
                 'Instantiating the WebsiteArticleUrlsSubscriber without the $documentInspector argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
+
+        if (null === $this->documentRegistry) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $documentRegistry argument is deprecated!',
+                \E_USER_DEPRECATED
+            );
+        }
+
+        if (null === $this->nodeManager) {
+            @\trigger_error(
+                'Instantiating the WebsiteArticleUrlsSubscriber without the $nodeManager argument is deprecated!',
                 \E_USER_DEPRECATED
             );
         }
@@ -156,13 +187,27 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
     /**
      * @return string[]
      */
-    private function getPublishedLocales(ArticleDocument $article, Webspace $webspace): array
+    private function getPublishedLocales(ArticleDocument $document, Webspace $webspace): array
     {
-        if (null === $this->documentInspector) {
+        if (null === $this->documentInspector || null === $this->documentRegistry || null === $this->nodeManager) {
             // BC layer
             return $this->getWebspaceLocales($webspace);
         }
 
-        return $this->documentInspector->getPublishedLocales($article);
+        // In the preview, the ArticleDocument is not registered in the DocumentRegistry, because this usually
+        // happens automatically when calling DocumentManager::find(), which is not done for the preview, but the
+        // DocumentInspector::getPublishedLocales() requires it to be registered.
+        // Therefore we need to register it manually in that case.
+        if (!$this->documentRegistry->hasDocument($document)) {
+            try {
+                $node = $this->nodeManager->find($document->getUuid());
+            } catch (DocumentNotFoundException $e) {
+                return [];
+            }
+
+            $this->documentRegistry->registerDocument($document, $node, $document->getLocale());
+        }
+
+        return $this->documentInspector->getPublishedLocales($document);
     }
 }
