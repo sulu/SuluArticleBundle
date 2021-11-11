@@ -184,7 +184,7 @@ class ArticleImport extends Import implements ArticleImportInterface
             // save document
             $this->documentManager->persist($document, $locale);
 
-            if (WorkflowStage::PUBLISHED ===  ((int) $this->getParser($format)->getPropertyData('workflowStage', $data))) {
+            if (WorkflowStage::PUBLISHED === ((int) $this->getParser($format)->getPropertyData('workflowStage', $data))) {
                 $this->documentManager->publish($document, $locale);
             }
 
