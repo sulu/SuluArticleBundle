@@ -86,11 +86,11 @@
     },
     "scripts": {
         "bootstrap-test-environment": [
-            "Tests/Application/bin/adminconsole doctrine:database:drop --if-exists --force --env test",
-            "Tests/Application/bin/adminconsole doctrine:database:create --env test",
-            "Tests/Application/bin/adminconsole doctrine:schema:update --force --env test",
-            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=default --if-not-exists --env test",
-            "Tests/Application/bin/adminconsole ongr:es:index:create --manager=live --if-not-exists --env test"
+            "@php Tests/Application/bin/adminconsole doctrine:database:drop --if-exists --force --env test",
+            "@php Tests/Application/bin/adminconsole doctrine:database:create --env test",
+            "@php Tests/Application/bin/adminconsole doctrine:schema:update --force --env test",
+            "@php Tests/Application/bin/adminconsole ongr:es:index:create --manager=default --if-not-exists --env test",
+            "@php Tests/Application/bin/adminconsole ongr:es:index:create --manager=live --if-not-exists --env test"
         ],
         "lint": [
             "@phpstan",
@@ -105,29 +105,29 @@
             "Composer\\Config::disableProcessTimeout",
             "@phpunit"
         ],
-        "phpunit": "vendor/bin/phpunit",
+        "phpunit": "@php vendor/bin/phpunit",
         "phpstan": [
-            "Tests/Application/bin/adminconsole cache:warmup --env=dev",
-            "vendor/bin/phpstan analyse"
+            "@php Tests/Application/bin/adminconsole cache:warmup --env=dev",
+            "@php vendor/bin/phpstan analyse"
         ],
-        "php-cs": "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
-        "php-cs-fix": "vendor/bin/php-cs-fixer fix",
+        "php-cs": "@php vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
+        "php-cs-fix": "@php vendor/bin/php-cs-fixer fix",
         "lint-composer": "@composer validate --strict",
-        "lint-twig": "Tests/Application/bin/adminconsole lint:twig Resources/doc",
-        "lint-yaml": "Tests/Application/bin/adminconsole lint:yaml Resources/config Tests/Application/config",
+        "lint-twig": "@php Tests/Application/bin/adminconsole lint:twig Resources/doc",
+        "lint-yaml": "@php Tests/Application/bin/adminconsole lint:yaml Resources/config Tests/Application/config",
         "lint-container": [
-            "Tests/Application/bin/adminconsole lint:container --env dev",
-            "Tests/Application/bin/websiteconsole lint:container --env dev",
-            "Tests/Application/bin/adminconsole lint:container --env test",
-            "Tests/Application/bin/websiteconsole lint:container --env test",
-            "Tests/Application/bin/adminconsole lint:container --env stage",
-            "Tests/Application/bin/websiteconsole lint:container --env stage",
-            "Tests/Application/bin/adminconsole lint:container --env prod",
-            "Tests/Application/bin/websiteconsole lint:container --env prod"
+            "@php Tests/Application/bin/adminconsole lint:container --env dev",
+            "@php Tests/Application/bin/websiteconsole lint:container --env dev",
+            "@php Tests/Application/bin/adminconsole lint:container --env test",
+            "@php Tests/Application/bin/websiteconsole lint:container --env test",
+            "@php Tests/Application/bin/adminconsole lint:container --env stage",
+            "@php Tests/Application/bin/websiteconsole lint:container --env stage",
+            "@php Tests/Application/bin/adminconsole lint:container --env prod",
+            "@php Tests/Application/bin/websiteconsole lint:container --env prod"
         ],
         "lint-doctrine": [
-            "Tests/Application/bin/adminconsole doctrine:schema:validate --skip-sync",
-            "Tests/Application/bin/adminconsole doctrine:ensure-production-settings --env prod"
+            "@php Tests/Application/bin/adminconsole doctrine:schema:validate --skip-sync",
+            "@php Tests/Application/bin/adminconsole doctrine:ensure-production-settings --env prod"
         ]
     },
     "config": {

@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Component\Content\Compat\Structure\LegacyPropertyFactory;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Extension\ExportExtensionInterface;
 use Sulu\Component\Content\Extension\ExtensionInterface;
 use Sulu\Component\Content\Extension\ExtensionManagerInterface;
@@ -182,7 +183,11 @@ class ArticleImport extends Import implements ArticleImportInterface
 
             // save document
             $this->documentManager->persist($document, $locale);
-            $this->documentManager->publish($document, $locale);
+
+            if (WorkflowStage::PUBLISHED === ((int) $this->getParser($format)->getPropertyData('workflowStage', $data))) {
+                $this->documentManager->publish($document, $locale);
+            }
+
             $this->documentManager->flush();
             $this->documentRegistry->clear();
         } catch (\Exception $e) {
