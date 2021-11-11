@@ -43,7 +43,9 @@ class WebspaceResolver
             return reset($webspaces)->getKey();
         }
 
-        if ($document->getMainWebspace()) {
+        $hasCustomizedWebspaceSettings = $this->hasCustomizedWebspaceSettings($document);
+
+        if ($hasCustomizedWebspaceSettings) {
             return $document->getMainWebspace();
         }
 
@@ -59,11 +61,18 @@ class WebspaceResolver
             return [];
         }
 
-        if (null !== $document->getAdditionalWebspaces()) {
-            return $document->getAdditionalWebspaces();
+        $hasCustomizedWebspaceSettings = $this->hasCustomizedWebspaceSettings($document);
+
+        if ($hasCustomizedWebspaceSettings) {
+            return $document->getAdditionalWebspaces() ?? [];
         }
 
         return $this->webspaceSettingsConfigurationResolver->getDefaultAdditionalWebspacesForLocale($document->getOriginalLocale());
+    }
+
+    public function hasCustomizedWebspaceSettings(WebspaceBehavior $document): bool
+    {
+        return null !== $document->getMainWebspace();
     }
 
     /**
