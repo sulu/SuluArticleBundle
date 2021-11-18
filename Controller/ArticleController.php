@@ -326,6 +326,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->setScroll('1m');
         }
 
+        if (method_exists($search, 'setTrackTotalHits')) {
+            $search->setTrackTotalHits(true);
+        }
+
         $searchResult = $repository->findRaw($search);
         $result = [];
         foreach ($searchResult as $document) {
