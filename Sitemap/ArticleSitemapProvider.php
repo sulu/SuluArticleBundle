@@ -172,7 +172,9 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         }
 
         $search->addQuery($webspaceQuery);
-        $search->setTrackTotalHits(true);
+        if (method_exists($search, 'setTrackTotalHits')) {
+            $search->setTrackTotalHits(true);
+        }
 
         return $repository->findDocuments($search);
     }
