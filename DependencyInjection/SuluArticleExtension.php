@@ -305,6 +305,9 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         if (array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         }
+        if (\array_key_exists('SuluTrashBundle', $bundles)) {
+            $loader->load('services_trash.xml');
+        }
 
         $this->appendDefaultAuthor($config, $container);
         $this->appendArticlePageConfig($container);

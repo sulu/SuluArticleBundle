@@ -411,6 +411,16 @@ class ArticleDocument implements UuidBehavior,
     }
 
     /**
+     * @param int|null $userId
+     *
+     * @return void
+     */
+    public function setCreator($userId)
+    {
+        $this->creator = $userId;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getChanger()
@@ -424,6 +434,16 @@ class ArticleDocument implements UuidBehavior,
     public function getCreated()
     {
         return $this->created;
+    }
+
+    /**
+     * @param \DateTime $created
+     *
+     * @return void
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
     }
 
     /**

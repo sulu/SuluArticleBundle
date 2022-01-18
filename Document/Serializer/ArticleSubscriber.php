@@ -20,6 +20,7 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Resolver\WebspaceResolver;
+use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Metadata\StructureTagTrait;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
@@ -92,6 +93,11 @@ class ArticleSubscriber implements EventSubscriberInterface
                 'event' => Events::POST_SERIALIZE,
                 'format' => 'json',
                 'method' => 'addPageTitlePropertyNameOnPostSerialize',
+            ],
+            [
+                'event' => Events::POST_SERIALIZE,
+                'format' => 'json',
+                'method' => 'addRoutePathOnPostSerialize',
             ],
         ];
     }
@@ -197,6 +203,23 @@ class ArticleSubscriber implements EventSubscriberInterface
                 $propertyName
             );
         }
+    }
+
+    public function addRoutePathOnPostSerialize(ObjectEvent $event): void
+    {
+        $article = $event->getObject();
+        /** @var SerializationVisitorInterface $visitor */
+        $visitor = $event->getVisitor();
+
+        if (!($article instanceof ArticleDocument)) {
+            return;
+        }
+
+        // Sulu\Bundle\PageBundle\Serializer\Subscriber\StructureSubscriber serializes value of the structure
+        // unfortunately, this serializes the route path of the target locale in case of a shadow article
+        // we return the path of the source locale to prevent changing the route when the shadow article is modified
+        $routePath = $article->getRoutePath();
+        $visitor->visitProperty(new StaticPropertyMetadata('', RoutableSubscriber::ROUTE_FIELD, $routePath), $routePath);
     }
 
     /**
