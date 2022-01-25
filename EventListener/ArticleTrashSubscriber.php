@@ -19,6 +19,7 @@ use Sulu\Bundle\TrashBundle\Application\TrashManager\TrashManagerInterface;
 use Sulu\Component\DocumentManager\Event\ClearEvent;
 use Sulu\Component\DocumentManager\Event\FlushEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\RemoveLocaleEvent;
 use Sulu\Component\DocumentManager\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -57,6 +58,7 @@ final class ArticleTrashSubscriber implements EventSubscriberInterface
     {
         return [
             Events::REMOVE => ['storeArticleToTrash', 1024],
+            Events::REMOVE_LOCALE => ['storeArticleTranslationToTrash', 1024],
             Events::FLUSH => 'flushTrashItem',
             Events::CLEAR => 'clearPendingTrashItem',
         ];
@@ -71,6 +73,22 @@ final class ArticleTrashSubscriber implements EventSubscriberInterface
         }
 
         $this->trashManager->store(ArticleDocument::RESOURCE_KEY, $document);
+        $this->hasPendingTrashItem = true;
+    }
+
+    public function storeArticleTranslationToTrash(RemoveLocaleEvent $event): void
+    {
+        $document = $event->getDocument();
+
+        if (!$document instanceof ArticleDocument) {
+            return;
+        }
+
+        $this->trashManager->store(
+            ArticleDocument::RESOURCE_KEY,
+            $document,
+            ['locale' => $event->getLocale()]
+        );
         $this->hasPendingTrashItem = true;
     }
 

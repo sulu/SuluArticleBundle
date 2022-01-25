@@ -18,6 +18,7 @@ use Sulu\Bundle\ArticleBundle\Controller\ArticleController;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleRestoredEvent;
+use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleTranslationRestoredEvent;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
 use Sulu\Bundle\DocumentManagerBundle\Collector\DocumentDomainEventCollectorInterface;
 use Sulu\Bundle\TrashBundle\Application\RestoreConfigurationProvider\RestoreConfiguration;
@@ -80,8 +81,6 @@ final class ArticleTrashItemHandler implements
             'parentUuid' => $article->getParent()->getUuid(),
             'locales' => [],
         ];
-
-        // TODO: test removing only single translation
 
         $restoreType = isset($options['locale']) ? 'translation' : null;
         $locales = isset($options['locale']) ? [$options['locale']] : $this->documentInspector->getLocales($article);
@@ -179,7 +178,10 @@ final class ArticleTrashItemHandler implements
         }
 
         Assert::isInstanceOf($localizedArticle, ArticleDocument::class);
-        $this->documentDomainEventCollector->collect(new ArticleRestoredEvent($localizedArticle, $data));
+        $event = 'translation' === $trashItem->getRestoreType()
+            ? new ArticleTranslationRestoredEvent($localizedArticle, $trashItem->getRestoreOptions()['locale'], $data)
+            : new ArticleRestoredEvent($localizedArticle, $data);
+        $this->documentDomainEventCollector->collect($event);
         $this->documentManager->flush();
 
         return $localizedArticle;
