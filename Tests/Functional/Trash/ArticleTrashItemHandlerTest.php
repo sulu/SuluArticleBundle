@@ -15,6 +15,7 @@ use Sulu\Bundle\ArticleBundle\Controller\ArticleController;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Trash\ArticleTrashItemHandler;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Bundle\TrashBundle\SuluTrashBundle;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 
 class ArticleTrashItemHandlerTest extends SuluTestCase
@@ -33,6 +34,10 @@ class ArticleTrashItemHandlerTest extends SuluTestCase
     {
         static::purgeDatabase();
         static::initPhpcr();
+
+        if (!class_exists(SuluTrashBundle::class)) {
+            $this->markTestSkipped('SuluTrashBundle does not exist in Sulu <2.4');
+        }
 
         $this->documentManager = static::getContainer()->get('sulu_document_manager.document_manager');
         $this->articleTrashItemHandler = static::getContainer()->get('sulu_article.article_trash_item_handler');
