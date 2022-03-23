@@ -64,7 +64,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
 
         if ($document instanceof BasePageDocument && $document->getResourceSegment()) {
             // the selected data-source could be removed
-            $search->addQuery(new PrefixQuery('route_path.raw', $document->getResourceSegment()));
+            $search->addQuery(new PrefixQuery('route_path.raw', $document->getResourceSegment() . '/'));
         }
 
         return $search;
