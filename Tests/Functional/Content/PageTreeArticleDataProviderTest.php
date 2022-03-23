@@ -51,7 +51,9 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
     public function testFilterByDataSource()
     {
         $page1 = $this->createPage('Test Page', '/page-1');
-        $page2 = $this->createPage('Test Page', '/page-2');
+
+        // Tests additionally that the trailing slash in the prefix query is there
+        $page2 = $this->createPage('Test Page', '/page-1-1');
 
         $articles = [
             $this->createArticle($page1, 'Test 1'),
