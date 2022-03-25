@@ -58,6 +58,18 @@ jobs:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
+                    - php-version: '8.1'
+                      elasticsearch-version: '8.0.1'
+                      elasticsearch-package-constraint: '^8.0'
+                      phpcr-transport: jackrabbit
+                      dependency-versions: 'highest'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      lint: false
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
+
         services:
             mysql:
                 image: mysql:5.7
