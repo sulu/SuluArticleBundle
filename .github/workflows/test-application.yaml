@@ -6,7 +6,6 @@ on:
         branches:
             - '[0-9]+.x'
             - '[0-9]+.[0-9]+'
-
 jobs:
     test:
         name: "PHP ${{ matrix.php-version }} (elasticsearch ${{ matrix.elasticsearch-version }}, ${{ matrix.phpcr-transport }}, ${{ matrix.dependency-versions }})"
@@ -15,6 +14,7 @@ jobs:
         env:
             DATABASE_URL: mysql://root:root@127.0.0.1:3306/sulu_test?serverVersion=5.7
             PHPCR_TRANSPORT: ${{ matrix.phpcr-transport }}
+            COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
         strategy:
             fail-fast: false
