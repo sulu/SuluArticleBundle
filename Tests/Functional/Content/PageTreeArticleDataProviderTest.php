@@ -50,22 +50,33 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
 
     public function testFilterByDataSource()
     {
-        $page1 = $this->createPage('Test Page', '/page-1');
-
-        // Tests additionally that the trailing slash in the prefix query is there
-        $page2 = $this->createPage('Test Page', '/page-1-1');
+        $page1 = $this->createPage('Test Page 1', '/page-1');
+        $page2 = $this->createPage('Test Page 2', '/page-1/page-2');
+        $page3 = $this->createPage('Test Page 3', '/page-1-1');
 
         $articles = [
             $this->createArticle($page1, 'Test 1'),
             $this->createArticle($page2, 'Test 2'),
+            $this->createArticle($page3, 'Test 3'),
         ];
 
         $dataProvider = $this->getContainer()->get('sulu_article.content.page_tree_data_provider');
-        $result = $dataProvider->resolveDataItems(['dataSource' => $page1->getUuid()], [], ['locale' => 'de']);
 
+        $result = $dataProvider->resolveDataItems(['dataSource' => $page1->getUuid()], [], ['locale' => 'de']);
         $this->assertInstanceOf(DataProviderResult::class, $result);
         $this->assertCount(1, $result->getItems());
         $this->assertEquals($articles[0]['id'], $result->getItems()[0]->getId());
+
+        $result = $dataProvider->resolveDataItems(['dataSource' => $page1->getUuid(), 'includeSubFolders' => false], [], ['locale' => 'de']);
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(1, $result->getItems());
+        $this->assertEquals($articles[0]['id'], $result->getItems()[0]->getId());
+
+        $result = $dataProvider->resolveDataItems(['dataSource' => $page1->getUuid(), 'includeSubFolders' => true], [], ['locale' => 'de']);
+        $this->assertInstanceOf(DataProviderResult::class, $result);
+        $this->assertCount(2, $result->getItems());
+        $this->assertEquals($articles[0]['id'], $result->getItems()[0]->getId());
+        $this->assertEquals($articles[1]['id'], $result->getItems()[1]->getId());
     }
 
     public function testSortByTitle()
