@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use ONGR\ElasticsearchDSL\Query\TermLevel\PrefixQuery;
+use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use ONGR\ElasticsearchDSL\Search;
 use Sulu\Bundle\PageBundle\Document\BasePageDocument;
 use Sulu\Component\SmartContent\DatasourceItem;
@@ -62,10 +63,19 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
 
         $document = $this->documentManager->find($filters['dataSource'], $locale);
 
-        if ($document instanceof BasePageDocument && $document->getResourceSegment()) {
-            // the selected data-source could be removed
-            $search->addQuery(new PrefixQuery('route_path.raw', $document->getResourceSegment() . '/'));
+        if (!$document instanceof BasePageDocument || !$document->getResourceSegment()) {
+            return $search;
         }
+
+        $includeSubFolders = $filters['includeSubFolders'] ?? null;
+
+        if (true === $includeSubFolders) {
+            $search->addQuery(new PrefixQuery('route_path.raw', rtrim($document->getResourceSegment(), '/') . '/'));
+
+            return $search;
+        }
+
+        $search->addQuery(new TermQuery('parent_page_uuid', $document->getUuid()));
 
         return $search;
     }
