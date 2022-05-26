@@ -115,7 +115,7 @@ class PageTreeRouteContentType extends SimpleContentType
         }
 
         $path = $this->getAttribute('path', $value, '');
-        $page = $this->getAttribute('page', $value, ['uuid' => null, 'path' => '/', 'webspace' => $webspaceKey]);
+        $page = $this->getAttribute('page', $value, null) ?? ['uuid' => null, 'path' => '/', 'webspace' => $webspaceKey];
 
         $suffix = $this->getAttribute('suffix', $value);
         if (!$suffix) {

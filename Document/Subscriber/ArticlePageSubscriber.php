@@ -160,6 +160,10 @@ class ArticlePageSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (WorkflowStage::TEST === $document->getParent()->getWorkflowStage()) {
+            return;
+        }
+
         $document->getParent()->setWorkflowStage(WorkflowStage::TEST);
         $this->documentManager->persist(
             $document->getParent(),
