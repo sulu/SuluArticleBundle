@@ -48,7 +48,9 @@
         "sulu/automation-bundle": "^2.0@dev",
         "symfony/browser-kit": "^4.3 || ^5.0",
         "symfony/dotenv": "^4.3 || ^5.0",
+        "symfony/framework-bundle": "^4.3 || ^5.0",
         "symfony/monolog-bundle": "^3.1",
+        "symfony/security-bundle": "^4.3 || ^5.0",
         "symfony/stopwatch": "^4.3 || ^5.0",
         "thecodingmachine/phpstan-strict-rules": "^0.12.0"
     },
