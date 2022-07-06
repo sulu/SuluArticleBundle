@@ -177,6 +177,7 @@ class ArticleAdmin extends Admin
 
         $viewCollection->add(
             $this->viewBuilderFactory->createTabViewBuilder(static::LIST_VIEW, '/articles')
+                ->addRouterAttributesToBlacklist(['active', 'filter', 'limit', 'page', 'search', 'sortColumn', 'sortOrder'])
         );
 
         foreach ($this->getTypes() as $typeKey => $typeConfig) {
@@ -295,6 +296,7 @@ class ArticleAdmin extends Admin
                     ->addLocales($locales)
                     ->setTitleProperty('title')
                     ->setBackView(static::LIST_VIEW . '_' . $typeKey)
+                    ->addRouterAttributesToBlacklist(['active', 'filter', 'limit', 'page', 'search', 'sortColumn', 'sortOrder'])
             );
             $viewCollection->add(
                 $this->viewBuilderFactory->createPreviewFormViewBuilder(static::EDIT_FORM_VIEW_DETAILS . '_' . $typeKey, '/details')
@@ -357,6 +359,7 @@ class ArticleAdmin extends Admin
                         ->setResourceKey(ArticleDocument::RESOURCE_KEY)
                         ->setTabTitle($this->versioningEnabled ? 'sulu_admin.activity_versions' : 'sulu_admin.activity')
                         ->setTitleProperty('')
+                        ->addRouterAttributesToBlacklist(['active', 'filter', 'limit', 'page', 'search', 'sortColumn', 'sortOrder'])
                         ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
                 );
 

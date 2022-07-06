@@ -43,7 +43,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
@@ -95,7 +95,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
             ->setPublic(true);
     }
 
-    protected function getKernelParameters()
+    protected function getKernelParameters(): array
     {
         $parameters = parent::getKernelParameters();
 
