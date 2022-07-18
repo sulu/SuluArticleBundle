@@ -36,6 +36,26 @@ sulu_route:
 This schema will be used for all articles which will be created in the future. Older articles
 will not be touched.
 
+### Overwrite route schema in template
+
+You can use a different `route_schema` for articles with a specific template by setting the 
+`route_schema` param of the `routePath` property in the template:
+
+```xml
+<property name="routePath" type="route">
+    <meta>
+        <title lang="en">Resourcelocator</title>
+        <title lang="de">Adresse</title>
+    </meta>
+
+    <params>
+        <param name="route_schema" value="/template-specific-prefix/{implode('-', object)}"/>
+    </params>
+
+    <tag name="sulu_article.article_route"/>
+</property>
+```
+
 ## Route Generation
 
 For the route generation this bundle provides two different ways and two different approaches.
