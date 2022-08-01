@@ -55,7 +55,7 @@ jobs:
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: false
-                      lint: true
+                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
@@ -68,7 +68,7 @@ jobs:
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: false
-                      lint: false
+                      lint: true
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'

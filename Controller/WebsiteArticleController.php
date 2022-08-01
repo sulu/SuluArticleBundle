@@ -205,7 +205,7 @@ class WebsiteArticleController extends AbstractController
         return $this->container->get('sulu_article.article_content_resolver');
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         $subscribedServices = parent::getSubscribedServices();
 
