@@ -53,7 +53,7 @@ class Version202005151141 implements VersionInterface, ContainerAwareInterface
 
             foreach ($node->getProperties() as $property) {
                 if (\is_string($property->getValue())) {
-                    $propertyValue = json_decode($property->getValue(), true);
+                    $propertyValue = \json_decode($property->getValue(), true);
                     if (\is_array($propertyValue) && \array_key_exists('items', $propertyValue)) {
                         foreach ($propertyValue['items'] as &$item) {
                             if (isset($item['type']) && 'article' === $item['type']) {
@@ -64,7 +64,7 @@ class Version202005151141 implements VersionInterface, ContainerAwareInterface
                             }
                         }
 
-                        $property->setValue(json_encode($propertyValue));
+                        $property->setValue(\json_encode($propertyValue));
                     }
                 }
             }
@@ -83,7 +83,7 @@ class Version202005151141 implements VersionInterface, ContainerAwareInterface
 
             foreach ($node->getProperties() as $property) {
                 if (\is_string($property->getValue())) {
-                    $propertyValue = json_decode($property->getValue(), true);
+                    $propertyValue = \json_decode($property->getValue(), true);
                     if (\is_array($propertyValue) && \array_key_exists('items', $propertyValue)) {
                         foreach ($propertyValue['items'] as &$item) {
                             if (isset($item['type']) && 'articles' === $item['type']) {
@@ -94,7 +94,7 @@ class Version202005151141 implements VersionInterface, ContainerAwareInterface
                             }
                         }
 
-                        $property->setValue(json_encode($propertyValue));
+                        $property->setValue(\json_encode($propertyValue));
                     }
                 }
             }

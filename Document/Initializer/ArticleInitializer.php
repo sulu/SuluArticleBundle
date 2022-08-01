@@ -47,9 +47,6 @@ class ArticleInitializer implements InitializerInterface
         $this->sessionManager = $sessionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(OutputInterface $output, $purge = false)
     {
         $nodeTypeManager = $this->sessionManager->getSession()->getWorkspace()->getNodeTypeManager();
@@ -58,9 +55,9 @@ class ArticleInitializer implements InitializerInterface
 
         $articlesPath = $this->pathBuilder->build(['%base%', '%articles%']);
         if (true === $this->nodeManager->has($articlesPath)) {
-            $output->writeln(sprintf('  [ ] <info>Articles path:</info>: %s ', $articlesPath));
+            $output->writeln(\sprintf('  [ ] <info>Articles path:</info>: %s ', $articlesPath));
         } else {
-            $output->writeln(sprintf('  [+] <info>Articles path:</info>: %s ', $articlesPath));
+            $output->writeln(\sprintf('  [+] <info>Articles path:</info>: %s ', $articlesPath));
             $this->nodeManager->createPath($articlesPath);
             $this->nodeManager->save();
         }

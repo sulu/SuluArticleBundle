@@ -44,8 +44,6 @@ class ArticleRouteGeneratorByType implements RouteGeneratorInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $entity
      */
     public function generate($entity, array $options)
@@ -54,18 +52,15 @@ class ArticleRouteGeneratorByType implements RouteGeneratorInterface
             $this->structureMetadataFactory->getStructureMetadata('article', $entity->getStructureType())
         );
 
-        if (!array_key_exists($type, $options)) {
-            throw new RouteSchemaNotFoundException($type, array_keys($options));
+        if (!\array_key_exists($type, $options)) {
+            throw new RouteSchemaNotFoundException($type, \array_keys($options));
         }
 
         return $this->routeGenerator->generate($entity, ['route_schema' => $options[$type]]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver(array $options)
     {
-        return (new OptionsResolver())->setDefined(array_keys($options));
+        return (new OptionsResolver())->setDefined(\array_keys($options));
     }
 }

@@ -49,33 +49,21 @@ class ArticleDataItem implements ItemInterface
         $this->resource = $resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResource()
     {
         return $this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getImage()
     {
         return;

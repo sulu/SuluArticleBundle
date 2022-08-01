@@ -28,9 +28,6 @@ class ArticleLinkProviderTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -54,7 +51,7 @@ class ArticleLinkProviderTest extends SuluTestCase
             $this->createAndPublishArticle(),
         ];
 
-        $uuids = array_map(
+        $uuids = \array_map(
             function(array $data) {
                 return $data['id'];
             },
@@ -79,7 +76,7 @@ class ArticleLinkProviderTest extends SuluTestCase
             $this->createAndPublishArticle(),
         ];
 
-        $uuids = array_map(
+        $uuids = \array_map(
             function(array $data) {
                 return $data['id'];
             },
@@ -108,7 +105,7 @@ class ArticleLinkProviderTest extends SuluTestCase
             $this->createArticle(),
         ];
 
-        $uuids = array_map(
+        $uuids = \array_map(
             function(array $data) {
                 return $data['id'];
             },
@@ -125,10 +122,10 @@ class ArticleLinkProviderTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     private function createAndPublishArticle($title = 'Test-Article', $template = 'default', $data = [])
@@ -136,9 +133,9 @@ class ArticleLinkProviderTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 }

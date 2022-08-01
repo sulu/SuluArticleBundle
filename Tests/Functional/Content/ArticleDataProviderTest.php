@@ -29,9 +29,6 @@ class ArticleDataProviderTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -300,7 +297,7 @@ class ArticleDataProviderTest extends SuluTestCase
 
     public function testResolveResourceItemsWithSegments()
     {
-        if (!class_exists(SegmentSelect::class)) {
+        if (!\class_exists(SegmentSelect::class)) {
             $this->markTestSkipped('Segments did not exist in Sulu <2.2.');
         }
 
@@ -633,6 +630,6 @@ class ArticleDataProviderTest extends SuluTestCase
         $response = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $response);
 
-        return json_decode($response->getContent(), true);
+        return \json_decode($response->getContent(), true);
     }
 }

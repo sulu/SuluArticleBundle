@@ -100,9 +100,6 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -146,12 +143,12 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
         $publishedLocales = $this->getPublishedLocales($article, $webspace);
 
         foreach ($this->getWebspaceLocales($webspace) as $locale) {
-            $published = in_array($locale, $publishedLocales, true);
+            $published = \in_array($locale, $publishedLocales, true);
             $path = '/';
             $alternate = false;
 
             if ($published) {
-                $route = $this->routeRepository->findByEntity(get_class($article), $article->getUuid(), $locale);
+                $route = $this->routeRepository->findByEntity(\get_class($article), $article->getUuid(), $locale);
 
                 if ($route) {
                     $path = $route->getPath();

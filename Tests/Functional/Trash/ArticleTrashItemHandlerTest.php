@@ -35,7 +35,7 @@ class ArticleTrashItemHandlerTest extends SuluTestCase
         static::purgeDatabase();
         static::initPhpcr();
 
-        if (!class_exists(SuluTrashBundle::class)) {
+        if (!\class_exists(SuluTrashBundle::class)) {
             $this->markTestSkipped('SuluTrashBundle does not exist in Sulu <2.4');
         }
 

@@ -90,9 +90,6 @@ class ArticleLinkProvider implements LinkProviderInterface
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration()
     {
         // TODO implement tabs again?
@@ -108,9 +105,6 @@ class ArticleLinkProvider implements LinkProviderInterface
             ->getLinkConfiguration();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preload(array $hrefs, $locale, $published = true)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -122,7 +116,7 @@ class ArticleLinkProvider implements LinkProviderInterface
 
         $search = new Search();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($hrefs, $locale)));
-        $search->setSize(count($hrefs));
+        $search->setSize(\count($hrefs));
 
         $repository = $this->liveManager->getRepository($this->articleViewClass);
         if (!$published) {

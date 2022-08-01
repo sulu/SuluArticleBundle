@@ -24,37 +24,31 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class Kernel extends SuluTestKernel implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
         $bundles[] = new ONGRElasticsearchBundle();
 
-        if ('extend' === getenv('ARTICLE_TEST_CASE')) {
+        if ('extend' === \getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();
         }
 
         return $bundles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         parent::registerContainerConfiguration($loader);
 
-        if ('jackrabbit' === getenv('PHPCR_TRANSPORT')) {
+        if ('jackrabbit' === \getenv('PHPCR_TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
 
         $loader->load(__DIR__ . '/config/config.yml');
         $type = 'default';
-        if (getenv('ARTICLE_TEST_CASE')) {
-            $type = getenv('ARTICLE_TEST_CASE');
+        if (\getenv('ARTICLE_TEST_CASE')) {
+            $type = \getenv('ARTICLE_TEST_CASE');
         }
 
         $loader->load(__DIR__ . '/config/config_' . $type . '.yml');

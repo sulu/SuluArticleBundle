@@ -35,11 +35,11 @@ class WebspaceSettingsConfigurationResolver
 
     public function getDefaultMainWebspaceForLocale(string $searchedLocale): string
     {
-        if (array_key_exists($searchedLocale, $this->defaultMainWebspace)) {
+        if (\array_key_exists($searchedLocale, $this->defaultMainWebspace)) {
             return $this->defaultMainWebspace[$searchedLocale];
         }
 
-        if (array_key_exists('default', $this->defaultMainWebspace)) {
+        if (\array_key_exists('default', $this->defaultMainWebspace)) {
             return $this->defaultMainWebspace['default'];
         }
 
@@ -48,11 +48,11 @@ class WebspaceSettingsConfigurationResolver
 
     public function getDefaultAdditionalWebspacesForLocale(string $searchedLocale): array
     {
-        if (array_key_exists($searchedLocale, $this->defaultAdditionalWebspaces)) {
+        if (\array_key_exists($searchedLocale, $this->defaultAdditionalWebspaces)) {
             return $this->defaultAdditionalWebspaces[$searchedLocale];
         }
 
-        if (array_key_exists('default', $this->defaultAdditionalWebspaces)) {
+        if (\array_key_exists('default', $this->defaultAdditionalWebspaces)) {
             return $this->defaultAdditionalWebspaces['default'];
         }
 

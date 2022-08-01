@@ -152,8 +152,8 @@ class ArticleIndexer implements IndexerInterface
      */
     private function getTypeTranslation(string $type): string
     {
-        if (!array_key_exists($type, $this->typeConfiguration)) {
-            return ucfirst($type);
+        if (!\array_key_exists($type, $this->typeConfiguration)) {
+            return \ucfirst($type);
         }
 
         $typeTranslationKey = $this->typeConfiguration[$type]['translation_key'];
@@ -226,10 +226,10 @@ class ArticleIndexer implements IndexerInterface
             $extensions = $extensions->toArray();
         }
 
-        if (array_key_exists('excerpt', $extensions)) {
+        if (\array_key_exists('excerpt', $extensions)) {
             $article->setExcerpt($this->excerptFactory->create($extensions['excerpt'], $document->getLocale()));
         }
-        if (array_key_exists('seo', $extensions)) {
+        if (\array_key_exists('seo', $extensions)) {
             $article->setSeo($this->seoFactory->create($extensions['seo']));
         }
         if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.description')) {
@@ -241,13 +241,13 @@ class ArticleIndexer implements IndexerInterface
         if ($structureMetadata->hasPropertyWithTagName('sulu.teaser.media')) {
             $mediaProperty = $structureMetadata->getPropertyByTagName('sulu.teaser.media');
             $mediaData = $document->getStructure()->getProperty($mediaProperty->getName())->getValue();
-            if (null !== $mediaData && array_key_exists('ids', $mediaData)) {
-                $article->setTeaserMediaId(reset($mediaData['ids']) ?: null);
+            if (null !== $mediaData && \array_key_exists('ids', $mediaData)) {
+                $article->setTeaserMediaId(\reset($mediaData['ids']) ?: null);
             }
         }
 
         $article->setContentFields($this->getContentFields($structureMetadata, $document));
-        $article->setContentData(json_encode($document->getStructure()->toArray()));
+        $article->setContentData(\json_encode($document->getStructure()->toArray()));
 
         $article->setMainWebspace($this->webspaceResolver->resolveMainWebspace($document));
         $article->setAdditionalWebspaces($this->webspaceResolver->resolveAdditionalWebspaces($document));
@@ -262,16 +262,16 @@ class ArticleIndexer implements IndexerInterface
         $tag = 'sulu.search.field';
         $contentFields = [];
         foreach ($structure->getProperties() as $property) {
-            if (method_exists($property, 'getComponents') && \count($property->getComponents()) > 0) {
+            if (\method_exists($property, 'getComponents') && \count($property->getComponents()) > 0) {
                 $blocks = $document->getStructure()->getProperty($property->getName())->getValue();
                 if (isset($blocks['hotspots'])) {
                     $blocks = $blocks['hotspots'];
                 }
-                $contentFields = array_merge($contentFields, $this->getBlockContentFieldsRecursive($blocks, $document, $property, $tag));
+                $contentFields = \array_merge($contentFields, $this->getBlockContentFieldsRecursive($blocks, $document, $property, $tag));
             } elseif ($property->hasTag($tag)) {
                 $value = $document->getStructure()->getProperty($property->getName())->getValue();
-                if (is_string($value) && '' !== $value) {
-                    $contentFields[] = strip_tags($value);
+                if (\is_string($value) && '' !== $value) {
+                    $contentFields[] = \strip_tags($value);
                 }
             }
         }
@@ -288,8 +288,8 @@ class ArticleIndexer implements IndexerInterface
         foreach ($blockMetaData->getComponents() as $component) {
             /** @var PropertyMetadata $componentProperty */
             foreach ($component->getChildren() as $componentProperty) {
-                if (method_exists($componentProperty, 'getComponents') && \count($componentProperty->getComponents()) > 0) {
-                    $filteredBlocks = array_filter($blocks, function($block) use ($component) {
+                if (\method_exists($componentProperty, 'getComponents') && \count($componentProperty->getComponents()) > 0) {
+                    $filteredBlocks = \array_filter($blocks, function($block) use ($component) {
                         return $block['type'] === $component->getName();
                     });
 
@@ -297,7 +297,7 @@ class ArticleIndexer implements IndexerInterface
                         if (isset($filteredBlock['hotspots'])) {
                             $filteredBlock = $filteredBlock['hotspots'];
                         }
-                        $contentFields = array_merge(
+                        $contentFields = \array_merge(
                             $contentFields,
                             $this->getBlockContentFieldsRecursive(
                                 $filteredBlock[$componentProperty->getName()],
@@ -317,7 +317,7 @@ class ArticleIndexer implements IndexerInterface
                     if ($block['type'] === $component->getName()) {
                         $blockValue = $block[$componentProperty->getName()];
                         if (\is_string($blockValue) && '' !== $blockValue) {
-                            $contentFields[] = strip_tags($blockValue);
+                            $contentFields[] = \strip_tags($blockValue);
                         }
                     }
                 }
@@ -376,7 +376,7 @@ class ArticleIndexer implements IndexerInterface
             $page->pageNumber = $child->getPageNumber();
             $page->title = $child->getPageTitle();
             $page->routePath = $child->getRoutePath();
-            $page->contentData = json_encode($child->getStructure()->toArray());
+            $page->contentData = \json_encode($child->getStructure()->toArray());
 
             $pages[] = $page;
         }
@@ -411,12 +411,9 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->remove($article);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function remove(ArticleDocument $document/*, ?string $locale = null*/): void
     {
-        $locale = func_num_args() >= 2 ? func_get_arg(1) : null;
+        $locale = \func_num_args() >= 2 ? \func_get_arg(1) : null;
 
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
         $search = $repository->createSearch()
@@ -438,7 +435,7 @@ class ArticleIndexer implements IndexerInterface
      */
     public function removeLocale(ArticleDocument $document, string $locale): void
     {
-        @trigger_error('Calling ArticleIndexer::removeLocale() is deprecated and will be removed in future. Use ArticleIndexer::replaceWithGhostData() instead.', \E_USER_DEPRECATED);
+        @\trigger_error('Calling ArticleIndexer::removeLocale() is deprecated and will be removed in future. Use ArticleIndexer::replaceWithGhostData() instead.', \E_USER_DEPRECATED);
 
         $this->replaceWithGhostData($document, $locale);
     }
@@ -452,17 +449,11 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->persist($article);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush(): void
     {
         $this->manager->commit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): void
     {
         $pageSize = 500;
@@ -484,9 +475,6 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->flush();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUnpublished(string $uuid, string $locale): ?ArticleViewDocumentInterface
     {
         $articleId = $this->getViewDocumentId($uuid, $locale);
@@ -504,9 +492,6 @@ class ArticleIndexer implements IndexerInterface
         return $article;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function index(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
@@ -545,7 +530,7 @@ class ArticleIndexer implements IndexerInterface
             return;
         }
 
-        foreach (array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
+        foreach (\array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
             try {
                 /** @var ArticleDocument $shadowDocument */
                 $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);
@@ -557,9 +542,6 @@ class ArticleIndexer implements IndexerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function dropIndex(): void
     {
         if (!$this->manager->indexExists()) {
@@ -569,9 +551,6 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->dropIndex();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createIndex(): void
     {
         if ($this->manager->indexExists()) {
@@ -581,9 +560,6 @@ class ArticleIndexer implements IndexerInterface
         $this->manager->createIndex();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDocumentInspector()
     {
         return $this->inspector;

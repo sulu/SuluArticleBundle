@@ -26,17 +26,11 @@ class DocumentFactory implements DocumentFactoryInterface
         $this->documents = $documents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(string $type): string
     {
         return $this->documents[$type]['view'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(string $type)
     {
         $class = $this->getClass($type);

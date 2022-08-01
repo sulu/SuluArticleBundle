@@ -304,17 +304,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         $this->uuid = $uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setId($id)
     {
         $this->id = $id;
@@ -322,17 +316,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUuid()
     {
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
@@ -340,17 +328,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
@@ -358,17 +340,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTitle($title)
     {
         $this->title = $title;
@@ -376,17 +352,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoutePath()
     {
         return $this->routePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoutePath($routePath)
     {
         $this->routePath = $routePath;
@@ -394,17 +364,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParentPageUuid()
     {
         return $this->parentPageUuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParentPageUuid($parentPageUuid)
     {
         $this->parentPageUuid = $parentPageUuid;
@@ -412,17 +376,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getType()
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setType($type)
     {
         $this->type = $type;
@@ -430,17 +388,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeTranslation()
     {
         return $this->typeTranslation;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTypeTranslation($typeTranslation)
     {
         $this->typeTranslation = $typeTranslation;
@@ -448,17 +400,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStructureType()
     {
         return $this->structureType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setStructureType($structureType)
     {
         $this->structureType = $structureType;
@@ -466,17 +412,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChangerFullName()
     {
         return $this->changerFullName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setChangerFullName($changerFullName)
     {
         $this->changerFullName = $changerFullName;
@@ -484,17 +424,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreatorFullName()
     {
         return $this->creatorFullName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCreatorFullName($creatorFullName)
     {
         $this->creatorFullName = $creatorFullName;
@@ -502,17 +436,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChanged()
     {
         return $this->changed;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setChanged($changed)
     {
         $this->changed = $changed;
@@ -520,17 +448,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreated()
     {
         return $this->created;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCreated($created)
     {
         $this->created = $created;
@@ -538,17 +460,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExcerpt()
     {
         return $this->excerpt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setExcerpt(ExcerptViewObject $excerpt)
     {
         $this->excerpt = $excerpt;
@@ -556,17 +472,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSeo()
     {
         return $this->seo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSeo(SeoViewObject $seo)
     {
         $this->seo = $seo;
@@ -574,17 +484,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthored()
     {
         return $this->authored;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthored(\DateTime $authored = null)
     {
         $this->authored = $authored;
@@ -592,17 +496,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthorFullName()
     {
         return $this->authorFullName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthorFullName($authorFullName)
     {
         $this->authorFullName = $authorFullName;
@@ -610,17 +508,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTeaserDescription()
     {
         return $this->teaserDescription;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTeaserDescription($teaserDescription)
     {
         $this->teaserDescription = $teaserDescription;
@@ -628,17 +520,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTeaserMediaId()
     {
         return $this->teaserMediaId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTeaserMediaId($teaserMediaId)
     {
         $this->teaserMediaId = $teaserMediaId;
@@ -646,17 +532,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublished()
     {
         return $this->published;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPublished(\DateTime $published = null)
     {
         $this->published = $published;
@@ -664,17 +544,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublishedState()
     {
         return $this->publishedState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPublishedState($publishedState)
     {
         $this->publishedState = $publishedState;
@@ -682,17 +556,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocalizationState()
     {
         return $this->localizationState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocalizationState(LocalizationStateViewObject $localizationState)
     {
         $this->localizationState = $localizationState;
@@ -700,9 +568,6 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthorId($authorId)
     {
         $this->authorId = $authorId;
@@ -710,17 +575,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthorId()
     {
         return $this->authorId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setCreatorContactId($creatorContactId)
     {
         $this->creatorContactId = $creatorContactId;
@@ -728,17 +587,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreatorContactId()
     {
         return $this->creatorContactId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setChangerContactId($changerContactId)
     {
         $this->changerContactId = $changerContactId;
@@ -746,25 +599,16 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChangerContactId()
     {
         return $this->changerContactId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPages()
     {
         return $this->pages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPages($pages)
     {
         $this->pages = $pages;
@@ -772,17 +616,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContentData()
     {
         return $this->contentData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setContentData($contentData)
     {
         $this->contentData = $contentData;
@@ -790,17 +628,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContent()
     {
         return $this->content;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setContent(\ArrayObject $content)
     {
         $this->content = $content;
@@ -808,17 +640,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getView()
     {
         return $this->view;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setView(\ArrayObject $view)
     {
         $this->view = $view;
@@ -826,17 +652,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMainWebspace()
     {
         return $this->mainWebspace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMainWebspace($mainWebspace)
     {
         $this->mainWebspace = $mainWebspace;
@@ -844,17 +664,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAdditionalWebspaces()
     {
         return $this->additionalWebspaces;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAdditionalWebspaces($additionalWebspace)
     {
         $this->additionalWebspaces = $additionalWebspace;
@@ -862,17 +676,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTargetWebspace()
     {
         return $this->targetWebspace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTargetWebspace($targetWebspace)
     {
         $this->targetWebspace = $targetWebspace;
@@ -880,17 +688,11 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContentFields(): array
     {
         return $this->contentFields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setContentFields(array $contentFields): ArticleViewDocumentInterface
     {
         $this->contentFields = $contentFields;

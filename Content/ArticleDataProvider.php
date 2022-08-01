@@ -107,9 +107,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration()
     {
         return $this->getConfigurationBuilder()->getConfiguration();
@@ -136,16 +133,13 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
                 ]
             );
 
-        if (method_exists($builder, 'enableTypes')) {
+        if (\method_exists($builder, 'enableTypes')) {
             $builder->enableTypes($this->getTypes());
         }
 
         return $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultPropertyParameter()
     {
         return [
@@ -154,9 +148,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveDataItems(
         array $filters,
         array $propertyParameter,
@@ -170,7 +161,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
         // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
         // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
-        $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
+        $filters['structureTypes'] = \array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
@@ -187,9 +178,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveResourceItems(
         array $filters,
         array $propertyParameter,
@@ -203,7 +191,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         // filtering by template-type is possible via the structureTypes xml param and the admin interface overlay
         // unfortunately, the admin frontend sends the selected types in $filters['types'] to the provider
         // TODO: adjust the naming of the xml params to be consistent consistent, but this will be a bc break
-        $filters['structureTypes'] = array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
+        $filters['structureTypes'] = \array_merge($filters['types'] ?? [], $this->getStructureTypesProperty($propertyParameter));
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
@@ -221,9 +209,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         return new DataProviderResult($result, $this->hasNextPage($queryResult, $limit, $page, $pageSize));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         return;
@@ -231,7 +216,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     private function getWebspaceKey(array $propertyParameter, array $options): ?string
     {
-        if (array_key_exists('ignoreWebspaces', $propertyParameter)) {
+        if (\array_key_exists('ignoreWebspaces', $propertyParameter)) {
             $value = $propertyParameter['ignoreWebspaces']->getValue();
 
             if (true === $value) {
@@ -239,7 +224,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             }
         }
 
-        if (array_key_exists('webspaceKey', $options)) {
+        if (\array_key_exists('webspaceKey', $options)) {
             return $options['webspaceKey'];
         }
 
@@ -279,8 +264,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
         $this->addPagination($search, $pageSize, $page, $limit);
 
-        if (array_key_exists('sortBy', $filters)) {
-            $sortMethod = array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
+        if (\array_key_exists('sortBy', $filters)) {
+            $sortMethod = \array_key_exists('sortMethod', $filters) ? $filters['sortMethod'] : 'asc';
             $search->addSort(new FieldSort($filters['sortBy'], $sortMethod));
         }
 
@@ -321,7 +306,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     protected function createSearch(Search $search, array $filters, string $locale): Search
     {
-        if (0 < count($filters['excluded'])) {
+        if (0 < \count($filters['excluded'])) {
             foreach ($filters['excluded'] as $uuid) {
                 $search->addQuery(new TermQuery('uuid', $uuid), BoolQuery::MUST_NOT);
             }
@@ -344,7 +329,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $search->addQuery(new TermQuery('locale', $locale));
         }
 
-        if (array_key_exists('types', $filters) && $filters['types']) {
+        if (\array_key_exists('types', $filters) && $filters['types']) {
             $typesQuery = new BoolQuery();
             foreach ($filters['types'] as $typeFilter) {
                 $typesQuery->add(new TermQuery('type', $typeFilter), BoolQuery::SHOULD);
@@ -352,7 +337,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
             $search->addQuery($typesQuery);
         }
 
-        if (array_key_exists('structureTypes', $filters) && $filters['structureTypes']) {
+        if (\array_key_exists('structureTypes', $filters) && $filters['structureTypes']) {
             $strTypesQuery = new BoolQuery();
             foreach ($filters['structureTypes'] as $filter) {
                 $strTypesQuery->add(new TermQuery('structure_type', $filter), BoolQuery::SHOULD);
@@ -376,9 +361,9 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     {
         $filterTypes = [];
 
-        if (array_key_exists('types', $propertyParameter)
+        if (\array_key_exists('types', $propertyParameter)
             && !empty($value = $propertyParameter['types']->getValue())) {
-            $types = is_array($value) ? $value : explode(',', $value);
+            $types = \is_array($value) ? $value : \explode(',', $value);
             foreach ($types as $type) {
                 $filterTypes[] = $type;
             }
@@ -394,8 +379,8 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
     {
         $filterStrTypes = [];
 
-        if (array_key_exists('structureTypes', $propertyParameter)
-            && null !== ($types = explode(',', $propertyParameter['structureTypes']->getValue()))
+        if (\array_key_exists('structureTypes', $propertyParameter)
+            && null !== ($types = \explode(',', $propertyParameter['structureTypes']->getValue()))
         ) {
             foreach ($types as $type) {
                 $filterStrTypes[] = $type;
@@ -412,11 +397,11 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     private function getExcludedFilter(array $filters, array $propertyParameter): array
     {
-        $excluded = array_key_exists('excluded', $filters) ? $filters['excluded'] : [];
-        if (array_key_exists('exclude_duplicates', $propertyParameter)
+        $excluded = \array_key_exists('excluded', $filters) ? $filters['excluded'] : [];
+        if (\array_key_exists('exclude_duplicates', $propertyParameter)
             && $propertyParameter['exclude_duplicates']->getValue()
         ) {
-            $excluded = array_merge($excluded, $this->referenceStore->getAll());
+            $excluded = \array_merge($excluded, $this->referenceStore->getAll());
         }
 
         return $excluded;
@@ -456,7 +441,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         BoolQuery $query,
         int &$queriesCount
     ): void {
-        if (0 !== count($tags = $this->getFilter($filters, $filterName, []))) {
+        if (0 !== \count($tags = $this->getFilter($filters, $filterName, []))) {
             ++$queriesCount;
             $query->add($this->getBoolQuery($field, $tags, $operator));
         }
@@ -467,7 +452,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     private function getBoolQuery(string $field, array $values, string $operator): BoolQuery
     {
-        $type = ('or' === strtolower($operator) ? BoolQuery::SHOULD : BoolQuery::MUST);
+        $type = ('or' === \strtolower($operator) ? BoolQuery::SHOULD : BoolQuery::MUST);
 
         $query = new BoolQuery();
         foreach ($values as $value) {
@@ -522,7 +507,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
      */
     private function hasFilter(array $filters, string $name): bool
     {
-        return array_key_exists($name, $filters) && null !== $filters[$name];
+        return \array_key_exists($name, $filters) && null !== $filters[$name];
     }
 
     /**
@@ -547,9 +532,6 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAlias()
     {
         return 'article';

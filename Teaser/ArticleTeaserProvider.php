@@ -49,9 +49,6 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         $this->articleDocumentClass = $articleDocumentClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration()
     {
         return new TeaserConfiguration(
@@ -63,12 +60,9 @@ class ArticleTeaserProvider implements TeaserProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function find(array $ids, $locale)
     {
-        if (0 === count($ids)) {
+        if (0 === \count($ids)) {
             return [];
         }
 
@@ -86,17 +80,17 @@ class ArticleTeaserProvider implements TeaserProviderInterface
                 $item->getUuid(),
                 'articles',
                 $item->getLocale(),
-                ('' !== $excerpt->title ? $excerpt->title : $item->getTitle()),
-                ('' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription()),
+                '' !== $excerpt->title ? $excerpt->title : $item->getTitle(),
+                '' !== $excerpt->description ? $excerpt->description : $item->getTeaserDescription(),
                 $excerpt->more,
                 $item->getRoutePath(),
-                count($excerpt->images) ? $excerpt->images[0]->id : $item->getTeaserMediaId(),
+                \count($excerpt->images) ? $excerpt->images[0]->id : $item->getTeaserMediaId(),
                 $this->getAttributes($item)
             );
         }
 
-        $idPositions = array_flip($ids);
-        usort($result, function(Teaser $a, Teaser $b) use ($idPositions) {
+        $idPositions = \array_flip($ids);
+        \usort($result, function(Teaser $a, Teaser $b) use ($idPositions) {
             return $idPositions[$a->getId()] - $idPositions[$b->getId()];
         });
 

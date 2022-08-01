@@ -29,9 +29,6 @@ class ArticleSitemapProviderTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -91,12 +88,12 @@ class ArticleSitemapProviderTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
         $response = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $response);
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 }

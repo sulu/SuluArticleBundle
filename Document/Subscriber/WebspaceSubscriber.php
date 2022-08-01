@@ -29,9 +29,9 @@ class WebspaceSubscriber implements EventSubscriberInterface
 {
     use PageTreeTrait;
 
-    const MAIN_WEBSPACE_PROPERTY = 'mainWebspace';
+    public const MAIN_WEBSPACE_PROPERTY = 'mainWebspace';
 
-    const ADDITIONAL_WEBSPACES_PROPERTY = 'additionalWebspaces';
+    public const ADDITIONAL_WEBSPACES_PROPERTY = 'additionalWebspaces';
 
     /**
      * @var DocumentManagerInterface
@@ -58,9 +58,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         $this->propertyEncoder = $propertyEncoder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -145,9 +142,6 @@ class WebspaceSubscriber implements EventSubscriberInterface
         return $this->propertyEncoder->localizedSystemName(self::ADDITIONAL_WEBSPACES_PROPERTY, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getDocumentInspector()
     {
         return $this->documentInspector;

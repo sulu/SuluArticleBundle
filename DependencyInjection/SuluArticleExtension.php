@@ -30,9 +30,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class SuluArticleExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container)
     {
         if ($container->hasExtension('sulu_core')) {
@@ -270,7 +267,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ],
             ];
 
-            if (count($hosts) > 0) {
+            if (\count($hosts) > 0) {
                 $ongrElasticSearchConfig['managers']['default']['index']['hosts'] = $hosts;
                 $ongrElasticSearchConfig['managers']['live']['index']['hosts'] = $hosts;
             }
@@ -282,9 +279,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -302,7 +296,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $loader->load('services.xml');
 
         $bundles = $container->getParameter('kernel.bundles');
-        if (array_key_exists('SuluAutomationBundle', $bundles)) {
+        if (\array_key_exists('SuluAutomationBundle', $bundles)) {
             $loader->load('automation.xml');
         }
         if (\array_key_exists('SuluTrashBundle', $bundles)) {

@@ -62,9 +62,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
         $this->structureMetadataFactory = $structureMetadataFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getObject($id, $locale)
     {
         return $this->documentManager->find(
@@ -78,8 +75,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $object
      */
     public function getId($object)
@@ -88,8 +83,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $object
      */
     public function setValues($object, $locale, array $data)
@@ -110,13 +103,11 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $object
      */
     public function setContext($object, $locale, array $context)
     {
-        if (array_key_exists('template', $context)) {
+        if (\array_key_exists('template', $context)) {
             $object->setStructureType($context['template']);
         }
 
@@ -124,8 +115,6 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $object
      */
     public function serialize($object)
@@ -146,17 +135,15 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
                 ->setGroups(['preview'])
         );
 
-        return json_encode(['pageNumber' => $pageNumber, 'object' => $result]);
+        return \json_encode(['pageNumber' => $pageNumber, 'object' => $result]);
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $serializedObject
      */
     public function deserialize($serializedObject, $objectClass)
     {
-        $result = json_decode($serializedObject, true);
+        $result = \json_decode($serializedObject, true);
 
         $article = $this->serializer->deserialize(
             $result['object'],
@@ -174,7 +161,7 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             return $article;
         }
 
-        $children = array_values($article->getChildren());
+        $children = \array_values($article->getChildren());
 
         $object = $children[$result['pageNumber'] - 2];
 

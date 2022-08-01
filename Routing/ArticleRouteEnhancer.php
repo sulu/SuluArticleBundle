@@ -49,9 +49,6 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function enhance(array $defaults, Request $request)
     {
         if (!$this->shouldAddCanonicalTag($defaults, $request)) {
@@ -66,7 +63,7 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
             $this->webspaceResolver->resolveMainWebspace($article)
         );
 
-        return array_merge(
+        return \array_merge(
             $defaults,
             ['_seo' => $seo]
         );
@@ -77,7 +74,7 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
      */
     private function shouldAddCanonicalTag(array $defaults, Request $request): bool
     {
-        if (!array_key_exists('object', $defaults)) {
+        if (!\array_key_exists('object', $defaults)) {
             return false;
         }
 
@@ -98,7 +95,7 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
         }
 
         $additionalWebspaces = $this->webspaceResolver->resolveAdditionalWebspaces($article);
-        if (!$additionalWebspaces || !in_array($webspace->getKey(), $additionalWebspaces)) {
+        if (!$additionalWebspaces || !\in_array($webspace->getKey(), $additionalWebspaces)) {
             return false;
         }
 

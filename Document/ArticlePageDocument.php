@@ -119,17 +119,11 @@ class ArticlePageDocument implements UuidBehavior,
         $this->structure = new Structure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUuid()
     {
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUuid($uuid): RoutablePageBehavior
     {
         $this->uuid = $uuid;
@@ -137,17 +131,11 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTitle($title)
     {
         $this->title = $title;
@@ -179,17 +167,11 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParent($parent)
     {
         $this->parent = $parent;
@@ -197,25 +179,16 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         return $this->path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
@@ -223,17 +196,11 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOriginalLocale()
     {
         return $this->originalLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setOriginalLocale($originalLocale)
     {
         $this->originalLocale = $originalLocale;
@@ -241,17 +208,11 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStructureType(): ?string
     {
         return $this->structureType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setStructureType($structureType)
     {
         $this->structureType = $structureType;
@@ -259,33 +220,21 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStructure(): StructureInterface
     {
         return $this->structure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoute()
     {
         return $this->route;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
@@ -293,9 +242,6 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function removeRoute(): RoutablePageBehavior
     {
         $this->route = null;
@@ -304,17 +250,11 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoutePath(): ?string
     {
         return $this->routePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoutePath($routePath): RoutablePageBehavior
     {
         $this->routePath = $routePath;
@@ -322,25 +262,16 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): string
     {
-        return get_class($this);
+        return \get_class($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPageNumber(): int
     {
         return $this->pageNumber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPageNumber(int $pageNumber): PageBehavior
     {
         $this->pageNumber = $pageNumber;
@@ -348,65 +279,41 @@ class ArticlePageDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getArticleUuid(): string
     {
         return $this->getParent()->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPageUuid(): string
     {
         return $this->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getWorkflowStage()
     {
         return $this->getParent()->getWorkflowStage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtensionsData()
     {
         return $this->getParent()->getExtensionsData();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShadowLocale()
     {
         return $this->shadowLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setShadowLocale($shadowLocale)
     {
         $this->shadowLocale = $shadowLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isShadowLocaleEnabled()
     {
         return $this->shadowLocaleEnabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setShadowLocaleEnabled($shadowLocaleEnabled)
     {
         $this->shadowLocaleEnabled = $shadowLocaleEnabled;

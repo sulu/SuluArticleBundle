@@ -23,9 +23,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SuluArticleBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new ConverterCompilerPass());
