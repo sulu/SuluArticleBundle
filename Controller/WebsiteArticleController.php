@@ -64,9 +64,9 @@ class WebsiteArticleController extends AbstractController
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $parameters = $this->get('sulu_website.resolver.parameter')->resolve(
+        $parameters = $this->container->get('sulu_website.resolver.parameter')->resolve(
             [],
-            $this->get('sulu_core.webspace.request_analyzer'),
+            $this->container->get('sulu_core.webspace.request_analyzer'),
             null,
             $preview
         );
