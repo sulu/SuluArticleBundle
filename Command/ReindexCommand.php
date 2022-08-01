@@ -77,9 +77,6 @@ class ReindexCommand extends Command
         $this->suluContext = $suluContext;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configure()
     {
         $this->setDescription('Rebuild elastic-search index for articles');
@@ -88,19 +85,16 @@ class ReindexCommand extends Command
         $this->addOption('clear', null, InputOption::VALUE_NONE, 'Clear all articles of index before reindex');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $startTime = microtime(true);
+        $startTime = \microtime(true);
 
         $indexer = SuluKernel::CONTEXT_WEBSITE === $this->suluContext
             ? $this->liveIndexer
             : $this->draftIndexer;
 
         $output->writeln(
-            sprintf('Reindex articles for the <comment>`%s`</comment> context' . PHP_EOL, $this->suluContext)
+            \sprintf('Reindex articles for the <comment>`%s`</comment> context' . \PHP_EOL, $this->suluContext)
         );
 
         if (!$this->dropIndex($indexer, $input, $output)) {
@@ -115,18 +109,18 @@ class ReindexCommand extends Command
         $locales = $this->webspaceManager->getAllLocalizations();
 
         foreach ($locales as $locale) {
-            $output->writeln(sprintf('<info>Locale "</info>%s<info>"</info>' . PHP_EOL, $locale->getLocale()));
+            $output->writeln(\sprintf('<info>Locale "</info>%s<info>"</info>' . \PHP_EOL, $locale->getLocale()));
 
             $this->indexDocuments($locale->getLocale(), $indexer, $output);
 
-            $output->writeln(PHP_EOL);
+            $output->writeln(\PHP_EOL);
         }
 
         $output->writeln(
-            sprintf(
+            \sprintf(
                 '<info>Index rebuild completed (</info>%ss %s</info><info>)</info>',
-                number_format(microtime(true) - $startTime, 2),
-                $this->humanBytes(memory_get_peak_usage())
+                \number_format(\microtime(true) - $startTime, 2),
+                $this->humanBytes(\memory_get_peak_usage())
             )
         );
 
@@ -162,8 +156,8 @@ class ReindexCommand extends Command
         $indexer->dropIndex();
 
         $output->writeln(
-            sprintf(
-                'Dropped and recreated index for the <comment>`%s`</comment> context' . PHP_EOL,
+            \sprintf(
+                'Dropped and recreated index for the <comment>`%s`</comment> context' . \PHP_EOL,
                 $this->suluContext
             )
         );
@@ -180,7 +174,7 @@ class ReindexCommand extends Command
             return;
         }
 
-        $output->writeln(sprintf('Cleared index for the <comment>`%s`</comment> context', $this->suluContext));
+        $output->writeln(\sprintf('Cleared index for the <comment>`%s`</comment> context', $this->suluContext));
         $indexer->clear();
     }
 
@@ -190,7 +184,7 @@ class ReindexCommand extends Command
     protected function indexDocuments(string $locale, IndexerInterface $indexer, OutputInterface $output): void
     {
         $documents = $this->getDocuments($locale);
-        $count = count($documents);
+        $count = \count($documents);
         if (0 === $count) {
             $output->writeln('  No documents found');
 
@@ -215,7 +209,7 @@ class ReindexCommand extends Command
      */
     protected function getDocuments(string $locale): QueryResultCollection
     {
-        $sql2 = sprintf(
+        $sql2 = \sprintf(
             'SELECT * FROM [nt:unstructured] AS a WHERE [jcr:mixinTypes] = "sulu:article" AND [%s] IS NOT NULL',
             $this->propertyEncoder->localizedSystemName('template', $locale)
         );
@@ -231,8 +225,8 @@ class ReindexCommand extends Command
     protected function humanBytes(int $bytes, int $dec = 2): string
     {
         $size = ['b', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-        $factor = (int) floor((strlen($bytes) - 1) / 3);
+        $factor = (int) \floor((\strlen($bytes) - 1) / 3);
 
-        return sprintf("%.{$dec}f", $bytes / pow(1024, $factor)) . $size[$factor];
+        return \sprintf("%.{$dec}f", $bytes / \pow(1024, $factor)) . $size[$factor];
     }
 }

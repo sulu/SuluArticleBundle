@@ -21,11 +21,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ConverterCompilerPass implements CompilerPassInterface
 {
-    const SERVICE_ID = 'es.result_converter';
+    public const SERVICE_ID = 'es.result_converter';
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_ID)) {

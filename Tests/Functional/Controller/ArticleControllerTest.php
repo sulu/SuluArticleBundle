@@ -74,9 +74,6 @@ class ArticleControllerTest extends SuluTestCase
      */
     private $activityRespository;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -108,7 +105,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => $template,
-            'authored' => date('c', strtotime($authored)),
+            'authored' => \date('c', \strtotime($authored)),
             'action' => $action,
         ];
 
@@ -120,7 +117,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     protected function postPage($article, $pageTitle = 'Test-Page')
@@ -131,13 +128,13 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'pageTitle' => $pageTitle,
                 'template' => $article['template'],
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     public function testPost($title = 'Test-Article', $template = 'default')
@@ -147,7 +144,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($this->getRoute($title), $response['route']);
         $this->assertEquals(self::$typeMap[$template], $response['articleType']);
         $this->assertEquals($template, $response['template']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertFalse($response['customizeWebspaceSettings']);
 
@@ -170,17 +167,17 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($this->getRoute($title), $response['route']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($user->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
@@ -192,7 +189,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     public function testGet()
@@ -214,7 +211,7 @@ class ArticleControllerTest extends SuluTestCase
         $requestData = [
             'title' => $title,
             'template' => 'default',
-            'authored' => date('c', strtotime('2016-01-01')),
+            'authored' => \date('c', \strtotime('2016-01-01')),
         ];
 
         if ($shadowLocale) {
@@ -230,7 +227,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     public function testPut($title = 'Sulu is awesome', $locale = 'de', $article = null)
@@ -243,7 +240,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($article['route'], $response['route']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
@@ -267,17 +264,17 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => 'default',
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
                 'author' => $user->getId(),
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($article['route'], $response['route']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($user->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
@@ -291,7 +288,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($this->getRoute($title), $response['route']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
 
         $this->assertNotNull($this->findViewDocument($response['id'], 'de'));
@@ -349,7 +346,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
         // check response
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
         $customizeWebspaceSettings = $response['customizeWebspaceSettings'];
         $this->assertEquals(null !== $mainWebspace, $customizeWebspaceSettings);
@@ -427,10 +424,10 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
     }
@@ -446,9 +443,9 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', date('Y-m-d', strtotime($response['authored'])));
+        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
         $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
         $this->assertEquals(['name' => 'shadow', 'value' => 'de'], $response['type']);
         $this->assertEquals('/articles/sulu-is-great', $response['route']);
@@ -470,12 +467,12 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'de'.
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -488,12 +485,12 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'en'.
         $this->client->jsonRequest('GET', '/api/articles?locale=en&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -518,7 +515,7 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'de'.
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog&fields=title&exclude-ghosts=true');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
@@ -526,7 +523,7 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'en'.
         $this->client->jsonRequest('GET', '/api/articles?locale=en&types=blog&fields=title&exclude-ghosts=true');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -554,12 +551,12 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'de'.
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(3, $response['total']);
         $this->assertCount(3, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -573,12 +570,12 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'en'.
         $this->client->jsonRequest('GET', '/api/articles?locale=en&types=blog&fields=title,route');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(3, $response['total']);
         $this->assertCount(3, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
@@ -612,7 +609,7 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'de'.
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog&fields=title&exclude-shadows=true');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(3, $response['total']);
         $this->assertCount(3, $response['_embedded']['articles']);
@@ -620,7 +617,7 @@ class ArticleControllerTest extends SuluTestCase
         // Retrieve articles in 'en'.
         $this->client->jsonRequest('GET', '/api/articles?locale=en&types=blog&fields=title,route&exclude-shadows=true');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
@@ -679,12 +676,12 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals($extensions['seo'], $response['ext']['seo']);
 
-        if (!class_exists(SegmentSelect::class)) {
+        if (!\class_exists(SegmentSelect::class)) {
             // segment is only returned for sulu versions >= 2.2
             unset($extensions['excerpt']['segments']);
         }
@@ -704,7 +701,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertNotEquals($article['title'], $response['title']);
         $this->assertEquals($title, $response['title']);
         $this->assertEquals('simple', $response['template']);
@@ -724,7 +721,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(['de', 'en'], $response['contentLocales']);
         $this->assertEquals($title, $response['title']);
     }
@@ -740,12 +737,12 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -765,12 +762,12 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest(
             'GET',
-            '/api/articles?locale=de&ids=' . implode(',', [$article2['id'], $article1['id']])
+            '/api/articles?locale=de&ids=' . \implode(',', [$article2['id'], $article1['id']])
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
@@ -793,7 +790,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -813,7 +810,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -833,7 +830,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -852,7 +849,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -875,7 +872,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
@@ -896,7 +893,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
@@ -915,7 +912,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
@@ -936,12 +933,12 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -954,12 +951,12 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -980,7 +977,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals(2, $response['total']);
     }
@@ -1102,7 +1099,7 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
@@ -1113,7 +1110,7 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
@@ -1124,7 +1121,7 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
@@ -1135,7 +1132,7 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
 
@@ -1146,7 +1143,7 @@ class ArticleControllerTest extends SuluTestCase
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(1, $response['total']);
         $this->assertCount(1, $response['_embedded']['articles']);
     }
@@ -1163,7 +1160,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog');
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
 
@@ -1181,14 +1178,14 @@ class ArticleControllerTest extends SuluTestCase
         $article2 = $this->testPost('Sulu is awesome', 'simple');
         $this->flush();
 
-        $this->client->jsonRequest('DELETE', '/api/articles?ids=' . implode(',', [$article1['id'], $article2['id']]));
+        $this->client->jsonRequest('DELETE', '/api/articles?ids=' . \implode(',', [$article1['id'], $article2['id']]));
         $this->flush();
 
         $this->assertHttpStatusCode(204, $this->client->getResponse());
 
         $this->client->jsonRequest('GET', '/api/articles?locale=de&types=blog');
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
 
@@ -1212,11 +1209,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in default locale
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $locale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -1229,11 +1226,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in dest locale (both should be ghosts)
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
@@ -1248,7 +1245,7 @@ class ArticleControllerTest extends SuluTestCase
             'POST',
             '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&dest=' . $destLocale . '&action=copy-locale'
         );
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
         $this->assertEquals($article1['id'], $response['id']);
@@ -1258,11 +1255,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in dest locale (now only one should be a ghost)
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
@@ -1290,11 +1287,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in default locale
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $srclocale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title']];
             },
@@ -1307,11 +1304,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in dest locale (both should be ghosts)
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
@@ -1326,7 +1323,7 @@ class ArticleControllerTest extends SuluTestCase
             'POST',
             '/api/articles/' . $article1['id'] . '?locale=' . $locale . '&src=' . $srclocale . '&dest=' . $destLocale . '&action=copy-locale'
         );
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
         $this->assertEquals($article1['id'], $response['id']);
@@ -1336,11 +1333,11 @@ class ArticleControllerTest extends SuluTestCase
         // get all articles in dest locale (now only one should be a ghost)
         $this->client->jsonRequest('GET', '/api/articles?locale=' . $destLocale . '&types=blog&fields=title');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
         $this->assertEquals(2, $response['total']);
         $this->assertCount(2, $response['_embedded']['articles']);
 
-        $items = array_map(
+        $items = \array_map(
             function($item) {
                 return [$item['id'], $item['title'], $item['localizationState']];
             },
@@ -1367,20 +1364,20 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['categories' => [$category->getId()]]],
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $article1 = json_decode($this->client->getResponse()->getContent(), true);
+        $article1 = \json_decode($this->client->getResponse()->getContent(), true);
         // create second article which should not appear in response
         $article2 = $this->post();
 
         $this->client->jsonRequest('GET', '/api/articles?locale=de&categoryId=' . $category->getId());
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $result['_embedded']['articles']);
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
@@ -1398,20 +1395,20 @@ class ArticleControllerTest extends SuluTestCase
             [
                 'title' => $title,
                 'template' => $template,
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
                 'ext' => ['excerpt' => ['tags' => [$tag->getName()]]],
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        $article1 = json_decode($this->client->getResponse()->getContent(), true);
+        $article1 = \json_decode($this->client->getResponse()->getContent(), true);
         // create second article which should not appear in response
         $article2 = $this->post();
 
         $this->client->jsonRequest('GET', '/api/articles?locale=de&tagId=' . $tag->getId());
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $result['_embedded']['articles']);
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
@@ -1438,7 +1435,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest('GET', '/api/articles?locale=de&pageId=' . $page->getUuid());
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount(1, $result['_embedded']['articles']);
         $this->assertEquals($article1['id'], $result['_embedded']['articles'][0]['id']);
@@ -1508,7 +1505,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest('GET', '/api/articles/' . $article['id'] . '?locale=de');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
         $this->assertEquals('/test-page-2/articles/test-article', $response['route']);
@@ -1549,7 +1546,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest('GET', '/api/articles/' . $article['id'] . '?locale=de');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
         $this->assertEquals('/page-2/page-1/articles/test-article', $response['route']);
@@ -1587,7 +1584,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $this->client->jsonRequest('GET', '/api/articles/' . $article['id'] . '?locale=de');
         $this->assertHttpStatusCode(200, $this->client->getResponse());
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertEquals('Test Article', $response['title']);
         $this->assertEquals('/test-page/articles/test-article', $response['route']);
@@ -1609,7 +1606,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->client->jsonRequest('PUT', '/api/articles/' . $id . '?action=publish&locale=de', $this->get($id));
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     public function testOrderPages()
@@ -1640,7 +1637,7 @@ class ArticleControllerTest extends SuluTestCase
         $response = $this->publish($article['id']);
 
         $responsePages = $response['children'];
-        for ($i = 0; $i < count($expectedPages); ++$i) {
+        for ($i = 0; $i < \count($expectedPages); ++$i) {
             $this->assertEquals($expectedPages[$i], $responsePages[$i]['id']);
             $this->assertEquals($i + 2, $responsePages[$i]['pageNumber']);
             $this->assertEquals(
@@ -1649,7 +1646,7 @@ class ArticleControllerTest extends SuluTestCase
             );
 
             $route = $this->findRoute($responsePages[$i]['route'], 'de');
-            $this->assertTrue(is_subclass_of($route->getEntityClass(), ArticlePageDocument::class) || ArticlePageDocument::class === $route->getEntityClass());
+            $this->assertTrue(\is_subclass_of($route->getEntityClass(), ArticlePageDocument::class) || ArticlePageDocument::class === $route->getEntityClass());
             $this->assertEquals($responsePages[$i]['id'], $route->getEntityId());
             $this->assertEquals('de', $route->getLocale());
             $this->assertFalse($route->isHistory());
@@ -1666,13 +1663,13 @@ class ArticleControllerTest extends SuluTestCase
                 'title' => $title,
                 'template' => 'page_tree_route',
                 'routePath' => $routePathData,
-                'authored' => date('c', strtotime('2016-01-01')),
+                'authored' => \date('c', \strtotime('2016-01-01')),
             ]
         );
 
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

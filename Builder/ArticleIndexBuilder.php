@@ -19,25 +19,16 @@ use Sulu\Bundle\CoreBundle\Build\SuluBuilder;
  */
 class ArticleIndexBuilder extends SuluBuilder
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'article_index';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDependencies()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function build()
     {
         $this->buildForManager($this->container->get('es.manager.live'), $this->input->getOption('destroy'));
@@ -55,7 +46,7 @@ class ArticleIndexBuilder extends SuluBuilder
     {
         $name = $manager->getName();
         if (!$manager->indexExists()) {
-            $this->output->writeln(sprintf('Create index for "<comment>%s</comment>" manager.', $name));
+            $this->output->writeln(\sprintf('Create index for "<comment>%s</comment>" manager.', $name));
             $manager->createIndex();
 
             return;
@@ -65,7 +56,7 @@ class ArticleIndexBuilder extends SuluBuilder
             return;
         }
 
-        $this->output->writeln(sprintf('Drop and create index for "<comment>%s</comment>" manager.', $name));
+        $this->output->writeln(\sprintf('Drop and create index for "<comment>%s</comment>" manager.', $name));
         $manager->dropAndCreateIndex();
     }
 }

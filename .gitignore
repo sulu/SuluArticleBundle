@@ -2,9 +2,9 @@
 /phpunit.xml
 .phpunit.result.cache
 
-# PHPCS
-.php_cs.cache
-/php-cs-fixer.phar
+# php-cs-fixer
+.php-cs-fixer.cache
+php-cs-fixer
 
 # composer
 /composer.phar
@@ -15,10 +15,6 @@
 # symfony
 .env.local
 .env.*.local
-
-# php-cs
-.php_cs
-.php_cs.cache
 
 # Backup entities generated with doctrine:generate:entities command
 */Entity/*~

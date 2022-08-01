@@ -80,9 +80,6 @@ class ArticleSubscriberTest extends TestCase
      */
     private $locale = 'de';
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->indexer = $this->prophesize(IndexerInterface::class);
@@ -489,8 +486,8 @@ class ArticleSubscriberTest extends TestCase
         $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
             ->willReturn($propertyName);
 
-        $node->getPropertyValueWithDefault($propertyName, json_encode([]))
-            ->willReturn(json_encode([['title' => 'Test title']]));
+        $node->getPropertyValueWithDefault($propertyName, \json_encode([]))
+            ->willReturn(\json_encode([['title' => 'Test title']]));
 
         $this->document->setPages([['title' => 'Test title']])->shouldBeCalled();
         $this->document->getOriginalLocale()->willReturn($this->locale);
@@ -518,8 +515,8 @@ class ArticleSubscriberTest extends TestCase
         $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)
             ->willReturn($propertyNameDE);
 
-        $node->getPropertyValueWithDefault($propertyNameDE, json_encode([]))
-            ->willReturn(json_encode(
+        $node->getPropertyValueWithDefault($propertyNameDE, \json_encode([]))
+            ->willReturn(\json_encode(
                 [
                     [
                         'title' => 'Test Überschrift',
@@ -528,8 +525,8 @@ class ArticleSubscriberTest extends TestCase
                 ]
             ));
 
-        $node->getPropertyValueWithDefault($propertyNameEN, json_encode([]))
-            ->willReturn(json_encode(
+        $node->getPropertyValueWithDefault($propertyNameEN, \json_encode([]))
+            ->willReturn(\json_encode(
                 [
                     [
                         'title' => 'Test Headline',
@@ -596,7 +593,7 @@ class ArticleSubscriberTest extends TestCase
             ->willReturn($propertyName);
 
         $this->document->setPages($pages)->shouldBeCalled();
-        $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
+        $node->setProperty($propertyName, \json_encode($pages))->shouldBeCalled();
 
         $this->articleSubscriber->persistPageData($event->reveal());
     }
@@ -645,11 +642,11 @@ class ArticleSubscriberTest extends TestCase
 
         $propertyName = 'i18n:' . $this->locale . '-' . ArticleSubscriber::PAGES_PROPERTY;
         $this->propertyEncoder->localizedSystemName(ArticleSubscriber::PAGES_PROPERTY, $this->locale)->willReturn(
-                $propertyName
-            );
+            $propertyName
+        );
 
         $this->document->setPages($pages)->shouldBeCalled();
-        $node->setProperty($propertyName, json_encode($pages))->shouldBeCalled();
+        $node->setProperty($propertyName, \json_encode($pages))->shouldBeCalled();
         $this->document->setWorkflowStage(WorkflowStage::TEST)->shouldBeCalled();
         $this->document->setWorkflowStage(WorkflowStage::TEST);
 

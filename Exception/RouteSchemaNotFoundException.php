@@ -32,7 +32,7 @@ class RouteSchemaNotFoundException extends \Exception
     public function __construct(string $requested, array $available)
     {
         parent::__construct(
-            sprintf('Route-schema for "%s" not configured. Available: ["%s"]', $requested, implode('","', $available))
+            \sprintf('Route-schema for "%s" not configured. Available: ["%s"]', $requested, \implode('","', $available))
         );
 
         $this->requested = $requested;

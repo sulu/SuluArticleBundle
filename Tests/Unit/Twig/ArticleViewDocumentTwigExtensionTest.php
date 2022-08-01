@@ -169,7 +169,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
     {
         $ids = ['123-123-123', '321-321-321', '111-111-111'];
 
-        return array_map(
+        return \array_map(
             function($id) {
                 $articleDocument = new ArticleDocument();
                 $articleDocument->setUuid($id);
@@ -178,7 +178,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
 
                 return $articleDocument;
             },
-            array_values($ids)
+            \array_values($ids)
         );
     }
 
@@ -187,7 +187,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
      */
     private function getArticleViewDocuments(array $articleDocuments)
     {
-        return array_map(
+        return \array_map(
             function($articleDocument) {
                 $articleViewDocument = new ArticleViewDocument($articleDocument->getUuid());
                 $articleViewDocument->setLocale($articleDocument->getLocale());
@@ -195,7 +195,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
 
                 return $articleViewDocument;
             },
-            array_values($articleDocuments)
+            \array_values($articleDocuments)
         );
     }
 
@@ -227,7 +227,7 @@ class ArticleViewDocumentTwigExtensionTest extends TestCase
             return $articleViewDocuments[$documentIteratorCount++];
         });
         $documentIterator->valid()->will(function() use (&$documentIteratorCount, $articleViewDocuments) {
-            if (array_key_exists($documentIteratorCount, $articleViewDocuments)) {
+            if (\array_key_exists($documentIteratorCount, $articleViewDocuments)) {
                 return true;
             }
 

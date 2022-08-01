@@ -168,33 +168,21 @@ class ArticleResourceItem implements ResourceItemInterface
         return $this->article->getAdditionalWebspaces();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getResource()
     {
         return $this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthorId()
     {
         return $this->article->getAuthorId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthorFullName()
     {
         return $this->article->getAuthorFullName();

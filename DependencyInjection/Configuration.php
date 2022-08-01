@@ -21,9 +21,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('sulu_article');
@@ -48,7 +45,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('default_additional_webspaces')
                     ->beforeNormalization()
                         ->ifTrue(function($v) {
-                            return count(array_filter(array_keys($v), 'is_string')) <= 0;
+                            return \count(\array_filter(\array_keys($v), 'is_string')) <= 0;
                         })
                         ->then(function($v) {
                             return ['default' => $v];

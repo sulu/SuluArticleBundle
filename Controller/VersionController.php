@@ -75,25 +75,25 @@ class VersionController extends AbstractRestController implements ClassResourceI
         $locale = $this->getRequestParameter($request, 'locale', true);
 
         $document = $this->documentManager->find($id, $request->query->get('locale'));
-        $versions = array_reverse(
-            array_filter(
+        $versions = \array_reverse(
+            \array_filter(
                 $document->getVersions(),
                 function($version) use ($locale) {
-                    /** @var Version $version */
+                    /* @var Version $version */
                     return $version->getLocale() === $locale;
                 }
             )
         );
-        $total = count($versions);
+        $total = \count($versions);
 
         $limit = $this->restHelper->getLimit();
 
-        $versions = array_slice($versions, $this->restHelper->getOffset(), $limit);
+        $versions = \array_slice($versions, $this->restHelper->getOffset(), $limit);
 
-        $userIds = array_unique(
-            array_map(
+        $userIds = \array_unique(
+            \array_map(
                 function($version) {
-                    /** @var Version $version */
+                    /* @var Version $version */
                     return $version->getAuthor();
                 },
                 $versions
@@ -112,9 +112,9 @@ class VersionController extends AbstractRestController implements ClassResourceI
         /** @var Version $version */
         foreach ($versions as $version) {
             $versionData[] = [
-                'id' => str_replace('.', '_', $version->getId()),
+                'id' => \str_replace('.', '_', $version->getId()),
                 'locale' => $version->getLocale(),
-                'author' => array_key_exists($version->getAuthor(), $fullNamesByIds)
+                'author' => \array_key_exists($version->getAuthor(), $fullNamesByIds)
                     ? $fullNamesByIds[$version->getAuthor()] : '',
                 'authored' => $version->getAuthored(),
             ];
@@ -153,7 +153,7 @@ class VersionController extends AbstractRestController implements ClassResourceI
                 $this->documentManager->restore(
                     $document,
                     $locale,
-                    str_replace('_', '.', $version)
+                    \str_replace('_', '.', $version)
                 );
                 $this->documentManager->flush();
 
@@ -167,23 +167,17 @@ class VersionController extends AbstractRestController implements ClassResourceI
 
                 break;
             default:
-                throw new RestException(sprintf('Unrecognized action: "%s"', $action));
+                throw new RestException(\sprintf('Unrecognized action: "%s"', $action));
         }
 
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecurityContext()
     {
         return ArticleAdmin::SECURITY_CONTEXT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale(Request $request)
     {
         return $this->getRequestParameter($request, 'locale', true);

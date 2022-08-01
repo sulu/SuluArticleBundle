@@ -88,8 +88,8 @@ class MediaViewObject
      */
     public function setFormats($formats): self
     {
-        if (is_array($formats)) {
-            $formats = json_encode($formats);
+        if (\is_array($formats)) {
+            $formats = \json_encode($formats);
         }
 
         $this->formats = $formats;
@@ -102,6 +102,6 @@ class MediaViewObject
      */
     public function getThumbnails(): array
     {
-        return json_decode($this->formats, true);
+        return \json_decode($this->formats, true);
     }
 }

@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class PageSubscriber implements EventSubscriberInterface
 {
-    const FIELD = 'pageNumber';
+    public const FIELD = 'pageNumber';
 
     /**
      * @var DocumentInspector
@@ -57,9 +57,6 @@ class PageSubscriber implements EventSubscriberInterface
         $this->documentManager = $documentManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -70,7 +70,7 @@ class WebsiteArticleController extends AbstractController
             null,
             $preview
         );
-        $data = array_merge($parameters, $content, $attributes);
+        $data = \array_merge($parameters, $content, $attributes);
 
         try {
             if ($partial) {
@@ -92,7 +92,7 @@ class WebsiteArticleController extends AbstractController
 
                 return $this->render(
                     '@SuluWebsite/Preview/preview.html.twig',
-                    array_merge($data, $parameters),
+                    \array_merge($data, $parameters),
                     $this->createResponse($request)
                 );
             } else {
@@ -168,17 +168,17 @@ class WebsiteArticleController extends AbstractController
         $attributes = $twig->mergeGlobals($attributes);
         $template = $twig->load($template);
 
-        $level = ob_get_level();
-        ob_start();
+        $level = \ob_get_level();
+        \ob_start();
 
         try {
             $rendered = $template->renderBlock($block, $attributes);
-            ob_end_clean();
+            \ob_end_clean();
 
             return $rendered;
         } catch (\Exception $e) {
-            while (ob_get_level() > $level) {
-                ob_end_clean();
+            while (\ob_get_level() > $level) {
+                \ob_end_clean();
             }
 
             throw $e;

@@ -53,7 +53,7 @@ trait StructureTagTrait
         }
 
         $tag = $metadata->getTag($tag);
-        if (!array_key_exists($attribute, $tag['attributes'])) {
+        if (!\array_key_exists($attribute, $tag['attributes'])) {
             return $default;
         }
 

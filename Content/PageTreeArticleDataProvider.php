@@ -22,9 +22,6 @@ use Sulu\Component\SmartContent\DatasourceItem;
  */
 class PageTreeArticleDataProvider extends ArticleDataProvider
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration()
     {
         return $this->getConfigurationBuilder()
@@ -32,9 +29,6 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
             ->getConfiguration();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
         if (!$datasource) {
@@ -50,14 +44,11 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
         return new DatasourceItem($document->getUuid(), $document->getTitle(), $document->getResourceSegment());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function createSearch(Search $search, array $filters, string $locale): Search
     {
         $search = parent::createSearch($search, $filters, $locale);
 
-        if (!array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
+        if (!\array_key_exists('dataSource', $filters) || !$filters['dataSource']) {
             return $search;
         }
 
@@ -70,7 +61,7 @@ class PageTreeArticleDataProvider extends ArticleDataProvider
         $includeSubFolders = $filters['includeSubFolders'] ?? null;
 
         if (true === $includeSubFolders) {
-            $search->addQuery(new PrefixQuery('route_path.raw', rtrim($document->getResourceSegment(), '/') . '/'));
+            $search->addQuery(new PrefixQuery('route_path.raw', \rtrim($document->getResourceSegment(), '/') . '/'));
 
             return $search;
         }

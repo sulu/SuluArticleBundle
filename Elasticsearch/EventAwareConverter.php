@@ -33,9 +33,6 @@ class EventAwareConverter extends Converter
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function convertToDocument($rawData, Manager $manager)
     {
         $document = parent::convertToDocument($rawData, $manager);

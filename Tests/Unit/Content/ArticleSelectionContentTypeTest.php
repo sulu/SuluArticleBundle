@@ -31,11 +31,11 @@ class ArticleSelectionContentTypeTest extends TestCase
     public function testGetContentData()
     {
         $ids = ['123-123-123', '321-321-321'];
-        $articles = array_map(
+        $articles = \array_map(
             function($id) {
                 return new ArticleViewDocument($id);
             },
-            array_reverse($ids)
+            \array_reverse($ids)
         );
 
         $manager = $this->prophesize(Manager::class);
@@ -56,7 +56,7 @@ class ArticleSelectionContentTypeTest extends TestCase
                 function(IdsQuery $query) use ($ids) {
                     return $query->toArray() === [
                             'ids' => [
-                                'values' => array_map(
+                                'values' => \array_map(
                                     function($id) {
                                         return $id . '-de';
                                     },

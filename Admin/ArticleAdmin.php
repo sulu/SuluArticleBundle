@@ -40,31 +40,31 @@ class ArticleAdmin extends Admin
 {
     use StructureTagTrait;
 
-    const STRUCTURE_TAG_TYPE = 'sulu_article.type';
+    public const STRUCTURE_TAG_TYPE = 'sulu_article.type';
 
-    const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
+    public const STRUCTURE_TAG_MULTIPAGE = 'sulu_article.multi_page';
 
-    const SECURITY_CONTEXT = 'sulu.modules.articles';
+    public const SECURITY_CONTEXT = 'sulu.modules.articles';
 
-    const LIST_VIEW = 'sulu_article.list';
+    public const LIST_VIEW = 'sulu_article.list';
 
-    const ADD_FORM_VIEW = 'sulu_article.add_form';
+    public const ADD_FORM_VIEW = 'sulu_article.add_form';
 
-    const ADD_FORM_VIEW_DETAILS = 'sulu_article.add_form.details';
+    public const ADD_FORM_VIEW_DETAILS = 'sulu_article.add_form.details';
 
-    const EDIT_FORM_VIEW = 'sulu_article.edit_form';
+    public const EDIT_FORM_VIEW = 'sulu_article.edit_form';
 
-    const EDIT_FORM_VIEW_DETAILS = 'sulu_article.edit_form.details';
+    public const EDIT_FORM_VIEW_DETAILS = 'sulu_article.edit_form.details';
 
-    const EDIT_FORM_VIEW_SEO = 'sulu_article.edit_form.seo';
+    public const EDIT_FORM_VIEW_SEO = 'sulu_article.edit_form.seo';
 
-    const EDIT_FORM_VIEW_EXCERPT = 'sulu_article.edit_form.excerpt';
+    public const EDIT_FORM_VIEW_EXCERPT = 'sulu_article.edit_form.excerpt';
 
-    const EDIT_FORM_VIEW_SETTINGS = 'sulu_article.edit_form.settings';
+    public const EDIT_FORM_VIEW_SETTINGS = 'sulu_article.edit_form.settings';
 
-    const EDIT_FORM_VIEW_AUTOMATION = 'sulu_article.edit_form.automation';
+    public const EDIT_FORM_VIEW_AUTOMATION = 'sulu_article.edit_form.automation';
 
-    const EDIT_FORM_VIEW_ACTIVITY = 'sulu_article.edit_form.activity';
+    public const EDIT_FORM_VIEW_ACTIVITY = 'sulu_article.edit_form.activity';
 
     /**
      * @var ViewBuilderFactoryInterface
@@ -126,9 +126,6 @@ class ArticleAdmin extends Admin
         $this->automationViewBuilderFactory = $automationViewBuilderFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
     {
         if (!$this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
@@ -157,17 +154,14 @@ class ArticleAdmin extends Admin
         $navigationItemCollection->add($articleItem);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureViews(ViewCollection $viewCollection): void
     {
         if (!$this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::EDIT)) {
             return;
         }
 
-        $locales = array_values(
-            array_map(
+        $locales = \array_values(
+            \array_map(
                 function(Localization $localization) {
                     return $localization->getLocale();
                 },
@@ -415,9 +409,6 @@ class ArticleAdmin extends Admin
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecurityContexts()
     {
         $securityContext = [];
@@ -480,8 +471,8 @@ class ArticleAdmin extends Admin
 
     private function getTitle(string $type): string
     {
-        if (!array_key_exists($type, $this->articleTypeConfigurations)) {
-            return ucfirst($type);
+        if (!\array_key_exists($type, $this->articleTypeConfigurations)) {
+            return \ucfirst($type);
         }
 
         return $this->articleTypeConfigurations[$type]['translation_key'];

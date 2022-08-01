@@ -82,7 +82,7 @@ class ContentProxyFactory
 
         $content = [];
         foreach ($structure->getProperties(true) as $child) {
-            if (array_key_exists($child->getName(), $data)) {
+            if (\array_key_exists($child->getName(), $data)) {
                 $child->setValue($data[$child->getName()]);
             }
 
@@ -126,7 +126,7 @@ class ContentProxyFactory
 
         $view = [];
         foreach ($structure->getProperties(true) as $child) {
-            if (array_key_exists($child->getName(), $data)) {
+            if (\array_key_exists($child->getName(), $data)) {
                 $child->setValue($data[$child->getName()]);
             }
 

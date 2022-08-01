@@ -33,9 +33,6 @@ class ArticleBridge extends StructureBridge
         return $this->structure->getView();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUuid()
     {
         // is set for structure loaded with document from document-manager
@@ -47,9 +44,6 @@ class ArticleBridge extends StructureBridge
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
@@ -83,25 +77,16 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExt()
     {
         return $this->document->getExtensionsData();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getWebspaceKey()
     {
         return $this->webspaceKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setWebspaceKey($webspace)
     {
         $this->webspaceKey = $webspace;

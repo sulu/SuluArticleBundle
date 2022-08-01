@@ -35,26 +35,21 @@ class ArticleRouteGeneratorByTemplate implements RouteGeneratorInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $entity
      */
     public function generate($entity, array $options)
     {
         $template = $entity->getStructureType();
 
-        if (!array_key_exists($template, $options)) {
-            throw new RouteSchemaNotFoundException($template, array_keys($options));
+        if (!\array_key_exists($template, $options)) {
+            throw new RouteSchemaNotFoundException($template, \array_keys($options));
         }
 
         return $this->routeGenerator->generate($entity, ['route_schema' => $options[$template]]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver(array $options)
     {
-        return (new OptionsResolver())->setDefined(array_keys($options));
+        return (new OptionsResolver())->setDefined(\array_keys($options));
     }
 }
