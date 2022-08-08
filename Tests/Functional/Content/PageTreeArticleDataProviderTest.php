@@ -29,9 +29,6 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -180,7 +177,7 @@ class PageTreeArticleDataProviderTest extends SuluTestCase
             ]
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

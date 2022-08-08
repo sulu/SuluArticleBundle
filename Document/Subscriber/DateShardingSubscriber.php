@@ -39,9 +39,6 @@ class DateShardingSubscriber implements EventSubscriberInterface
         $this->nodeManager = $nodeManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

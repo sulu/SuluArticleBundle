@@ -50,9 +50,6 @@ class ArticleIndexerTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -244,7 +241,7 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertEquals($secondLocale, $viewDocument->getLocale());
         $this->assertEquals('Test Article', $viewDocument->getTitle());
 
-        $contentData = json_decode($viewDocument->getContentData(), true);
+        $contentData = \json_decode($viewDocument->getContentData(), true);
         $this->assertEquals($contentData['article'], 'Test content');
 
         // now update the source locale
@@ -263,7 +260,7 @@ class ArticleIndexerTest extends SuluTestCase
         $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
         $this->assertEquals('Test Article - CHANGED!', $viewDocument->getTitle());
 
-        $contentData = json_decode($viewDocument->getContentData(), true);
+        $contentData = \json_decode($viewDocument->getContentData(), true);
         $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
     }
 
@@ -306,7 +303,7 @@ class ArticleIndexerTest extends SuluTestCase
             'article_2' => '<p>should not be indexed</p>',
         ];
 
-        if (class_exists(ImageMapContentType::class)) {
+        if (\class_exists(ImageMapContentType::class)) {
             $data['blocks'] = [
                 [
                     'type' => 'title-with-article',
@@ -336,7 +333,7 @@ class ArticleIndexerTest extends SuluTestCase
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertSame($article['id'], $viewDocument->getUuid());
-        $this->assertSame($data, json_decode($viewDocument->getContentData(), true));
+        $this->assertSame($data, \json_decode($viewDocument->getContentData(), true));
 
         $this->assertCount(5, $contentFields);
         $this->assertContains('Test Article Title', $contentFields);
@@ -348,7 +345,7 @@ class ArticleIndexerTest extends SuluTestCase
 
     public function testIndexTaggedPropertiesBlocksInBlocks(): void
     {
-        if (!method_exists(RouteRepositoryInterface::class, 'remove')) {
+        if (!\method_exists(RouteRepositoryInterface::class, 'remove')) {
             $this->markTestSkipped('Only for Sulu > 2.1.0 (requires nested blocks)');
         }
 
@@ -455,7 +452,7 @@ class ArticleIndexerTest extends SuluTestCase
 
         $viewDocument = $this->findViewDocument($article['id']);
         $this->assertEquals($article['id'], $viewDocument->getUuid());
-        $this->assertEquals($data, json_decode($viewDocument->getContentData(), true));
+        $this->assertEquals($data, \json_decode($viewDocument->getContentData(), true));
 
         $this->assertProxies($data, $viewDocument->getContent(), $viewDocument->getView());
 
@@ -479,8 +476,8 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertInstanceOf(\ArrayObject::class, $contentProxy);
         $this->assertInstanceOf(\ArrayObject::class, $viewProxy);
 
-        $content = iterator_to_array($contentProxy);
-        $view = iterator_to_array($viewProxy);
+        $content = \iterator_to_array($contentProxy);
+        $view = \iterator_to_array($viewProxy);
 
         $this->assertEquals($data, $content);
         foreach ($data as $key => $value) {
@@ -501,10 +498,10 @@ class ArticleIndexerTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=' . $this->locale . '&action=publish',
-            array_merge(['title' => $title, 'template' => $template], $data)
+            \array_merge(['title' => $title, 'template' => $template], $data)
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**
@@ -542,7 +539,7 @@ class ArticleIndexerTest extends SuluTestCase
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**
@@ -562,11 +559,11 @@ class ArticleIndexerTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles/' . $article['id'] . '/pages?locale=' . $this->locale . '&action=publish',
-            array_merge(['pageTitle' => $pageTitle, 'template' => $template], $data)
+            \array_merge(['pageTitle' => $pageTitle, 'template' => $template], $data)
         );
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     /**

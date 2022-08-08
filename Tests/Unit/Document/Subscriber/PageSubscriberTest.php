@@ -57,9 +57,6 @@ class PageSubscriberTest extends TestCase
      */
     private $node;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->documentInspector = $this->prophesize(DocumentInspector::class);
@@ -193,7 +190,7 @@ class PageSubscriberTest extends TestCase
 
         $parentNode = $this->prophesize(NodeInterface::class);
         $parentNode->getNodes()->willReturn(
-            array_map(
+            \array_map(
                 function($item) {
                     return $item->reveal();
                 },

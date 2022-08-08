@@ -28,7 +28,7 @@ class ArticlePageNotFoundException extends \Exception
 
     public function __construct(string $pageUuid, string $articleUuid)
     {
-        parent::__construct(sprintf('Page "%s" not found in article "%s".', $pageUuid, $articleUuid));
+        parent::__construct(\sprintf('Page "%s" not found in article "%s".', $pageUuid, $articleUuid));
         $this->pageUuid = $pageUuid;
         $this->articleUuid = $articleUuid;
     }

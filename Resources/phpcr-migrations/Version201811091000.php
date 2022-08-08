@@ -28,13 +28,10 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    const MAIN_WEBSPACE_PROPERTY_NAME = 'mainWebspace';
+    public const MAIN_WEBSPACE_PROPERTY_NAME = 'mainWebspace';
 
-    const ADDITONAL_WEBSPACES_PROPERTY_NAME = 'additionalWebspaces';
+    public const ADDITONAL_WEBSPACES_PROPERTY_NAME = 'additionalWebspaces';
 
-    /**
-     * {@inheritdoc}
-     */
     public function up(SessionInterface $session)
     {
         $liveSession = $this->container->get('sulu_document_manager.live_session');
@@ -76,7 +73,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
                 // check if node exists
-                if (!$node->hasProperty(sprintf('i18n:%s-template', $localization->getLocale()))) {
+                if (!$node->hasProperty(\sprintf('i18n:%s-template', $localization->getLocale()))) {
                     continue;
                 }
 
@@ -101,7 +98,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
 
         $value = $node->getPropertyValue(self::MAIN_WEBSPACE_PROPERTY_NAME);
         if ($value) {
-            $mainWebspacePropertyNameLocalized = sprintf('i18n:%s-' . self::MAIN_WEBSPACE_PROPERTY_NAME, $locale);
+            $mainWebspacePropertyNameLocalized = \sprintf('i18n:%s-' . self::MAIN_WEBSPACE_PROPERTY_NAME, $locale);
             $node->setProperty(
                 $mainWebspacePropertyNameLocalized,
                 $node->getPropertyValue(self::MAIN_WEBSPACE_PROPERTY_NAME)
@@ -117,7 +114,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
 
         $value = $node->getPropertyValue(self::ADDITONAL_WEBSPACES_PROPERTY_NAME);
         if ($value) {
-            $additionalWebspacesPropertyNameLocalized = sprintf('i18n:%s-' . self::ADDITONAL_WEBSPACES_PROPERTY_NAME, $locale);
+            $additionalWebspacesPropertyNameLocalized = \sprintf('i18n:%s-' . self::ADDITONAL_WEBSPACES_PROPERTY_NAME, $locale);
             $node->setProperty(
                 $additionalWebspacesPropertyNameLocalized,
                 $value
@@ -144,7 +141,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
                 // check if node exists
-                if (!$node->hasProperty(sprintf('i18n:%s-template', $localization->getLocale()))) {
+                if (!$node->hasProperty(\sprintf('i18n:%s-template', $localization->getLocale()))) {
                     continue;
                 }
 
@@ -156,7 +153,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
 
     private function downgradeMainWebspace(NodeInterface $node, $locale)
     {
-        $mainWebspacePropertyNameLocalized = sprintf('i18n:%s-' . self::MAIN_WEBSPACE_PROPERTY_NAME, $locale);
+        $mainWebspacePropertyNameLocalized = \sprintf('i18n:%s-' . self::MAIN_WEBSPACE_PROPERTY_NAME, $locale);
         if (!$node->hasProperty($mainWebspacePropertyNameLocalized)) {
             return;
         }
@@ -171,7 +168,7 @@ class Version201811091000 implements VersionInterface, ContainerAwareInterface
 
     private function downgradeAdditionalWebspaces(NodeInterface $node, $locale)
     {
-        $additionalWebspacesPropertyNameLocalized = sprintf('i18n:%s-' . self::ADDITONAL_WEBSPACES_PROPERTY_NAME, $locale);
+        $additionalWebspacesPropertyNameLocalized = \sprintf('i18n:%s-' . self::ADDITONAL_WEBSPACES_PROPERTY_NAME, $locale);
         if (!$node->hasProperty($additionalWebspacesPropertyNameLocalized)) {
             return;
         }

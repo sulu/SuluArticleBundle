@@ -37,9 +37,9 @@ class ArticleImportTest extends SuluTestCase
 
         $import = $this->getContainer()->get('sulu_article.import.importer');
 
-        $fileContent = file_get_contents(__DIR__ . '/export.xliff');
-        $fileContent = str_replace('%uuid%', $article['id'], $fileContent);
-        file_put_contents(__DIR__ . '/export.test.xliff', $fileContent);
+        $fileContent = \file_get_contents(__DIR__ . '/export.xliff');
+        $fileContent = \str_replace('%uuid%', $article['id'], $fileContent);
+        \file_put_contents(__DIR__ . '/export.test.xliff', $fileContent);
 
         $result = $import->import('de', __DIR__ . '/export.test.xliff', null, '1.2.xliff', true);
 
@@ -78,16 +78,16 @@ class ArticleImportTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=en&action=publish',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
     private function getArticle(string $id, string $locale = 'de'): array
     {
         $this->client->jsonRequest('GET', '/api/articles/' . $id . '?locale=' . $locale);
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 }

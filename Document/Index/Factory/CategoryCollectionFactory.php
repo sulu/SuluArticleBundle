@@ -69,6 +69,6 @@ class CategoryCollectionFactory
             $categories[$id]->keywords[] = $categoryData['keyword'];
         }
 
-        return new Collection(array_values($categories));
+        return new Collection(\array_values($categories));
     }
 }

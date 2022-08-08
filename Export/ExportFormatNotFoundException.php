@@ -20,7 +20,7 @@ class ExportFormatNotFoundException extends \Exception
 
     public function __construct(string $format, int $code = 0, \Throwable $previous = null)
     {
-        parent::__construct(sprintf('No format "%s" configured for Snippet export', $format), $code, $previous);
+        parent::__construct(\sprintf('No format "%s" configured for Snippet export', $format), $code, $previous);
 
         $this->format = $format;
     }

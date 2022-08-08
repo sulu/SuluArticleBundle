@@ -33,9 +33,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ArticlePageSubscriber implements EventSubscriberInterface
 {
-    const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
+    public const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
 
-    const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
+    public const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
 
     /**
      * @var StructureMetadataFactoryInterface
@@ -76,9 +76,6 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         $this->resolver = $resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -181,7 +178,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         $pageTitle = $this->getPageTitle($document);
 
         // if no page-title exists use a unique-id
-        $nodeName = $this->slugifier->slugify($pageTitle ?: uniqid('page-', true));
+        $nodeName = $this->slugifier->slugify($pageTitle ?: \uniqid('page-', true));
         $nodeName = $this->resolver->resolveName($event->getParentNode(), $nodeName);
         $node = $event->getParentNode()->addNode($nodeName);
 
@@ -212,7 +209,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
         }
 
         $stagedData = $document->getStructure()->getStagedData();
-        if (array_key_exists($pageTitleProperty->getName(), $stagedData)) {
+        if (\array_key_exists($pageTitleProperty->getName(), $stagedData)) {
             return $stagedData[$pageTitleProperty->getName()];
         }
 
@@ -267,7 +264,7 @@ class ArticlePageSubscriber implements EventSubscriberInterface
     public function handleMetadataLoad(MetadataLoadEvent $event): void
     {
         if (ArticlePageDocument::class !== $event->getMetadata()->getClass()
-            && !is_subclass_of($event->getMetadata()->getClass(), ArticlePageDocument::class)
+            && !\is_subclass_of($event->getMetadata()->getClass(), ArticlePageDocument::class)
         ) {
             return;
         }

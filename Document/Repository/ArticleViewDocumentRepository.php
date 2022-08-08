@@ -29,7 +29,7 @@ class ArticleViewDocumentRepository
 {
     use ArticleViewDocumentIdTrait;
 
-    const DEFAULT_LIMIT = 5;
+    public const DEFAULT_LIMIT = 5;
 
     /**
      * @var Manager

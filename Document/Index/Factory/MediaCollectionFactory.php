@@ -46,7 +46,7 @@ class MediaCollectionFactory
             return $mediaCollection;
         }
 
-        if (array_key_exists('ids', $data)) {
+        if (\array_key_exists('ids', $data)) {
             $medias = $this->mediaManager->getByIds($data['ids'], $locale);
 
             foreach ($medias as $media) {

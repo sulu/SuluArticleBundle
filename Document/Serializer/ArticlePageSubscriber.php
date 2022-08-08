@@ -23,9 +23,6 @@ use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
  */
 class ArticlePageSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

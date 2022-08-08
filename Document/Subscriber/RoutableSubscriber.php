@@ -41,11 +41,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class RoutableSubscriber implements EventSubscriberInterface
 {
-    const ROUTE_FIELD = 'routePath';
+    public const ROUTE_FIELD = 'routePath';
 
-    const ROUTES_PROPERTY = 'suluRoutes';
+    public const ROUTES_PROPERTY = 'suluRoutes';
 
-    const TAG_NAME = 'sulu_article.article_route';
+    public const TAG_NAME = 'sulu_article.article_route';
 
     /**
      * @var ChainRouteGeneratorInterface
@@ -114,9 +114,6 @@ class RoutableSubscriber implements EventSubscriberInterface
         $this->conflictResolver = $conflictResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -275,11 +272,11 @@ class RoutableSubscriber implements EventSubscriberInterface
             return null;
         }
 
-        $oldRoute = $this->routeRepository->findByEntity(get_class($document), $document->getUuid(), $locale);
-        $history = $this->routeRepository->findHistoryByEntity(get_class($document), $document->getUuid(), $locale);
+        $oldRoute = $this->routeRepository->findByEntity(\get_class($document), $document->getUuid(), $locale);
+        $history = $this->routeRepository->findHistoryByEntity(\get_class($document), $document->getUuid(), $locale);
 
         /** @var RouteInterface $historyRoute */
-        foreach (array_filter(array_merge($history, [$oldRoute])) as $historyRoute) {
+        foreach (\array_filter(\array_merge($history, [$oldRoute])) as $historyRoute) {
             if ($historyRoute->getId() === $newRoute->getId() || $document->getId() !== $historyRoute->getEntityId()) {
                 // Mismatch of entity-id's happens because doctrine don't check entities which has been changed in the
                 // current session. If the old-route was already reused by a page before it will be returned in the
@@ -293,7 +290,7 @@ class RoutableSubscriber implements EventSubscriberInterface
             $newRoute->addHistory($historyRoute);
         }
 
-        $newRoute->setEntityClass(get_class($document));
+        $newRoute->setEntityClass(\get_class($document));
         $newRoute->setEntityId($document->getId());
         $newRoute->setTarget(null);
         $newRoute->setHistory(false);

@@ -62,9 +62,6 @@ class ArticleRouteEnhancerTest extends TestCase
      */
     private $article;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->webspace = $this->prophesize(Webspace::class);
@@ -105,7 +102,7 @@ class ArticleRouteEnhancerTest extends TestCase
     {
         $defaults = $this->articleRouteGenerator->enhance($this->defaults, $this->request->reveal());
         $this->assertArrayHasKey('_seo', $defaults);
-        $this->assertTrue(is_array($defaults['_seo']));
+        $this->assertTrue(\is_array($defaults['_seo']));
         $this->assertArrayHasKey('canonicalUrl', $defaults['_seo']);
         $this->assertEquals('main-webspace/route/path', $defaults['_seo']['canonicalUrl']);
     }

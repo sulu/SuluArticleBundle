@@ -27,13 +27,10 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    const AUTHOR_PROPERTY_NAME = 'sulu:author';
+    public const AUTHOR_PROPERTY_NAME = 'sulu:author';
 
-    const AUTHORED_PROPERTY_NAME = 'sulu:authored';
+    public const AUTHORED_PROPERTY_NAME = 'sulu:authored';
 
-    /**
-     * {@inheritdoc}
-     */
     public function up(SessionInterface $session)
     {
         $liveSession = $this->container->get('sulu_document_manager.live_session');
@@ -74,7 +71,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
-                if (!$node->hasProperty(sprintf('i18n:%s-template', $localization->getLocale()))) {
+                if (!$node->hasProperty(\sprintf('i18n:%s-template', $localization->getLocale()))) {
                     continue;
                 }
 
@@ -97,7 +94,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
             return;
         }
 
-        $authorPropertyName = sprintf('i18n:%s-author', $locale);
+        $authorPropertyName = \sprintf('i18n:%s-author', $locale);
         $node->setProperty($authorPropertyName, $node->getPropertyValue(self::AUTHOR_PROPERTY_NAME));
     }
 
@@ -107,7 +104,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
             return;
         }
 
-        $authoredPropertyName = sprintf('i18n:%s-authored', $locale);
+        $authoredPropertyName = \sprintf('i18n:%s-authored', $locale);
         $node->setProperty($authoredPropertyName, $node->getPropertyValue(self::AUTHORED_PROPERTY_NAME));
     }
 
@@ -129,7 +126,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
-                if (!$node->hasProperty(sprintf('i18n:%s-changed', $localization->getLocale()))) {
+                if (!$node->hasProperty(\sprintf('i18n:%s-changed', $localization->getLocale()))) {
                     continue;
                 }
 
@@ -141,7 +138,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 
     private function downgradeAuthor(NodeInterface $node, $locale)
     {
-        $authorPropertyName = sprintf('i18n:%s-author', $locale);
+        $authorPropertyName = \sprintf('i18n:%s-author', $locale);
         if (!$node->hasProperty($authorPropertyName)) {
             return;
         }
@@ -152,7 +149,7 @@ class Version201712041018 implements VersionInterface, ContainerAwareInterface
 
     private function downgradeAuthored(NodeInterface $node, $locale)
     {
-        $authoredPropertyName = sprintf('i18n:%s-authored', $locale);
+        $authoredPropertyName = \sprintf('i18n:%s-authored', $locale);
         if (!$node->hasProperty($authoredPropertyName)) {
             return;
         }

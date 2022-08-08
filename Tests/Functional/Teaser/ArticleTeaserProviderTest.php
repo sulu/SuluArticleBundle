@@ -23,9 +23,6 @@ class ArticleTeaserProviderTest extends SuluTestCase
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -85,9 +82,9 @@ class ArticleTeaserProviderTest extends SuluTestCase
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 }

@@ -51,7 +51,7 @@ class ContentProxyListener
         $structure = $this->structureManager->getStructure($document->getStructureType(), 'article');
 
         if (!$structure) {
-            throw new \RuntimeException(sprintf('Could not find article structure from type "%s".', $document->getStructureType()));
+            throw new \RuntimeException(\sprintf('Could not find article structure from type "%s".', $document->getStructureType()));
         }
 
         $structure->setUuid($document->getUuid());
@@ -74,7 +74,7 @@ class ContentProxyListener
     private function getProxies(string $contentData, StructureInterface $structure): array
     {
         $contentData = $contentData ?: '{}';
-        $data = json_decode($contentData, true);
+        $data = \json_decode($contentData, true);
 
         $content = $this->contentProxyFactory->createContentProxy($structure, $data);
         $view = $this->contentProxyFactory->createViewProxy($structure, $data);

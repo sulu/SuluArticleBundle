@@ -22,9 +22,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticlePageDocumentType extends AbstractStructureBehaviorType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -33,9 +30,6 @@ class ArticlePageDocumentType extends AbstractStructureBehaviorType
         $builder->add('shadowLocale', TextType::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

@@ -141,9 +141,9 @@ EOT;
         $this->client->jsonRequest(
             'POST',
             '/api/articles?locale=de&action=publish',
-            array_merge($data, ['title' => $title, 'template' => $template])
+            \array_merge($data, ['title' => $title, 'template' => $template])
         );
 
-        return json_decode($this->client->getResponse()->getContent(), true);
+        return \json_decode($this->client->getResponse()->getContent(), true);
     }
 }

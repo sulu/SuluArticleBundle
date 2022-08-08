@@ -26,9 +26,6 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function up(SessionInterface $session)
     {
         $liveSession = $this->container->get('sulu_document_manager.live_session');
@@ -40,9 +37,6 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
         $session->save();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function down(SessionInterface $session)
     {
         $liveSession = $this->container->get('sulu_document_manager.live_session');
@@ -73,16 +67,16 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
                 $value = null;
-                $authorsPropertyName = sprintf('i18n:%s-authors', $localization->getLocale());
+                $authorsPropertyName = \sprintf('i18n:%s-authors', $localization->getLocale());
                 if ($node->hasProperty($authorsPropertyName)) {
                     $property = $node->getProperty($authorsPropertyName);
                     $value = $property->getValue();
-                    if (is_array($value) && count($value) > 0) {
+                    if (\is_array($value) && \count($value) > 0) {
                         $value = $value[0];
                     }
                     $property->remove();
                 }
-                $authorPropertyName = sprintf('i18n:%s-author', $localization->getLocale());
+                $authorPropertyName = \sprintf('i18n:%s-author', $localization->getLocale());
                 if (!$node->hasProperty($authorPropertyName)) {
                     $node->setProperty(
                         $authorPropertyName,
@@ -111,13 +105,13 @@ class Version201702211450 implements VersionInterface, ContainerAwareInterface
             /** @var Localization $localization */
             foreach ($localizations as $localization) {
                 $value = null;
-                $authorPropertyName = sprintf('i18n:%s-author', $localization->getLocale());
+                $authorPropertyName = \sprintf('i18n:%s-author', $localization->getLocale());
                 if ($node->hasProperty($authorPropertyName)) {
                     $property = $node->getProperty($authorPropertyName);
                     $value = $property->getValue();
                     $property->remove();
                 }
-                $authorsPropertyName = sprintf('i18n:%s-authors', $localization->getLocale());
+                $authorsPropertyName = \sprintf('i18n:%s-authors', $localization->getLocale());
                 if (!$node->hasProperty($authorsPropertyName)) {
                     $node->setProperty(
                         $authorsPropertyName,

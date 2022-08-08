@@ -208,7 +208,7 @@ class ArticleExport extends Export implements ArticleExportInterface
     protected function getTemplate($format)
     {
         if (!isset($this->formatFilePaths[$format])) {
-            throw new ExportFormatNotFoundException(sprintf('No format "%s" configured for Snippet export', $format));
+            throw new ExportFormatNotFoundException(\sprintf('No format "%s" configured for Snippet export', $format));
         }
 
         return $this->formatFilePaths[$format];

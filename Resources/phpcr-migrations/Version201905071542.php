@@ -52,16 +52,16 @@ class Version201905071542 implements VersionInterface, ContainerAwareInterface
             $node = $row->getNode();
 
             foreach ($node->getProperties() as $property) {
-                if (is_string($property->getValue())) {
-                    $propertyValue = json_decode($property->getValue(), true);
-                    if (is_array($propertyValue) && array_key_exists('items', $propertyValue)) {
+                if (\is_string($property->getValue())) {
+                    $propertyValue = \json_decode($property->getValue(), true);
+                    if (\is_array($propertyValue) && \array_key_exists('items', $propertyValue)) {
                         foreach ($propertyValue['items'] as &$item) {
                             if (isset($item['type']) && 'article' === $item['type']) {
                                 $item['type'] = 'articles';
                             }
                         }
 
-                        $property->setValue(json_encode($propertyValue));
+                        $property->setValue(\json_encode($propertyValue));
                     }
                 }
             }
@@ -79,16 +79,16 @@ class Version201905071542 implements VersionInterface, ContainerAwareInterface
             $node = $row->getNode();
 
             foreach ($node->getProperties() as $property) {
-                if (is_string($property->getValue())) {
-                    $propertyValue = json_decode($property->getValue(), true);
-                    if (is_array($propertyValue) && array_key_exists('items', $propertyValue)) {
+                if (\is_string($property->getValue())) {
+                    $propertyValue = \json_decode($property->getValue(), true);
+                    if (\is_array($propertyValue) && \array_key_exists('items', $propertyValue)) {
                         foreach ($propertyValue['items'] as &$item) {
                             if (isset($item['type']) && 'articles' === $item['type']) {
                                 $item['type'] = 'article';
                             }
                         }
 
-                        $property->setValue(json_encode($propertyValue));
+                        $property->setValue(\json_encode($propertyValue));
                     }
                 }
             }

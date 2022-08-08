@@ -39,9 +39,6 @@ class ArticlePageRouteGeneratorTest extends TestCase
      */
     private $articleRouteGenerator;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->routeGenerator = $this->prophesize(RouteGeneratorInterface::class);
