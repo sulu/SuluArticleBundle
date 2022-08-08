@@ -49,7 +49,7 @@ class ArticleRouteEnhancer implements RouteEnhancerInterface
         $this->environment = $environment;
     }
 
-    public function enhance(array $defaults, Request $request)
+    public function enhance(array $defaults, Request $request): array
     {
         if (!$this->shouldAddCanonicalTag($defaults, $request)) {
             return $defaults;

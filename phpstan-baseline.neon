@@ -2411,12 +2411,12 @@ parameters:
 			path: Routing/ArticleRouteEnhancer.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Routing\\\\ArticleRouteEnhancer\\:\\:enhance\\(\\) has parameter \\$defaults with no value type specified in iterable type array\\.$#"
+			message: "#^Cannot call method getLocale\\(\\) on mixed\\.$#"
 			count: 1
 			path: Routing/ArticleRouteEnhancer.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Routing\\\\ArticleRouteEnhancer\\:\\:enhance\\(\\) return type has no value type specified in iterable type array\\.$#"
+			message: "#^Cannot call method getRoutePath\\(\\) on mixed\\.$#"
 			count: 1
 			path: Routing/ArticleRouteEnhancer.php
 
@@ -2427,6 +2427,11 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: Routing/ArticleRouteEnhancer.php
+
+		-
+			message: "#^Parameter \\#1 \\$document of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Resolver\\\\WebspaceResolver\\:\\:resolveMainWebspace\\(\\) expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Behavior\\\\WebspaceBehavior, mixed given\\.$#"
 			count: 1
 			path: Routing/ArticleRouteEnhancer.php
 
