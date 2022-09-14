@@ -16,7 +16,7 @@ use Sulu\Component\Content\Compat\Structure\StructureBridge;
 /**
  * Own structure bridge for articles.
  */
-class ArticleBridge extends StructureBridge
+class ArticleBridge extends StructureBridge implements CacheLifetimeBehaviourInterface
 {
     /**
      * @var string
@@ -90,5 +90,10 @@ class ArticleBridge extends StructureBridge
     public function setWebspaceKey($webspace)
     {
         $this->webspaceKey = $webspace;
+    }
+
+    public function getCacheLifeTime()
+    {
+        return $this->structure->getCacheLifetime();
     }
 }
