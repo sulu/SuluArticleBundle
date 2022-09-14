@@ -94,6 +94,9 @@ class ArticleBridge extends StructureBridge implements CacheLifetimeBehaviourInt
 
     public function getCacheLifeTime()
     {
-        return $this->structure->getCacheLifetime();
+        /** @var array{type: string, value: string} $cacheLifetime */
+        $cacheLifetime = $this->structure->getCacheLifetime();
+
+        return $cacheLifetime;
     }
 }
