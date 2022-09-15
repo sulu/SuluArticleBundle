@@ -14,6 +14,7 @@ namespace Sulu\Bundle\ArticleBundle\Tests\Application;
 use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
+use Sulu\Bundle\HeadlessBundle\SuluHeadlessBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -29,6 +30,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $bundles = parent::registerBundles();
         $bundles[] = new SuluArticleBundle();
         $bundles[] = new ONGRElasticsearchBundle();
+        $bundles[] = new SuluHeadlessBundle();
 
         if ('extend' === \getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();

@@ -94,7 +94,7 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
     /**
      * @param string $webspaceKey
      * @param string $locale
-     * @param mixed[] $additionalFields
+     * @param array<string, array<array{name: string, property: string, extension?: string, templateKey?: string}>> $additionalFields
      *
      * @return string
      */
@@ -111,12 +111,13 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
 
     /**
      * @param string $locale
-     * @param mixed[] $additionalFields
+     * @param array<string, array<array{name: string, property: string, extension?: string, templateKey?: string}>> $additionalFields
      */
     private function buildPropertiesSelect($locale, &$additionalFields): void
     {
         foreach ($this->propertiesConfig as $parameter) {
             $alias = $parameter->getName();
+            /** @var string $propertyName */
             $propertyName = $parameter->getValue();
 
             if (false !== \strpos($propertyName, '.')) {
@@ -133,7 +134,7 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
      * @param string $alias
      * @param string $propertyName
      * @param string $locale
-     * @param mixed[] $additionalFields
+     * @param array<string, array<array{name: string, property: string, extension?: string, templateKey?: string}>> $additionalFields
      */
     private function buildPropertySelect($alias, $propertyName, $locale, &$additionalFields): void
     {
@@ -154,7 +155,7 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
      * @param string $extension
      * @param string $propertyName
      * @param string $locale
-     * @param mixed[] $additionalFields
+     * @param array<string, array<array{name: string, property: string, extension?: string, templateKey?: string}>> $additionalFields
      */
     private function buildExtensionSelect($alias, $extension, $propertyName, $locale, &$additionalFields): void
     {

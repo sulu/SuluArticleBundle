@@ -50,6 +50,7 @@
         "phpstan/phpstan-webmozart-assert": "^1.0",
         "phpunit/phpunit": "^8.2",
         "sulu/automation-bundle": "^2.0@dev",
+        "sulu/headless-bundle": "^0.8.0@dev",
         "symfony/browser-kit": "^4.3 || ^5.0 || ^6.0",
         "symfony/dotenv": "^4.3 || ^5.0 || ^6.0",
         "symfony/framework-bundle": "^4.3 || ^5.0 || ^6.0",

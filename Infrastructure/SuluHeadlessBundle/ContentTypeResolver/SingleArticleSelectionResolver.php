@@ -36,12 +36,18 @@ class SingleArticleSelectionResolver implements ContentTypeResolverInterface
 
     public function resolve($data, PropertyInterface $property, string $locale, array $attributes = []): ContentView
     {
-        if (empty($data)) {
+        /** @var string|null $id */
+        $id = $data;
+
+        if (empty($id)) {
             return new ContentView(null, ['id' => null]);
         }
 
-        $content = $this->articleSelectionResolver->resolve([$data], $property, $locale, $attributes);
+        $content = $this->articleSelectionResolver->resolve([$id], $property, $locale, $attributes);
 
-        return new ContentView($content->getContent()[0] ?? null, ['id' => $data]);
+        /** @var mixed[]|null $contentData */
+        $contentData = $content->getContent();
+
+        return new ContentView($contentData[0] ?? null, ['id' => $id]);
     }
 }

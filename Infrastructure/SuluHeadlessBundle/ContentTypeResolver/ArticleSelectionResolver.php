@@ -62,7 +62,10 @@ class ArticleSelectionResolver implements ContentTypeResolverInterface
 
     public function resolve($data, PropertyInterface $property, string $locale, array $attributes = []): ContentView
     {
-        if (empty($data)) {
+        /** @var string[]|null $ids */
+        $ids = $data;
+
+        if (empty($ids)) {
             return new ContentView([], ['ids' => []]);
         }
 
@@ -72,12 +75,14 @@ class ArticleSelectionResolver implements ContentTypeResolverInterface
         $propertiesParamValue = isset($params['properties']) ? $params['properties']->getValue() : [];
 
         $this->contentQueryBuilder->init([
-            'ids' => $data,
+            'ids' => $ids,
             'properties' => $propertiesParamValue,
             'published' => !$this->showDrafts,
         ]);
 
-        list($articlesQuery) = $this->contentQueryBuilder->build($property->getStructure()->getWebspaceKey(), [$locale]);
+        /** @var array{string, mixed[]} $queryBuilderResult */
+        $queryBuilderResult = $this->contentQueryBuilder->build($property->getStructure()->getWebspaceKey(), [$locale]);
+        list($articlesQuery) = $queryBuilderResult;
 
         $articleStructures = $this->contentMapper->loadBySql2(
             $articlesQuery,
@@ -96,12 +101,12 @@ class ArticleSelectionResolver implements ContentTypeResolverInterface
             $propertyMap[$paramName] = \is_string($paramValue) ? $paramValue : $paramName;
         }
 
-        $articles = \array_fill_keys($data, null);
+        $articles = \array_fill_keys($ids, null);
 
         foreach ($articleStructures as $articleStructure) {
             $articles[$articleStructure->getUuid()] = $this->structureResolver->resolveProperties($articleStructure, $propertyMap, $locale);
         }
 
-        return new ContentView(\array_values(\array_filter($articles)), ['ids' => $data]);
+        return new ContentView(\array_values(\array_filter($articles)), ['ids' => $ids]);
     }
 }

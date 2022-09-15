@@ -55,7 +55,7 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         StructureResolverInterface $structureResolver,
         ContentQueryBuilderInterface $contentQueryBuilder,
         ContentMapperInterface $contentMapper,
-        bool $showDrafts
+        bool $showDrafts,
     ) {
         $this->articleDataProvider = $articleDataProvider;
         $this->structureResolver = $structureResolver;
@@ -77,16 +77,13 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         return $this->articleDataProvider->getDefaultPropertyParameter();
     }
 
-    /**
-     * @var PropertyParameter[]
-     */
     public function resolve(
         array $filters,
         array $propertyParameters,
         array $options = [],
         ?int $limit = null,
         int $article = 1,
-        ?int $pageSize = null
+        ?int $pageSize = null,
     ): DataProviderResult {
         $providerResult = $this->articleDataProvider->resolveResourceItems(
             $filters,
@@ -94,8 +91,13 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
             $options,
             $limit,
             $article,
-            $pageSize
+            $pageSize,
         );
+
+        /** @var string $webspaceKey */
+        $webspaceKey = $options['webspaceKey'];
+        /** @var string $locale */
+        $locale = $options['locale'];
 
         $articleIds = [];
         foreach ($providerResult->getItems() as $resultItem) {
@@ -111,8 +113,8 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         $articleStructures = $this->loadArticleStructures(
             $articleIds,
             $propertiesParamValue,
-            $options['webspaceKey'],
-            $options['locale']
+            $webspaceKey,
+            $locale,
         );
 
         $propertyMap = [
@@ -129,7 +131,7 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         $resolvedArticles = \array_fill_keys($articleIds, null);
 
         foreach ($articleStructures as $articleStructure) {
-            $resolvedArticles[$articleStructure->getUuid()] = $this->structureResolver->resolveProperties($articleStructure, $propertyMap, $options['locale']);
+            $resolvedArticles[$articleStructure->getUuid()] = $this->structureResolver->resolveProperties($articleStructure, $propertyMap, $locale);
         }
 
         return new DataProviderResult(\array_values(\array_filter($resolvedArticles)), $providerResult->getHasNextPage());
@@ -152,12 +154,15 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
             'properties' => $propertiesParamValue,
             'published' => !$this->showDrafts,
         ]);
-        [$articlesQuery] = $this->contentQueryBuilder->build($webspaceKey, [$locale]);
+
+        /** @var array{string, mixed[]} $queryBuilderResult */
+        $queryBuilderResult = $this->contentQueryBuilder->build($webspaceKey, [$locale]);
+        list($articlesQuery) = $queryBuilderResult;
 
         return $this->contentMapper->loadBySql2(
             $articlesQuery,
             $locale,
-            $webspaceKey
+            $webspaceKey,
         );
     }
 }
