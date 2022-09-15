@@ -42,6 +42,7 @@
         "jangregor/phpstan-prophecy": "^1.0",
         "massive/build-bundle": "^0.3 || ^0.4 || ^0.5",
         "phpcr/phpcr-shell": "^1.1",
+        "phpspec/prophecy": "^1.15",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-doctrine": "^1.0",
         "phpstan/phpstan-phpunit": "^1.0",
