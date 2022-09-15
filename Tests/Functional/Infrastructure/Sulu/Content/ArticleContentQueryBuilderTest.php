@@ -346,52 +346,60 @@ class ArticleContentQueryBuilderTest extends SuluTestCase
         );
 
         $result = $this->contentQuery->execute('sulu_io', ['en'], $builder);
+        $this->assertCount(4, $result);
 
-        $this->assertSame(4, \count($result));
+        $items = [];
+        foreach ($result as $item) {
+            $items[$item['routePath']] = $item;
+        }
 
-        $this->assertSame('/team/thomas', $result[0]['routePath']);
-        $this->assertSame('Thomas', $result[0]['title']);
-        $this->assertFalse($result[0]['publishedState']);
-        $this->assertNull($result[0]['published']);
+        $this->assertSame('/team/thomas', $items['/team/thomas']['routePath']);
+        $this->assertSame('Thomas', $items['/team/thomas']['title']);
+        $this->assertFalse($items['/team/thomas']['publishedState']);
+        $this->assertNull($items['/team/thomas']['published']);
 
-        $this->assertSame('/team/daniel', $result[1]['routePath']);
-        $this->assertSame('Daniel', $result[1]['title']);
-        $this->assertTrue($result[1]['publishedState']);
-        $this->assertNotNull($result[1]['published']);
+        $this->assertSame('/team/daniel', $items['/team/daniel']['routePath']);
+        $this->assertSame('Daniel', $items['/team/daniel']['title']);
+        $this->assertTrue($items['/team/daniel']['publishedState']);
+        $this->assertNotNull($items['/team/daniel']['published']);
 
-        $this->assertSame('/team/johannes', $result[2]['routePath']);
-        $this->assertSame('Johannes', $result[2]['title']);
-        $this->assertFalse($result[2]['publishedState']);
-        $this->assertNull($result[2]['published']);
+        $this->assertSame('/team/johannes', $items['/team/johannes']['routePath']);
+        $this->assertSame('Johannes', $items['/team/johannes']['title']);
+        $this->assertFalse($items['/team/johannes']['publishedState']);
+        $this->assertNull($items['/team/johannes']['published']);
 
-        $this->assertSame('/team/alex', $result[3]['routePath']);
-        $this->assertSame('Alex', $result[3]['title']);
-        $this->assertTrue($result[3]['publishedState']);
-        $this->assertNotNull($result[3]['published']);
+        $this->assertSame('/team/alex', $items['/team/alex']['routePath']);
+        $this->assertSame('Alex', $items['/team/alex']['title']);
+        $this->assertTrue($items['/team/alex']['publishedState']);
+        $this->assertNotNull($items['/team/alex']['published']);
 
         $result = $this->contentQuery->execute('sulu_io', ['de'], $builder);
+        $this->assertCount(4, $result);
 
-        $this->assertSame(4, \count($result));
+        $items = [];
+        foreach ($result as $item) {
+            $items[$item['routePath']] = $item;
+        }
 
-        $this->assertSame('/team/thomas', $result[0]['routePath']);
-        $this->assertSame('Thomas', $result[0]['title']);
-        $this->assertFalse($result[0]['publishedState']);
-        $this->assertNull($result[0]['published']);
+        $this->assertSame('/team/thomas', $items['/team/thomas']['routePath']);
+        $this->assertSame('Thomas', $items['/team/thomas']['title']);
+        $this->assertFalse($items['/team/thomas']['publishedState']);
+        $this->assertNull($items['/team/thomas']['published']);
 
-        $this->assertSame('/team/daniel', $result[1]['routePath']);
-        $this->assertSame('Daniel', $result[1]['title']);
-        $this->assertTrue($result[1]['publishedState']);
-        $this->assertNotNull($result[1]['published']);
+        $this->assertSame('/team/daniel', $items['/team/daniel']['routePath']);
+        $this->assertSame('Daniel', $items['/team/daniel']['title']);
+        $this->assertTrue($items['/team/daniel']['publishedState']);
+        $this->assertNotNull($items['/team/daniel']['published']);
 
-        $this->assertSame('/team/johannes', $result[2]['routePath']);
-        $this->assertSame('Johannes DE', $result[2]['title']);
-        $this->assertTrue($result[2]['publishedState']);
-        $this->assertNotNull($result[2]['published']);
+        $this->assertSame('/team/johannes', $items['/team/johannes']['routePath']);
+        $this->assertSame('Johannes DE', $items['/team/johannes']['title']);
+        $this->assertTrue($items['/team/johannes']['publishedState']);
+        $this->assertNotNull($items['/team/johannes']['published']);
 
-        $this->assertSame('/team/alex', $result[3]['routePath']);
-        $this->assertSame('Alex', $result[3]['title']);
-        $this->assertFalse($result[3]['publishedState']);
-        $this->assertNull($result[3]['published']);
+        $this->assertSame('/team/alex', $items['/team/alex']['routePath']);
+        $this->assertSame('Alex', $items['/team/alex']['title']);
+        $this->assertFalse($items['/team/alex']['publishedState']);
+        $this->assertNull($items['/team/alex']['published']);
     }
 
     private function save(
