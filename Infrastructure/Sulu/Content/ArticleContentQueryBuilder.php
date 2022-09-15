@@ -75,7 +75,7 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
         }
 
         $this->ids = $ids;
-        $this->propertiesConfig = array_merge(
+        $this->propertiesConfig = \array_merge(
             ['routePath' => new PropertyParameter('routePath', 'routePath')],
             isset($options['properties']) ? $options['properties'] : []
         );
