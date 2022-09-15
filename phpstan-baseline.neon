@@ -221,6 +221,11 @@ parameters:
 			path: Content/ArticleDataProvider.php
 
 		-
+			message: "#^Parameter \\#2 \\$initializer of method ProxyManager\\\\Factory\\\\LazyLoadingValueHolderFactory\\:\\:createProxy\\(\\) expects Closure\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\|null\\=, ProxyManager\\\\Proxy\\\\ValueHolderInterface\\<Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\>&ProxyManager\\\\Proxy\\\\VirtualProxyInterface&Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\=, string\\=, array\\<string, mixed\\>\\=, Closure\\|null\\=\\)\\: bool, Closure\\(mixed, ProxyManager\\\\Proxy\\\\LazyLoadingInterface, mixed, array, mixed\\)\\: true given\\.$#"
+			count: 1
+			path: Content/ArticleDataProvider.php
+
+		-
 			message: "#^Parameter \\#2 \\$value of class Sulu\\\\Component\\\\Content\\\\Compat\\\\PropertyParameter constructor expects array\\|bool\\|string, null given\\.$#"
 			count: 1
 			path: Content/ArticleDataProvider.php
@@ -254,6 +259,11 @@ parameters:
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleResourceItem\\:\\:getResource\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Content/ArticleResourceItem.php
+
+		-
+			message: "#^Parameter \\#2 \\$initializer of method ProxyManager\\\\Factory\\\\LazyLoadingValueHolderFactory\\:\\:createProxy\\(\\) expects Closure\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\|null\\=, ProxyManager\\\\Proxy\\\\ValueHolderInterface\\<Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\>&ProxyManager\\\\Proxy\\\\VirtualProxyInterface&Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\=, string\\=, array\\<string, mixed\\>\\=, Closure\\|null\\=\\)\\: bool, Closure\\(mixed, ProxyManager\\\\Proxy\\\\LazyLoadingInterface, mixed, array, mixed\\)\\: true given\\.$#"
+			count: 1
+			path: Content/ArticleResourceItemFactory.php
 
 		-
 			message: "#^Parameter \\#2 \\$resource of class Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleResourceItem constructor expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument, object given\\.$#"
@@ -1591,6 +1601,11 @@ parameters:
 			path: Document/Structure/ContentProxyFactory.php
 
 		-
+			message: "#^Parameter \\#2 \\$initializer of method ProxyManager\\\\Factory\\\\LazyLoadingValueHolderFactory\\:\\:createProxy\\(\\) expects Closure\\(ArrayObject\\|null\\=, ArrayObject&ProxyManager\\\\Proxy\\\\ValueHolderInterface\\<ArrayObject\\>&ProxyManager\\\\Proxy\\\\VirtualProxyInterface\\=, string\\=, array\\<string, mixed\\>\\=, Closure\\|null\\=\\)\\: bool, Closure\\(mixed, ProxyManager\\\\Proxy\\\\LazyLoadingInterface, mixed, array, mixed\\)\\: true given\\.$#"
+			count: 2
+			path: Document/Structure/ContentProxyFactory.php
+
+		-
 			message: "#^Call to an undefined method object\\:\\:getStructureType\\(\\)\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticlePageSubscriber.php
@@ -2657,11 +2672,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$extensions of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setExtensionsData\\(\\) expects array\\<array\\>\\|Sulu\\\\Component\\\\Content\\\\Document\\\\Extension\\\\ExtensionContainer, mixed given\\.$#"
-			count: 1
-			path: Trash/ArticleTrashItemHandler.php
-
-		-
-			message: "#^Parameter \\#1 \\$identifier of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:find\\(\\) expects string, mixed given\\.$#"
 			count: 1
 			path: Trash/ArticleTrashItemHandler.php
 
