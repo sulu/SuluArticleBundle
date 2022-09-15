@@ -32,6 +32,11 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
     protected static $structureType = 'article';
 
     /**
+     * @var string[]
+     */
+    protected $properties = ['routePath'];
+
+    /**
      * disable automatic excerpt loading.
      *
      * @var bool
@@ -70,7 +75,10 @@ class ArticleContentQueryBuilder extends ContentQueryBuilder
         }
 
         $this->ids = $ids;
-        $this->propertiesConfig = isset($options['properties']) ? $options['properties'] : [];
+        $this->propertiesConfig = array_merge(
+            ['routePath' => new PropertyParameter('routePath', 'routePath')],
+            isset($options['properties']) ? $options['properties'] : []
+        );
         $this->published = isset($options['published']) ? $options['published'] : false;
     }
 

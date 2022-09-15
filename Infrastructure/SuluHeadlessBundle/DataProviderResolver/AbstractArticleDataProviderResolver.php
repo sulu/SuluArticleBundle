@@ -55,7 +55,7 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         StructureResolverInterface $structureResolver,
         ContentQueryBuilderInterface $contentQueryBuilder,
         ContentMapperInterface $contentMapper,
-        bool $showDrafts,
+        bool $showDrafts
     ) {
         $this->articleDataProvider = $articleDataProvider;
         $this->structureResolver = $structureResolver;
@@ -83,7 +83,7 @@ abstract class AbstractArticleDataProviderResolver implements DataProviderResolv
         array $options = [],
         ?int $limit = null,
         int $article = 1,
-        ?int $pageSize = null,
+        ?int $pageSize = null
     ): DataProviderResult {
         $providerResult = $this->articleDataProvider->resolveResourceItems(
             $filters,

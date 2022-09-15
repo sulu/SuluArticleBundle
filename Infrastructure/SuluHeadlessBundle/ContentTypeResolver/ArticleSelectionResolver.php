@@ -52,7 +52,7 @@ class ArticleSelectionResolver implements ContentTypeResolverInterface
         StructureResolverInterface $structureResolver,
         ContentQueryBuilderInterface $contentQueryBuilder,
         ContentMapperInterface $contentMapper,
-        bool $showDrafts,
+        bool $showDrafts
     ) {
         $this->structureResolver = $structureResolver;
         $this->contentQueryBuilder = $contentQueryBuilder;
