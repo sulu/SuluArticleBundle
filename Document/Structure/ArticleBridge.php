@@ -36,10 +36,7 @@ class ArticleBridge extends StructureBridge implements RoutableStructureInterfac
         return $view;
     }
 
-    /**
-     * @return string
-     */
-    public function getController()
+    public function getController(): string
     {
         /** @var string $controller */
         $controller = $this->structure->getController();
@@ -50,7 +47,7 @@ class ArticleBridge extends StructureBridge implements RoutableStructureInterfac
     /**
      * @return array{type: string, value: string}
      */
-    public function getCacheLifeTime()
+    public function getCacheLifeTime(): array
     {
         /** @var array{type: string, value: string} $cacheLifetime */
         $cacheLifetime = $this->structure->getCacheLifetime();
