@@ -24,29 +24,6 @@ if (\interface_exists(SuluRoutableStructureInterface::class)) {
      */
     interface RoutableStructureInterface extends SuluRoutableStructureInterface
     {
-        /**
-         * twig template of template definition.
-         *
-         * @return string
-         */
-        public function getView();
-
-        /**
-         * controller which renders the twig template.
-         *
-         * @return string
-         */
-        public function getController();
-
-        /**
-         * cacheLifeTime of template definition.
-         *
-         * @return array{
-         *     type: string,
-         *     value: string,
-         * }
-         */
-        public function getCacheLifeTime();
     }
 } else {
     /**
