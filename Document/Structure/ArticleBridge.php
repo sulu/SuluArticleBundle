@@ -16,7 +16,7 @@ use Sulu\Component\Content\Compat\Structure\StructureBridge;
 /**
  * Own structure bridge for articles.
  */
-class ArticleBridge extends StructureBridge implements CacheLifetimeBehaviourInterface
+class ArticleBridge extends StructureBridge implements RoutableStructureInterface
 {
     /**
      * @var string
@@ -31,6 +31,19 @@ class ArticleBridge extends StructureBridge implements CacheLifetimeBehaviourInt
     public function getView(): string
     {
         return $this->structure->getView();
+    }
+
+    public function getController()
+    {
+        return $this->structure->getController();
+    }
+
+    public function getCacheLifeTime()
+    {
+        /** @var array{type: string, value: string} $cacheLifetime */
+        $cacheLifetime = $this->structure->getCacheLifetime();
+
+        return $cacheLifetime;
     }
 
     public function getUuid()
@@ -90,13 +103,5 @@ class ArticleBridge extends StructureBridge implements CacheLifetimeBehaviourInt
     public function setWebspaceKey($webspace)
     {
         $this->webspaceKey = $webspace;
-    }
-
-    public function getCacheLifeTime()
-    {
-        /** @var array{type: string, value: string} $cacheLifetime */
-        $cacheLifetime = $this->structure->getCacheLifetime();
-
-        return $cacheLifetime;
     }
 }
