@@ -1526,11 +1526,6 @@ parameters:
 			path: Document/Structure/ArticleBridge.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:getView\\(\\) should return string but returns string\\|null\\.$#"
-			count: 1
-			path: Document/Structure/ArticleBridge.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:setUuid\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/Structure/ArticleBridge.php
