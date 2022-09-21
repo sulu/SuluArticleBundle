@@ -11,11 +11,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Infrastructure\SuluHeadlessBundle\Content\DataProviderResolver;
+namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Infrastructure\Sulu\Headless\Content\DataProviderResolver;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver\ArticlePageTreeDataProviderResolver;
+use Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\DataProviderResolver\ArticleDataProviderResolver;
 use Sulu\Bundle\HeadlessBundle\Content\StructureResolverInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\Content\Compat\StructureInterface;
@@ -26,7 +26,7 @@ use Sulu\Component\SmartContent\DataProviderInterface;
 use Sulu\Component\SmartContent\DataProviderResult;
 use Sulu\Component\SmartContent\ResourceItemInterface;
 
-class ArticlePageTreeDataProviderResolverTest extends TestCase
+class ArticleDataProviderResolverTest extends TestCase
 {
     /**
      * @var DataProviderInterface|ObjectProphecy
@@ -49,7 +49,7 @@ class ArticlePageTreeDataProviderResolverTest extends TestCase
     private $contentMapper;
 
     /**
-     * @var ArticlePageTreeDataProviderResolver
+     * @var ArticleDataProviderResolver
      */
     private $articleDataProviderResolver;
 
@@ -60,7 +60,7 @@ class ArticlePageTreeDataProviderResolverTest extends TestCase
         $this->contentQueryBuilder = $this->prophesize(ContentQueryBuilderInterface::class);
         $this->contentMapper = $this->prophesize(ContentMapperInterface::class);
 
-        $this->articleDataProviderResolver = new ArticlePageTreeDataProviderResolver(
+        $this->articleDataProviderResolver = new ArticleDataProviderResolver(
             $this->articleDataProvider->reveal(),
             $this->structureResolver->reveal(),
             $this->contentQueryBuilder->reveal(),
@@ -71,7 +71,7 @@ class ArticlePageTreeDataProviderResolverTest extends TestCase
 
     public function testGetDataProvider(): void
     {
-        self::assertSame('articles_page_tree', $this->articleDataProviderResolver::getDataProvider());
+        self::assertSame('articles', $this->articleDataProviderResolver::getDataProvider());
     }
 
     public function testGetProviderConfiguration(): void

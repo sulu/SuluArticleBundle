@@ -5,7 +5,7 @@
     <services>
         <service
             id="sulu_article.content_type_resolver.article_selection"
-            class="Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\ContentTypeResolver\ArticleSelectionResolver"
+            class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver\ArticleSelectionResolver"
             lazy="true"
         >
             <argument type="service" id="sulu_headless.structure_resolver"/>
@@ -18,7 +18,7 @@
 
         <service
             id="sulu_article.content_type_resolver.single_page_selection"
-            class="Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\ContentTypeResolver\SingleArticleSelectionResolver"
+            class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver\SingleArticleSelectionResolver"
             lazy="true"
         >
             <argument type="service" id="sulu_article.content_type_resolver.article_selection"/>
@@ -28,7 +28,7 @@
 
         <service
             id="sulu_article.data_provider_resolver.article_data_provider_resolver"
-            class="Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver\ArticleDataProviderResolver"
+            class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\DataProviderResolver\ArticleDataProviderResolver"
         >
             <argument type="service" id="sulu_article.content.data_provider"/>
             <argument type="service" id="sulu_headless.structure_resolver"/>
@@ -41,7 +41,7 @@
 
         <service
             id="sulu_article.data_provider_resolver.article_page_tree_data_provider_resolver"
-            class="Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver\ArticlePageTreeDataProviderResolver"
+            class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\DataProviderResolver\ArticlePageTreeDataProviderResolver"
         >
             <argument type="service" id="sulu_article.content.page_tree_data_provider"/>
             <argument type="service" id="sulu_headless.structure_resolver"/>

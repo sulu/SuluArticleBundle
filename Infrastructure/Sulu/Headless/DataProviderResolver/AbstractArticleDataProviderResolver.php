@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver;
+namespace Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\DataProviderResolver;
 
 use Sulu\Bundle\HeadlessBundle\Content\DataProviderResolver\DataProviderResolverInterface;
 use Sulu\Bundle\HeadlessBundle\Content\DataProviderResolver\DataProviderResult;

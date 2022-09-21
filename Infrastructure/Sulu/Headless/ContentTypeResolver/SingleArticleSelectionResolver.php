@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\ContentTypeResolver;
+namespace Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver;
 
 use Sulu\Bundle\HeadlessBundle\Content\ContentTypeResolver\ContentTypeResolverInterface;
 use Sulu\Bundle\HeadlessBundle\Content\ContentView;

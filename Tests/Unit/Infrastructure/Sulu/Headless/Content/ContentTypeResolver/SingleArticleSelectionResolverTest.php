@@ -11,12 +11,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\HeadlessBundle\Tests\Unit\Content\ContentTypeResolver;
+namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Infrastructure\Sulu\Headless\Content\ContentTypeResolver;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\ContentTypeResolver\ArticleSelectionResolver;
-use Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\ContentTypeResolver\SingleArticleSelectionResolver;
+use Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver\ArticleSelectionResolver;
+use Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver\SingleArticleSelectionResolver;
 use Sulu\Bundle\HeadlessBundle\Content\ContentView;
 use Sulu\Component\Content\Compat\PropertyInterface;
 
