@@ -362,6 +362,12 @@
 
             <tag name="sulu.teaser.provider" alias="articles"/>
         </service>
+        <service id="sulu_article.article_content_query_builder"
+                 class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Content\ArticleContentQueryBuilder">
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_page.extension.manager"/>
+            <argument>%sulu.content.language.namespace%</argument>
+        </service>
 
         <!-- sitemap -->
         <service id="sulu_article.sitemap.articles" class="Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider">

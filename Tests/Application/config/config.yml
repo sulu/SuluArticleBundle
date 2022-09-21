@@ -50,3 +50,8 @@ ongr_elasticsearch:
         analyzer:
             pathAnalyzer:
                 tokenizer: pathTokenizer
+
+services:
+    sulu_article_test.query_executor:
+        alias: sulu.content.query_executor
+        public: true
