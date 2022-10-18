@@ -11,28 +11,22 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Infrastructure\SuluHeadlessBundle\Content\DataProviderResolver;
+namespace Sulu\Bundle\ArticleBundle\Tests\Unit\Infrastructure\Sulu\Headless\Content\ContentTypeResolver;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
-use Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver\ArticleDataProviderResolver;
+use Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\ContentTypeResolver\ArticleSelectionResolver;
+use Sulu\Bundle\HeadlessBundle\Content\ContentView;
 use Sulu\Bundle\HeadlessBundle\Content\StructureResolverInterface;
+use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\Compat\PropertyParameter;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\Content\Query\ContentQueryBuilderInterface;
-use Sulu\Component\SmartContent\Configuration\ProviderConfigurationInterface;
-use Sulu\Component\SmartContent\DataProviderInterface;
-use Sulu\Component\SmartContent\DataProviderResult;
-use Sulu\Component\SmartContent\ResourceItemInterface;
 
-class ArticleDataProviderResolverTest extends TestCase
+class ArticleSelectionResolverTest extends TestCase
 {
-    /**
-     * @var DataProviderInterface|ObjectProphecy
-     */
-    private $articleDataProvider;
-
     /**
      * @var StructureResolverInterface|ObjectProphecy
      */
@@ -49,19 +43,17 @@ class ArticleDataProviderResolverTest extends TestCase
     private $contentMapper;
 
     /**
-     * @var ArticleDataProviderResolver
+     * @var ArticleSelectionResolver
      */
-    private $articleDataProviderResolver;
+    private $articleSelectionResolver;
 
     protected function setUp(): void
     {
-        $this->articleDataProvider = $this->prophesize(DataProviderInterface::class);
         $this->structureResolver = $this->prophesize(StructureResolverInterface::class);
         $this->contentQueryBuilder = $this->prophesize(ContentQueryBuilderInterface::class);
         $this->contentMapper = $this->prophesize(ContentMapperInterface::class);
 
-        $this->articleDataProviderResolver = new ArticleDataProviderResolver(
-            $this->articleDataProvider->reveal(),
+        $this->articleSelectionResolver = new ArticleSelectionResolver(
             $this->structureResolver->reveal(),
             $this->contentQueryBuilder->reveal(),
             $this->contentMapper->reveal(),
@@ -69,59 +61,33 @@ class ArticleDataProviderResolverTest extends TestCase
         );
     }
 
-    public function testGetDataProvider(): void
+    public function testGetContentType(): void
     {
-        self::assertSame('articles', $this->articleDataProviderResolver::getDataProvider());
-    }
-
-    public function testGetProviderConfiguration(): void
-    {
-        $configuration = $this->prophesize(ProviderConfigurationInterface::class);
-        $this->articleDataProvider->getConfiguration()->willReturn($configuration->reveal());
-
-        $this->assertSame($configuration->reveal(), $this->articleDataProviderResolver->getProviderConfiguration());
-    }
-
-    public function testGetProviderDefaultParams(): void
-    {
-        $propertyParameter = $this->prophesize(PropertyParameter::class);
-        $this->articleDataProvider->getDefaultPropertyParameter()->willReturn(['test' => $propertyParameter->reveal()]);
-
-        $this->assertSame(['test' => $propertyParameter->reveal()], $this->articleDataProviderResolver->getProviderDefaultParams());
+        self::assertSame('article_selection', $this->articleSelectionResolver::getContentType());
     }
 
     public function testResolve(): void
     {
-        $providerResultItem1 = $this->prophesize(ResourceItemInterface::class);
-        $providerResultItem1->getId()->willReturn('article-id-1');
+        $structure = $this->prophesize(StructureInterface::class);
+        $structure->getWebspaceKey()->willReturn('webspace-key');
 
-        $providerResultItem2 = $this->prophesize(ResourceItemInterface::class);
-        $providerResultItem2->getId()->willReturn('article-id-2');
-
-        $providerResult = $this->prophesize(DataProviderResult::class);
-        $providerResult->getHasNextPage()->willReturn(true);
-        $providerResult->getItems()->willReturn([$providerResultItem1->reveal(), $providerResultItem2->reveal()]);
-
-        $propertyParameters = [
+        /** @var PropertyInterface|ObjectProphecy $property */
+        $property = $this->prophesize(PropertyInterface::class);
+        $params = [
             'properties' => new PropertyParameter('properties', [
                 new PropertyParameter('contentDescription', 'description'),
                 new PropertyParameter('excerptTitle', 'excerpt.title'),
+                new PropertyParameter('categories', 'excerpt.categories'),
             ]),
         ];
 
-        // expected and unexpected service calls
-        $this->articleDataProvider->resolveResourceItems(
-            ['filter-key' => 'filter-value'],
-            $propertyParameters,
-            ['webspaceKey' => 'webspace-key', 'locale' => 'en'],
-            10,
-            1,
-            5
-        )->willReturn($providerResult->reveal())->shouldBeCalledOnce();
+        $property->getParams()->willReturn($params);
+        $property->getStructure()->willReturn($structure->reveal());
 
+        // expected and unexpected service calls
         $this->contentQueryBuilder->init([
             'ids' => ['article-id-1', 'article-id-2'],
-            'properties' => $propertyParameters['properties']->getValue(),
+            'properties' => $params['properties']->getValue(),
             'published' => false,
         ])->shouldBeCalled();
         $this->contentQueryBuilder->build('webspace-key', ['en'])->willReturn(['article-query-string']);
@@ -130,6 +96,7 @@ class ArticleDataProviderResolverTest extends TestCase
         $articleStructure1->getUuid()->willReturn('article-id-1');
         $articleStructure2 = $this->prophesize(StructureInterface::class);
         $articleStructure2->getUuid()->willReturn('article-id-2');
+
         $this->contentMapper->loadBySql2(
             'article-query-string',
             'en',
@@ -138,7 +105,6 @@ class ArticleDataProviderResolverTest extends TestCase
             $articleStructure2->reveal(),
             $articleStructure1->reveal(),
         ])->shouldBeCalledOnce();
-
         $this->structureResolver->resolveProperties(
             $articleStructure1->reveal(),
             [
@@ -146,6 +112,7 @@ class ArticleDataProviderResolverTest extends TestCase
                 'routePath' => 'routePath',
                 'contentDescription' => 'description',
                 'excerptTitle' => 'excerpt.title',
+                'categories' => 'excerpt.categories',
             ],
             'en'
         )->willReturn([
@@ -156,12 +123,14 @@ class ArticleDataProviderResolverTest extends TestCase
                 'routePath' => '/article-url-1',
                 'contentDescription' => 'Article Content Description',
                 'excerptTitle' => 'Article Excerpt Title 1',
+                'categories' => [],
             ],
             'view' => [
                 'title' => [],
                 'routePath' => [],
                 'contentDescription' => [],
                 'excerptTitle' => [],
+                'categories' => [],
             ],
         ])->shouldBeCalledOnce();
 
@@ -172,6 +141,7 @@ class ArticleDataProviderResolverTest extends TestCase
                 'routePath' => 'routePath',
                 'contentDescription' => 'description',
                 'excerptTitle' => 'excerpt.title',
+                'categories' => 'excerpt.categories',
             ],
             'en'
         )->willReturn([
@@ -182,26 +152,25 @@ class ArticleDataProviderResolverTest extends TestCase
                 'routePath' => '/article-url-2',
                 'contentDescription' => 'Article Content Description',
                 'excerptTitle' => 'Article Excerpt Title 2',
+                'categories' => [],
             ],
             'view' => [
                 'title' => [],
                 'routePath' => [],
                 'contentDescription' => [],
                 'excerptTitle' => [],
+                'categories' => [],
             ],
         ])->shouldBeCalledOnce();
 
         // call test function
-        $result = $this->articleDataProviderResolver->resolve(
-            ['filter-key' => 'filter-value'],
-            $propertyParameters,
-            ['webspaceKey' => 'webspace-key', 'locale' => 'en'],
-            10,
-            1,
-            5
+        $result = $this->articleSelectionResolver->resolve(
+            ['article-id-1', 'article-id-2'],
+            $property->reveal(),
+            'en'
         );
 
-        $this->assertTrue($result->getHasNextPage());
+        $this->assertInstanceOf(ContentView::class, $result);
         $this->assertSame(
             [
                 [
@@ -212,12 +181,14 @@ class ArticleDataProviderResolverTest extends TestCase
                         'routePath' => '/article-url-1',
                         'contentDescription' => 'Article Content Description',
                         'excerptTitle' => 'Article Excerpt Title 1',
+                        'categories' => [],
                     ],
                     'view' => [
                         'title' => [],
                         'routePath' => [],
                         'contentDescription' => [],
                         'excerptTitle' => [],
+                        'categories' => [],
                     ],
                 ],
                 [
@@ -228,57 +199,63 @@ class ArticleDataProviderResolverTest extends TestCase
                         'routePath' => '/article-url-2',
                         'contentDescription' => 'Article Content Description',
                         'excerptTitle' => 'Article Excerpt Title 2',
+                        'categories' => [],
                     ],
                     'view' => [
                         'title' => [],
                         'routePath' => [],
                         'contentDescription' => [],
                         'excerptTitle' => [],
+                        'categories' => [],
                     ],
                 ],
             ],
-            $result->getItems()
+            $result->getContent()
+        );
+
+        $this->assertSame(
+            ['ids' => ['article-id-1', 'article-id-2']],
+            $result->getView()
         );
     }
 
-    public function testResolveEmptyProviderResult(): void
+    public function testResolveDataIsNull(): void
     {
-        $providerResult = $this->prophesize(DataProviderResult::class);
-        $providerResult->getHasNextPage()->willReturn(false);
-        $providerResult->getItems()->willReturn([]);
-
-        $propertyParameters = [
-            'properties' => new PropertyParameter('properties', [
-                new PropertyParameter('contentDescription', 'description'),
-                new PropertyParameter('excerptTitle', 'excerpt.title'),
-            ]),
-        ];
+        $locale = 'en';
+        $property = $this->prophesize(PropertyInterface::class);
 
         // expected and unexpected service calls
-        $this->articleDataProvider->resolveResourceItems(
-            ['filter-key' => 'filter-value'],
-            $propertyParameters,
-            ['webspaceKey' => 'webspace-key', 'locale' => 'en'],
-            10,
-            1,
-            5
-        )->willReturn($providerResult->reveal())
-            ->shouldBeCalledOnce();
+        $this->contentQueryBuilder->init(Argument::cetera())
+            ->shouldNotBeCalled();
+
+        $this->structureResolver->resolve(Argument::cetera())
+            ->shouldNotBeCalled();
 
         // call test function
-        $result = $this->articleDataProviderResolver->resolve(
-            ['filter-key' => 'filter-value'],
-            $propertyParameters,
-            ['webspaceKey' => 'webspace-key', 'locale' => 'en'],
-            10,
-            1,
-            5
-        );
+        $result = $this->articleSelectionResolver->resolve(null, $property->reveal(), $locale);
 
-        $this->assertFalse($result->getHasNextPage());
-        $this->assertSame(
-            [],
-            $result->getItems()
-        );
+        $this->assertSame([], $result->getContent());
+
+        $this->assertSame(['ids' => []], $result->getView());
+    }
+
+    public function testResolveDataIsEmptyArray(): void
+    {
+        $locale = 'en';
+        $property = $this->prophesize(PropertyInterface::class);
+
+        // expected and unexpected service calls
+        $this->contentQueryBuilder->init(Argument::any())
+            ->shouldNotBeCalled();
+
+        $this->structureResolver->resolve(Argument::any())
+            ->shouldNotBeCalled();
+
+        // call test function
+        $result = $this->articleSelectionResolver->resolve([], $property->reveal(), $locale);
+
+        $this->assertSame([], $result->getContent());
+
+        $this->assertSame(['ids' => []], $result->getView());
     }
 }

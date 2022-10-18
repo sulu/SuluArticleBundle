@@ -11,12 +11,12 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Infrastructure\SuluHeadlessBundle\DataProviderResolver;
+namespace Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Headless\DataProviderResolver;
 
-class ArticlePageTreeDataProviderResolver extends AbstractArticleDataProviderResolver
+class ArticleDataProviderResolver extends AbstractArticleDataProviderResolver
 {
     public static function getDataProvider(): string
     {
-        return 'articles_page_tree';
+        return 'articles';
     }
 }
