@@ -86,6 +86,9 @@ class ArticleObjectProviderTest extends TestCase
         $object = $this->prophesize(ArticleDocument::class);
         $object->getStructure()->willReturn($structure);
 
+        $object->setLocale($locale)->shouldBeCalled();
+        $object->setOriginalLocale($locale)->shouldBeCalled();
+
         $this->provider->setValues($object->reveal(), $locale, $data);
 
         $this->assertEquals('SULU', $structure->getProperty('title')->getValue());

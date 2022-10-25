@@ -91,6 +91,9 @@ class ArticleObjectProvider implements PreviewObjectProviderInterface
             ->enableMagicCall()
             ->getPropertyAccessor();
 
+        $object->setLocale($locale);
+        $object->setOriginalLocale($locale);
+
         $structure = $object->getStructure();
         foreach ($data as $property => $value) {
             try {
