@@ -15,6 +15,13 @@
             translation="sulu_admin.type"
         />
         <property
+            name="type"
+            visibility="never"
+            translation="sulu_admin.type"
+        >
+            <filter type="select"/>
+        </property>
+        <property
             name="title"
             visibility="always"
             translation="sulu_admin.title"
@@ -51,6 +58,58 @@
             type="date"
             visibility="no"
             translation="sulu_admin.authored"
-        />
+        >
+            <filter type="date" />
+        </property>
+        <property
+            name="contactId"
+            visibility="never"
+            translation="sulu_contact.people"
+        >
+            <filter type="selection">
+                <params>
+                    <param name="displayProperty" value="fullName" />
+                    <param name="resourceKey" value="contacts" />
+                </params>
+            </filter>
+        </property>
+        <property
+            name="categoryId"
+            visibility="never"
+            translation="sulu_category.categories"
+        >
+            <filter type="selection">
+                <params>
+                    <param name="displayProperty" value="name" />
+                    <param name="resourceKey" value="categories" />
+                </params>
+            </filter>
+        </property>
+        <property
+            name="tagId"
+            visibility="never"
+            translation="sulu_tag.tags"
+        >
+            <filter type="selection">
+                <params>
+                    <param name="displayProperty" value="name" />
+                    <param name="resourceKey" value="tags" />
+                </params>
+            </filter>
+        </property>
+        <property
+            name="publishedState"
+            visibility="never"
+            translation="sulu_article.published_state"
+        >
+            <filter type="select">
+                <params>
+                    <param name="options" type="collection">
+                        <param name="published" value="sulu_article.published" />
+                        <param name="test" value="sulu_article.not_published" />
+                    </param>
+                </params>
+            </filter>
+        </property>
     </properties>
 </list>

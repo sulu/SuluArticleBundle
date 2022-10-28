@@ -212,6 +212,20 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $limit = (int) $this->restHelper->getLimit();
         $page = (int) $this->restHelper->getPage();
 
+        /** @var array{
+         *     authored?: array{
+         *         from: string,
+         *         to: string,
+         *     },
+         *     type?: string,
+         *     contactId?: string,
+         *     categoryId?: string,
+         *     tagId?: string,
+         *     pageId?: string,
+         *     publishedState?: string,
+         *  } $filter */
+        $filter = $request->query->all()['filter'] ?? [];
+
         if (null !== $locale) {
             $search->addQuery(new TermQuery('locale', $locale));
         }
@@ -235,7 +249,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery($boolQuery);
         }
 
-        if (null !== ($typeString = $request->get('types'))) {
+        if (null !== ($typeString = $request->get('types', $filter['type'] ?? null))) {
             $types = \explode(',', $typeString);
 
             if (\count($types) > 1) {
@@ -251,7 +265,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             }
         }
 
-        if ($contactId = $request->get('contactId')) {
+        if ($contactId = $request->get('contactId', $filter['contactId'] ?? null)) {
             $boolQuery = new BoolQuery();
             $boolQuery->add(new MatchQuery('changer_contact_id', $contactId), BoolQuery::SHOULD);
             $boolQuery->add(new MatchQuery('creator_contact_id', $contactId), BoolQuery::SHOULD);
@@ -259,19 +273,19 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery($boolQuery);
         }
 
-        if ($categoryId = $request->get('categoryId')) {
+        if ($categoryId = $request->get('categoryId', $filter['categoryId'] ?? null)) {
             $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
         }
 
-        if ($tagId = $request->get('tagId')) {
+        if ($tagId = $request->get('tagId', $filter['tagId'] ?? null)) {
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
-        if ($pageId = $request->get('pageId')) {
+        if ($pageId = $request->get('pageId', $filter['pageId'] ?? null)) {
             $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
         }
 
-        if ($workflowStage = $request->get('workflowStage')) {
+        if ($workflowStage = $request->get('workflowStage', $filter['publishedState'] ?? null)) {
             $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
         }
 
@@ -283,8 +297,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery(new TermQuery('localization_state.state', 'ghost'), BoolQuery::MUST_NOT);
         }
 
-        $authoredFrom = $request->get('authoredFrom');
-        $authoredTo = $request->get('authoredTo');
+        $authoredFrom = $request->get('authoredFrom', $this->convertDateTime($filter['authored']['from'] ?? null));
+        $authoredTo = $request->get('authoredTo', $this->convertDateTime($filter['authored']['to'] ?? null));
         if ($authoredFrom || $authoredTo) {
             $search->addQuery($this->getRangeQuery('authored', $authoredFrom, $authoredTo), BoolQuery::MUST);
         }
@@ -682,5 +696,16 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         }
 
         return null;
+    }
+
+    private function convertDateTime(?string $dateTimeString): ?string
+    {
+        if (!$dateTimeString) {
+            return null;
+        }
+
+        $dateTime = new \DateTime($dateTimeString);
+
+        return $dateTime->format('Y-m-d');
     }
 }
