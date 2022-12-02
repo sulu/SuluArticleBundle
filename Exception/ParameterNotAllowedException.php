@@ -28,7 +28,7 @@ class ParameterNotAllowedException extends \Exception
 
     public function __construct(string $property, string $class)
     {
-        parent::__construct(sprintf('Parameter "%s" is not allowed for class "%s".', $property, $class));
+        parent::__construct(\sprintf('Parameter "%s" is not allowed for class "%s".', $property, $class));
 
         $this->property = $property;
         $this->class = $class;

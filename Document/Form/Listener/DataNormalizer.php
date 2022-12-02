@@ -25,7 +25,7 @@ class DataNormalizer
     public static function normalize(FormEvent $event)
     {
         $data = $event->getData();
-        $data = array_merge(
+        $data = \array_merge(
             [
                 'mainWebspace' => self::getAndUnsetValue($data['structure'], 'mainWebspace'),
                 'additionalWebspaces' => self::getAndUnsetValue($data['structure'], 'additionalWebspaces'),

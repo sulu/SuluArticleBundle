@@ -15,6 +15,7 @@ use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
 use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
 use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
 use Sulu\Bundle\ContentBundle\SuluContentBundle;
+use Sulu\Bundle\HeadlessBundle\SuluHeadlessBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Sulu\Component\HttpKernel\SuluKernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -56,21 +57,21 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
             $bundles[] = new SuluContentBundle();
         }
 
-        if ('extend' === getenv('ARTICLE_TEST_CASE')) {
+        $bundles[] = new ONGRElasticsearchBundle();
+        $bundles[] = new SuluHeadlessBundle();
+
+        if ('extend' === \getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();
         }
 
         return $bundles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         parent::registerContainerConfiguration($loader);
 
-        if ('jackrabbit' === getenv('PHPCR_TRANSPORT')) {
+        if ('jackrabbit' === \getenv('PHPCR_TRANSPORT')) {
             $loader->load(__DIR__ . '/config/versioning.yml');
         }
 
@@ -78,8 +79,8 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
 
         $type = 'default';
-        if (getenv('ARTICLE_TEST_CASE')) {
-            $type = getenv('ARTICLE_TEST_CASE');
+        if (\getenv('ARTICLE_TEST_CASE')) {
+            $type = \getenv('ARTICLE_TEST_CASE');
         }
 
         $loader->load(__DIR__ . '/config/config_' . $type . '.yml');

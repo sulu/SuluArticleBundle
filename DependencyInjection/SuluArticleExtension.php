@@ -36,9 +36,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 {
     use PersistenceExtensionTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function prepend(ContainerBuilder $container)
     {
         $configs = $container->getExtensionConfig($this->getAlias());
@@ -303,7 +300,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ],
             ];
 
-            if (count($hosts) > 0) {
+            if (\count($hosts) > 0) {
                 $ongrElasticSearchConfig['managers']['default']['index']['hosts'] = $hosts;
                 $ongrElasticSearchConfig['managers']['live']['index']['hosts'] = $hosts;
             }
@@ -395,9 +392,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();

@@ -82,9 +82,6 @@ class ArticlePageSubscriberTest extends TestCase
      */
     private $locale = 'de';
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->factory = $this->prophesize(StructureMetadataFactoryInterface::class);

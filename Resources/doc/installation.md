@@ -30,12 +30,7 @@ sulu_route:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
             generator: schema
             options:
-                route_schema: '/articles/{object.getTitle()}'
-        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
-            generator: article_page
-            options:
-                route_schema: '{translator.trans("page")}-{object.getPageNumber()}'
-                parent: '{object.getParent().getRoutePath()}'
+                route_schema: '/articles/{implode("-", object)}'
 
 ongr_elasticsearch:
 # If you expect more than 10000 articles, you need to set the `max_result_window` to an appropriate number  

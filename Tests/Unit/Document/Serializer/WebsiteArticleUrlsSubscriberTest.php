@@ -70,9 +70,6 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
      */
     private $urlsSubscriber;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         $this->requestStack = $this->prophesize(RequestStack::class);
@@ -116,7 +113,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $event->getVisitor()->willReturn($visitor->reveal());
         $event->getContext()->willReturn($context->reveal());
 
-        $entityClass = get_class($article->reveal());
+        $entityClass = \get_class($article->reveal());
 
         $this->documentRegistry->hasDocument($article->reveal())->willReturn(true);
         $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['en', 'de']);
@@ -170,7 +167,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $event->getVisitor()->willReturn($visitor->reveal());
         $event->getContext()->willReturn($context->reveal());
 
-        $entityClass = get_class($article->reveal());
+        $entityClass = \get_class($article->reveal());
 
         $this->documentRegistry->hasDocument($article->reveal())->willReturn(false);
         $this->nodeManager->find($entityId)->willReturn($node->reveal())->shouldBeCalled();
@@ -224,7 +221,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $event->getVisitor()->willReturn($visitor->reveal());
         $event->getContext()->willReturn($context->reveal());
 
-        $entityClass = get_class($article->reveal());
+        $entityClass = \get_class($article->reveal());
 
         $this->documentRegistry->hasDocument($article->reveal())->willReturn(true);
         $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['en', 'de']);
@@ -275,7 +272,7 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
         $event->getVisitor()->willReturn($visitor->reveal());
         $event->getContext()->willReturn($context->reveal());
 
-        $entityClass = get_class($article->reveal());
+        $entityClass = \get_class($article->reveal());
 
         $this->documentRegistry->hasDocument($article->reveal())->willReturn(true);
         $this->documentInspector->getPublishedLocales($article->reveal())->willReturn(['de']);

@@ -78,9 +78,6 @@ class ArticleGhostIndexer extends ArticleIndexer
         $this->documentManager = $documentManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function index(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {

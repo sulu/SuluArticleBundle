@@ -78,8 +78,6 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param ArticleDocument $object
      */
     public function getByEntity($entityClass, $id, $locale, $object = null)
@@ -141,7 +139,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         if (!$webspace ||
             (
                 $this->webspaceResolver->resolveMainWebspace($object) !== $webspace->getKey()
-                && !in_array($webspace->getKey(), $this->webspaceResolver->resolveAdditionalWebspaces($object))
+                && !\in_array($webspace->getKey(), $this->webspaceResolver->resolveAdditionalWebspaces($object))
             )
         ) {
             return false;
@@ -150,15 +148,12 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports($entityClass)
     {
         return ArticleDocument::class === $entityClass
             || ArticlePageDocument::class === $entityClass
-            || is_subclass_of($entityClass, ArticleDocument::class)
-            || is_subclass_of($entityClass, ArticlePageDocument::class);
+            || \is_subclass_of($entityClass, ArticleDocument::class)
+            || \is_subclass_of($entityClass, ArticlePageDocument::class);
     }
 
     /**
@@ -172,12 +167,12 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             return null;
         }
 
-        if (!is_array($cacheLifetime)
+        if (!\is_array($cacheLifetime)
             || !isset($cacheLifetime['type'])
             || !isset($cacheLifetime['value'])
             || !$this->cacheLifetimeResolver->supports($cacheLifetime['type'], $cacheLifetime['value'])
         ) {
-            throw new \InvalidArgumentException(sprintf('Invalid cachelifetime in article route default provider: %s', var_export($cacheLifetime, true)));
+            throw new \InvalidArgumentException(\sprintf('Invalid cachelifetime in article route default provider: %s', \var_export($cacheLifetime, true)));
         }
 
         return $this->cacheLifetimeResolver->resolve($cacheLifetime['type'], $cacheLifetime['value']);

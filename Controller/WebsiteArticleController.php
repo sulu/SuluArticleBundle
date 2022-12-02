@@ -64,13 +64,13 @@ class WebsiteArticleController extends AbstractController
 
         $content = $this->resolveArticle($object, $pageNumber);
 
-        $parameters = $this->get('sulu_website.resolver.parameter')->resolve(
+        $parameters = $this->container->get('sulu_website.resolver.parameter')->resolve(
             [],
-            $this->get('sulu_core.webspace.request_analyzer'),
+            $this->container->get('sulu_core.webspace.request_analyzer'),
             null,
             $preview
         );
-        $data = array_merge($parameters, $content, $attributes);
+        $data = \array_merge($parameters, $content, $attributes);
 
         try {
             if ($partial) {
@@ -92,7 +92,7 @@ class WebsiteArticleController extends AbstractController
 
                 return $this->render(
                     '@SuluWebsite/Preview/preview.html.twig',
-                    array_merge($data, $parameters),
+                    \array_merge($data, $parameters),
                     $this->createResponse($request)
                 );
             } else {
@@ -168,17 +168,17 @@ class WebsiteArticleController extends AbstractController
         $attributes = $twig->mergeGlobals($attributes);
         $template = $twig->load($template);
 
-        $level = ob_get_level();
-        ob_start();
+        $level = \ob_get_level();
+        \ob_start();
 
         try {
             $rendered = $template->renderBlock($block, $attributes);
-            ob_end_clean();
+            \ob_end_clean();
 
             return $rendered;
         } catch (\Exception $e) {
-            while (ob_get_level() > $level) {
-                ob_end_clean();
+            while (\ob_get_level() > $level) {
+                \ob_end_clean();
             }
 
             throw $e;
@@ -205,7 +205,7 @@ class WebsiteArticleController extends AbstractController
         return $this->container->get('sulu_article.article_content_resolver');
     }
 
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         $subscribedServices = parent::getSubscribedServices();
 

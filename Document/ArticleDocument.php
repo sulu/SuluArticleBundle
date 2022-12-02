@@ -58,9 +58,9 @@ class ArticleDocument implements UuidBehavior,
     ShadowLocaleBehavior,
     WebspaceBehavior
 {
-    const RESOURCE_KEY = 'articles';
+    public const RESOURCE_KEY = 'articles';
 
-    const LIST_KEY = 'articles';
+    public const LIST_KEY = 'articles';
 
     /**
      * @var string
@@ -225,17 +225,11 @@ class ArticleDocument implements UuidBehavior,
         $this->children = new \ArrayIterator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUuid()
     {
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUuid($uuid): RoutablePageBehavior
     {
         $this->uuid = $uuid;
@@ -243,49 +237,31 @@ class ArticleDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getNodeName()
     {
         return $this->nodeName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPath()
     {
         return $this->path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getParent()
     {
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setParent($document)
     {
         $this->parent = $document;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTitle()
     {
         return $this->title;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setTitle($title)
     {
         $this->title = $title;
@@ -301,17 +277,11 @@ class ArticleDocument implements UuidBehavior,
         return $this->route;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoute(RouteInterface $route)
     {
         $this->route = $route;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function removeRoute(): RoutablePageBehavior
     {
         $this->route = null;
@@ -320,17 +290,11 @@ class ArticleDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoutePath(): ?string
     {
         return $this->routePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoutePath($routePath): RoutablePageBehavior
     {
         $this->routePath = $routePath;
@@ -338,97 +302,81 @@ class ArticleDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getClass(): string
     {
-        return get_class($this);
+        return \get_class($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getLocale()
     {
         return $this->locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLocale($locale)
     {
         $this->locale = $locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOriginalLocale()
     {
         return $this->originalLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setOriginalLocale($locale)
     {
         $this->originalLocale = $locale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStructureType(): ?string
     {
         return $this->structureType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setStructureType($structureType)
     {
         $this->structureType = $structureType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getStructure(): StructureInterface
     {
         return $this->structure;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreator()
     {
         return $this->creator;
     }
 
     /**
-     * {@inheritdoc}
+     * @param int|null $userId
+     *
+     * @return void
      */
+    public function setCreator($userId)
+    {
+        $this->creator = $userId;
+    }
+
     public function getChanger()
     {
         return $this->changer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCreated()
     {
         return $this->created;
     }
 
     /**
-     * {@inheritdoc}
+     * @param \DateTime $created
+     *
+     * @return void
      */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+    }
+
     public function getChanged()
     {
         return $this->changed;
@@ -444,137 +392,86 @@ class ArticleDocument implements UuidBehavior,
         return $this->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtensionsData()
     {
         return $this->extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setExtensionsData($extensions)
     {
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setExtension($name, $data)
     {
         $this->extensions[$name] = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getWorkflowStage()
     {
         return $this->workflowStage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setWorkflowStage($workflowStage)
     {
         $this->workflowStage = $workflowStage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPublished()
     {
         return $this->published;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthored()
     {
         return $this->authored;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthored($authored)
     {
         $this->authored = $authored;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAuthor()
     {
         return $this->author;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAuthor($author)
     {
         $this->author = $author;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVersions()
     {
         return $this->versions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setVersions($versions)
     {
         $this->versions = $versions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChildren()
     {
         return $this->children;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getArticleUuid(): string
     {
         return $this->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPageUuid(): string
     {
         return $this->getUuid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPageNumber(): int
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPageTitle(): ?string
     {
         return $this->pageTitle;
@@ -618,49 +515,31 @@ class ArticleDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getShadowLocale()
     {
         return $this->shadowLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setShadowLocale($shadowLocale)
     {
         $this->shadowLocale = $shadowLocale;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isShadowLocaleEnabled()
     {
         return $this->shadowLocaleEnabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setShadowLocaleEnabled($shadowLocaleEnabled)
     {
         $this->shadowLocaleEnabled = $shadowLocaleEnabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMainWebspace(): ?string
     {
         return $this->mainWebspace;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setMainWebspace(?string $mainWebspace): WebspaceBehavior
     {
         $this->mainWebspace = $mainWebspace;
@@ -668,17 +547,11 @@ class ArticleDocument implements UuidBehavior,
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAdditionalWebspaces(): ?array
     {
         return $this->additionalWebspaces;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setAdditionalWebspaces(?array $additionalWebspaces): WebspaceBehavior
     {
         $this->additionalWebspaces = $additionalWebspaces;

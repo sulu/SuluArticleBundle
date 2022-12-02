@@ -37,7 +37,7 @@ class ArticlePageController extends AbstractRestController implements ClassResou
 {
     use RequestParametersTrait;
 
-    const DOCUMENT_TYPE = 'article_page';
+    public const DOCUMENT_TYPE = 'article_page';
 
     /**
      * @var DocumentManagerInterface
@@ -179,9 +179,6 @@ class ArticlePageController extends AbstractRestController implements ClassResou
         return $this->handleView($this->view(null));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecurityContext()
     {
         return ArticleAdmin::SECURITY_CONTEXT;
@@ -196,13 +193,13 @@ class ArticlePageController extends AbstractRestController implements ClassResou
      */
     private function persistDocument(array $data, object $document, string $locale, string $articleUuid): void
     {
-        if (array_key_exists('title', $data)) {
-            throw new ParameterNotAllowedException('title', get_class($document));
+        if (\array_key_exists('title', $data)) {
+            throw new ParameterNotAllowedException('title', \get_class($document));
         }
 
         $article = $this->documentManager->find($articleUuid, $locale);
 
-        if (!array_key_exists('template', $data)) {
+        if (!\array_key_exists('template', $data)) {
             $data['template'] = $article->getStructureType();
         }
 

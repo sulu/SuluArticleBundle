@@ -84,7 +84,6 @@ class WebspaceSettingsConfigurationResolverTest extends TestCase
     }
 
     /**
-     * @param string $expectedResult
      * @param string[] $expectedResultAdditionalWebspaces
      *
      * @dataProvider configuration

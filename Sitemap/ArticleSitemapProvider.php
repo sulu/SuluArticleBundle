@@ -54,9 +54,6 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         $this->webspaceManager = $webspaceManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function build($page, $scheme, $host)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
@@ -75,8 +72,8 @@ class ArticleSitemapProvider implements SitemapProviderInterface
             /** @var ArticleViewDocumentInterface $item */
             foreach ($bulk as $item) {
                 // Get all webspace keys which are for the current document and current selected webspaces
-                $itemWebspaceKeys = array_intersect(
-                    array_merge([$item->getMainWebspace()], $item->getAdditionalWebspaces()),
+                $itemWebspaceKeys = \array_intersect(
+                    \array_merge([$item->getMainWebspace()], $item->getAdditionalWebspaces()),
                     $webspaceKeys
                 );
 
@@ -172,24 +169,18 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         }
 
         $search->addQuery($webspaceQuery);
-        if (method_exists($search, 'setTrackTotalHits')) {
+        if (\method_exists($search, 'setTrackTotalHits')) {
             $search->setTrackTotalHits(true);
         }
 
         return $repository->findDocuments($search);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createSitemap($scheme, $host)
     {
         return new Sitemap($this->getAlias(), $this->getMaxPage($scheme, $host));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMaxPage($schema, $host)
     {
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
@@ -204,7 +195,7 @@ class ArticleSitemapProvider implements SitemapProviderInterface
             $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
         }
 
-        return ceil($repository->count($search) / static::PAGE_SIZE);
+        return \ceil($repository->count($search) / static::PAGE_SIZE);
     }
 
     /**
@@ -222,9 +213,6 @@ class ArticleSitemapProvider implements SitemapProviderInterface
         return $webspaceKeys;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAlias()
     {
         return 'articles';

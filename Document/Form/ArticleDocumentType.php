@@ -26,9 +26,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArticleDocumentType extends AbstractStructureBehaviorType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -61,9 +58,6 @@ class ArticleDocumentType extends AbstractStructureBehaviorType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [DataNormalizer::class, 'normalize']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

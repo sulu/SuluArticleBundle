@@ -370,6 +370,12 @@
 
             <tag name="sulu.teaser.provider" alias="articles"/>
         </service>
+        <service id="sulu_article.article_content_query_builder"
+                 class="Sulu\Bundle\ArticleBundle\Infrastructure\Sulu\Content\ArticleContentQueryBuilder">
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument type="service" id="sulu_page.extension.manager"/>
+            <argument>%sulu.content.language.namespace%</argument>
+        </service>
 
         <!-- sitemap -->
         <service id="sulu_article.sitemap.articles" class="Sulu\Bundle\ArticleBundle\Sitemap\ArticleSitemapProvider">
@@ -533,6 +539,16 @@
             <argument type="service" id="sulu_document_manager.property_encoder"/>
 
             <tag name="sulu_document_manager.event_subscriber" />
+        </service>
+
+        <service
+            id="sulu_article.articles_list_metadata_visitor"
+            class="Sulu\Bundle\ArticleBundle\Metadata\ListMetadataVisitor"
+        >
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument>%sulu_article.types%</argument>
+
+            <tag name="sulu_admin.list_metadata_visitor"/>
         </service>
     </services>
 </container>

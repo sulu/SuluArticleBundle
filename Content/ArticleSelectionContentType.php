@@ -54,13 +54,10 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $this->articleDocumentClass = $articleDocumentClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContentData(PropertyInterface $property)
     {
         $value = $property->getValue();
-        if (null === $value || !is_array($value) || 0 === count($value)) {
+        if (null === $value || !\is_array($value) || 0 === \count($value)) {
             return [];
         }
 
@@ -69,26 +66,23 @@ class ArticleSelectionContentType extends SimpleContentType implements PreResolv
         $repository = $this->searchManager->getRepository($this->articleDocumentClass);
         $search = $repository->createSearch();
         $search->addQuery(new IdsQuery($this->getViewDocumentIds($value, $locale)));
-        $search->setSize(count($value));
+        $search->setSize(\count($value));
 
         $result = [];
         /** @var ArticleViewDocumentInterface $articleDocument */
         foreach ($repository->findDocuments($search) as $articleDocument) {
-            $result[array_search($articleDocument->getUuid(), $value, false)] = $articleDocument;
+            $result[\array_search($articleDocument->getUuid(), $value, false)] = $articleDocument;
         }
 
-        ksort($result);
+        \ksort($result);
 
-        return array_values($result);
+        return \array_values($result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preResolve(PropertyInterface $property)
     {
         $uuids = $property->getValue();
-        if (!is_array($uuids)) {
+        if (!\is_array($uuids)) {
             return;
         }
 

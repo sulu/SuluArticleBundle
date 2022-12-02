@@ -56,9 +56,6 @@ class ArticleContentResolver implements ArticleContentResolverInterface
         $this->contentProxyFactory = $contentProxyFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolve(ArticleInterface $article, int $pageNumber = 1)
     {
         $data = $this->serializer->serialize(
@@ -83,7 +80,7 @@ class ArticleContentResolver implements ArticleContentResolverInterface
         $data['uuid'] = $article->getArticleUuid();
         $data['pageUuid'] = $article->getPageUuid();
 
-        $data = array_merge($data, $this->resolveContent($article));
+        $data = \array_merge($data, $this->resolveContent($article));
 
         return $data;
     }

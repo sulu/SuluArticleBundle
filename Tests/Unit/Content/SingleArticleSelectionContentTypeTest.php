@@ -29,7 +29,7 @@ class SingleArticleSelectionContentTypeTest extends TestCase
     {
         $id = '123-123-123';
         $locale = 'de';
-        $localizedId = sprintf('%s-%s', $id, $locale);
+        $localizedId = \sprintf('%s-%s', $id, $locale);
         $article = new ArticleViewDocument($id);
 
         $manager = $this->prophesize(Manager::class);

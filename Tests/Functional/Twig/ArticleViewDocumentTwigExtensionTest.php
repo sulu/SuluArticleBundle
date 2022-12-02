@@ -22,16 +22,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
 {
-    const LOCALE = 'de';
+    public const LOCALE = 'de';
 
     /**
      * @var KernelBrowser
      */
     private $client;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -116,7 +113,7 @@ class ArticleViewDocumentTwigExtensionTest extends SuluTestCase
         $respone = $this->client->getResponse();
         $this->assertHttpStatusCode(200, $respone);
 
-        return json_decode($respone->getContent(), true);
+        return \json_decode($respone->getContent(), true);
     }
 
     private function pushFakeRequest($webspaceKey, $id)

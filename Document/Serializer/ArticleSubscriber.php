@@ -34,8 +34,8 @@ class ArticleSubscriber implements EventSubscriberInterface
 {
     use StructureTagTrait;
 
-    const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
-    const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
+    public const PAGE_TITLE_TAG_NAME = 'sulu_article.page_title';
+    public const PAGE_TITLE_PROPERTY_NAME = 'pageTitle';
 
     /**
      * @var StructureManagerInterface
@@ -67,9 +67,6 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->webspaceResolver = $webspaceResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [

@@ -170,7 +170,7 @@ class ArticleObjectProviderTest extends TestCase
             $object->reveal(),
             $this->provider->deserialize(
                 '{"pageNumber":1,"object":"{\"title\": \"test\"}"}',
-                get_class($object->reveal())
+                \get_class($object->reveal())
             )
         );
     }
@@ -201,7 +201,7 @@ class ArticleObjectProviderTest extends TestCase
             $object->reveal(),
             $this->provider->deserialize(
                 '{"pageNumber":2,"object":"{\"title\": \"test\"}"}',
-                get_class($object->reveal())
+                \get_class($object->reveal())
             )
         );
     }

@@ -17,9 +17,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class RouteEnhancerCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('sulu_route.routing.router')) {

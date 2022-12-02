@@ -40,7 +40,7 @@ class WebspaceResolver
         if (!$this->hasMoreThanOneWebspace()) {
             $webspaces = $this->webspaceManager->getWebspaceCollection()->getWebspaces();
 
-            return reset($webspaces)->getKey();
+            return \reset($webspaces)->getKey();
         }
 
         $hasCustomizedWebspaceSettings = $this->hasCustomizedWebspaceSettings($document);
@@ -80,6 +80,6 @@ class WebspaceResolver
      */
     private function hasMoreThanOneWebspace(): bool
     {
-        return count($this->webspaceManager->getWebspaceCollection()->getWebspaces()) > 1;
+        return \count($this->webspaceManager->getWebspaceCollection()->getWebspaces()) > 1;
     }
 }

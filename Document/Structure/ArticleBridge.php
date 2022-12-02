@@ -16,7 +16,7 @@ use Sulu\Component\Content\Compat\Structure\StructureBridge;
 /**
  * Own structure bridge for articles.
  */
-class ArticleBridge extends StructureBridge
+class ArticleBridge extends StructureBridge implements RoutableStructureInterface
 {
     /**
      * @var string
@@ -30,12 +30,25 @@ class ArticleBridge extends StructureBridge
 
     public function getView(): string
     {
+        /** @var string */
         return $this->structure->getView();
     }
 
+    public function getController(): string
+    {
+        /** @var string */
+        return $this->structure->getController();
+    }
+
     /**
-     * {@inheritdoc}
+     * @return array{type: string, value: string}
      */
+    public function getCacheLifeTime(): array
+    {
+        /** @var array{type: string, value: string} */
+        return $this->structure->getCacheLifetime();
+    }
+
     public function getUuid()
     {
         // is set for structure loaded with document from document-manager
@@ -47,9 +60,6 @@ class ArticleBridge extends StructureBridge
         return $this->uuid;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUuid($uuid)
     {
         $this->uuid = $uuid;
@@ -83,25 +93,16 @@ class ArticleBridge extends StructureBridge
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExt()
     {
         return $this->document->getExtensionsData();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getWebspaceKey()
     {
         return $this->webspaceKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setWebspaceKey($webspace)
     {
         $this->webspaceKey = $webspace;

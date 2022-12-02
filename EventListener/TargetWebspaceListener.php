@@ -52,7 +52,7 @@ class TargetWebspaceListener
         $webspaceKey = $this->requestAnalyzer->getWebspace()->getKey();
 
         if ($document->getMainWebspace() === $webspaceKey
-            || ($document->getAdditionalWebspaces() && in_array($webspaceKey, $document->getAdditionalWebspaces()))
+            || ($document->getAdditionalWebspaces() && \in_array($webspaceKey, $document->getAdditionalWebspaces()))
         ) {
             return $webspaceKey;
         }

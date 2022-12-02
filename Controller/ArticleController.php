@@ -59,7 +59,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
 {
     use ArticleViewDocumentIdTrait;
     use RequestParametersTrait;
-    const DOCUMENT_TYPE = 'article';
+    public const DOCUMENT_TYPE = 'article';
 
     /**
      * @var DocumentManagerInterface
@@ -212,17 +212,31 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $limit = (int) $this->restHelper->getLimit();
         $page = (int) $this->restHelper->getPage();
 
+        /** @var array{
+         *     authored?: array{
+         *         from: string,
+         *         to: string,
+         *     },
+         *     type?: string,
+         *     contactId?: string,
+         *     categoryId?: string,
+         *     tagId?: string,
+         *     pageId?: string,
+         *     publishedState?: string,
+         *  } $filter */
+        $filter = $request->query->all()['filter'] ?? [];
+
         if (null !== $locale) {
             $search->addQuery(new TermQuery('locale', $locale));
         }
 
-        if (count($ids = array_filter(explode(',', $request->get('ids', ''))))) {
+        if (\count($ids = \array_filter(\explode(',', $request->get('ids', ''))))) {
             $search->addQuery(new IdsQuery($this->getViewDocumentIds($ids, $locale)));
-            $limit = count($ids);
+            $limit = \count($ids);
         }
 
         $searchFields = $this->restHelper->getSearchFields();
-        if (0 === count($searchFields)) {
+        if (0 === \count($searchFields)) {
             $searchFields = ['title'];
         }
 
@@ -235,10 +249,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery($boolQuery);
         }
 
-        if (null !== ($typeString = $request->get('types'))) {
-            $types = explode(',', $typeString);
+        if (null !== ($typeString = $request->get('types', $filter['type'] ?? null))) {
+            $types = \explode(',', $typeString);
 
-            if (count($types) > 1) {
+            if (\count($types) > 1) {
                 $query = new BoolQuery();
 
                 foreach ($types as $type) {
@@ -251,7 +265,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             }
         }
 
-        if ($contactId = $request->get('contactId')) {
+        if ($contactId = $request->get('contactId', $filter['contactId'] ?? null)) {
             $boolQuery = new BoolQuery();
             $boolQuery->add(new MatchQuery('changer_contact_id', $contactId), BoolQuery::SHOULD);
             $boolQuery->add(new MatchQuery('creator_contact_id', $contactId), BoolQuery::SHOULD);
@@ -259,19 +273,19 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery($boolQuery);
         }
 
-        if ($categoryId = $request->get('categoryId')) {
+        if ($categoryId = $request->get('categoryId', $filter['categoryId'] ?? null)) {
             $search->addQuery(new TermQuery('excerpt.categories.id', $categoryId), BoolQuery::MUST);
         }
 
-        if ($tagId = $request->get('tagId')) {
+        if ($tagId = $request->get('tagId', $filter['tagId'] ?? null)) {
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
-        if ($pageId = $request->get('pageId')) {
+        if ($pageId = $request->get('pageId', $filter['pageId'] ?? null)) {
             $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
         }
 
-        if ($workflowStage = $request->get('workflowStage')) {
+        if ($workflowStage = $request->get('workflowStage', $filter['publishedState'] ?? null)) {
             $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
         }
 
@@ -283,8 +297,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery(new TermQuery('localization_state.state', 'ghost'), BoolQuery::MUST_NOT);
         }
 
-        $authoredFrom = $request->get('authoredFrom');
-        $authoredTo = $request->get('authoredTo');
+        $authoredFrom = $request->get('authoredFrom', $this->convertDateTime($filter['authored']['from'] ?? null));
+        $authoredTo = $request->get('authoredTo', $this->convertDateTime($filter['authored']['to'] ?? null));
         if ($authoredFrom || $authoredTo) {
             $search->addQuery($this->getRangeQuery('authored', $authoredFrom, $authoredTo), BoolQuery::MUST);
         }
@@ -311,14 +325,14 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->setSize($limit);
             $search->setFrom(($page - 1) * $limit);
 
-            $fields = array_merge(
+            $fields = \array_merge(
                 $this->restHelper->getFields() ?: [],
                 ['id', 'localizationState', 'publishedState', 'published', 'title', 'routePath']
             );
-            $fieldDescriptors = array_filter(
+            $fieldDescriptors = \array_filter(
                 $fieldDescriptors,
                 function(FieldDescriptorInterface $fieldDescriptor) use ($fields) {
-                    return in_array($fieldDescriptor->getName(), $fields);
+                    return \in_array($fieldDescriptor->getName(), $fields);
                 }
             );
         } else {
@@ -326,7 +340,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->setScroll('1m');
         }
 
-        if (method_exists($search, 'setTrackTotalHits')) {
+        if (\method_exists($search, 'setTrackTotalHits')) {
             $search->setTrackTotalHits(true);
         }
 
@@ -336,16 +350,16 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $documentData = $this->normalize($document['_source'], $fieldDescriptors);
             $documentData['ghostLocale'] = 'ghost' == $documentData['localizationState']['state'] ? $documentData['localizationState']['locale'] : null;
 
-            if (false !== ($index = array_search($documentData['id'], $ids))) {
+            if (false !== ($index = \array_search($documentData['id'], $ids))) {
                 $result[$index] = $documentData;
             } else {
                 $result[] = $documentData;
             }
         }
 
-        if (count($ids)) {
-            ksort($result);
-            $result = array_values($result);
+        if (\count($ids)) {
+            \ksort($result);
+            $result = \array_values($result);
         }
 
         $count = $searchResult->count();
@@ -377,7 +391,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 $property = 'uuid';
             }
 
-            $result[$fieldDescriptor->getName()] = array_key_exists($property, $document) ? $document[$property] : null;
+            $result[$fieldDescriptor->getName()] = \array_key_exists($property, $document) ? $document[$property] : null;
         }
 
         return $result;
@@ -388,7 +402,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      */
     private function getRangeQuery(string $field, string $from, string $to): RangeQuery
     {
-        return new RangeQuery($field, array_filter(['gte' => $from, 'lte' => $to]));
+        return new RangeQuery($field, \array_filter(['gte' => $from, 'lte' => $to]));
     }
 
     /**
@@ -474,7 +488,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      */
     public function cdeleteAction(Request $request): Response
     {
-        $ids = array_filter(explode(',', $request->get('ids', '')));
+        $ids = \array_filter(\explode(',', $request->get('ids', '')));
 
         $documentManager = $this->documentManager;
         foreach ($ids as $id) {
@@ -540,7 +554,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 case 'copy-locale':
                     $srcLocale = $this->getRequestParameter($request, 'src', false, $locale);
                     $destLocales = $this->getRequestParameter($request, 'dest', true);
-                    $destLocales = explode(',', $destLocales);
+                    $destLocales = \explode(',', $destLocales);
 
                     foreach ($destLocales as $destLocale) {
                         $this->securityChecker->checkPermission(
@@ -562,7 +576,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 case 'copy':
                     /** @var ArticleDocument $document */
                     $document = $this->documentManager->find($id, $locale);
-                    $copiedPath = $this->documentManager->copy($document, dirname($document->getPath()));
+                    $copiedPath = $this->documentManager->copy($document, \dirname($document->getPath()));
                     $this->documentManager->flush();
 
                     $data = $this->documentManager->find($copiedPath, $locale);
@@ -602,15 +616,12 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     {
         $documentManager = $this->documentManager;
 
-        for ($i = 0; $i < count($pages); ++$i) {
+        for ($i = 0; $i < \count($pages); ++$i) {
             $document = $documentManager->find($pages[$i], $locale);
             $documentManager->reorder($document, null);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSecurityContext()
     {
         return ArticleAdmin::SECURITY_CONTEXT;
@@ -639,15 +650,15 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             throw new InvalidFormException($form);
         }
 
-        if (array_key_exists('author', $data) && null === $data['author']) {
+        if (\array_key_exists('author', $data) && null === $data['author']) {
             $document->setAuthor(null);
         }
 
-        if (array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
+        if (\array_key_exists('additionalWebspaces', $data) && null === $data['additionalWebspaces']) {
             $document->setAdditionalWebspaces(null);
         }
 
-        if (array_key_exists('customizeWebspaceSettings', $data) && false === $data['customizeWebspaceSettings']) {
+        if (\array_key_exists('customizeWebspaceSettings', $data) && false === $data['customizeWebspaceSettings']) {
             $document->setMainWebspace(null);
             $document->setAdditionalWebspaces(null);
         }
@@ -680,10 +691,21 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $sortBy = Caser::snake($sortBy);
         $fieldDescriptors = $this->getFieldDescriptors();
 
-        if (array_key_exists($sortBy, $fieldDescriptors)) {
+        if (\array_key_exists($sortBy, $fieldDescriptors)) {
             return $fieldDescriptors[$sortBy]->getSortField();
         }
 
         return null;
+    }
+
+    private function convertDateTime(?string $dateTimeString): ?string
+    {
+        if (!$dateTimeString) {
+            return null;
+        }
+
+        $dateTime = new \DateTime($dateTimeString);
+
+        return $dateTime->format('Y-m-d');
     }
 }

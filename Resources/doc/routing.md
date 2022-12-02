@@ -30,28 +30,30 @@ sulu_route:
         Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
             generator: schema
             options:
-                route_schema: /articles/{object.getTitle()}
-        Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument:
-            generator: "article_page"
-            options:
-                route_schema: "/{translator.trans(\"page\")}-{object.getPageNumber()}"
-                parent: "{object.getParent().getRoutePath()}"
+                route_schema: '/articles/{implode("-", object)}'
 ```
 
 This schema will be used for all articles which will be created in the future. Older articles
 will not be touched.
 
-If you want to define the schema based on the template or type you can use the related generator
-(`type` or `template`).
+### Overwrite route schema in template
 
-```yml
-sulu_route:
-    mappings:
-        Sulu\Bundle\ArticleBundle\Document\ArticleDocument:
-            generator: <template|type>
-            options:
-                custom_template_or_type1: /test1/{object.getTitle()}
-                custom_template_or_type2: /test2/{object.getTitle()}
+You can use a different `route_schema` for articles with a specific template by setting the 
+`route_schema` param of the `routePath` property in the template:
+
+```xml
+<property name="routePath" type="route">
+    <meta>
+        <title lang="en">Resourcelocator</title>
+        <title lang="de">Adresse</title>
+    </meta>
+
+    <params>
+        <param name="route_schema" value="/template-specific-prefix/{implode('-', object)}"/>
+    </params>
+
+    <tag name="sulu_article.article_route"/>
+</property>
 ```
 
 ## Route Generation
@@ -66,8 +68,8 @@ already configured in the installation process (see [installation](installation.
 To use this approach you have to do nothing (if you followed the installation description). For
 the completeness you have to be aware that following steps are done:
  
-* The content-type `route` for the property `routePath`
-* The `route_schema` was configured for the appropriate template or type.
+* The `routePath` property uses the `route` content type
+* The `sulu_route` configuration includes a `route_schema` for the `ArticleDocument`
 
 ### Page tree integration
 

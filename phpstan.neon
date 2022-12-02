@@ -1,15 +1,24 @@
 includes:
+    - phpstan-baseline.neon
+    - vendor/jangregor/phpstan-prophecy/extension.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
     - vendor/phpstan/phpstan-doctrine/extension.neon
     - vendor/phpstan/phpstan-doctrine/rules.neon
-    - vendor/phpstan/phpstan-symfony/extension.neon
-    - vendor/thecodingmachine/phpstan-strict-rules/phpstan-strict-rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-phpunit/rules.neon
+    - vendor/phpstan/phpstan-webmozart-assert/extension.neon
 
 parameters:
     paths:
         - .
-    level: 2
-    excludes_analyse:
+    level: max
+    excludePaths:
         - %currentWorkingDirectory%/DependencyInjection/Configuration.php
         - %currentWorkingDirectory%/vendor/*
         - %currentWorkingDirectory%/Tests/*
         - %currentWorkingDirectory%/Resources/phpcr-migrations/*
+    symfony:
+        container_xml_path: %rootDir%/../../../Tests/Application/var/cache/admin/dev/Sulu_Bundle_ArticleBundle_Tests_Application_KernelDevDebugContainer.xml
+        console_application_loader: Tests/phpstan/console-application.php
+    doctrine:
+        objectManagerLoader: Tests/phpstan/object-manager.php

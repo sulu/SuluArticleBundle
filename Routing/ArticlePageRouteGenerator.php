@@ -39,15 +39,12 @@ class ArticlePageRouteGenerator implements RouteGeneratorInterface
         $this->tokenProvider = $tokenProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function generate($entity, array $options)
     {
         $parent = $options['parent'];
 
         $tokens = [];
-        preg_match_all('/{(.*?)}/', $parent, $matches);
+        \preg_match_all('/{(.*?)}/', $parent, $matches);
         $tokenNames = $matches[1];
 
         foreach ($tokenNames as $name) {
@@ -57,14 +54,11 @@ class ArticlePageRouteGenerator implements RouteGeneratorInterface
             $tokens[$tokenName] = $tokenValue;
         }
 
-        $parentPath = strtr($parent, $tokens);
+        $parentPath = \strtr($parent, $tokens);
 
         return $this->routeGenerator->generate($entity, ['route_schema' => $parentPath . $options['route_schema']]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOptionsResolver(array $options)
     {
         return (new OptionsResolver())->setRequired(['route_schema', 'parent']);

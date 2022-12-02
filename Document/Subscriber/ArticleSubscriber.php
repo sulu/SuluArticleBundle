@@ -42,7 +42,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ArticleSubscriber implements EventSubscriberInterface
 {
-    const PAGES_PROPERTY = 'suluPages';
+    public const PAGES_PROPERTY = 'suluPages';
 
     /**
      * @var IndexerInterface
@@ -98,9 +98,6 @@ class ArticleSubscriber implements EventSubscriberInterface
         $this->propertyEncoder = $propertyEncoder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -189,7 +186,7 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $liveChildren = $this->getChildren($liveNode);
         $draftChildren = $this->getChildren($draftNode);
-        $removedChildrenIds = array_diff(array_keys($liveChildren), array_keys($draftChildren));
+        $removedChildrenIds = \array_diff(\array_keys($liveChildren), \array_keys($draftChildren));
 
         foreach ($removedChildrenIds as $removedChildrenId) {
             $liveChildren[$removedChildrenId]->remove();
@@ -221,7 +218,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $children = iterator_to_array($document->getChildren());
+        $children = \iterator_to_array($document->getChildren());
         foreach ($children as $child) {
             if (LocalizationState::GHOST !== $this->documentInspector->getLocalizationState($child)) {
                 $this->documentManager->publish($child, $event->getLocale());
@@ -300,7 +297,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         $document->setPages($pages);
         $node->setProperty(
             $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $locale),
-            json_encode($pages)
+            \json_encode($pages)
         );
     }
 
@@ -316,9 +313,9 @@ class ArticleSubscriber implements EventSubscriberInterface
 
         $pages = $event->getNode()->getPropertyValueWithDefault(
             $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $document->getOriginalLocale()),
-            json_encode([])
+            \json_encode([])
         );
-        $pages = json_decode($pages, true);
+        $pages = \json_decode($pages, true);
 
         if (LocalizationState::SHADOW === $this->documentInspector->getLocalizationState($document)) {
             $pages = $this->loadPageDataForShadow($event->getNode(), $document, $pages);
@@ -334,11 +331,11 @@ class ArticleSubscriber implements EventSubscriberInterface
     {
         $pages = $node->getPropertyValueWithDefault(
             $this->propertyEncoder->localizedSystemName(self::PAGES_PROPERTY, $document->getLocale()),
-            json_encode([])
+            \json_encode([])
         );
-        $pages = json_decode($pages, true);
+        $pages = \json_decode($pages, true);
 
-        for ($i = 0; $i < count($originalPages); ++$i) {
+        for ($i = 0; $i < \count($originalPages); ++$i) {
             $pages[$i]['routePath'] = $originalPages[$i]['routePath'];
         }
 
@@ -375,7 +372,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     public function handleFlush(FlushEvent $event): void
     {
-        if (count($this->documents) < 1) {
+        if (\count($this->documents) < 1) {
             return;
         }
 
@@ -395,7 +392,7 @@ class ArticleSubscriber implements EventSubscriberInterface
      */
     public function handleFlushLive(FlushEvent $event): void
     {
-        if (count($this->liveDocuments) < 1) {
+        if (\count($this->liveDocuments) < 1) {
             return;
         }
 
@@ -420,7 +417,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3779 */
+        /* @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3779 */
         $this->liveIndexer->remove($document, $event->getLocale());
         $this->liveIndexer->flush();
 

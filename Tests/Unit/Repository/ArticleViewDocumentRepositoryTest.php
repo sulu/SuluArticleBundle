@@ -221,7 +221,7 @@ class ArticleViewDocumentRepositoryTest extends TestCase
             $this->assertEquals($expectedSearch, $search->getQueries()->toArray());
             $this->assertEquals($limit, $search->getSize());
             $this->assertCount(1, $search->getSorts());
-            $this->assertEquals(new FieldSort('authored', FieldSort::DESC), current($search->getSorts()));
+            $this->assertEquals(new FieldSort('authored', FieldSort::DESC), \current($search->getSorts()));
 
             return true;
         }))->willReturn($documentIterator->reveal());
