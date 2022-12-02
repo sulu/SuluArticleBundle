@@ -532,5 +532,15 @@
 
             <tag name="sulu_document_manager.event_subscriber" />
         </service>
+
+        <service
+            id="sulu_article.articles_list_metadata_visitor"
+            class="Sulu\Bundle\ArticleBundle\Metadata\ListMetadataVisitor"
+        >
+            <argument type="service" id="sulu.content.structure_manager"/>
+            <argument>%sulu_article.types%</argument>
+
+            <tag name="sulu_admin.list_metadata_visitor"/>
+        </service>
     </services>
 </container>
