@@ -18,6 +18,7 @@ use Sulu\Bundle\ContentBundle\SuluContentBundle;
 use Sulu\Bundle\HeadlessBundle\SuluHeadlessBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Sulu\Component\HttpKernel\SuluKernel;
+use Sulu\Messenger\Infrastructure\Symfony\HttpKernel\SuluMessengerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -56,6 +57,7 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
 
         if ('experimental_storage' === $this->config) {
             $bundles[] = new SuluContentBundle();
+            $bundles[] = new SuluMessengerBundle();
         }
 
         if ('extend' === \getenv('ARTICLE_TEST_CASE')) {

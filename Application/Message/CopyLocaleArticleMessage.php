@@ -5,9 +5,9 @@ namespace Sulu\Bundle\ArticleBundle\Application\Message;
 class CopyLocaleArticleMessage
 {
     /**
-     * @param array{
+     * @var array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     private $identifier;
 
@@ -34,9 +34,9 @@ class CopyLocaleArticleMessage
     }
 
     /**
-     * @param array{
+     * @return array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     public function getIdentifier()
     {

@@ -20,7 +20,6 @@ use Sulu\Bundle\ArticleBundle\Application\Message\CopyLocaleArticleMessage;
 use Sulu\Bundle\ArticleBundle\Application\Message\CreateArticleMessage;
 use Sulu\Bundle\ArticleBundle\Application\Message\ModifyArticleMessage;
 use Sulu\Bundle\ArticleBundle\Application\Message\RemoveArticleMessage;
-use Sulu\Bundle\ArticleBundle\Common\MessageBus\Stamps\EnableFlushStamp;
 use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Domain\Repository\ArticleRepositoryInterface;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
@@ -31,9 +30,11 @@ use Sulu\Component\Rest\ListBuilder\Doctrine\FieldDescriptor\DoctrineFieldDescri
 use Sulu\Component\Rest\ListBuilder\Metadata\FieldDescriptorFactoryInterface;
 use Sulu\Component\Rest\ListBuilder\PaginatedRepresentation;
 use Sulu\Component\Rest\RestHelperInterface;
+use Sulu\Messenger\Infrastructure\Symfony\Messenger\FlushMiddleware\EnableFlushStamp;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
@@ -45,16 +46,12 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 final class ArticleController implements ClassResourceInterface
 {
     use ControllerTrait;
+    use HandleTrait;
 
     /**
      * @var ArticleRepositoryInterface
      */
     private $articleRepository;
-
-    /**
-     * @var MessageBusInterface
-     */
-    private $messageBus;
 
     /**
      * @var ContentManagerInterface
@@ -125,15 +122,22 @@ final class ArticleController implements ClassResourceInterface
     public function getAction(Request $request, string $id): Response // TODO route should be a uuid
     {
         $dimensionAttributes = [
-            'locale' => $request->query->get('locale', $request->getLocale()),
+            'locale' => (string) $request->query->get('locale', $request->getLocale()),
             'stage' => DimensionContentInterface::STAGE_DRAFT,
         ];
 
-        $article = $this->articleRepository->getOneBy(\array_merge([
-            'uuid' => $id,
-        ], \array_replace($dimensionAttributes, ['loadGhost' => true])), [
-            ArticleRepositoryInterface::GROUP_SELECT_ARTICLE_ADMIN,
-        ]);
+        $article = $this->articleRepository->getOneBy(
+            \array_merge(
+                [
+                    'uuid' => $id,
+                    'load_ghost_content' => true,
+                ],
+                $dimensionAttributes,
+            ),
+            [
+                ArticleRepositoryInterface::GROUP_SELECT_ARTICLE_ADMIN => true,
+            ]
+        );
 
         // TODO the `$article` should just be serialized here with `['article_admin', 'content_admin']`
         //      Instead of calling the content resolver service which triggers an additional query.
@@ -151,6 +155,7 @@ final class ArticleController implements ClassResourceInterface
         $message = new CreateArticleMessage($this->getData($request));
 
         /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CreateArticleMessageHandler */
+        /** @var ArticleInterface $article */
         $article = $this->handle($message);
         $uuid = $article->getUuid();
 
@@ -172,7 +177,7 @@ final class ArticleController implements ClassResourceInterface
         return $this->getAction($request, $id);
     }
 
-    public function postTriggerAction(Request $request, $id): Response
+    public function postTriggerAction(Request $request, string $id): Response
     {
         $this->handleAction($request, $id);
 
@@ -186,32 +191,6 @@ final class ArticleController implements ClassResourceInterface
         $this->handle($message);
 
         return new Response('', 204);
-    }
-
-    private function handle(object $message): ?ArticleInterface
-    {
-        try {
-            $envelope = $this->messageBus->dispatch($message, [new EnableFlushStamp()]);
-        } catch (HandlerFailedException $exception) { /** @phpstan-ignore-line */ // @codeCoverageIgnore
-            // @codeCoverageIgnoreStart
-            if ($previous = $exception->getPrevious()) {
-                throw $previous;
-            }
-
-            throw $exception;
-            // @codeCoverageIgnoreEnd
-        }
-
-        /** @var HandledStamp[] $handledStamps */
-        $handledStamps = $envelope->all(HandledStamp::class);
-
-        /** @var HandledStamp $handledStamp|null */
-        $handledStamp = \reset($handledStamps);
-
-        /** @var ArticleInterface|null $article */
-        $article = $handledStamp ? $handledStamp->getResult() : null;
-
-        return $article;
     }
 
     /**
@@ -244,14 +223,16 @@ final class ArticleController implements ClassResourceInterface
             /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CopyLocaleArticleMessageHandler */
             $message = new CopyLocaleArticleMessage(
                 ['uuid' => $uuid],
-                $request->query->get('src'),
-                $request->query->get('dest')
+                (string) $request->query->get('src'),
+                (string) $request->query->get('dest')
             );
             /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CopyLocaleArticleMessageHandler */
+            /** @var ArticleInterface */
             return $this->handle($message);
         } else {
             $message = new ApplyWorkflowTransitionArticleMessage(['uuid' => $uuid], $this->getLocale($request), $action);
             /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\ApplyWorkflowTransitionArticleMessageHandler */
+            /** @var ArticleInterface */
             return $this->handle($message);
         }
     }

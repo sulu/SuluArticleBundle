@@ -445,7 +445,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             $suluSearchConfigs = $container->getExtensionConfig('sulu_search');
 
             foreach ($suluSearchConfigs as $suluSearchConfig) {
-                if (isset($suluSearchConfig['website']['indexes'])) {
+                if (isset($suluSearchConfig['website']['indexes'])) { // @phpstan-ignore-line
                     $container->prependExtensionConfig(
                         'sulu_search',
                         [
@@ -461,9 +461,28 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
     }
 
+    /**
+     * @param mixed[] $configs
+     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
+        /**
+         * @var array{
+         *     storage: 'experimental'|'phpcr',
+         *     objects: array<string, array{model: class-string}>,
+         *     default_main_webspace: string|null,
+         *     default_additional_webspaces: string[]|null,
+         *     types: array<string, string>,
+         *     display_tab_all: bool,
+         *     smart_content: array{
+         *         default_limit: int,
+         *     },
+         *     search_fields: string[],
+         *     documents: array<string, array{view: class-string}>,
+         *     default_author: bool,
+         * } $config
+         */
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -478,12 +497,16 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
     }
 
+    /**
+     * @param array{objects: array<string, array{model: class-string}>} $config
+     */
     private function loadExperimentalStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
     {
         $this->configurePersistence($config['objects'], $container);
 
         $loader->load('experimental.xml');
-        $this->createMessageBus($container, 'sulu_article.message_bus');
+
+        $container->setAlias('sulu_article.message_bus', 'sulu_message_bus');
 
         $container->registerForAutoconfiguration(ArticleMapperInterface::class)
             ->addTag('sulu_article.article_mapper');
@@ -491,6 +514,19 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     /**
      * Can be removed when phpcr storage is removed.
+     *
+     * @param array{
+     *     default_main_webspace: string|null,
+     *     default_additional_webspaces: string[]|null,
+     *     types: array<string, string>,
+     *     display_tab_all: bool,
+     *     smart_content: array{
+     *         default_limit: int,
+     *     },
+     *     search_fields: string[],
+     *     documents: array<string, array{view: class-string}>,
+     *     default_author: bool,
+     * } $config
      */
     private function loadPHPCRStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
     {
@@ -529,6 +565,8 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
      * Append configuration for article "set_default_author".
      *
      * Can be removed when phpcr storage is removed.
+     *
+     * @param array{default_author: bool} $config
      */
     private function appendDefaultAuthor(array $config, ContainerBuilder $container): void
     {
@@ -574,34 +612,5 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
 
         return $result;
-    }
-
-    private function createMessageBus(ContainerBuilder $container, string $busId): void
-    {
-        // We can not prepend the message bus in framework bundle as we don't
-        // want that it is accidentally the default bus of a project.
-        // So we create the bus here ourselves be reimplementing the logic of
-        // the FrameworkExtension.
-        // See: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1735-L1774
-
-        $container->register($busId, MessageBus::class)
-            ->addArgument([])
-            ->addTag('messenger.bus');
-
-        $middleware = [
-            // before from: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1736-L1741
-            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => [$busId]],
-            ['id' => 'reject_redelivered_message_middleware'],
-            ['id' => 'dispatch_after_current_bus'],
-            ['id' => 'failed_message_processing_middleware'],
-            // custom middlewares
-            ['id' => 'sulu_article.doctrine_flush_middleware'],
-            // after from: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1742-L1745
-            ['id' => 'send_message'],
-            ['id' => 'handle_message'],
-        ];
-
-        $container->setParameter($busId . '.middleware', $middleware);
-        $container->registerAliasForArgument($busId, MessageBusInterface::class);
     }
 }

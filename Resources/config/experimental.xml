@@ -11,13 +11,6 @@
     -->
 
     <services>
-        <!-- Common -->
-        <service id="sulu_article.doctrine_flush_middleware" class="Sulu\Bundle\ArticleBundle\Common\MessageBus\Middleware\DoctrineFlushMiddleware">
-            <argument type="service" id="doctrine.orm.entity_manager"/>
-
-            <tag name="messenger.middleware"/>
-        </service>
-
         <!-- Message Handler -->
         <service id="sulu_article.create_article_handler" class="Sulu\Bundle\ArticleBundle\Application\MessageHandler\CreateArticleMessageHandler">
             <argument type="service" id="sulu_article.article_repository"/>

@@ -34,6 +34,9 @@ final class CreateArticleMessageHandler
      */
     private $articleMappers;
 
+    /**
+     * @param iterable<ArticleMapperInterface> $articleMappers
+     */
     public function __construct(
         ArticleRepositoryInterface $articleRepository,
         iterable $articleMappers
@@ -45,7 +48,7 @@ final class CreateArticleMessageHandler
     public function __invoke(CreateArticleMessage $message): ArticleInterface
     {
         $data = $message->getData();
-        $article = $this->articleRepository->createNew($data['uuid'] ?? null);
+        $article = $this->articleRepository->createNew($message->getUuid());
 
         foreach ($this->articleMappers as $articleMapper) {
             $articleMapper->mapArticleData($article, $data);

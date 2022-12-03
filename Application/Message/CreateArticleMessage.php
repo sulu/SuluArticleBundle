@@ -24,14 +24,27 @@ class CreateArticleMessage
     private $data;
 
     /**
+     * @var string|null
+     */
+    private $uuid;
+
+    /**
      * @param mixed[] $data
      */
     public function __construct(array $data)
     {
+        $uuid = $data['uuid'] ?? null;
+
         Assert::string($data['locale'] ?? null, 'Expected a "locale" string given.');
-        Assert::nullOrString($data['uuid'] ?? null, 'Expected "uuid" to be a string.');
+        Assert::nullOrString($uuid, 'Expected "uuid" to be a string.');
 
         $this->data = $data;
+        $this->uuid = $uuid;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
     }
 
     /**

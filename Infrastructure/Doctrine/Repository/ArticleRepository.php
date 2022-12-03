@@ -29,7 +29,7 @@ class ArticleRepository implements ArticleRepositoryInterface
      */
     private const SELECTS = [
         // GROUPS
-        self::SELECT_ARTICLE_CONTENT => [
+        self::GROUP_SELECT_ARTICLE_ADMIN => [
             self::SELECT_ARTICLE_CONTENT => [
                 DimensionContentQueryEnhancer::GROUP_SELECT_CONTENT_ADMIN => true,
             ],
@@ -125,13 +125,13 @@ class ArticleRepository implements ArticleRepositoryInterface
         // instead of that the developer need to take that into account
         // in there call of the countBy method.
         unset($filters['page']); // @phpstan-ignore-line
-        unset($filters['limit']);
+        unset($filters['limit']); // @phpstan-ignore-line
 
         $queryBuilder = $this->createQueryBuilder($filters);
 
         $queryBuilder->select('COUNT(DISTINCT article.uuid)');
 
-        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult(); // @phpstan-ignore-line
     }
 
     /**
@@ -243,7 +243,7 @@ class ArticleRepository implements ArticleRepositoryInterface
         // selects
         if ($selects[self::SELECT_ARTICLE_CONTENT] ?? null) {
             /** @var array<string, bool> $contentSelects */
-            $contentSelects = $selects[self::SELECT_ARTICLE_CONTENT] ?? [];
+            $contentSelects = $selects[self::SELECT_ARTICLE_CONTENT];
 
             $queryBuilder->leftJoin(
                 'article.dimensionContents',

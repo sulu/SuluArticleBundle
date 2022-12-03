@@ -34,6 +34,9 @@ final class ModifyArticleMessageHandler
      */
     private $articleMappers;
 
+    /**
+     * @param iterable<ArticleMapperInterface> $articleMappers
+     */
     public function __construct(
         ArticleRepositoryInterface $articleRepository,
         iterable $articleMappers
@@ -46,7 +49,7 @@ final class ModifyArticleMessageHandler
     {
         $identifier = $message->getIdentifier();
         $data = $message->getData();
-        $article = $this->articleRepository->findOneBy($identifier);
+        $article = $this->articleRepository->getOneBy($identifier);
 
         foreach ($this->articleMappers as $articleMapper) {
             $articleMapper->mapArticleData($article, $data);

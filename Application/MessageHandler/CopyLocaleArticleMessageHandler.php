@@ -44,7 +44,7 @@ final class CopyLocaleArticleMessageHandler
 
     public function __invoke(CopyLocaleArticleMessage $message): void
     {
-        $article = $this->articleRepository->findOneBy($message->getIdentifier());
+        $article = $this->articleRepository->getOneBy($message->getIdentifier());
 
         $this->contentCopier->copy(
             $article,

@@ -14,9 +14,9 @@ namespace Sulu\Bundle\ArticleBundle\Application\Message;
 class ApplyWorkflowTransitionArticleMessage
 {
     /**
-     * @param array{
-     *     uuid?: string
-     * } $identifier
+     * @var array{
+     *     uuid?: string,
+     * }
      */
     private $identifier;
 
@@ -43,9 +43,9 @@ class ApplyWorkflowTransitionArticleMessage
     }
 
     /**
-     * @param array{
+     * @return array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     public function getIdentifier(): array
     {

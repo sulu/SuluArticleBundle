@@ -17,9 +17,9 @@ namespace Sulu\Bundle\ArticleBundle\Application\Message;
 class RemoveArticleMessage
 {
     /**
-     * @param array{
+     * @var array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     private $identifier;
 
@@ -34,9 +34,9 @@ class RemoveArticleMessage
     }
 
     /**
-     * @param array{
+     * @return array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     public function getIdentifier(): array
     {

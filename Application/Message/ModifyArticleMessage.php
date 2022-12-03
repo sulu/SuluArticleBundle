@@ -19,9 +19,9 @@ use Webmozart\Assert\Assert;
 class ModifyArticleMessage
 {
     /**
-     * @param array{
+     * @var array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     private $identifier;
 
@@ -45,9 +45,9 @@ class ModifyArticleMessage
     }
 
     /**
-     * @param array{
+     * @return array{
      *     uuid?: string
-     * } $identifier
+     * }
      */
     public function getIdentifier(): array
     {
@@ -55,7 +55,7 @@ class ModifyArticleMessage
     }
 
     /**
-     * @var mixed[]
+     * @return mixed[]
      */
     public function getData(): array
     {

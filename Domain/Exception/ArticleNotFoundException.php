@@ -21,7 +21,7 @@ class ArticleNotFoundException extends \Exception
     private $model;
 
     /**
-     * @param array<string, mixed> $filters
+     * @var array<string, mixed>
      */
     private $filters;
 
