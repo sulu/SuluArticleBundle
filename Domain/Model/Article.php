@@ -27,17 +27,22 @@ class Article implements ArticleInterface
     /**
      * @var string
      */
-    protected $id;
+    protected $uuid;
 
     public function __construct(
-        ?string $id = null
+        ?string $uuid = null
     ) {
-        $this->id = $id ?: Uuid::uuid4()->toString();
+        $this->uuid = $uuid ?: Uuid::uuid4()->toString();
     }
 
-    public function getId(): string
+    public function getId(): string // TODO should be replaced by uuid
     {
-        return $this->id;
+        return $this->uuid;
+    }
+
+    public function getUuid(): string
+    {
+        return $this->uuid;
     }
 
     /**

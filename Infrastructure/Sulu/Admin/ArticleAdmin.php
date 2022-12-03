@@ -124,7 +124,7 @@ class ArticleAdmin extends Admin
                     ->setBackView(static::LIST_VIEW)
             );
             $viewCollection->add(
-                $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_TABS_VIEW, '/' . $resourceKey . '/:locale/:id')
+                $this->viewBuilderFactory->createResourceTabViewBuilder(static::EDIT_TABS_VIEW, '/' . $resourceKey . '/:locale/:id') // TODO should be uuid
                     ->setResourceKey($resourceKey)
                     ->addLocales($locales)
                     ->setBackView(static::LIST_VIEW)

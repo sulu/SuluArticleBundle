@@ -51,14 +51,12 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
 
         if ('phpcr_storage' === $this->config) {
             $bundles[] = new ONGRElasticsearchBundle();
+            $bundles[] = new SuluHeadlessBundle();
         }
 
         if ('experimental_storage' === $this->config) {
             $bundles[] = new SuluContentBundle();
         }
-
-        $bundles[] = new ONGRElasticsearchBundle();
-        $bundles[] = new SuluHeadlessBundle();
 
         if ('extend' === \getenv('ARTICLE_TEST_CASE')) {
             $bundles[] = new TestExtendBundle();
@@ -78,22 +76,26 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $loader->load(__DIR__ . '/config/config.yml');
         $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
 
-        $type = 'default';
-        if (\getenv('ARTICLE_TEST_CASE')) {
-            $type = \getenv('ARTICLE_TEST_CASE');
-        }
+        if ('phpcr_storage' === $this->config) {
+            $type = 'default';
+            if (\getenv('ARTICLE_TEST_CASE')) {
+                $type = \getenv('ARTICLE_TEST_CASE');
+            }
 
-        $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
+            $loader->load(__DIR__ . '/config/config_' . $type . '.yml');
+        }
     }
 
     public function process(ContainerBuilder $container)
     {
-        // Make some services which were inlined in optimization
-        $container->getDefinition('sulu_article.content.page_tree_data_provider')
-            ->setPublic(true);
+        if ('phpcr_storage' === $this->config) {
+            // Make some services which were inlined in optimization
+            $container->getDefinition('sulu_article.content.page_tree_data_provider')
+                ->setPublic(true);
 
-        $container->getDefinition('sulu_article.elastic_search.article_indexer')
-            ->setPublic(true);
+            $container->getDefinition('sulu_article.elastic_search.article_indexer')
+                ->setPublic(true);
+        }
     }
 
     protected function getKernelParameters(): array
@@ -104,5 +106,15 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         $parameters['gedmo_directory'] = \dirname($gedmoReflection->getFileName());
 
         return $parameters;
+    }
+
+    public function getCacheDir(): string
+    {
+        return parent::getCacheDir() . '/' . $this->config;
+    }
+
+    public function getCommonCacheDir(): string
+    {
+        return parent::getCommonCacheDir() . '/' . $this->config;
     }
 }

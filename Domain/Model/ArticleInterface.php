@@ -16,11 +16,18 @@ use Sulu\Component\Persistence\Model\AuditableInterface;
 
 /**
  * @experimental
+ *
+ * @method ArticleDimensionContentInterface createDimensionContent() see also
  */
 interface ArticleInterface extends AuditableInterface, ContentRichEntityInterface
 {
     public const TEMPLATE_TYPE = 'article';
-    public const RESOURCE_KEY = 'article';
+    public const RESOURCE_KEY = 'articles';
 
+    /**
+     * @internal
+     */
     public function getId(): string;
+
+    public function getUuid(): string;
 }

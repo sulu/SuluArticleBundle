@@ -11,6 +11,7 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
+use Sulu\Bundle\ArticleBundle\Application\Mapper\ArticleMapperInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
@@ -26,6 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @internal
@@ -61,6 +64,18 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             );
         }
 
+        if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
+            $this->prependPHPCRStorage($container);
+        } elseif (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage) {
+            $this->prependExperimentalStorage($container);
+        }
+    }
+
+    /**
+     * Can be removed when phpcr storage is removed.
+     */
+    private function prependPHPCRStorage(ContainerBuilder $container): void
+    {
         if ($container->hasExtension('sulu_admin')) {
             $container->prependExtensionConfig(
                 'sulu_admin',
@@ -127,18 +142,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
             );
         }
 
-        if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
-            $this->prependPHPCRStorage($container);
-        } elseif (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage) {
-            $this->prependExperimentalStorage($container);
-        }
-    }
-
-    /**
-     * Can be removed when phpcr storage is removed.
-     */
-    private function prependPHPCRStorage(ContainerBuilder $container): void
-    {
         if ($container->hasExtension('sulu_core')) {
             // can be removed when phpcr storage is removed
             $container->prependExtensionConfig(
@@ -314,6 +317,72 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
 
     private function prependExperimentalStorage(ContainerBuilder $container): void
     {
+        if ($container->hasExtension('sulu_admin')) {
+            $container->prependExtensionConfig(
+                'sulu_admin',
+                [
+                    'lists' => [
+                        'directories' => [
+                            __DIR__ . '/../Resources/config/experimental/lists',
+                        ],
+                    ],
+                    'forms' => [
+                        'directories' => [
+                            // __DIR__ . '/../Resources/config/forms',
+                        ],
+                    ],
+                    'resources' => [
+                        'articles' => [
+                            'routes' => [
+                                'list' => 'sulu_article.get_articles',
+                                'detail' => 'sulu_article.get_article',
+                            ],
+                        ],
+                        'article_versions' => [
+                            'routes' => [
+                                'list' => 'sulu_article.get_article_versions',
+                                'detail' => 'sulu_article.post_article_version_trigger',
+                            ],
+                        ],
+                    ],
+                    'field_type_options' => [
+                        'selection' => [
+                            'article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title', 'routePath'],
+                                        'icon' => 'su-newspaper',
+                                        'label' => 'sulu_article.selection_label',
+                                        'overlay_title' => 'sulu_article.selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'single_selection' => [
+                            'single_article_selection' => [
+                                'default_type' => 'list_overlay',
+                                'resource_key' => 'articles',
+                                'types' => [
+                                    'list_overlay' => [
+                                        'adapter' => 'table',
+                                        'list_key' => 'articles',
+                                        'display_properties' => ['title'],
+                                        'empty_text' => 'sulu_article.no_article_selected',
+                                        'icon' => 'su-newspaper',
+                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
+
         if ($container->hasExtension('doctrine')) {
             $container->prependExtensionConfig(
                 'doctrine',
@@ -363,7 +432,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                         ArticleInterface::class => [
                             'generator' => 'schema',
                             'options' => [
-                                'route_schema' => '/{implode("-", object)}',
+                                'route_schema' => '/{object["title"]}',
                             ],
                             'resource_key' => ArticleInterface::RESOURCE_KEY,
                         ],
@@ -414,6 +483,10 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $this->configurePersistence($config['objects'], $container);
 
         $loader->load('experimental.xml');
+        $this->createMessageBus($container, 'sulu_article.message_bus');
+
+        $container->registerForAutoconfiguration(ArticleMapperInterface::class)
+            ->addTag('sulu_article.article_mapper');
     }
 
     /**
@@ -501,5 +574,34 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
 
         return $result;
+    }
+
+    private function createMessageBus(ContainerBuilder $container, string $busId): void
+    {
+        // We can not prepend the message bus in framework bundle as we don't
+        // want that it is accidentally the default bus of a project.
+        // So we create the bus here ourselves be reimplementing the logic of
+        // the FrameworkExtension.
+        // See: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1735-L1774
+
+        $container->register($busId, MessageBus::class)
+            ->addArgument([])
+            ->addTag('messenger.bus');
+
+        $middleware = [
+            // before from: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1736-L1741
+            ['id' => 'add_bus_name_stamp_middleware', 'arguments' => [$busId]],
+            ['id' => 'reject_redelivered_message_middleware'],
+            ['id' => 'dispatch_after_current_bus'],
+            ['id' => 'failed_message_processing_middleware'],
+            // custom middlewares
+            ['id' => 'sulu_article.doctrine_flush_middleware'],
+            // after from: https://github.com/symfony/symfony/blob/v4.4.16/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php#L1742-L1745
+            ['id' => 'send_message'],
+            ['id' => 'handle_message'],
+        ];
+
+        $container->setParameter($busId . '.middleware', $middleware);
+        $container->registerAliasForArgument($busId, MessageBusInterface::class);
     }
 }
