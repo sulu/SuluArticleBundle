@@ -57,7 +57,6 @@ trait CreateArticleTrait
         $localizedDimensionContent = $article->createDimensionContent();
         $localizedDimensionContent->setLocale($locale);
         $localizedDimensionContent->setStage($stage);
-        $localizedDimensionContent->setTitle($data['title'] ?? null);
 
         $templateKey = $data['templateKey'] ?? null;
         if ($templateKey) {
