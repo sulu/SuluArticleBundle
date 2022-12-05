@@ -33,10 +33,9 @@ use Sulu\Component\Rest\RestHelperInterface;
 use Sulu\Messenger\Infrastructure\Symfony\Messenger\FlushMiddleware\EnableFlushStamp;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
  * @internal this class should not be instated by a project
@@ -156,7 +155,7 @@ final class ArticleController implements ClassResourceInterface
 
         /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CreateArticleMessageHandler */
         /** @var ArticleInterface $article */
-        $article = $this->handle($message);
+        $article = $this->handle(new Envelope($message, [new EnableFlushStamp()]));
         $uuid = $article->getUuid();
 
         $this->handleAction($request, $uuid);
@@ -166,11 +165,11 @@ final class ArticleController implements ClassResourceInterface
         return $response->setStatusCode(201);
     }
 
-    public function putAction(Request $request, string $id): Response // TODO route should be a uuid
+    public function putAction(Request $request, string $id): Response // TODO route should be a uuid?
     {
         $message = new ModifyArticleMessage(['uuid' => $id], $this->getData($request));
         /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\ModifyArticleMessageHandler */
-        $this->handle($message);
+        $this->handle(new Envelope($message, [new EnableFlushStamp()]));
 
         $this->handleAction($request, $id);
 
@@ -188,7 +187,7 @@ final class ArticleController implements ClassResourceInterface
     {
         $message = new RemoveArticleMessage(['uuid' => $id]);
         /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\RemoveArticleMessageHandler */
-        $this->handle($message);
+        $this->handle(new Envelope($message, [new EnableFlushStamp()]));
 
         return new Response('', 204);
     }
@@ -219,21 +218,20 @@ final class ArticleController implements ClassResourceInterface
             return null;
         }
 
-        if ($action === 'copy-locale') {
-            /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CopyLocaleArticleMessageHandler */
+        if ('copy-locale' === $action) {
             $message = new CopyLocaleArticleMessage(
                 ['uuid' => $uuid],
                 (string) $request->query->get('src'),
                 (string) $request->query->get('dest')
             );
             /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\CopyLocaleArticleMessageHandler */
-            /** @var ArticleInterface */
-            return $this->handle($message);
+            /** @var null */
+            return $this->handle(new Envelope($message, [new EnableFlushStamp()]));
         } else {
             $message = new ApplyWorkflowTransitionArticleMessage(['uuid' => $uuid], $this->getLocale($request), $action);
             /** @see Sulu\Bundle\ArticleBundle\Application\MessageHandler\ApplyWorkflowTransitionArticleMessageHandler */
-            /** @var ArticleInterface */
-            return $this->handle($message);
+            /** @var null */
+            return $this->handle(new Envelope($message, [new EnableFlushStamp()]));
         }
     }
 }

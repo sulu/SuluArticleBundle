@@ -35,16 +35,13 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
 
     public function __construct(string $environment, bool $debug, string $suluContext = SuluKernel::CONTEXT_ADMIN)
     {
-        $environmentParts = explode('_', $environment, 2);
+        $environmentParts = \explode('_', $environment, 2);
         $environment = $environmentParts[0];
         $this->config = $environmentParts[1] ?? $this->config;
 
         parent::__construct($environment, $debug, $suluContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function registerBundles(): iterable
     {
         $bundles = parent::registerBundles();

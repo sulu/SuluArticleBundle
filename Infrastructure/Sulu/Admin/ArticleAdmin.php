@@ -32,13 +32,13 @@ use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
  */
 class ArticleAdmin extends Admin
 {
-    const SECURITY_CONTEXT = 'sulu.article.articles';
+    public const SECURITY_CONTEXT = 'sulu.article.articles';
 
-    const LIST_VIEW = 'sulu_article.article.list';
+    public const LIST_VIEW = 'sulu_article.article.list';
 
-    const ADD_TABS_VIEW = 'sulu_article.article.add_tabs';
+    public const ADD_TABS_VIEW = 'sulu_article.article.add_tabs';
 
-    const EDIT_TABS_VIEW = 'sulu_article.article.edit_tabs';
+    public const EDIT_TABS_VIEW = 'sulu_article.article.edit_tabs';
 
     /**
      * @var ViewBuilderFactoryInterface

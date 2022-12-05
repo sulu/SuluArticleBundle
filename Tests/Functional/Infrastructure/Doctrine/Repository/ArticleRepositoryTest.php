@@ -54,7 +54,7 @@ class ArticleRepositoryTest extends SuluTestCase
     public function testFindByNotExist(): void
     {
         $uuid = Uuid::uuid4()->toString();
-        $articles = iterator_to_array($this->articleRepository->findBy(['uuids' => [$uuid]]));
+        $articles = \iterator_to_array($this->articleRepository->findBy(['uuids' => [$uuid]]));
         $this->assertCount(0, $articles);
     }
 
@@ -116,7 +116,7 @@ class ArticleRepositoryTest extends SuluTestCase
         static::getEntityManager()->flush();
         static::getEntityManager()->clear();
 
-        $articles = iterator_to_array($this->articleRepository->findBy(['uuids' => [$uuid, $uuid3]]));
+        $articles = \iterator_to_array($this->articleRepository->findBy(['uuids' => [$uuid, $uuid3]]));
 
         $this->assertCount(2, $articles);
     }
@@ -172,7 +172,7 @@ class ArticleRepositoryTest extends SuluTestCase
         $categoryBId = $categoryB->getId();
         static::getEntityManager()->clear();
 
-        $this->assertCount(2, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(2, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'categoryKeys' => ['a', 'b'],
@@ -184,7 +184,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'categoryKeys' => ['a', 'b'],
         ]));
 
-        $this->assertCount(1, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(1, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'categoryKeys' => ['a', 'b'],
@@ -198,7 +198,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'categoryOperator' => 'AND',
         ]));
 
-        $this->assertCount(2, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(2, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'categoryIds' => [$categoryAId, $categoryBId],
@@ -210,7 +210,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'categoryIds' => [$categoryAId, $categoryBId],
         ]));
 
-        $this->assertCount(1, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(1, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'categoryIds' => [$categoryAId, $categoryBId],
@@ -243,7 +243,7 @@ class ArticleRepositoryTest extends SuluTestCase
         $tagBId = $tagB->getId();
         static::getEntityManager()->clear();
 
-        $this->assertCount(2, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(2, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'tagNames' => ['a', 'b'],
@@ -255,7 +255,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'tagNames' => ['a', 'b'],
         ]));
 
-        $this->assertCount(1, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(1, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'tagNames' => ['a', 'b'],
@@ -269,7 +269,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'tagOperator' => 'AND',
         ]));
 
-        $this->assertCount(2, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(2, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'tagIds' => [$tagAId, $tagBId],
@@ -281,7 +281,7 @@ class ArticleRepositoryTest extends SuluTestCase
             'tagIds' => [$tagAId, $tagBId],
         ]));
 
-        $this->assertCount(1, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(1, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'tagIds' => [$tagAId, $tagBId],
@@ -309,7 +309,7 @@ class ArticleRepositoryTest extends SuluTestCase
         static::getEntityManager()->flush();
         static::getEntityManager()->clear();
 
-        $this->assertCount(2, iterator_to_array($this->articleRepository->findBy([
+        $this->assertCount(2, \iterator_to_array($this->articleRepository->findBy([
             'locale' => 'en',
             'stage' => 'draft',
             'templateKeys' => ['a', 'c'],
