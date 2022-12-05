@@ -210,7 +210,7 @@ final class ArticleController implements ClassResourceInterface
         return $request->query->getAlnum('locale', $request->getLocale());
     }
 
-    private function handleAction(Request $request, string $uuid): ?ArticleInterface
+    private function handleAction(Request $request, string $uuid): ?ArticleInterface // @phpstan-ignore-line
     {
         $action = $request->query->get('action');
 
