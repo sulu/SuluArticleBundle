@@ -228,7 +228,6 @@ class ArticleAdmin extends Admin
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::LIVE)
                 && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::LIVE)) {
-
                 $editDropdownToolbarActions = [
                     new ToolbarAction('sulu_admin.delete_draft'),
                     new ToolbarAction('sulu_admin.set_unpublished'),
