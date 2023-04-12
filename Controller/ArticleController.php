@@ -528,7 +528,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     {
         // extract parameter
         $action = $this->getRequestParameter($request, 'action', true);
-        $locale = $this->getRequestParameter($request, 'locale', true);
+        $locale = $this->getRequestParameter($request, 'locale', false);
 
         // prepare vars
         $view = null;

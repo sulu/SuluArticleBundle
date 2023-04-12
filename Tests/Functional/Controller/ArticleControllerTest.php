@@ -1193,6 +1193,28 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertNull($this->findViewDocument($article2['id'], 'de'));
     }
 
+    public function testCopy()
+    {
+        // create article
+        $sourceArticle = $this->testPost('Sulu ist toll - Artikel 1');
+        $this->publish($sourceArticle['id']);
+        $this->flush();
+
+        // trigger copy action
+        $this->client->jsonRequest('POST',
+            \sprintf('/api/articles/%s?action=copy', $sourceArticle['id'])
+        );
+        $response = $this->client->getResponse();
+
+        $result = \json_decode($response->getContent(), true);
+        $this->assertHttpStatusCode(200, $response);
+
+        $this->assertNotEquals($sourceArticle['id'], $result['id']);
+        $this->assertEquals($sourceArticle['title'], $result['title']);
+        $this->assertEquals($sourceArticle['articleType'], $result['articleType']);
+        $this->assertEquals(false, $result['publishedState']);
+    }
+
     public function testCopyLocaleWithoutSource()
     {
         // prepare vars
