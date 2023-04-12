@@ -451,7 +451,6 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-
         $this->indexer->remove($document);
         $this->indexer->flush();
     }
