@@ -150,6 +150,6 @@ class ContentProxyFactory
             return null;
         }
 
-        return $attributes->getAttribute('webspaceKey');
+        return $attributes->getAttribute('webspaceKey') ?? $attributes->getAttribute('webspace')->getKey();
     }
 }
