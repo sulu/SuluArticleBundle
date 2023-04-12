@@ -164,7 +164,7 @@ articles.
         {% endfor %}
 
         {% if page < pages %}
-            <a href="?page={{ page + 1 }}">Previous</a>
+            <a href="?page={{ page + 1 }}">Next</a>
         {% endif %}
     </nav>
 {% endblock %}
