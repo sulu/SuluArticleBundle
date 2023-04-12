@@ -417,7 +417,6 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /* @phpstan-ignore-next-line See https://github.com/phpstan/phpstan/issues/3779 */
         $this->liveIndexer->remove($document, $event->getLocale());
         $this->liveIndexer->flush();
 
@@ -451,6 +450,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         if (!$document instanceof ArticleDocument) {
             return;
         }
+
 
         $this->indexer->remove($document);
         $this->indexer->flush();
