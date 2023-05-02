@@ -635,6 +635,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      */
     private function persistDocument(array $data, object $document, string $locale): void
     {
+        /** @var class-string<\Symfony\Component\Form\FormTypeInterface> $formType */
         $formType = $this->metadataFactory->getMetadataForAlias('article')->getFormType();
         $form = $this->formFactory->create(
             $formType,
