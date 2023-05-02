@@ -362,8 +362,10 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filterTypes = [];
 
         if (\array_key_exists('types', $propertyParameter)
-            && !empty($value = $propertyParameter['types']->getValue())) {
-            $types = \is_array($value) ? $value : \explode(',', $value);
+            && !empty($value = $propertyParameter['types']->getValue())
+            && \is_string($value)) {
+            $types = \explode(',', $value);
+
             foreach ($types as $type) {
                 $filterTypes[] = $type;
             }

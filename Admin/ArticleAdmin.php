@@ -228,13 +228,20 @@ class ArticleAdmin extends Admin
 
             if ($this->securityChecker->hasPermission(static::SECURITY_CONTEXT, PermissionTypes::LIVE)
                 && $this->securityChecker->hasPermission(static::getArticleSecurityContext($typeKey), PermissionTypes::LIVE)) {
+                $editDropdownToolbarActions = [
+                    new ToolbarAction('sulu_admin.delete_draft'),
+                    new ToolbarAction('sulu_admin.set_unpublished'),
+                    new ToolbarAction('sulu_admin.copy'),
+                ];
+
+                if (\count($locales) > 1) {
+                    $editDropdownToolbarActions[] = new ToolbarAction('sulu_admin.copy_locale');
+                }
+
                 $formToolbarActionsWithType[] = new DropdownToolbarAction(
                     'sulu_admin.edit',
                     'su-pen',
-                    [
-                        new ToolbarAction('sulu_admin.delete_draft'),
-                        new ToolbarAction('sulu_admin.set_unpublished'),
-                    ]
+                    $editDropdownToolbarActions
                 );
             }
 

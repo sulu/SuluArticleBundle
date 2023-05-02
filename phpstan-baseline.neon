@@ -1696,6 +1696,11 @@ parameters:
 			path: Document/Subscriber/ArticleSubscriber.php
 
 		-
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\IndexerInterface\\:\\:remove\\(\\) invoked with 1 parameter, 2 required\\.$#"
+			count: 2
+			path: Document/Subscriber/ArticleSubscriber.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:getChildren\\(\\) has parameter \\$node with no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticleSubscriber.php
