@@ -203,6 +203,7 @@ class ArticlePageController extends AbstractRestController implements ClassResou
             $data['template'] = $article->getStructureType();
         }
 
+        /** @var class-string<\Symfony\Component\Form\FormTypeInterface> $formType */
         $formType = $this->metadataFactory->getMetadataForAlias('article_page')->getFormType();
 
         $form = $this->formFactory->create(
