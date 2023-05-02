@@ -49,8 +49,8 @@
         "phpstan/phpstan-symfony": "^1.0",
         "phpstan/phpstan-webmozart-assert": "^1.0",
         "phpunit/phpunit": "^8.2",
-        "sulu/automation-bundle": "^2.0@dev",
-        "sulu/headless-bundle": "^0.8.0@dev",
+        "sulu/automation-bundle": "^2.0 || ^2.1@dev",
+        "sulu/headless-bundle": "^0.8 || ^0.9 || ^0.10@dev",
         "symfony/browser-kit": "^4.3 || ^5.0 || ^6.0",
         "symfony/dotenv": "^4.3 || ^5.0 || ^6.0",
         "symfony/framework-bundle": "^4.3 || ^5.0 || ^6.0",
@@ -59,7 +59,9 @@
         "symfony/stopwatch": "^4.3 || ^5.0 || ^6.0"
     },
     "conflict": {
-        "guzzlehttp/ringphp": "<1.1.1"
+        "guzzlehttp/ringphp": "<1.1.1",
+        "sulu/automation-bundle": "<2.0, >=3.0",
+        "sulu/headless-bundle": "<0.8, >=0.11"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows to outsource long-running route update processes."
