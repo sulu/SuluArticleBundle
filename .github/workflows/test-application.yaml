@@ -15,6 +15,7 @@ jobs:
         env:
             DATABASE_URL: mysql://root:root@127.0.0.1:3306/sulu_test?serverVersion=5.7
             PHPCR_TRANSPORT: ${{ matrix.phpcr-transport }}
+            COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
         strategy:
             fail-fast: false
@@ -27,7 +28,6 @@ jobs:
                       dependency-versions: 'lowest'
                       php-extensions: 'ctype, iconv, mysql, gd'
                       tools: 'composer:v1'
-                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: disabled
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
@@ -42,7 +42,6 @@ jobs:
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: true
-                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
@@ -50,12 +49,11 @@ jobs:
                     - php-version: '8.0'
                       elasticsearch-version: '7.11.1'
                       elasticsearch-package-constraint: '~7.11.0'
-                      phpcr-transport: jackrabbit
+                      phpcr-transport: doctrinedbal
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: false
-                      lint: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
@@ -63,12 +61,23 @@ jobs:
                     - php-version: '8.1'
                       elasticsearch-version: '7.11.1'
                       elasticsearch-package-constraint: '~7.11.0'
-                      phpcr-transport: jackrabbit
+                      phpcr-transport: doctrinedbal
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
                       phpstan: false
-                      lint: true
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
+
+                    - php-version: '8.2'
+                      elasticsearch-version: '7.11.1'
+                      elasticsearch-package-constraint: '~7.11.0'
+                      phpcr-transport: doctrinedbal
+                      dependency-versions: 'highest'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      phpstan: false
                       env:
                           SYMFONY_DEPRECATIONS_HELPER: weak
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
@@ -128,11 +137,37 @@ jobs:
               run: composer bootstrap-test-environment
               env: ${{ matrix.env }}
 
-            - name: Lint code
-              if: ${{ matrix.lint }}
-              run: composer lint
-              env: ${{ matrix.env }}
-
             - name: Execute test cases
               run: time composer test
               env: ${{ matrix.env }}
+
+    lint:
+        name: "PHP Lint"
+        runs-on: ubuntu-latest
+
+        env:
+            COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        steps:
+            - name: Checkout project
+              uses: actions/checkout@v2
+
+            - name: Install and configure PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.1
+                  extensions: 'ctype, iconv, mysql, imagick'
+                  tools: 'composer:v2'
+                  coverage: none
+
+            - name: Require elasticsearch dependency
+              run: composer require --dev elasticsearch/elasticsearch:"~7.11.0" --no-interaction --no-update
+
+            - name: Install composer dependencies
+              uses: ramsey/composer-install@v1
+              with:
+                  dependency-versions: ${{matrix.dependency-versions}}
+                  composer-options: ${{ matrix.composer-options }}
+
+            - name: Lint code
+              run: composer lint
