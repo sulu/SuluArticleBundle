@@ -27,7 +27,7 @@
         "jms/serializer": "^3.3",
         "jms/serializer-bundle": "^3.3 || ^4.0",
         "ramsey/uuid": "^3.1 || ^4.0",
-        "sulu/sulu": "^2.5.0 || ^2.5@dev",
+        "sulu/sulu": "^2.5.9 || ^2.5.9@dev",
         "symfony/config": "^5.4 || ^6.0",
         "symfony/dependency-injection": "^5.4 || ^6.0",
         "symfony/http-foundation": "^5.4 || ^6.0",
