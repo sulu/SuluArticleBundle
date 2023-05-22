@@ -22,6 +22,8 @@ use Sulu\Bundle\ContentBundle\Content\Domain\Model\WorkflowInterface;
 
 /**
  * @experimental
+ * 
+ * @extends DimensionContentInterface<ArticleInterface>
  */
 interface ArticleDimensionContentInterface extends DimensionContentInterface, ExcerptInterface, SeoInterface, TemplateInterface, RoutableInterface, WorkflowInterface, /*WebspaceInterface,*/ AuthorInterface
 {

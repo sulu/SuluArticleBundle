@@ -21,6 +21,9 @@ use Sulu\Component\Persistence\Model\AuditableTrait;
  */
 class Article implements ArticleInterface
 {
+    /**
+     * @phpstan-use ContentRichEntityTrait<ArticleDimensionContent>
+     */
     use ContentRichEntityTrait;
     use AuditableTrait;
 

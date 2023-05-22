@@ -17,7 +17,7 @@ use Sulu\Component\Persistence\Model\AuditableInterface;
 /**
  * @experimental
  *
- * @method ArticleDimensionContentInterface createDimensionContent() see also
+ * @extends ContentRichEntityInterface<ArticleDimensionContentInterface>
  */
 interface ArticleInterface extends AuditableInterface, ContentRichEntityInterface
 {
