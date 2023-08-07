@@ -195,6 +195,8 @@ class ArticleSitemapProvider implements SitemapProviderInterface
             $webspaceQuery->add(new TermQuery('additional_webspaces', $webspaceKey), BoolQuery::SHOULD);
         }
 
+        $search->addQuery($webspaceQuery);
+
         return \ceil($repository->count($search) / static::PAGE_SIZE);
     }
 
