@@ -41,19 +41,9 @@ parameters:
 			path: Builder/ArticleIndexBuilder.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Command\\\\ArticleExportCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Command/ArticleExportCommand.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between 0 and bool will always evaluate to false\\.$#"
 			count: 1
 			path: Command/ArticleExportCommand.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Command\\\\ArticleImportCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Command/ArticleImportCommand.php
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Command\\\\ArticleImportCommand\\:\\:printExceptions\\(\\) has no return type specified\\.$#"
@@ -69,11 +59,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between 0 and bool will always evaluate to false\\.$#"
 			count: 1
 			path: Command/ArticleImportCommand.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Command\\\\ReindexCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Command/ReindexCommand.php
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Command\\\\ReindexCommand\\:\\:getDocuments\\(\\) should return Sulu\\\\Component\\\\DocumentManager\\\\Collection\\\\QueryResultCollection but returns mixed\\.$#"
@@ -536,21 +521,6 @@ parameters:
 			path: Controller/WebsiteArticleController.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\DependencyInjection\\\\ConverterCompilerPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: DependencyInjection/ConverterCompilerPass.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\DependencyInjection\\\\RouteEnhancerCompilerPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: DependencyInjection/RouteEnhancerCompilerPass.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\DependencyInjection\\\\StructureValidatorCompilerPass\\:\\:process\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: DependencyInjection/StructureValidatorCompilerPass.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: DependencyInjection/StructureValidatorCompilerPass.php
@@ -587,11 +557,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\DependencyInjection\\\\SuluArticleExtension\\:\\:load\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: DependencyInjection/SuluArticleExtension.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\DependencyInjection\\\\SuluArticleExtension\\:\\:prepend\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: DependencyInjection/SuluArticleExtension.php
 
@@ -961,17 +926,7 @@ parameters:
 			path: Document/Form/ArticleDocumentType.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Form\\\\ArticleDocumentType\\:\\:configureOptions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Form/ArticleDocumentType.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Form\\\\ArticlePageDocumentType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Form/ArticlePageDocumentType.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Form\\\\ArticlePageDocumentType\\:\\:configureOptions\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/Form/ArticlePageDocumentType.php
 
@@ -994,11 +949,6 @@ parameters:
 			message: "#^Parameter \\#2 \\.\\.\\.\\$arrays of function array_merge expects array, mixed given\\.$#"
 			count: 1
 			path: Document/Form/Listener/DataNormalizer.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Form\\\\UnstructuredType\\:\\:configureOptions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Form/UnstructuredType.php
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleGhostIndexer\\:\\:__construct\\(\\) has parameter \\$typeConfiguration with no value type specified in iterable type array\\.$#"
@@ -1687,6 +1637,11 @@ parameters:
 
 		-
 			message: "#^Cannot access offset 'routePath' on mixed\\.$#"
+			count: 1
+			path: Document/Subscriber/ArticleSubscriber.php
+
+		-
+			message: "#^Cannot access offset int\\<0, max\\> on mixed\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticleSubscriber.php
 
@@ -2509,11 +2464,6 @@ parameters:
 			message: "#^Parameter \\#3 \\$defaultLocale of class Sulu\\\\Bundle\\\\WebsiteBundle\\\\Sitemap\\\\SitemapUrl constructor expects string\\|null, DateTime given\\.$#"
 			count: 1
 			path: Sitemap/ArticleSitemapProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\SuluArticleBundle\\:\\:build\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: SuluArticleBundle.php
 
 		-
 			message: "#^Cannot call method getExcerpt\\(\\) on mixed\\.$#"
