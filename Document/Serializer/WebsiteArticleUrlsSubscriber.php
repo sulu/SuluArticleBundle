@@ -138,11 +138,18 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (null !== ($portal = $attributes->getAttribute('portal'))) {
+            $allLocalizations = $portal->getLocalizations();
+        } else {
+            $allLocalizations = $webspace->getAllLocalizations();
+        }
+
         $urls = [];
         $localizations = [];
         $publishedLocales = $this->getPublishedLocales($article, $webspace);
 
-        foreach ($this->getWebspaceLocales($webspace) as $locale) {
+        foreach ($allLocalizations as $localization) {
+            $locale = $localization->getLocale();
             $published = \in_array($locale, $publishedLocales, true);
             $path = '/';
             $alternate = false;
@@ -160,6 +167,7 @@ class WebsiteArticleUrlsSubscriber implements EventSubscriberInterface
             $localizations[$locale] = [
                 'locale' => $locale,
                 'url' => $this->webspaceManager->findUrlByResourceLocator($path, null, $locale),
+                'country' => $localization->getCountry(),
                 'alternate' => $alternate,
             ];
         }
