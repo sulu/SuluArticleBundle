@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class SuluArticleBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new ConverterCompilerPass());
         $container->addCompilerPass(new StructureValidatorCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
