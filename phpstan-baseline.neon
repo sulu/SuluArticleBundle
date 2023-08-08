@@ -1456,6 +1456,11 @@ parameters:
 			path: Document/Structure/ArticleBridge.php
 
 		-
+			message: "#^Left side of && is always true\\.$#"
+			count: 1
+			path: Document/Structure/ArticleBridge.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:getConcreteLanguages\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Document/Structure/ArticleBridge.php
@@ -1482,6 +1487,11 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:setWebspaceKey\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Document/Structure/ArticleBridge.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: Document/Structure/ArticleBridge.php
 
