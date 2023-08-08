@@ -386,6 +386,11 @@ parameters:
 			path: Controller/ArticleController.php
 
 		-
+			message: "#^Parameter \\#1 \\$type of method Symfony\\\\Component\\\\Form\\\\FormFactoryInterface\\:\\:create\\(\\) expects class\\-string\\<Symfony\\\\Component\\\\Form\\\\FormTypeInterface\\<object\\>\\>, string given\\.$#"
+			count: 1
+			path: Controller/ArticleController.php
+
+		-
 			message: "#^Parameter \\#1 \\$value of function count expects array\\|Countable, array\\|null given\\.$#"
 			count: 1
 			path: Controller/ArticleController.php
@@ -453,6 +458,11 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$actionParameter of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\ArticlePageController\\:\\:handleActionParameter\\(\\) expects string\\|null, mixed given\\.$#"
 			count: 2
+			path: Controller/ArticlePageController.php
+
+		-
+			message: "#^Parameter \\#1 \\$type of method Symfony\\\\Component\\\\Form\\\\FormFactoryInterface\\:\\:create\\(\\) expects class\\-string\\<Symfony\\\\Component\\\\Form\\\\FormTypeInterface\\<object\\>\\>, string given\\.$#"
+			count: 1
 			path: Controller/ArticlePageController.php
 
 		-
@@ -1456,6 +1466,11 @@ parameters:
 			path: Document/Structure/ArticleBridge.php
 
 		-
+			message: "#^Left side of && is always true\\.$#"
+			count: 1
+			path: Document/Structure/ArticleBridge.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:getConcreteLanguages\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Document/Structure/ArticleBridge.php
@@ -1482,6 +1497,11 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Structure\\\\ArticleBridge\\:\\:setWebspaceKey\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Document/Structure/ArticleBridge.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: Document/Structure/ArticleBridge.php
 
