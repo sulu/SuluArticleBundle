@@ -108,7 +108,6 @@ class ArticleBridge extends StructureBridge implements RoutableStructureInterfac
         $this->webspaceKey = $webspace;
     }
 
-
     public function getLanguageCode()
     {
         if (!$this->document) {
