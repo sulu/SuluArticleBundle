@@ -161,6 +161,9 @@ class WebsiteArticleController extends AbstractController
         return $response;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     protected function renderBlockView(string $view, string $block, array $parameters = []): string
     {
         $twig = $this->getTwig();
