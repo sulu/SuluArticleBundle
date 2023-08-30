@@ -1,5 +1,14 @@
 # Upgrade
 
+## 2.5.2
+
+### Rename WebsiteArticleController::renderBlock to WebsiteArticleController::renderBlockView
+
+Symfony 6.4 did add an own `renderBlock` method to its `AbstractController`.
+This would actually throw an error when projects upgrading to Symfony 6.4
+as the `renderBlock` method of Sulu is incompatible to Symfony `renderBlock`
+method. For these cases we rename `renderBlock` to `renderBlockView`.
+
 ## 2.3.0
 
 ### Changed constructor of ArticleObjectProvider
@@ -332,4 +341,3 @@ Reindex elastic search indexes:
 bin/adminconsole sulu:article:index-rebuild ###LOCALE### --live
 bin/adminconsole sulu:article:index-rebuild ###LOCALE###
 ```
-
