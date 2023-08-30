@@ -76,7 +76,7 @@ class WebsiteArticleController extends AbstractController
             if ($partial) {
                 $response = $this->createResponse($request);
                 $response->setContent(
-                    $this->renderBlock(
+                    $this->renderBlockView(
                         $viewTemplate,
                         'content',
                         $data
@@ -161,18 +161,21 @@ class WebsiteArticleController extends AbstractController
         return $response;
     }
 
-    protected function renderBlock(string $template, string $block, array $attributes = []): string
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    protected function renderBlockView(string $view, string $block, array $parameters = []): string
     {
         $twig = $this->getTwig();
 
-        $attributes = $twig->mergeGlobals($attributes);
-        $template = $twig->load($template);
+        $parameters = $twig->mergeGlobals($parameters);
+        $template = $twig->load($view);
 
         $level = \ob_get_level();
         \ob_start();
 
         try {
-            $rendered = $template->renderBlock($block, $attributes);
+            $rendered = $template->renderBlock($block, $parameters);
             \ob_end_clean();
 
             return $rendered;

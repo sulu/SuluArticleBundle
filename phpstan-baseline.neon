@@ -496,11 +496,6 @@ parameters:
 			path: Controller/WebsiteArticleController.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\WebsiteArticleController\\:\\:renderBlock\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Controller/WebsiteArticleController.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\WebsiteArticleController\\:\\:resolveArticle\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Controller/WebsiteArticleController.php
