@@ -429,15 +429,9 @@ class ArticleIndexer implements IndexerInterface
         }
     }
 
-    /**
-     * @deprecated
-     * @see ArticleIndexer::replaceWithGhostData
-     */
     public function removeLocale(ArticleDocument $document, string $locale): void
     {
-        @\trigger_error('Calling ArticleIndexer::removeLocale() is deprecated and will be removed in future. Use ArticleIndexer::replaceWithGhostData() instead.', \E_USER_DEPRECATED);
-
-        $this->replaceWithGhostData($document, $locale);
+        $this->remove($document, $locale);
     }
 
     public function replaceWithGhostData(ArticleDocument $document, string $locale): void
@@ -530,7 +524,7 @@ class ArticleIndexer implements IndexerInterface
             return;
         }
 
-        foreach (\array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
+        foreach (\array_keys($this->inspector->getShadowLocales($document, true)) as $shadowLocale) {
             try {
                 /** @var ArticleDocument $shadowDocument */
                 $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);

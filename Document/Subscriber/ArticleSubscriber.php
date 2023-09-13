@@ -495,7 +495,7 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->liveIndexer->replaceWithGhostData($document, $event->getLocale());
+        $this->liveIndexer->removeLocale($document, $event->getLocale());
         $this->liveIndexer->flush();
     }
 
