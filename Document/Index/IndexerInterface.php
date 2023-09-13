@@ -43,7 +43,8 @@ interface IndexerInterface
     public function remove(ArticleDocument $document/*, ?string $locale = null*/): void;
 
     /**
-     * Removes a locale for the given document from the index.
+     * @deprecated
+     * @see IndexerInterface::replaceWithGhostData
      */
     public function removeLocale(ArticleDocument $document, string $locale): void;
 

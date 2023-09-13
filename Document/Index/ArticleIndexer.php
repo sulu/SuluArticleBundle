@@ -18,6 +18,7 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
+use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -327,6 +328,15 @@ class ArticleIndexer implements IndexerInterface
         return $contentFields;
     }
 
+    protected function findViewDocument(ArticleDocument $document, string $locale): ?ArticleViewDocumentInterface
+    {
+        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
+        /** @var ArticleViewDocumentInterface $article */
+        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
+
+        return $article;
+    }
+
     /**
      * Returns view-document from index or create a new one.
      */
@@ -335,9 +345,7 @@ class ArticleIndexer implements IndexerInterface
         string $locale,
         string $localizationState
     ): ?ArticleViewDocumentInterface {
-        $articleId = $this->getViewDocumentId($document->getUuid(), $locale);
-        /** @var ArticleViewDocumentInterface $article */
-        $article = $this->manager->find($this->documentFactory->getClass('article'), $articleId);
+        $article = $this->findViewDocument($document, $locale);
 
         if ($article) {
             // Only index ghosts when the article isn't a ghost himself.
@@ -351,7 +359,7 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $article = $this->documentFactory->create('article');
-        $article->setId($articleId);
+        $article->setId($this->getViewDocumentId($document->getUuid(), $locale));
         $article->setUuid($document->getUuid());
         $article->setLocale($locale);
 
@@ -505,11 +513,12 @@ class ArticleIndexer implements IndexerInterface
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
 
-        $this->createOrUpdateShadows($document);
+        $this->updateShadows($document);
     }
 
     protected function indexShadow(ArticleDocument $document): void
     {
+        /** @var ArticleDocument $shadowDocument */
         $shadowDocument = $this->documentManager->find(
             $document->getUuid(),
             $document->getOriginalLocale(),
@@ -519,21 +528,26 @@ class ArticleIndexer implements IndexerInterface
         );
 
         $article = $this->createOrUpdateArticle($shadowDocument, $document->getOriginalLocale(), LocalizationState::SHADOW);
-
         $this->dispatchIndexEvent($shadowDocument, $article);
         $this->manager->persist($article);
     }
 
-    protected function createOrUpdateShadows(ArticleDocument $document): void
+    protected function updateShadows(ArticleDocument $document): void
     {
         if ($document->isShadowLocaleEnabled()) {
             return;
         }
 
-        foreach (\array_keys($this->inspector->getPublishedShadowLocales($document)) as $shadowLocale) {
+        foreach (\array_keys($this->inspector->getShadowLocales($document)) as $shadowLocale) {
             try {
                 /** @var ArticleDocument $shadowDocument */
                 $shadowDocument = $this->documentManager->find($document->getUuid(), $shadowLocale);
+
+                // update shadow only if original document exists
+                if (!$this->findViewDocument($shadowDocument, $document->getLocale())) {
+                    continue;
+                }
+
                 $this->indexShadow($shadowDocument);
             } catch (DocumentManagerException $documentManagerException) {
                 // @ignoreException
