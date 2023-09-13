@@ -18,7 +18,6 @@ use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
-use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticleViewDocumentInterface;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
