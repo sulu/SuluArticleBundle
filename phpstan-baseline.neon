@@ -976,11 +976,6 @@ parameters:
 			path: Document/Index/ArticleIndexer.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:__construct\\(\\) has parameter \\$typeConfiguration with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Document/Index/ArticleIndexer.php
@@ -1051,16 +1046,6 @@ parameters:
 			path: Document/Index/ArticleIndexer.php
 
 		-
-			message: "#^Parameter \\#1 \\$document of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:createOrUpdateArticle\\(\\) expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument, object given\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Parameter \\#1 \\$document of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:dispatchIndexEvent\\(\\) expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument, object given\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
 			message: "#^Parameter \\#1 \\$metadata of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getType\\(\\) expects Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata, Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata\\|null given\\.$#"
 			count: 2
 			path: Document/Index/ArticleIndexer.php
@@ -1127,11 +1112,6 @@ parameters:
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between null and object will always evaluate to false\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: Document/Index/ArticleIndexer.php
 
@@ -1246,11 +1226,6 @@ parameters:
 			path: Document/Initializer/ArticleInitializer.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticleNodeType\\:\\:getDeclaredSupertypeNames\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Document/Initializer/ArticleNodeType.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticleNodeType\\:\\:getPrimaryItemName\\(\\) should return string but empty return statement found\\.$#"
 			count: 1
 			path: Document/Initializer/ArticleNodeType.php
@@ -1271,12 +1246,7 @@ parameters:
 			path: Document/Initializer/ArticlePageNodeDefinition.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getRequiredPrimaryTypeNames\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Document/Initializer/ArticlePageNodeDefinition.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getRequiredPrimaryTypeNames\\(\\) should return array but returns null\\.$#"
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getRequiredPrimaryTypeNames\\(\\) should return array\\<string\\> but returns null\\.$#"
 			count: 1
 			path: Document/Initializer/ArticlePageNodeDefinition.php
 
@@ -1284,11 +1254,6 @@ parameters:
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getRequiredPrimaryTypes\\(\\) should return array\\<PHPCR\\\\NodeType\\\\NodeTypeInterface\\> but returns null\\.$#"
 			count: 1
 			path: Document/Initializer/ArticlePageNodeDefinition.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeType\\:\\:getDeclaredSupertypeNames\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Document/Initializer/ArticlePageNodeType.php
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeType\\:\\:getPrimaryItemName\\(\\) should return string but empty return statement found\\.$#"
@@ -1651,28 +1616,8 @@ parameters:
 			path: Document/Subscriber/ArticleSubscriber.php
 
 		-
-			message: "#^Cannot call method getIdentifier\\(\\) on mixed\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\IndexerInterface\\:\\:remove\\(\\) invoked with 1 parameter, 2 required\\.$#"
 			count: 2
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:getChildren\\(\\) has parameter \\$node with no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:getChildren\\(\\) return type has no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:getChildren\\(\\) should return array\\<PHPCR\\\\NodeInterface\\> but returns array\\<int\\|string, mixed\\>\\.$#"
-			count: 1
 			path: Document/Subscriber/ArticleSubscriber.php
 
 		-
@@ -1682,11 +1627,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:handleRemoveLocaleLive\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:loadPageDataForShadow\\(\\) has parameter \\$node with no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticleSubscriber.php
 
@@ -1707,11 +1647,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:removeDraftChildren\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticleSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\ArticleSubscriber\\:\\:setPageData\\(\\) has parameter \\$node with no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticleSubscriber.php
 
@@ -1798,16 +1733,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method object\\:\\:getChildren\\(\\)\\.$#"
 			count: 2
-			path: Document/Subscriber/PageSubscriber.php
-
-		-
-			message: "#^Cannot call method getIdentifier\\(\\) on mixed\\.$#"
-			count: 1
-			path: Document/Subscriber/PageSubscriber.php
-
-		-
-			message: "#^Cannot call method setProperty\\(\\) on mixed\\.$#"
-			count: 1
 			path: Document/Subscriber/PageSubscriber.php
 
 		-
@@ -2062,11 +1987,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Import\\\\ArticleImport\\:\\:importExtension\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Import/ArticleImport.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Import\\\\ArticleImport\\:\\:importExtension\\(\\) has parameter \\$node with no value type specified in iterable type PHPCR\\\\NodeInterface\\.$#"
 			count: 1
 			path: Import/ArticleImport.php
 
