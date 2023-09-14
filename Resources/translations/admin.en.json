@@ -28,5 +28,6 @@
     "sulu_activity.description.articles.translation_copied": "{userFullName} has copied the \"{context_sourceLocale}\" translation of the article \"{resourceTitle}\" into \"{resourceLocale}\"",
     "sulu_activity.description.articles.translation_removed": "{userFullName} has removed the \"{resourceLocale}\" translation of the article \"{resourceTitle}\"",
     "sulu_activity.description.articles.translation_restored": "{userFullName} has restored the \"{resourceLocale}\" translation of the article \"{resourceTitle}\"",
-    "sulu_activity.description.articles.version_restored": "{userFullName} has restored the version \"{context_version}\" of the article \"{resourceTitle}\""
+    "sulu_activity.description.articles.version_restored": "{userFullName} has restored the version \"{context_version}\" of the article \"{resourceTitle}\"",
+    "sulu_activity.description.articles.route_removed": "{userFullName} has removed the route \"{resourceTitle}\"."
 }

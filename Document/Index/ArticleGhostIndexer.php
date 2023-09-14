@@ -87,7 +87,7 @@ class ArticleGhostIndexer extends ArticleIndexer
         }
 
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
-        $this->createOrUpdateShadows($document);
+        $this->updateShadows($document);
         $this->createOrUpdateGhosts($document);
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);

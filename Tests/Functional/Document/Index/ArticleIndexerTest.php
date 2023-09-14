@@ -264,6 +264,91 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
     }
 
+    public function testUnpublishedShadows(): void
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+        $secondLocale = 'de';
+        $thirdLocale = 'fr';
+
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'shadowOn' => true,
+                'shadowBaseLanguage' => $this->locale,
+            ],
+            null,
+            null
+        );
+
+        $this->updateArticle(
+            $article['id'],
+            $thirdLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test French Content',
+            ],
+            'Test Artikel French',
+            'default_with_route'
+        );
+        $this->updateArticle(
+            $article['id'],
+            $thirdLocale,
+            [
+                'id' => $article['id'],
+                'shadowOn' => true,
+                'shadowBaseLanguage' => $this->locale,
+            ],
+            null,
+            null
+        );
+
+        self::assertNotNull($this->findViewDocument($article['id'], $this->locale));
+        self::assertNotNull($this->findViewDocument($article['id'], $secondLocale));
+        self::assertNotNull($this->findViewDocument($article['id'], $thirdLocale));
+
+        $this->unpublishArticle($article['id'], $this->locale);
+        $this->unpublishArticle($article['id'], $secondLocale);
+        $this->unpublishArticle($article['id'], $thirdLocale);
+
+        self::assertNull($this->findViewDocument($article['id'], $this->locale));
+        self::assertNull($this->findViewDocument($article['id'], $secondLocale));
+        self::assertNull($this->findViewDocument($article['id'], $thirdLocale));
+
+        // publish the shadow
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+            ],
+            null,
+            null
+        );
+
+        // only the DE shadow should be published
+        self::assertNull($this->findViewDocument($article['id'], $this->locale));
+        self::assertNotNull($this->findViewDocument($article['id'], $secondLocale));
+        self::assertNull($this->findViewDocument($article['id'], $thirdLocale));
+    }
+
     public function testIndexPageTreeRoute()
     {
         $page = $this->createPage();
@@ -535,6 +620,18 @@ class ArticleIndexerTest extends SuluTestCase
             'PUT',
             '/api/articles/' . $uuid . '?locale=' . ($locale ? $locale : $this->locale) . '&action=publish',
             $requestData
+        );
+
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+        return \json_decode($this->client->getResponse()->getContent(), true);
+    }
+
+    private function unpublishArticle($uuid, $locale = null)
+    {
+        $this->client->jsonRequest(
+            'POST',
+            '/api/articles/' . $uuid . '?locale=' . ($locale ?: $this->locale) . '&action=unpublish'
         );
 
         $this->assertEquals(200, $this->client->getResponse()->getStatusCode());

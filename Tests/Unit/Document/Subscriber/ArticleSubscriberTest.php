@@ -31,6 +31,7 @@ use Sulu\Component\DocumentManager\Event\PersistEvent;
 use Sulu\Component\DocumentManager\Event\PublishEvent;
 use Sulu\Component\DocumentManager\Event\RemoveDraftEvent;
 use Sulu\Component\DocumentManager\Event\RemoveEvent;
+use Sulu\Component\DocumentManager\Event\RemoveLocaleEvent;
 use Sulu\Component\DocumentManager\Event\ReorderEvent;
 
 class ArticleSubscriberTest extends TestCase
@@ -653,5 +654,64 @@ class ArticleSubscriberTest extends TestCase
         $this->documentManager->persist($this->document->reveal(), 'de')->shouldBeCalled();
 
         $this->articleSubscriber->persistPageDataOnReorder($event->reveal());
+    }
+
+    public function testHandleRemoveLocaleWithInvalidDocument()
+    {
+        $event = $this->prophesize(RemoveLocaleEvent::class);
+        $document = $this->prophesize(\stdClass::class); // Not an ArticleDocument
+        $event->getDocument()->willReturn($document->reveal());
+
+        // Ensure the indexer methods are not called
+        $this->indexer->replaceWithGhostData()->shouldNotBeCalled();
+        $this->indexer->flush()->shouldNotBeCalled();
+
+        // Call the method and make sure it doesn't throw exceptions
+        $this->articleSubscriber->handleRemoveLocale($event->reveal());
+    }
+
+    public function testHandleRemoveLocale()
+    {
+        $event = $this->prophesize(RemoveLocaleEvent::class);
+        $document = $this->prophesize(ArticleDocument::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getLocale()->willReturn('en');
+
+        // Ensure the indexer methods are called
+        $this->indexer->replaceWithGhostData($document->reveal(), 'en')->shouldBeCalled();
+        $this->indexer->flush()->shouldBeCalled();
+
+        // Call the method
+        $this->articleSubscriber->handleRemoveLocale($event->reveal());
+    }
+
+    public function testHandleRemoveLocaleLiveWithInvalidDocument()
+    {
+        $event = $this->prophesize(RemoveLocaleEvent::class);
+        $document = $this->prophesize(\stdClass::class); // Not an ArticleDocument
+        $event->getDocument()->willReturn($document->reveal());
+
+        // Ensure the liveIndexer methods are not called
+        $this->liveIndexer->remove()->shouldNotBeCalled();
+        $this->liveIndexer->flush()->shouldNotBeCalled();
+
+        // Call the method and make sure it doesn't throw exceptions
+        $this->articleSubscriber->handleRemoveLocaleLive($event->reveal());
+    }
+
+    public function testHandleRemoveLocaleLive()
+    {
+        // Create a mock RemoveLocaleEvent with an ArticleDocument
+        $event = $this->prophesize(RemoveLocaleEvent::class);
+        $document = $this->prophesize(ArticleDocument::class);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getLocale()->willReturn('en');
+
+        // Ensure the liveIndexer methods are called
+        $this->liveIndexer->remove($document->reveal(), 'en')->shouldBeCalled();
+        $this->liveIndexer->flush()->shouldBeCalled();
+
+        // Call the method
+        $this->articleSubscriber->handleRemoveLocaleLive($event->reveal());
     }
 }
