@@ -83,7 +83,7 @@ jobs:
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
                     - php-version: '8.1'
-                      elasticsearch-version: '8.0.1'
+                      elasticsearch-version: '8.11.1'
                       elasticsearch-package-constraint: '~7.11.0'
                       phpcr-transport: jackrabbit
                       dependency-versions: 'highest'
