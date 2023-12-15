@@ -127,6 +127,20 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             ]
         );
 
+        if (!$object instanceof ArticleInterface) {
+            return false;
+        }
+
+        if ($object->isShadowLocaleEnabled()) {
+            $object = $this->documentManager->find(
+                $id,
+                $object->getShadowLocale(),
+                [
+                    'load_ghost_content' => false,
+                ],
+            );
+        }
+
         if (!$object instanceof ArticleInterface || WorkflowStage::PUBLISHED !== $object->getWorkflowStage()) {
             return false;
         }

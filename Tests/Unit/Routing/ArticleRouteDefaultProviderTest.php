@@ -147,6 +147,70 @@ class ArticleRouteDefaultProviderTest extends TestCase
         $this->assertEquals($result, $this->provider->isPublished($this->entityClass, $this->entityId, $this->locale));
     }
 
+    public function publishedDataProviderWithShadow()
+    {
+        $articleDocument = new ArticleDocument();
+        $articleDocument->setWorkflowStage(WorkflowStage::TEST);
+        $articleDocument->setShadowLocale('en');
+        $articleDocument->setShadowLocaleEnabled(true);
+
+        $baseDocument = new ArticleDocument();
+        $baseDocument->setWorkflowStage(WorkflowStage::TEST);
+
+        $baseDocumentPublished = new ArticleDocument();
+        $baseDocumentPublished->setWorkflowStage(WorkflowStage::PUBLISHED);
+
+        $unknownDocument = new UnknownDocument();
+
+        return [
+            [$articleDocument, $baseDocument, false],
+            [$articleDocument, $baseDocumentPublished, true],
+            [$articleDocument, $unknownDocument, false],
+        ];
+    }
+
+    /**
+     * @dataProvider publishedDataProviderWithShadow
+     */
+    public function testIsPublishedWithShadow(
+        $document,
+        $baseDocument,
+        $result
+    ) {
+        $webspace = $this->prophesize(Webspace::class);
+        $webspace->getKey()->willReturn('test');
+
+        $this->requestAnalyzer->getWebspace()->willReturn($webspace->reveal());
+
+        if ($document instanceof ArticleDocument) {
+            $this->webspaceResolver->resolveMainWebspace($baseDocument)->willReturn('test');
+            $this->webspaceResolver->resolveAdditionalWebspaces($baseDocument)->willReturn([]);
+        }
+
+        $this->documentManager->find(
+            $this->entityId,
+            $this->locale,
+            [
+                'load_ghost_content' => false,
+            ]
+        )->willReturn($document);
+
+        $this->documentManager->find(
+            $this->entityId,
+            'en',
+            [
+                'load_ghost_content' => false,
+            ]
+        )->willReturn($baseDocument);
+
+        $webspace = $this->prophesize(Webspace::class);
+        $webspace->getKey()->willReturn('test');
+
+        $this->requestAnalyzer->getWebspace()->willReturn($webspace->reveal());
+
+        $this->assertEquals($result, $this->provider->isPublished($this->entityClass, $this->entityId, $this->locale));
+    }
+
     public function testGetByEntity()
     {
         $article = $this->prophesize(ArticleDocument::class);
