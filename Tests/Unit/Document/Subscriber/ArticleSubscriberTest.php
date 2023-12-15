@@ -674,11 +674,40 @@ class ArticleSubscriberTest extends TestCase
     {
         $event = $this->prophesize(RemoveLocaleEvent::class);
         $document = $this->prophesize(ArticleDocument::class);
+        $document->getOriginalLocale()->willReturn('en');
+        $document->getUuid()->willReturn($this->uuid);
         $event->getDocument()->willReturn($document->reveal());
-        $event->getLocale()->willReturn('en');
+        $event->getLocale()->willReturn('de');
+
+        $this->documentInspector->getConcreteLocales($document->reveal())->willReturn(['en', 'fr']);
+
+        $originalDocument = $this->prophesize(ArticleDocument::class);
+        $this->documentManager->find($this->uuid, 'en')->willReturn($originalDocument->reveal());
 
         // Ensure the indexer methods are called
-        $this->indexer->replaceWithGhostData($document->reveal(), 'en')->shouldBeCalled();
+        $this->indexer->replaceWithGhostData($originalDocument->reveal(), 'de')->shouldBeCalled();
+        $this->indexer->flush()->shouldBeCalled();
+
+        // Call the method
+        $this->articleSubscriber->handleRemoveLocale($event->reveal());
+    }
+
+    public function testHandleRemoveLocaleWithDefaultLocaleDoesNotExists()
+    {
+        $event = $this->prophesize(RemoveLocaleEvent::class);
+        $document = $this->prophesize(ArticleDocument::class);
+        $document->getOriginalLocale()->willReturn('en');
+        $document->getUuid()->willReturn($this->uuid);
+        $event->getDocument()->willReturn($document->reveal());
+        $event->getLocale()->willReturn('de');
+
+        $this->documentInspector->getConcreteLocales($document->reveal())->willReturn(['fr']);
+
+        $originalDocument = $this->prophesize(ArticleDocument::class);
+        $this->documentManager->find($this->uuid, 'fr')->willReturn($originalDocument->reveal());
+
+        // Ensure the indexer methods are called
+        $this->indexer->replaceWithGhostData($originalDocument->reveal(), 'de')->shouldBeCalled();
         $this->indexer->flush()->shouldBeCalled();
 
         // Call the method

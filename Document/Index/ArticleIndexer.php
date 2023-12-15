@@ -13,6 +13,7 @@ namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Collection\Collection;
 use ONGR\ElasticsearchBundle\Service\Manager;
+use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
@@ -452,6 +453,17 @@ class ArticleIndexer implements IndexerInterface
         // overwrite removed locale with properties from original locale
         $article = $this->createOrUpdateArticle($document, $locale);
         $article->setLocalizationState(new LocalizationStateViewObject(LocalizationState::GHOST, $document->getOriginalLocale()));
+
+        $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
+        $search = $repository->createSearch();
+        $search->addQuery(new TermQuery('localization_state.state', 'ghost'), BoolQuery::MUST);
+        $search->addQuery(new TermQuery('localization_state.locale', $locale), BoolQuery::MUST);
+
+        /** @var array<array{locale: string}> $searchResult */
+        $searchResult = $repository->findArray($search);
+        foreach ($searchResult as $result) {
+            $this->replaceWithGhostData($document, $result['locale']);
+        }
 
         $this->manager->persist($article);
     }
