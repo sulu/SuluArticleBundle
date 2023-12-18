@@ -11,6 +11,11 @@ parameters:
 			path: Admin/ArticleAdmin.php
 
 		-
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\ArticleAdmin\\:\\:getSecurityContexts\\(\\) should return array\\<string, array\\<string, array\\<string, array\\<string\\>\\>\\>\\> but returns array\\<string, array\\<string, array\\<int\\|string, array\\<int, string\\>\\>\\>\\>\\.$#"
+			count: 1
+			path: Admin/ArticleAdmin.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\ArticleAdmin\\:\\:getTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Admin/ArticleAdmin.php
@@ -2147,7 +2152,7 @@ parameters:
 
 		-
 			message: "#^Cannot access offset 'pageNumber' on mixed\\.$#"
-			count: 2
+			count: 1
 			path: Preview/ArticleObjectProvider.php
 
 		-

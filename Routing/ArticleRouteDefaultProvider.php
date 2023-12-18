@@ -20,6 +20,7 @@ use Sulu\Bundle\HttpCacheBundle\CacheLifetime\CacheLifetimeResolverInterface;
 use Sulu\Bundle\RouteBundle\Routing\Defaults\RouteDefaultsProviderInterface;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Content\Document\Behavior\ShadowLocaleBehavior;
 use Sulu\Component\Content\Document\WorkflowStage;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -131,7 +132,7 @@ class ArticleRouteDefaultProvider implements RouteDefaultsProviderInterface
             return false;
         }
 
-        if ($object->isShadowLocaleEnabled()) {
+        if ($object instanceof ShadowLocaleBehavior && $object->isShadowLocaleEnabled()) {
             $object = $this->documentManager->find(
                 $id,
                 $object->getShadowLocale(),
