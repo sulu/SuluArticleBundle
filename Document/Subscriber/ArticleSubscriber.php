@@ -465,6 +465,17 @@ class ArticleSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $concreteLocales = $this->documentInspector->getConcreteLocales($document);
+        $ghostLocale = $document->getOriginalLocale();
+        if (!\in_array($ghostLocale, $concreteLocales, true)) {
+            $ghostLocale = $concreteLocales[0] ?? null;
+        }
+
+        if (null !== $ghostLocale) {
+            /** @var ArticleDocument $document */
+            $document = $this->documentManager->find($document->getUuid(), $ghostLocale);
+        }
+
         $this->indexer->replaceWithGhostData($document, $event->getLocale());
         $this->indexer->flush();
     }
