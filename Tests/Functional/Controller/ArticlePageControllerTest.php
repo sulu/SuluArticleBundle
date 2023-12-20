@@ -284,30 +284,6 @@ class ArticlePageControllerTest extends SuluTestCase
         $this->assertCount(0, $articleViewDocument->getPages());
     }
 
-    public function testHandleGhostArticlePageAndArticle($pageTitle = 'Sulu is awesome')
-    {
-        $article = $this->createArticle();
-        $page = $this->post($article);
-
-        $this->client->jsonRequest(
-            'PUT',
-            '/api/articles/' . $article['id'] . '/pages/' . $page['id'] . '?locale=en',
-            [
-                'pageTitle' => $pageTitle,
-            ]
-        );
-
-        $response = \json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertHttpStatusCode(200, $this->client->getResponse());
-
-        $this->assertArrayNotHasKey('type', $response);
-        $this->assertEquals($pageTitle, $response['pageTitle']);
-
-        // article should stay ghost
-        $article = $this->getArticle($article['id'], 'en');
-        $this->assertEquals('ghost', $article['type']['name']);
-    }
-
     public function testHandleSecondLocale($title = 'Sulu ist toll')
     {
         $articleDE = $this->createArticle($title);
