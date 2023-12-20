@@ -31,6 +31,8 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\DocumentFactoryInterface;
 use Sulu\Bundle\ArticleBundle\ListBuilder\ElasticSearchFieldDescriptor;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Form\Exception\InvalidFormException;
 use Sulu\Component\Content\Mapper\ContentMapperInterface;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -111,6 +113,11 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      */
     private $displayTabAll;
 
+    /**
+     * @var DocumentInspector|null
+     */
+    private $documentInspector;
+
     public function __construct(
         ViewHandlerInterface $viewHandler,
         DocumentManagerInterface $documentManager,
@@ -123,7 +130,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         RequestHashCheckerInterface $requestHashChecker,
         SecurityCheckerInterface $securityChecker,
         bool $displayTabAll,
-        ?TokenStorageInterface $tokenStorage = null
+        ?TokenStorageInterface $tokenStorage = null,
+        ?DocumentInspector $documentInspector = null
     ) {
         parent::__construct($viewHandler, $tokenStorage);
 
@@ -137,6 +145,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $this->requestHashChecker = $requestHashChecker;
         $this->securityChecker = $securityChecker;
         $this->displayTabAll = $displayTabAll;
+        $this->documentInspector = $documentInspector;
     }
 
     /**
@@ -417,6 +426,19 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $id,
             $locale
         );
+
+        $localizationState = $this->documentInspector->getLocalizationState($document);
+
+        if ($localizationState === LocalizationState::GHOST) {
+            $document = $this->documentManager->find(
+                $id,
+                $locale,
+                [
+                    'load_ghost_content' => false,
+                    'structure_type' => $document->getStructureType(),
+                ]
+            );
+        }
 
         $context = new Context();
         $context->setSerializeNull(true);
