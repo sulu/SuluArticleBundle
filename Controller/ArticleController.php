@@ -146,6 +146,10 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $this->securityChecker = $securityChecker;
         $this->displayTabAll = $displayTabAll;
         $this->documentInspector = $documentInspector;
+
+        if (null === $this->documentInspector) {
+            @trigger_deprecation('sulu/article-bundle', '2.5', 'Instantiating the ArticleController without the $documentInspector argument is deprecated!');
+        }
     }
 
     /**
@@ -422,22 +426,25 @@ class ArticleController extends AbstractRestController implements ClassResourceI
     public function getAction(Request $request, string $id): Response
     {
         $locale = $this->getRequestParameter($request, 'locale', true);
+        /** @var ArticleDocument $document */
         $document = $this->documentManager->find(
             $id,
             $locale
         );
 
-        $localizationState = $this->documentInspector->getLocalizationState($document);
+        if ($this->documentInspector) {
+            $localizationState = $this->documentInspector->getLocalizationState($document);
 
-        if ($localizationState === LocalizationState::GHOST) {
-            $document = $this->documentManager->find(
-                $id,
-                $locale,
-                [
-                    'load_ghost_content' => false,
-                    'structure_type' => $document->getStructureType(),
-                ]
-            );
+            if (LocalizationState::GHOST === $localizationState) {
+                $document = $this->documentManager->find(
+                    $id,
+                    $locale,
+                    [
+                        'load_ghost_content' => false,
+                        'structure_type' => $document->getStructureType(),
+                    ]
+                );
+            }
         }
 
         $context = new Context();
