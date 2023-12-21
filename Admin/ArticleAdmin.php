@@ -260,6 +260,7 @@ class ArticleAdmin extends Admin
                 ];
             }
 
+            $previewCondition = 'locale in availableLocales';
             $viewCollection->add(
                 $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW . '_' . $typeKey, '/:locale/' . $typeKey)
                     ->setResourceKey(ArticleDocument::RESOURCE_KEY)
@@ -308,6 +309,7 @@ class ArticleAdmin extends Admin
                     ->setTabCondition('shadowOn == false')
                     ->setTabPriority(1024)
                     ->addToolbarActions($formToolbarActionsWithType)
+                    ->setPreviewCondition($previewCondition)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -318,6 +320,7 @@ class ArticleAdmin extends Admin
                     ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setTitleVisible(true)
+                    ->setPreviewCondition($previewCondition)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -328,6 +331,7 @@ class ArticleAdmin extends Admin
                     ->setTabCondition('shadowOn == false')
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setTitleVisible(true)
+                    ->setPreviewCondition($previewCondition)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
             $viewCollection->add(
@@ -338,6 +342,7 @@ class ArticleAdmin extends Admin
                     ->setTabPriority(512)
                     ->addToolbarActions($formToolbarActionsWithoutType)
                     ->setTitleVisible(true)
+                    ->setPreviewCondition($previewCondition)
                     ->setParent(static::EDIT_FORM_VIEW . '_' . $typeKey)
             );
 
