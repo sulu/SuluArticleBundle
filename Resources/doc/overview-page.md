@@ -112,7 +112,8 @@ class ArticleOverviewController extends WebsiteController
         $search = $repository->createSearch()
             ->addSort(new FieldSort('authored', FieldSort::DESC))
             ->setFrom(($page - 1) * $pageSize)
-            ->setSize($pageSize);
+            ->setSize($pageSize)
+            ->addQuery(new TermQuery('locale', $locale));
 
         return $repository->findDocuments($search);
     }
