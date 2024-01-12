@@ -260,7 +260,7 @@ class ArticleAdmin extends Admin
                 ];
             }
 
-            $previewCondition = 'locale in availableLocales';
+            $previewCondition = '__routeAttributes.locale in availableLocales';
             $viewCollection->add(
                 $this->viewBuilderFactory->createListViewBuilder(static::LIST_VIEW . '_' . $typeKey, '/:locale/' . $typeKey)
                     ->setResourceKey(ArticleDocument::RESOURCE_KEY)
