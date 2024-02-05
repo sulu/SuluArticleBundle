@@ -16,7 +16,6 @@ namespace Sulu\Bundle\ArticleBundle\Trash;
 use Sulu\Bundle\ArticleBundle\Admin\ArticleAdmin;
 use Sulu\Bundle\ArticleBundle\Controller\ArticleController;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
-use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleRestoredEvent;
 use Sulu\Bundle\ArticleBundle\Domain\Event\ArticleTranslationRestoredEvent;
 use Sulu\Bundle\DocumentManagerBundle\Bridge\DocumentInspector;
@@ -97,7 +96,6 @@ final class ArticleTrashItemHandler implements
             // routePath property of structure contains route of target locale in case of a shadow page
             // we want to restore the path of the source locale, therefore we use the value of the document
             $structureData = $localizedArticle->getStructure()->toArray();
-            $structureData[RoutableSubscriber::ROUTE_FIELD] = $localizedArticle->getRoutePath();
 
             $articleTitles[$locale] = $localizedArticle->getTitle();
 
