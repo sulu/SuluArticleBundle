@@ -19,6 +19,7 @@ use Sulu\Bundle\RouteBundle\Model\RouteInterface;
 use Sulu\Component\Content\Document\Behavior\ExtensionBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuditableBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedAuthorBehavior;
+use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior;
 use Sulu\Component\Content\Document\Behavior\LocalizedStructureBehavior;
 use Sulu\Component\Content\Document\Behavior\ShadowLocaleBehavior;
 use Sulu\Component\Content\Document\Behavior\StructureBehavior;
@@ -56,7 +57,8 @@ class ArticleDocument implements UuidBehavior,
     ChildrenBehavior,
     ArticleInterface,
     ShadowLocaleBehavior,
-    WebspaceBehavior
+    WebspaceBehavior,
+    LocalizedLastModifiedBehavior
 {
     public const RESOURCE_KEY = 'articles';
 
@@ -146,6 +148,11 @@ class ArticleDocument implements UuidBehavior,
      * @var \DateTime
      */
     protected $changed;
+
+    /**
+     * @var \DateTime|null
+     */
+    protected $lastModified;
 
     /**
      * @var int
@@ -425,6 +432,32 @@ class ArticleDocument implements UuidBehavior,
     public function getAuthored()
     {
         return $this->authored;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLastModifiedEnabled()
+    {
+        return null !== $this->lastModified;
+    }
+
+    /**
+     * @param \DateTime|null $lastModified
+     *
+     * @return void
+     */
+    public function setLastModified($lastModified)
+    {
+        $this->lastModified = $lastModified;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getLastModified()
+    {
+        return $this->lastModified;
     }
 
     public function setAuthored($authored)
