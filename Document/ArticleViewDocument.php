@@ -183,6 +183,13 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     protected $authored;
 
     /**
+     * @var \DateTime
+     *
+     * @Property(type="date")
+     */
+    protected $lastModifiedOrAuthored;
+
+    /**
      * @var string
      *
      * @Property(
@@ -507,6 +514,23 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setLastModified($lastModified)
     {
         $this->lastModified = $lastModified;
+
+        return $this;
+    }
+
+    public function getLastModifiedOrAuthored(): \DateTime
+    {
+        return $this->lastModified ?? $this->authored;
+    }
+
+    /**
+     * @param \DateTime|null $lastModified
+     *
+     * @return $this|ArticleViewDocument
+     */
+    public function setLastModifiedOrAuthored()
+    {
+        $this->lastModifiedOrAuthored = $this->lastModified ?? $this->authored;
 
         return $this;
     }

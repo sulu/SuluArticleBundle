@@ -290,6 +290,15 @@ interface ArticleViewDocumentInterface
     public function setAuthored(\DateTime $authored = null);
 
     /**
+     * Returns lastModified or authored date.
+     *
+     * @return \DateTime|null
+     */
+    public function getLastModifiedOrAuthored();
+
+    public function setLastModifiedOrAuthored();
+
+    /**
      * Returns author full name.
      *
      * @return string
