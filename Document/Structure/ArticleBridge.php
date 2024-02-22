@@ -107,4 +107,18 @@ class ArticleBridge extends StructureBridge implements RoutableStructureInterfac
     {
         $this->webspaceKey = $webspace;
     }
+
+    public function getLanguageCode()
+    {
+        if (!$this->document) {
+            return $this->locale;
+        }
+
+        // return original locale for shadow or ghost pages
+        if ($this->getIsShadow() || ($this->getType() && 'ghost' === $this->getType()->getName())) {
+            return $this->inspector->getOriginalLocale($this->getDocument());
+        }
+
+        return parent::getLanguageCode();
+    }
 }

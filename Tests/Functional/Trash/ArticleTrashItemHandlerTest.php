@@ -205,7 +205,7 @@ class ArticleTrashItemHandlerTest extends SuluTestCase
         $restoredArticleEn = $this->documentManager->find($restoredArticle->getUuid(), 'en');
         static::assertSame('target-locale-title', $restoredArticleEn->getTitle());
         static::assertSame('de', $restoredArticleEn->getLocale());
-        static::assertSame('source-locale-route-path', $restoredArticleEn->getRoutePath());
+        static::assertSame('target-locale-route-path', $restoredArticleEn->getRoutePath());
         static::assertSame('target locale article content', $restoredArticleEn->getStructure()->toArray()['article']);
         static::assertSame('en', $restoredArticleEn->getOriginalLocale());
         static::assertSame('de', $restoredArticleEn->getShadowLocale());

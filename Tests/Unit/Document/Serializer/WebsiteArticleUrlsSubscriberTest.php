@@ -140,8 +140,8 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
-                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page', 'alternate' => true],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'country' => '', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page', 'country' => '', 'alternate' => true],
             ]
         )->shouldBeCalled();
 
@@ -197,8 +197,8 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
-                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page', 'alternate' => true],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'country' => '', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/page', 'country' => '', 'alternate' => true],
             ]
         )->shouldBeCalled();
 
@@ -248,8 +248,8 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
-                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/', 'alternate' => false],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'country' => '', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/', 'country' => '', 'alternate' => false],
             ]
         )->shouldBeCalled();
 
@@ -297,8 +297,8 @@ class WebsiteArticleUrlsSubscriberTest extends TestCase
                 return 'localizations' === $metadata->name;
             }),
             [
-                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'alternate' => true],
-                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/', 'alternate' => false],
+                'de' => ['locale' => 'de', 'url' => 'http://sulu.io/de/seite', 'country' => '', 'alternate' => true],
+                'en' => ['locale' => 'en', 'url' => 'http://sulu.io/', 'country' => '', 'alternate' => false],
             ]
         )->shouldBeCalled();
 

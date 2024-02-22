@@ -31,7 +31,7 @@ class SuluArticleBundle extends Bundle implements CompilerPassInterface
 {
     use PersistenceBundleTrait;
 
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass($this);
         $container->addCompilerPass(new StructureValidatorCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);

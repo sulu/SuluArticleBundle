@@ -371,7 +371,6 @@ class ArticleControllerTest extends SuluTestCase
 
         // test that ghost do not serve default webspace settings
         $response = $this->get($article['id'], 'en');
-        $this->assertEquals($title, $response['title']);
         $this->assertEquals('sulu_io', $response['mainWebspace']);
         $this->assertEquals([], $response['additionalWebspaces']);
 
@@ -415,7 +414,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals($additionalWebspaces ?? [], $viewDocument->getAdditionalWebspaces());
     }
 
-    public function testGetGhost()
+    public function testGetEmptyDocument()
     {
         $title = 'Sulu ist toll';
         $article = $this->testPut($title, 'de');
@@ -425,11 +424,10 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $this->client->getResponse());
 
         $response = \json_decode($this->client->getResponse()->getContent(), true);
-        $this->assertNotEquals($article['title'], $response['title']);
-        $this->assertEquals($title, $response['title']);
-        $this->assertEquals('2016-01-01', \date('Y-m-d', \strtotime($response['authored'])));
-        $this->assertEquals($this->getTestUser()->getContact()->getId(), $response['author']);
-        $this->assertEquals(['name' => 'ghost', 'value' => 'de'], $response['type']);
+        $this->assertEquals('', $response['title']);
+        $this->assertEquals(null, $response['authored']);
+        $this->assertEquals(null, $response['author']);
+        $this->assertEquals($article['template'], $response['template']);
     }
 
     public function testGetShadow()

@@ -20,6 +20,7 @@ use Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
+use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
@@ -38,7 +39,17 @@ class ArticleIndexerTest extends SuluTestCase
     /**
      * @var Manager
      */
+    private $liveManager;
+
+    /**
+     * @var Manager
+     */
     private $manager;
+
+    /**
+     * @var ArticleIndexer
+     */
+    private $liveIndexer;
 
     /**
      * @var ArticleIndexer
@@ -58,9 +69,12 @@ class ArticleIndexerTest extends SuluTestCase
         $this->initPhpcr();
         $this->purgeDatabase();
 
-        $this->manager = $this->getContainer()->get('es.manager.live');
+        $this->liveManager = $this->getContainer()->get('es.manager.live');
+        $this->manager = $this->getContainer()->get('es.manager.default');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
+        $this->liveIndexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
+        $this->liveIndexer->clear();
+        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_indexer');
         $this->indexer->clear();
     }
 
@@ -90,44 +104,11 @@ class ArticleIndexerTest extends SuluTestCase
 
         /** @var ArticleDocument $articleDocument */
         $articleDocument = $this->documentManager->find($article['id']);
-        $this->indexer->remove($articleDocument);
-        $this->indexer->flush();
+        $this->liveIndexer->remove($articleDocument);
+        $this->liveIndexer->flush();
 
-        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'de'));
-        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'en'));
-    }
-
-    public function testRemoveLocale()
-    {
-        $article = $this->createArticle(
-            [
-                'article' => 'Test content',
-            ],
-            'Test Article',
-            'default_with_route'
-        );
-
-        $secondLocale = 'de';
-
-        // now add second locale
-        $this->updateArticle(
-            $article['id'],
-            $secondLocale,
-            [
-                'id' => $article['id'],
-                'article' => 'Test Inhalt',
-            ],
-            'Test Artikel Deutsch',
-            'default_with_route'
-        );
-
-        /** @var ArticleDocument $articleDocument */
-        $articleDocument = $this->documentManager->find($article['id']);
-        $this->indexer->remove($articleDocument, 'en');
-        $this->indexer->flush();
-
-        self::assertNotNull($this->findViewDocument($articleDocument->getUuid(), 'de'));
-        self::assertNull($this->findViewDocument($articleDocument->getUuid(), 'en'));
+        self::assertNull($this->findLiveViewDocument($articleDocument->getUuid(), 'de'));
+        self::assertNull($this->findLiveViewDocument($articleDocument->getUuid(), 'en'));
     }
 
     public function testReplaceWithGhostData()
@@ -169,6 +150,73 @@ class ArticleIndexerTest extends SuluTestCase
         $this->assertSame('Test Article', $documentEN->getTitle());
     }
 
+    public function testReplaceWithGhostDataUpdateExistingGhosts()
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article English',
+            'default_with_route'
+        );
+
+        $this->updateArticle(
+            $article['id'],
+            'de',
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+
+        $this->updateArticle(
+            $article['id'],
+            'fr',
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel French',
+            'default_with_route'
+        );
+
+        $documentEN = $this->findViewDocument($article['id'], 'en');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentEN->getLocalizationState()->state);
+        $documentDE = $this->findViewDocument($article['id'], 'de');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentDE->getLocalizationState()->state);
+        $documentFR = $this->findViewDocument($article['id'], 'fr');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentFR->getLocalizationState()->state);
+
+        /** @var ArticleDocument $articleDocument */
+        $articleDocument = $this->documentManager->find($article['id'], 'en');
+        $this->indexer->replaceWithGhostData($articleDocument, 'fr');
+        $this->indexer->flush();
+
+        $documentEN = $this->findViewDocument($article['id'], 'en');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentEN->getLocalizationState()->state);
+        $documentDE = $this->findViewDocument($article['id'], 'de');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentDE->getLocalizationState()->state);
+        $documentFR = $this->findViewDocument($article['id'], 'fr');
+        $this->assertSame(LocalizationState::GHOST, $documentFR->getLocalizationState()->state);
+        $this->assertSame('en', $documentFR->getLocalizationState()->locale);
+
+        /** @var ArticleDocument $articleDocument */
+        $articleDocument = $this->documentManager->find($article['id'], 'de');
+        $this->indexer->replaceWithGhostData($articleDocument, 'en');
+        $this->indexer->flush();
+
+        $documentEN = $this->findViewDocument($article['id'], 'en');
+        $this->assertSame(LocalizationState::GHOST, $documentEN->getLocalizationState()->state);
+        $this->assertSame('de', $documentEN->getLocalizationState()->locale);
+        $documentDE = $this->findViewDocument($article['id'], 'de');
+        $this->assertSame(LocalizationState::LOCALIZED, $documentDE->getLocalizationState()->state);
+        $documentFR = $this->findViewDocument($article['id'], 'fr');
+        $this->assertSame(LocalizationState::GHOST, $documentFR->getLocalizationState()->state);
+        $this->assertSame('de', $documentFR->getLocalizationState()->locale);
+    }
+
     public function testIndexDefaultWithRoute()
     {
         $article = $this->createArticle(
@@ -179,12 +227,12 @@ class ArticleIndexerTest extends SuluTestCase
             'default_with_route'
         );
 
-        $this->indexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
+        $this->liveIndexer = $this->getContainer()->get('sulu_article.elastic_search.article_live_indexer');
 
         $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
+        $this->liveIndexer->index($document);
 
-        $viewDocument = $this->findViewDocument($article['id']);
+        $viewDocument = $this->findLiveViewDocument($article['id']);
         $this->assertEquals($document->getUuid(), $viewDocument->getUuid());
         $this->assertEquals('/articles/test-article', $viewDocument->getRoutePath());
         $this->assertInstanceOf('\DateTime', $viewDocument->getPublished());
@@ -230,7 +278,7 @@ class ArticleIndexerTest extends SuluTestCase
             null
         );
 
-        $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
+        $viewDocument = $this->findLiveViewDocument($article['id'], $secondLocale);
 
         $this->assertEquals($article['id'], $viewDocument->getUuid());
         $this->assertEquals('/articles/test-artikel-deutsch', $viewDocument->getRoutePath());
@@ -257,11 +305,96 @@ class ArticleIndexerTest extends SuluTestCase
             'default_with_route'
         );
 
-        $viewDocument = $this->findViewDocument($article['id'], $secondLocale);
+        $viewDocument = $this->findLiveViewDocument($article['id'], $secondLocale);
         $this->assertEquals('Test Article - CHANGED!', $viewDocument->getTitle());
 
         $contentData = \json_decode($viewDocument->getContentData(), true);
         $this->assertEquals($contentData['article'], 'Test content - CHANGED!');
+    }
+
+    public function testUnpublishedShadows(): void
+    {
+        $article = $this->createArticle(
+            [
+                'article' => 'Test content',
+            ],
+            'Test Article',
+            'default_with_route'
+        );
+        $secondLocale = 'de';
+        $thirdLocale = 'fr';
+
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test Inhalt',
+            ],
+            'Test Artikel Deutsch',
+            'default_with_route'
+        );
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+                'shadowOn' => true,
+                'shadowBaseLanguage' => $this->locale,
+            ],
+            null,
+            null
+        );
+
+        $this->updateArticle(
+            $article['id'],
+            $thirdLocale,
+            [
+                'id' => $article['id'],
+                'article' => 'Test French Content',
+            ],
+            'Test Artikel French',
+            'default_with_route'
+        );
+        $this->updateArticle(
+            $article['id'],
+            $thirdLocale,
+            [
+                'id' => $article['id'],
+                'shadowOn' => true,
+                'shadowBaseLanguage' => $this->locale,
+            ],
+            null,
+            null
+        );
+
+        self::assertNotNull($this->findLiveViewDocument($article['id'], $this->locale));
+        self::assertNotNull($this->findLiveViewDocument($article['id'], $secondLocale));
+        self::assertNotNull($this->findLiveViewDocument($article['id'], $thirdLocale));
+
+        $this->unpublishArticle($article['id'], $this->locale);
+        $this->unpublishArticle($article['id'], $secondLocale);
+        $this->unpublishArticle($article['id'], $thirdLocale);
+
+        self::assertNull($this->findLiveViewDocument($article['id'], $this->locale));
+        self::assertNull($this->findLiveViewDocument($article['id'], $secondLocale));
+        self::assertNull($this->findLiveViewDocument($article['id'], $thirdLocale));
+
+        // publish the shadow
+        $this->updateArticle(
+            $article['id'],
+            $secondLocale,
+            [
+                'id' => $article['id'],
+            ],
+            null,
+            null
+        );
+
+        // only the DE shadow should be published
+        self::assertNull($this->findLiveViewDocument($article['id'], $this->locale));
+        self::assertNotNull($this->findLiveViewDocument($article['id'], $secondLocale));
+        self::assertNull($this->findLiveViewDocument($article['id'], $thirdLocale));
     }
 
     public function testIndexPageTreeRoute()
@@ -279,9 +412,9 @@ class ArticleIndexerTest extends SuluTestCase
         );
 
         $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
+        $this->liveIndexer->index($document);
 
-        $viewDocument = $this->findViewDocument($article['id']);
+        $viewDocument = $this->findLiveViewDocument($article['id']);
         $this->assertEquals($page->getUuid(), $viewDocument->getParentPageUuid());
     }
 
@@ -289,7 +422,7 @@ class ArticleIndexerTest extends SuluTestCase
     {
         $article = $this->createArticle();
 
-        $viewDocument = $this->indexer->setUnpublished($article['id'], $this->locale);
+        $viewDocument = $this->liveIndexer->setUnpublished($article['id'], $this->locale);
         $this->assertNull($viewDocument->getPublished());
         $this->assertFalse($viewDocument->getPublishedState());
     }
@@ -326,10 +459,10 @@ class ArticleIndexerTest extends SuluTestCase
         $this->documentManager->clear();
 
         $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
+        $this->liveIndexer->index($document);
+        $this->liveIndexer->flush();
 
-        $viewDocument = $this->findViewDocument($article['id']);
+        $viewDocument = $this->findLiveViewDocument($article['id']);
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertSame($article['id'], $viewDocument->getUuid());
@@ -411,10 +544,10 @@ class ArticleIndexerTest extends SuluTestCase
         $this->documentManager->clear();
 
         $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
+        $this->liveIndexer->index($document);
+        $this->liveIndexer->flush();
 
-        $viewDocument = $this->findViewDocument($article['id']);
+        $viewDocument = $this->findLiveViewDocument($article['id']);
         $contentFields = $viewDocument->getContentFields();
 
         $this->assertEquals($article['id'], $viewDocument->getUuid());
@@ -447,10 +580,10 @@ class ArticleIndexerTest extends SuluTestCase
         $this->documentManager->clear();
 
         $document = $this->documentManager->find($article['id'], $this->locale);
-        $this->indexer->index($document);
-        $this->indexer->flush();
+        $this->liveIndexer->index($document);
+        $this->liveIndexer->flush();
 
-        $viewDocument = $this->findViewDocument($article['id']);
+        $viewDocument = $this->findLiveViewDocument($article['id']);
         $this->assertEquals($article['id'], $viewDocument->getUuid());
         $this->assertEquals($data, \json_decode($viewDocument->getContentData(), true));
 
@@ -542,6 +675,18 @@ class ArticleIndexerTest extends SuluTestCase
         return \json_decode($this->client->getResponse()->getContent(), true);
     }
 
+    private function unpublishArticle($uuid, $locale = null)
+    {
+        $this->client->jsonRequest(
+            'POST',
+            '/api/articles/' . $uuid . '?locale=' . ($locale ?: $this->locale) . '&action=unpublish'
+        );
+
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+        return \json_decode($this->client->getResponse()->getContent(), true);
+    }
+
     /**
      * Create article page.
      *
@@ -597,7 +742,23 @@ class ArticleIndexerTest extends SuluTestCase
     }
 
     /**
-     * Find view-document.
+     * Find view-document in live index.
+     *
+     * @param string $uuid
+     * @param string $locale
+     *
+     * @return ArticleViewDocument
+     */
+    private function findLiveViewDocument($uuid, $locale = null)
+    {
+        return $this->liveManager->find(
+            $this->getContainer()->getParameter('sulu_article.view_document.article.class'),
+            $uuid . '-' . ($locale ? $locale : $this->locale)
+        );
+    }
+
+    /**
+     * Find view-document in live index.
      *
      * @param string $uuid
      * @param string $locale
