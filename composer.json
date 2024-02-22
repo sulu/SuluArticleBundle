@@ -85,7 +85,7 @@
     "autoload": {
         "psr-4": {
             "Sulu\\Bundle\\ArticleBundle\\": "",
-            "Sulu\\Article\\": ""
+            "Sulu\\Article\\": "src/"
         },
         "exclude-from-classmap": [
             "/src/",

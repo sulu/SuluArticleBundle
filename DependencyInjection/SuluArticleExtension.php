@@ -11,14 +11,12 @@
 
 namespace Sulu\Bundle\ArticleBundle\DependencyInjection;
 
-use Sulu\Bundle\ArticleBundle\Application\Mapper\ArticleMapperInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
-use Sulu\Bundle\ArticleBundle\Domain\Model\ArticleInterface;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
 use Sulu\Bundle\PersistenceBundle\DependencyInjection\PersistenceExtensionTrait;
@@ -44,8 +42,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $configs = $resolvingBag->resolveValue($configs);
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $storage = $config['storage'];
-
         if ($container->hasExtension('jms_serializer')) {
             $container->prependExtensionConfig(
                 'jms_serializer',
@@ -61,19 +57,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                 ]
             );
         }
-
-        if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
-            $this->prependPHPCRStorage($container);
-        } elseif (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage) {
-            $this->prependExperimentalStorage($container);
-        }
-    }
-
-    /**
-     * Can be removed when phpcr storage is removed.
-     */
-    private function prependPHPCRStorage(ContainerBuilder $container): void
-    {
         if ($container->hasExtension('sulu_admin')) {
             $container->prependExtensionConfig(
                 'sulu_admin',
@@ -313,152 +296,6 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         }
     }
 
-    private function prependExperimentalStorage(ContainerBuilder $container): void
-    {
-        if ($container->hasExtension('sulu_admin')) {
-            $container->prependExtensionConfig(
-                'sulu_admin',
-                [
-                    'lists' => [
-                        'directories' => [
-                            __DIR__ . '/../Resources/config/experimental/lists',
-                        ],
-                    ],
-                    'forms' => [
-                        'directories' => [
-                            // __DIR__ . '/../Resources/config/forms',
-                        ],
-                    ],
-                    'resources' => [
-                        'articles' => [
-                            'routes' => [
-                                'list' => 'sulu_article.get_articles',
-                                'detail' => 'sulu_article.get_article',
-                            ],
-                        ],
-                        'article_versions' => [
-                            'routes' => [
-                                'list' => 'sulu_article.get_article_versions',
-                                'detail' => 'sulu_article.post_article_version_trigger',
-                            ],
-                        ],
-                    ],
-                    'field_type_options' => [
-                        'selection' => [
-                            'article_selection' => [
-                                'default_type' => 'list_overlay',
-                                'resource_key' => 'articles',
-                                'types' => [
-                                    'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => 'articles',
-                                        'display_properties' => ['title', 'routePath'],
-                                        'icon' => 'su-newspaper',
-                                        'label' => 'sulu_article.selection_label',
-                                        'overlay_title' => 'sulu_article.selection_overlay_title',
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'single_selection' => [
-                            'single_article_selection' => [
-                                'default_type' => 'list_overlay',
-                                'resource_key' => 'articles',
-                                'types' => [
-                                    'list_overlay' => [
-                                        'adapter' => 'table',
-                                        'list_key' => 'articles',
-                                        'display_properties' => ['title'],
-                                        'empty_text' => 'sulu_article.no_article_selected',
-                                        'icon' => 'su-newspaper',
-                                        'overlay_title' => 'sulu_article.single_selection_overlay_title',
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            );
-        }
-
-        if ($container->hasExtension('doctrine')) {
-            $container->prependExtensionConfig(
-                'doctrine',
-                [
-                    'orm' => [
-                        'mappings' => [
-                            'SuluBundleArticle' => [
-                                'type' => 'xml',
-                                'prefix' => 'Sulu\Bundle\ArticleBundle\Domain\Model',
-                                'dir' => \dirname(__DIR__) . '/Resources/config/doctrine/Article',
-                                'alias' => 'SuluArticleBundle',
-                                'is_bundle' => false,
-                                'mapping' => true,
-                            ],
-                        ],
-                    ],
-                ]
-            );
-        }
-
-        if ($container->hasExtension('sulu_core')) {
-            $container->prependExtensionConfig(
-                'sulu_core',
-                [
-                    'content' => [
-                        'structure' => [
-                            'paths' => [
-                                ArticleInterface::TEMPLATE_TYPE => [
-                                    'path' => '%kernel.project_dir%/config/templates/articles',
-                                    'type' => 'article',
-                                ],
-                            ],
-                            'default_type' => [
-                                ArticleInterface::TEMPLATE_TYPE => 'default',
-                            ],
-                        ],
-                    ],
-                ]
-            );
-        }
-
-        if ($container->hasExtension('sulu_route')) {
-            $container->prependExtensionConfig(
-                'sulu_route',
-                [
-                    'mappings' => [
-                        ArticleInterface::class => [
-                            'generator' => 'schema',
-                            'options' => [
-                                'route_schema' => '/{object["title"]}',
-                            ],
-                            'resource_key' => ArticleInterface::RESOURCE_KEY,
-                        ],
-                    ],
-                ]
-            );
-        }
-
-        if ($container->hasExtension('sulu_search')) {
-            $suluSearchConfigs = $container->getExtensionConfig('sulu_search');
-
-            foreach ($suluSearchConfigs as $suluSearchConfig) {
-                if (isset($suluSearchConfig['website']['indexes'])) { // @phpstan-ignore-line
-                    $container->prependExtensionConfig(
-                        'sulu_search',
-                        [
-                            'website' => [
-                                'indexes' => [
-                                    ArticleInterface::RESOURCE_KEY => ArticleInterface::RESOURCE_KEY . '_published',
-                                ],
-                            ],
-                        ]
-                    );
-                }
-            }
-        }
-    }
-
     /**
      * @param mixed[] $configs
      */
@@ -488,46 +325,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
         $storage = $config['storage'];
         $container->setParameter('sulu_article.article_storage', $storage);
 
-        if (Configuration::ARTICLE_STORAGE_PHPCR === $storage) {
-            $this->loadPHPCRStorage($config, $container, $loader);
-        } elseif (Configuration::ARTICLE_STORAGE_EXPERIMENTAL === $storage) {
-            $this->loadExperimentalStorage($config, $container, $loader);
-        }
-    }
 
-    /**
-     * @param array{objects: array<string, array{model: class-string}>} $config
-     */
-    private function loadExperimentalStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
-    {
-        $this->configurePersistence($config['objects'], $container);
-
-        $loader->load('experimental.xml');
-
-        $container->setAlias('sulu_article.message_bus', 'sulu_message_bus');
-
-        $container->registerForAutoconfiguration(ArticleMapperInterface::class)
-            ->addTag('sulu_article.article_mapper');
-    }
-
-    /**
-     * Can be removed when phpcr storage is removed.
-     *
-     * @param array{
-     *     default_main_webspace: string|null,
-     *     default_additional_webspaces: string[]|null,
-     *     types: array<string, string>,
-     *     display_tab_all: bool,
-     *     smart_content: array{
-     *         default_limit: int,
-     *     },
-     *     search_fields: string[],
-     *     documents: array<string, array{view: class-string}>,
-     *     default_author: bool,
-     * } $config
-     */
-    private function loadPHPCRStorage(array $config, ContainerBuilder $container, Loader\XmlFileLoader $loader): void
-    {
         $container->setParameter('sulu_article.default_main_webspace', $config['default_main_webspace']);
         $container->setParameter('sulu_article.default_additional_webspaces', $config['default_additional_webspaces']);
         $container->setParameter('sulu_article.types', $config['types']);
