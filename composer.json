@@ -84,9 +84,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Sulu\\Bundle\\ArticleBundle\\": ""
+            "Sulu\\Bundle\\ArticleBundle\\": "",
+            "Sulu\\Article\\": ""
         },
         "exclude-from-classmap": [
+            "/src/",
             "/Resources/phpcr-migrations/",
             "/Tests/"
         ]
