@@ -1581,11 +1581,6 @@ parameters:
 			path: Document/Subscriber/ArticlePageSubscriber.php
 
 		-
-			message: "#^Parameter \\#3 \\$options of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:persist\\(\\) expects array, array\\|Symfony\\\\Component\\\\OptionsResolver\\\\OptionsResolver given\\.$#"
-			count: 1
-			path: Document/Subscriber/ArticlePageSubscriber.php
-
-		-
 			message: "#^Right side of \\|\\| is always true\\.$#"
 			count: 1
 			path: Document/Subscriber/ArticlePageSubscriber.php

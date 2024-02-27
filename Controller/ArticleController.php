@@ -605,6 +605,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 case 'copy':
                     /** @var ArticleDocument $document */
                     $document = $this->documentManager->find($id, $locale);
+                    /** @var string $copiedPath */
                     $copiedPath = $this->documentManager->copy($document, \dirname($document->getPath()));
                     $this->documentManager->flush();
 
