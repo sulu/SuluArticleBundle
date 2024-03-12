@@ -30,6 +30,11 @@ class ElasticSearchFieldDescriptor extends FieldDescriptor
      */
     private $sortField;
 
+    /**
+     * @var string
+     */
+    private $searchField;
+
     public function __construct(
         string $name,
         string $sortField = null,
@@ -37,9 +42,11 @@ class ElasticSearchFieldDescriptor extends FieldDescriptor
         string $visibility = FieldDescriptorInterface::VISIBILITY_YES,
         string $searchability = FieldDescriptorInterface::SEARCHABILITY_NEVER,
         string $type = '',
-        bool $sortable = true
+        bool $sortable = true,
+        string $searchField = ''
     ) {
         $this->sortField = $sortField ? $sortField : $name;
+        $this->searchField = $searchField;
 
         parent::__construct(
             $name,
@@ -54,5 +61,10 @@ class ElasticSearchFieldDescriptor extends FieldDescriptor
     public function getSortField(): string
     {
         return $this->sortField;
+    }
+
+    public function getSearchField(): string
+    {
+        return $this->searchField;
     }
 }
