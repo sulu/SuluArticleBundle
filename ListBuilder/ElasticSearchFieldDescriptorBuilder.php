@@ -50,6 +50,11 @@ final class ElasticSearchFieldDescriptorBuilder
      */
     private $sortable = false;
 
+    /**
+     * @var string
+     */
+    private $searchField = '';
+
     public function __construct(string $name, string $translation = null)
     {
         $this->name = $name;
@@ -85,6 +90,13 @@ final class ElasticSearchFieldDescriptorBuilder
         return $this;
     }
 
+    public function setSearchField(string $searchField): self
+    {
+        $this->searchField = $searchField;
+
+        return $this;
+    }
+
     public function build(): ElasticSearchFieldDescriptor
     {
         return new ElasticSearchFieldDescriptor(
@@ -94,7 +106,8 @@ final class ElasticSearchFieldDescriptorBuilder
             $this->visibility,
             $this->searchability,
             $this->type,
-            $this->sortable
+            $this->sortable,
+            $this->searchField,
         );
     }
 }

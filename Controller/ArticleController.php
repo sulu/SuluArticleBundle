@@ -41,6 +41,7 @@ use Sulu\Component\Hash\RequestHashCheckerInterface;
 use Sulu\Component\Rest\AbstractRestController;
 use Sulu\Component\Rest\Exception\MissingParameterException;
 use Sulu\Component\Rest\Exception\RestException;
+use Sulu\Component\Rest\ListBuilder\FieldDescriptor;
 use Sulu\Component\Rest\ListBuilder\FieldDescriptorInterface;
 use Sulu\Component\Rest\ListBuilder\ListRepresentation;
 use Sulu\Component\Rest\ListBuilder\ListRestHelperInterface;
@@ -173,6 +174,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 ->build(),
             'title' => ElasticSearchFieldDescriptor::create('title', 'public.title')
                 ->setSortField('title.raw')
+                ->setSearchField('title')
+                ->setSearchability(FieldDescriptor::SEARCHABILITY_YES)
                 ->build(),
             'creatorFullName' => ElasticSearchFieldDescriptor::create('creatorFullName', 'sulu_article.list.creator')
                 ->setSortField('creatorFullName.raw')
@@ -208,6 +211,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 ->build(),
             'routePath' => ElasticSearchFieldDescriptor::create('routePath')
                 ->setVisibility(FieldDescriptorInterface::VISIBILITY_NO)
+                ->setSearchField('route_path.value')
+                ->setSearchability(FieldDescriptor::SEARCHABILITY_YES)
                 ->build(),
         ];
     }
@@ -248,9 +253,17 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $limit = \count($ids);
         }
 
+        $fieldDescriptors = $this->getFieldDescriptors();
+
         $searchFields = $this->restHelper->getSearchFields();
         if (0 === \count($searchFields)) {
-            $searchFields = ['title'];
+            foreach ($fieldDescriptors as $fieldDescriptor) {
+                if (FieldDescriptorInterface::SEARCHABILITY_YES !== $fieldDescriptor->getSearchability()) {
+                    continue;
+                }
+
+                $searchFields[] = $fieldDescriptor->getSearchField();
+            }
         }
 
         $searchPattern = $this->restHelper->getSearchPattern();
@@ -331,8 +344,6 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 new FieldSort('created', 'ASC')
             );
         }
-
-        $fieldDescriptors = $this->getFieldDescriptors();
 
         if ($limit) {
             $search->setSize($limit);
