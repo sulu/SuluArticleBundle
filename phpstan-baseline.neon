@@ -171,32 +171,7 @@ parameters:
 			path: Content/ArticleDataProvider.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveDataItems\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveDataItems\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveDatasource\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveDatasource\\(\\) should return Sulu\\\\Component\\\\SmartContent\\\\DatasourceItemInterface but empty return statement found\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveResourceItems\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveResourceItems\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Content/ArticleDataProvider.php
 
@@ -281,17 +256,12 @@ parameters:
 			path: Content/PageTreeArticleDataProvider.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\PageTreeArticleDataProvider\\:\\:resolveDatasource\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/PageTreeArticleDataProvider.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\PageTreeArticleDataProvider\\:\\:resolveDatasource\\(\\) should return Sulu\\\\Component\\\\SmartContent\\\\DatasourceItemInterface but returns null\\.$#"
 			count: 2
 			path: Content/PageTreeArticleDataProvider.php
 
 		-
-			message: "#^Parameter \\#1 \\$identifier of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:find\\(\\) expects string, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$identifier of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:find\\(\\) expects string, int\\<min, \\-1\\>\\|int\\<1, max\\>\\|string given\\.$#"
 			count: 1
 			path: Content/PageTreeArticleDataProvider.php
 
@@ -2076,6 +2046,16 @@ parameters:
 			path: Import/ImportResult.php
 
 		-
+			message: "#^Parameter \\#1 \\$filters of method Sulu\\\\Component\\\\SmartContent\\\\DataProviderInterface\\:\\:resolveResourceItems\\(\\) expects array\\{dataSource\\?\\: int\\|string\\|null, sortMethod\\?\\: 'asc'\\|'desc', sortBy\\?\\: string, tags\\?\\: array\\<string\\>, tagOperator\\?\\: 'and'\\|'or', types\\?\\: array\\<string\\>, categories\\?\\: array\\<int\\>, categoryOperator\\?\\: 'and'\\|'or', \\.\\.\\.\\}, array given\\.$#"
+			count: 1
+			path: Infrastructure/Sulu/Headless/DataProviderResolver/AbstractArticleDataProviderResolver.php
+
+		-
+			message: "#^Parameter \\#1 \\$filters of method Sulu\\\\Component\\\\SmartContent\\\\DataProviderInterface\\:\\:resolveResourceItems\\(\\) expects array\\{dataSource\\?\\: int\\|string\\|null, sortMethod\\?\\: 'asc'\\|'desc', sortBy\\?\\: string, tags\\?\\: array\\<string\\>, tagOperator\\?\\: 'and'\\|'or', types\\?\\: array\\<string\\>, categories\\?\\: array\\<int\\>, categoryOperator\\?\\: 'and'\\|'or', \\.\\.\\.\\}, array given\\.$#"
+			count: 1
+			path: Infrastructure/SuluHeadlessBundle/DataProviderResolver/AbstractArticleDataProviderResolver.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\ListBuilder\\\\ElasticSearchFieldDescriptorBuilder\\:\\:setSearchability\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: ListBuilder/ElasticSearchFieldDescriptorBuilder.php
@@ -2382,11 +2362,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#2 \\.\\.\\.\\$arrays of function array_merge expects array, array\\<string\\>\\|null given\\.$#"
-			count: 1
-			path: Sitemap/ArticleSitemapProvider.php
-
-		-
-			message: "#^Parameter \\#3 \\$defaultLocale of class Sulu\\\\Bundle\\\\WebsiteBundle\\\\Sitemap\\\\SitemapUrl constructor expects string\\|null, DateTime given\\.$#"
 			count: 1
 			path: Sitemap/ArticleSitemapProvider.php
 
