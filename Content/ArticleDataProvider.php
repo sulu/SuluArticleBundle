@@ -176,6 +176,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
+        /** @var string|null $locale */
         $locale = $options['locale'];
         $webspaceKey = $this->getWebspaceKey($propertyParameter, $options);
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $locale, $webspaceKey);
@@ -206,6 +207,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
         $filters['types'] = $this->getTypesProperty($propertyParameter);
         $filters['excluded'] = $this->getExcludedFilter($filters, $propertyParameter);
 
+        /** @var string|null $locale */
         $locale = $options['locale'];
         $webspaceKey = $this->getWebspaceKey($propertyParameter, $options);
         $queryResult = $this->getSearchResult($filters, $limit, $page, $pageSize, $locale, $webspaceKey);
