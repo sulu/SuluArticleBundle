@@ -2,14 +2,17 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
+The SuluArticleBundle requires a running Elasticsearch `^5.0`, `^6.0`, `^7.0`, `^8.0`.
 
 ## Install dependencies
 
 ```bash
-composer require "elasticsearch/elasticsearch:7.9.*" # should match version of your elasticsearch installation
+composer require "elasticsearch/elasticsearch:^7.17" # should match version of your elasticsearch installation
 composer require sulu/article-bundle
 ```
+
+For **Elasticsearch 8** the `^7.17` client is currently required, the Elasticsearch 8
+Server supports queries from the Elasticsearch 7 client via the [handcraftedinthealps/elasticsearch-bundle](https://github.com/handcraftedinthealps/ElasticsearchBundle).
 
 ### Configure SuluArticleBundle and sulu core
 
