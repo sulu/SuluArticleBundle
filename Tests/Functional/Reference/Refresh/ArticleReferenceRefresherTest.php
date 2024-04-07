@@ -17,6 +17,7 @@ use Sulu\Bundle\MediaBundle\Entity\Collection;
 use Sulu\Bundle\MediaBundle\Entity\CollectionType;
 use Sulu\Bundle\MediaBundle\Entity\Media;
 use Sulu\Bundle\MediaBundle\Entity\MediaType;
+use Sulu\Bundle\ReferenceBundle\Application\Refresh\ReferenceRefresherInterface;
 use Sulu\Bundle\ReferenceBundle\Domain\Model\Reference;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -37,6 +38,9 @@ class ArticleReferenceRefresherTest extends SuluTestCase
         $this->purgeDatabase();
         $this->initPhpcr();
 
+        if (!\interface_exists(ReferenceRefresherInterface::class)) {
+            return;
+        }
         $this->articleReferenceRefresher = $this->getContainer()->get('sulu_article.article_reference_refresher');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $this->referenceRepository = $this->getContainer()->get('sulu.repository.reference');
@@ -44,6 +48,10 @@ class ArticleReferenceRefresherTest extends SuluTestCase
 
     public function testRefreshWithoutReferences(): void
     {
+        if (!\interface_exists(ReferenceRefresherInterface::class)) {
+            $this->markTestSkipped('References did not exist in Sulu <2.6.');
+        }
+
         /** @var ArticleDocument $article */
         $article = $this->documentManager->create('article');
         $article->setTitle('Example article');
@@ -65,6 +73,10 @@ class ArticleReferenceRefresherTest extends SuluTestCase
 
     public function testRefresh(): void
     {
+        if (!\interface_exists(ReferenceRefresherInterface::class)) {
+            $this->markTestSkipped('References did not exist in Sulu <2.6.');
+        }
+
         $media = $this->createMedia();
         /** @var ArticleDocument $article */
         $article = $this->documentManager->create('article');
