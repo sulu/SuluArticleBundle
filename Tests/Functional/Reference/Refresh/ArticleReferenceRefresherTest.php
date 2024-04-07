@@ -25,13 +25,20 @@ use Sulu\Component\Persistence\Repository\ORM\EntityRepository;
 
 class ArticleReferenceRefresherTest extends SuluTestCase
 {
-    private ArticleReferenceRefresher $articleReferenceRefresher;
-    private DocumentManagerInterface $documentManager;
+    /**
+     * @var ArticleReferenceRefresher
+     */
+    private $articleReferenceRefresher;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
 
     /**
      * @var EntityRepository<Reference>
      */
-    private EntityRepository $referenceRepository;
+    private $referenceRepository;
 
     public function setUp(): void
     {
