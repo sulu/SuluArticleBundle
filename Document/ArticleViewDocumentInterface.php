@@ -294,7 +294,10 @@ interface ArticleViewDocumentInterface
      */
     public function getLastModifiedOrAuthored();
 
-    public function setLastModifiedOrAuthored();
+    /**
+     * @return $this
+     */
+    public function updateLastModifiedOrAuthored();
 
     /**
      * Returns author full name.

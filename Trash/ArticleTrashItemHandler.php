@@ -176,7 +176,7 @@ final class ArticleTrashItemHandler implements
                 $localizedArticle->setParent($this->documentManager->find($data['parentUuid']));
                 $localizedArticle->setUuid($uuid);
             }
-            $lastModified = array_key_exists('lastModified', $localeData) && $localeData['lastModified'] ? new \DateTime($localeData['lastModified']) : null;
+            $lastModified = \array_key_exists('lastModified', $localeData) && $localeData['lastModified'] ? new \DateTime($localeData['lastModified']) : null;
 
             $localizedArticle->setTitle($localeData['title']);
             $localizedArticle->setLocale($locale);

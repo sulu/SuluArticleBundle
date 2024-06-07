@@ -498,22 +498,15 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
         return $this;
     }
 
-    /**
-     * @return \DateTime|null
-     */
     public function getLastModified()
     {
         return $this->lastModified;
     }
 
-    /**
-     * @param \DateTime|null $lastModified
-     *
-     * @return $this|ArticleViewDocument
-     */
     public function setLastModified($lastModified)
     {
         $this->lastModified = $lastModified;
+        $this->updateLastModifiedOrAuthored();
 
         return $this;
     }
@@ -524,11 +517,18 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     }
 
     /**
-     * @param \DateTime|null $lastModified
+     * @internal setter is required for ONGR but should not be used
      *
-     * @return $this|ArticleViewDocument
+     * @return static
      */
-    public function setLastModifiedOrAuthored()
+    public function setLastModifiedOrAuthored(\DateTime $lastModifiedOrAuthored)
+    {
+        $this->lastModifiedOrAuthored = $lastModifiedOrAuthored;
+
+        return $this;
+    }
+
+    public function updateLastModifiedOrAuthored()
     {
         $this->lastModifiedOrAuthored = $this->lastModified ?? $this->authored;
 
@@ -543,6 +543,7 @@ class ArticleViewDocument implements ArticleViewDocumentInterface
     public function setAuthored(?\DateTime $authored = null)
     {
         $this->authored = $authored;
+        $this->updateLastModifiedOrAuthored();
 
         return $this;
     }
