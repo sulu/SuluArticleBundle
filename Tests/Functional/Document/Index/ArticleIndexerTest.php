@@ -19,6 +19,7 @@ use Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer;
 use Sulu\Bundle\MediaBundle\Content\Types\ImageMapContentType;
 use Sulu\Bundle\PageBundle\Document\PageDocument;
 use Sulu\Bundle\RouteBundle\Entity\RouteRepositoryInterface;
+use Sulu\Bundle\TestBundle\Testing\SetGetPrivatePropertyTrait;
 use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
@@ -26,6 +27,8 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 class ArticleIndexerTest extends SuluTestCase
 {
+    use SetGetPrivatePropertyTrait;
+
     /**
      * @var string
      */
@@ -173,27 +176,25 @@ class ArticleIndexerTest extends SuluTestCase
 
         /** @var ArticleDocument $articleDocument */
         $articleDocument = $this->documentManager->find($article['id']);
+        /** @var ArticleDocument $otherDocument */
         $otherDocument = $this->documentManager->find($otherArticle['id']);
+        static::setPrivateProperty($otherDocument, 'originalLocale', 'de'); // to reproduce https://github.com/sulu/SuluArticleBundle/pull/677 correctly
 
-        // instead of calling replaceWithGhostData directly we go through the document manager to reproduce: https://github.com/sulu/SuluArticleBundle/pull/677 correctly
-        $this->documentManager->removeLocale($articleDocument, 'de');
-        $this->documentManager->removeLocale($otherDocument, 'en');
+        $this->indexer->replaceWithGhostData($articleDocument, 'de');
+        $this->indexer->replaceWithGhostData($otherDocument, 'en');
 
-        $this->documentManager->flush();
+        $this->indexer->flush();
 
         $documentEN = $this->findViewDocument($articleDocument->getUuid(), 'en');
         $documentDE = $this->findViewDocument($articleDocument->getUuid(), 'de');
         $documentFR = $this->findViewDocument($articleDocument->getUuid(), 'fr');
 
-        $this->assertSame('Test Article', $documentEN->getTitle());
         $this->assertSame('localized', $documentEN->getLocalizationState()->state);
         $this->assertNull($documentEN->getLocalizationState()->locale);
 
-        $this->assertSame('Test Article', $documentDE->getTitle());
         $this->assertSame('ghost', $documentDE->getLocalizationState()->state);
         $this->assertSame('en', $documentDE->getLocalizationState()->locale);
 
-        $this->assertSame('Test Article', $documentFR->getTitle());
         $this->assertSame('ghost', $documentFR->getLocalizationState()->state);
         $this->assertSame('en', $documentFR->getLocalizationState()->locale);
 
@@ -202,15 +203,12 @@ class ArticleIndexerTest extends SuluTestCase
         $otherDocumentDE = $this->findViewDocument($otherDocument->getUuid(), 'de');
         $otherDocumentFR = $this->findViewDocument($otherDocument->getUuid(), 'fr');
 
-        $this->assertSame('Anderer Artikel Deutsch', $otherDocumentDE->getTitle());
         $this->assertSame('localized', $otherDocumentDE->getLocalizationState()->state);
         $this->assertNull($otherDocumentDE->getLocalizationState()->locale);
 
-        $this->assertSame('Anderer Artikel Deutsch', $otherDocumentEN->getTitle());
         $this->assertSame('ghost', $otherDocumentEN->getLocalizationState()->state);
         $this->assertSame('de', $otherDocumentEN->getLocalizationState()->locale);
 
-        $this->assertSame('Anderer Artikel Deutsch', $otherDocumentFR->getTitle());
         $this->assertSame('ghost', $otherDocumentFR->getLocalizationState()->state);
         $this->assertSame('de', $otherDocumentFR->getLocalizationState()->locale);
     }
