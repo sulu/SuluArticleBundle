@@ -23,27 +23,35 @@ use Sulu\Bundle\TestBundle\Testing\SuluTestCase;
 use Sulu\Component\DocumentManager\DocumentManagerInterface;
 use Sulu\Component\HttpKernel\SuluKernel;
 use Sulu\Component\Persistence\Repository\ORM\EntityRepository;
-use Sulu\Component\PHPCR\SessionManager\SessionManager;
 
 class ArticleReferenceProviderTest extends SuluTestCase
 {
-    private ArticleReferenceProvider $articleReferenceProvider;
-    private DocumentManagerInterface $documentManager;
-    private SessionManager $sessionManager;
+    /**
+     * @var ArticleReferenceProvider
+     */
+    private $articleReferenceProvider;
+
+    /**
+     * @var DocumentManagerInterface
+     */
+    private $documentManager;
 
     /**
      * @var EntityRepository<Reference>
      */
-    private EntityRepository $referenceRepository;
+    private $referenceRepository;
 
     public function setUp(): void
     {
         $this->purgeDatabase();
         $this->initPhpcr();
 
+        if (!\interface_exists(ReferenceRefresherInterface::class)) {
+            return;
+        }
+
         $this->articleReferenceProvider = $this->getContainer()->get('sulu_article.reference_provider');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->sessionManager = $this->getContainer()->get('sulu.phpcr.session');
         $this->referenceRepository = $this->getContainer()->get('sulu.repository.reference');
     }
 
@@ -97,7 +105,6 @@ class ArticleReferenceProviderTest extends SuluTestCase
         // refresh services from new kernel
         $this->articleReferenceProvider = $this->getContainer()->get('sulu_article.reference_provider');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
-        $this->sessionManager = $this->getContainer()->get('sulu.phpcr.session');
         $this->referenceRepository = $this->getContainer()->get('sulu.repository.reference');
 
         /** @var ArticleDocument $article */

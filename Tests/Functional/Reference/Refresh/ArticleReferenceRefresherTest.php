@@ -48,6 +48,7 @@ class ArticleReferenceRefresherTest extends SuluTestCase
         if (!\interface_exists(ReferenceRefresherInterface::class)) {
             return;
         }
+
         $this->articleReferenceRefresher = $this->getContainer()->get('sulu_article.article_reference_refresher');
         $this->documentManager = $this->getContainer()->get('sulu_document_manager.document_manager');
         $this->referenceRepository = $this->getContainer()->get('sulu.repository.reference');
