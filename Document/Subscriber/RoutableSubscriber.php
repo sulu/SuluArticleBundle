@@ -401,7 +401,7 @@ class RoutableSubscriber implements EventSubscriberInterface
     {
         $metadata = $this->metadataFactory->getStructureMetadata('article', $structureType);
 
-        if ($metadata->hasPropertyWithTagName(self::TAG_NAME)) {
+        if ($metadata->hasTag(self::TAG_NAME)) {
             return $this->getPropertyName($locale, $metadata->getPropertyByTagName(self::TAG_NAME)->getName());
         }
 

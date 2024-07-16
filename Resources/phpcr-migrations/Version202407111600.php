@@ -21,7 +21,6 @@ use Sulu\Component\DocumentManager\PropertyEncoder;
 use Sulu\Component\Localization\Localization;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 class Version202407111600 implements VersionInterface, ContainerAwareInterface
 {
     /**
