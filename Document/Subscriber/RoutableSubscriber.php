@@ -310,7 +310,7 @@ class RoutableSubscriber implements EventSubscriberInterface
 
         $node = $this->documentInspector->getNode($document);
         $node->setProperty($propertyName, $route->getPath());
-        $node->setProperty($this->propertyEncoder->localizedContentName(self::ROUTE_FIELD_NAME, $locale), $propertyName);
+        $node->setProperty($this->propertyEncoder->localizedContentName(self::ROUTE_FIELD_NAME, (string) $locale), $propertyName);
     }
 
     private function updateChildRoutes(ChildrenBehavior $document): void
