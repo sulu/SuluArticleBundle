@@ -83,8 +83,21 @@ jobs:
                           ELASTICSEARCH_HOST: '127.0.0.1:9200'
 
                     - php-version: '8.3'
-                      elasticsearch-version: '7.11.1'
-                      elasticsearch-package-constraint: '~7.11.0'
+                      elasticsearch-version: '7.17.2'
+                      elasticsearch-package-constraint: '~7.17.0'
+                      phpcr-transport: jackrabbit
+                      dependency-versions: 'highest'
+                      php-extensions: 'ctype, iconv, mysql, imagick'
+                      tools: 'composer:v2'
+                      phpstan: false
+                      env:
+                          SYMFONY_DEPRECATIONS_HELPER: weak
+                          ELASTICSEARCH_HOST: '127.0.0.1:9200'
+
+                    - php-version: '8.4'
+                      composer-options: '--ignore-platform-reqs'
+                      elasticsearch-version: '7.17.2'
+                      elasticsearch-package-constraint: '~7.17.0'
                       phpcr-transport: doctrinedbal
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
