@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle\Command;
 
 use Sulu\Bundle\ArticleBundle\Export\ArticleExportInterface;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

@@ -85,7 +85,7 @@ jobs:
                     - php-version: '8.3'
                       elasticsearch-version: '7.17.2'
                       elasticsearch-package-constraint: '~7.17.0'
-                      phpcr-transport: jackrabbit
+                      phpcr-transport: doctrinedbal
                       dependency-versions: 'highest'
                       php-extensions: 'ctype, iconv, mysql, imagick'
                       tools: 'composer:v2'
