@@ -31,6 +31,11 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class ReindexCommand extends Command
 {
     /**
+     * @var string
+     */
+    protected static $defaultName = 'sulu:article:reindex';
+
+    /**
      * @var WebspaceManagerInterface
      */
     private $webspaceManager;
@@ -68,7 +73,7 @@ class ReindexCommand extends Command
         IndexerInterface $liveIndexer,
         string $suluContext
     ) {
-        parent::__construct('sulu:article:reindex');
+        parent::__construct(static::$defaultName);
         $this->webspaceManager = $webspaceManager;
         $this->propertyEncoder = $propertyEncoder;
         $this->documentManager = $documentManager;

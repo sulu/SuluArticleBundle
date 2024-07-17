@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Command;
 
 use Sulu\Bundle\ArticleBundle\Export\ArticleExportInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,6 +22,9 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class ArticleExportCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'sulu:article:export';
 
     /**
@@ -30,7 +34,7 @@ class ArticleExportCommand extends Command
 
     public function __construct(ArticleExportInterface $articleExporter)
     {
-        parent::__construct();
+        parent::__construct(static::$defaultName);
 
         $this->articleExporter = $articleExporter;
     }

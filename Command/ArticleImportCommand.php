@@ -25,6 +25,9 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class ArticleImportCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'sulu:article:import';
 
     /**
@@ -39,7 +42,7 @@ class ArticleImportCommand extends Command
 
     public function __construct(ArticleImportInterface $articleImporter, ?LoggerInterface $logger = null)
     {
-        parent::__construct();
+        parent::__construct(static::$defaultName);
 
         $this->articleImporter = $articleImporter;
         $this->logger = $logger ?: new NullLogger();
