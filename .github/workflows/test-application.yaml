@@ -139,7 +139,7 @@ jobs:
 
         steps:
             - name: Checkout project
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Install and configure PHP
               uses: shivammathur/setup-php@v2
@@ -158,7 +158,7 @@ jobs:
               run: composer require --dev elasticsearch/elasticsearch:"${{ matrix.elasticsearch-package-constraint }}" --no-interaction --no-update
 
             - name: Install composer dependencies
-              uses: ramsey/composer-install@v1
+              uses: ramsey/composer-install@v2
               with:
                   dependency-versions: ${{matrix.dependency-versions}}
                   composer-options: ${{ matrix.composer-options }}
@@ -180,7 +180,7 @@ jobs:
 
         steps:
             - name: Checkout project
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Install and configure PHP
               uses: shivammathur/setup-php@v2
@@ -194,7 +194,7 @@ jobs:
               run: composer require --dev elasticsearch/elasticsearch:"~7.11.0" --no-interaction --no-update
 
             - name: Install composer dependencies
-              uses: ramsey/composer-install@v1
+              uses: ramsey/composer-install@v2
               with:
                   dependency-versions: ${{matrix.dependency-versions}}
                   composer-options: ${{ matrix.composer-options }}
