@@ -11,7 +11,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-use Sulu\Bundle\AdminBundle\Tests\Application\Kernel;
+use Sulu\Article\Tests\Application\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 require \dirname(__DIR__) . '/Application/config/bootstrap.php';
