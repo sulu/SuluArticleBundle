@@ -36,7 +36,7 @@
         "symfony/http-kernel": "^6.4 || ^7.0"
     },
     "require-dev": {
-        "coduo/php-matcher": "^6.0",
+        "coduo/php-matcher": "^6.0.14",
         "handcraftedinthealps/zendsearch": "^2.0",
         "jackalope/jackalope-doctrine-dbal": "^1.0 || ^2.0",
         "jangregor/phpstan-prophecy": "^1.0",
