@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/bootstrap.php';
 
-use Sulu\Bundle\ArticleBundle\Tests\Application\Kernel;
+use Sulu\Article\Tests\Application\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\ErrorHandler\Debug;
