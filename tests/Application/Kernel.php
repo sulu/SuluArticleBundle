@@ -9,13 +9,10 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle\Tests\Application;
+namespace Sulu\Article\Tests\Application;
 
-use ONGR\ElasticsearchBundle\ONGRElasticsearchBundle;
-use Sulu\Bundle\ArticleBundle\SuluArticleBundle;
-use Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\TestExtendBundle;
+use Sulu\Article\Infrastructure\Symfony\HttpKernel\SuluArticleBundle;
 use Sulu\Bundle\ContentBundle\SuluContentBundle;
-use Sulu\Bundle\HeadlessBundle\SuluHeadlessBundle;
 use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Sulu\Component\HttpKernel\SuluKernel;
 use Sulu\Messenger\Infrastructure\Symfony\HttpKernel\SuluMessengerBundle;
@@ -26,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * AppKernel for functional tests.
  */
-class Kernel extends SuluTestKernel implements CompilerPassInterface
+class Kernel extends SuluTestKernel
 {
     /**
      * @var string|null
@@ -57,7 +54,10 @@ class Kernel extends SuluTestKernel implements CompilerPassInterface
         parent::registerContainerConfiguration($loader);
 
         $loader->load(__DIR__ . '/config/config.yml');
-        $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
+
+        if (\file_exists(__DIR__ . '/config/config_' . $this->config . '.yml')) {
+            $loader->load(__DIR__ . '/config/config_' . $this->config . '.yml');
+        }
     }
 
     /**
