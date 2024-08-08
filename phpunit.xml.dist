@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true"
-         bootstrap="Tests/test-bootstrap.php"
+         bootstrap="tests/test-bootstrap.php"
 >
     <testsuites>
         <!-- Run Unit Tests before Functional Tests for better Developer Experience -->
