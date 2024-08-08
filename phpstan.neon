@@ -13,9 +13,8 @@ parameters:
     level: max
     excludePaths:
         - %currentWorkingDirectory%/vendor/*
-        - %currentWorkingDirectory%/tests/*
     symfony:
         container_xml_path: %currentWorkingDirectory%/tests/Application/var/cache/admin/dev/default/Sulu_Article_Tests_Application_KernelDevDebugContainer.xml
-        console_application_loader: Tests/phpstan/console-application.php
+        console_application_loader: tests/phpstan/console-application.php
     doctrine:
-        objectManagerLoader: Tests/phpstan/object-manager.php
+        objectManagerLoader: tests/phpstan/object-manager.php
