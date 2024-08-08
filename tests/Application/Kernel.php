@@ -28,7 +28,7 @@ class Kernel extends SuluTestKernel
     /**
      * @var string|null
      */
-    private $config = 'phpcr_storage';
+    private $config = 'default';
 
     public function __construct(string $environment, bool $debug, string $suluContext = SuluKernel::CONTEXT_ADMIN)
     {

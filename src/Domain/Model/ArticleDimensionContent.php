@@ -77,7 +77,9 @@ class ArticleDimensionContent implements ArticleDimensionContentInterface
 
     public function setTemplateData(array $templateData): void
     {
-        if (\array_key_exists('title', $templateData)) {
+        if (\array_key_exists('title', $templateData)
+            && \is_string($templateData['title'])
+        ) {
             $this->title = $templateData['title'];
         }
 
