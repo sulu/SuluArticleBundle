@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "doctrine/collections": "^1.0",
         "doctrine/orm": "^2.5.3",
@@ -27,7 +27,7 @@
         "jms/serializer": "^3.3",
         "jms/serializer-bundle": "^3.3 || ^4.0 || ^5.0",
         "ramsey/uuid": "^3.1 || ^4.0",
-        "sulu/sulu": "^2.5.9 || ^2.5.9@dev",
+        "sulu/sulu": "^2.6.0 || ^2.6.4@dev",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/http-foundation": "^6.4 || ^7.0",
