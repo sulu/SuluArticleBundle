@@ -31,9 +31,7 @@
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/http-foundation": "^6.4 || ^7.0",
-        "symfony/http-kernel": "^6.4 || ^7.0",
-        "symfony-cmf/slugifier-api": "^1.0 || ^2.0",
-        "twig/twig": "^1.41 || ^2.0 || ^3.0"
+        "symfony/http-kernel": "^6.4 || ^7.0"
     },
     "require-dev": {
         "coduo/php-matcher": "^6.0",
