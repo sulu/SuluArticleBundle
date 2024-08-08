@@ -21,6 +21,7 @@
 
     <php>
         <ini name="error_reporting" value="-1" />
+        <ini name="date.timezone" value="UTC" />
         <server name="SHELL_VERBOSITY" value="-1" />
         <server name="APP_ENV" value="test" force="true"/>
         <server name="KERNEL_CLASS" value="Sulu\Article\Tests\Application\Kernel"/>

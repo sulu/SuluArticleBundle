@@ -11,7 +11,7 @@
     "excerptTags": [],
     "excerptTitle":null,
     "ghostLocale": "en",
-    "id": "@integer@",
+    "id": "@string@",
     "locale": null,
     "mainWebspace": null,
     "published": null,

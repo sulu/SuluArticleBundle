@@ -1,9 +1,14 @@
 {
     "_embedded": {
-        "examples": [
+        "articles": [
             {
-                "id": "@integer@",
-                "title": "Test Example 2"
+                "author": null,
+                "changed": "@datetime@",
+                "changer": "Max Mustermann",
+                "created": "@datetime@",
+                "creator": "Max Mustermann",
+                "id": "@string@",
+                "title": "Test Article 2"
             }
         ]
     },

@@ -5,7 +5,7 @@
 
     <key>article</key>
 
-    <view>templates/articles/article</view>
+    <view>views/articles/article</view>
     <controller>Sulu\Bundle\ContentBundle\Content\UserInterface\Controller\Website\ContentController::indexAction</controller>
     <cacheLifetime>604800</cacheLifetime>
 

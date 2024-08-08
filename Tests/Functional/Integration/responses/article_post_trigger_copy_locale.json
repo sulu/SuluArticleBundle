@@ -9,6 +9,7 @@
         "en",
         "de"
     ],
+    "description": null,
     "excerptCategories": [],
     "excerptDescription": "Excerpt Description",
     "excerptIcon": null,
@@ -20,8 +21,8 @@
     ],
     "excerptTitle": "Excerpt Title",
     "ghostLocale": "en",
-    "id": "@integer@",
-    "images": null,
+    "id": "@string@",
+    "image": null,
     "locale": "de",
     "mainWebspace": "sulu-io",
     "published": null,
@@ -37,8 +38,8 @@
     "shadowLocales": [],
     "shadowOn": false,
     "stage": "draft",
-    "template": "example-2",
-    "title": "Test Example",
-    "url": "/my-example",
+    "template": "article",
+    "title": "Test Article",
+    "url": "/my-article",
     "workflowPlace": "unpublished"
 }

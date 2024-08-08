@@ -39,7 +39,7 @@ class ArticleControllerTest extends SuluTestCase
         );
     }
 
-    public function testPostPublish(): int
+    public function testPostPublish(): string
     {
         self::purgeDatabase();
         self::initPhpcr();
@@ -49,7 +49,8 @@ class ArticleControllerTest extends SuluTestCase
             'title' => 'Test Article',
             'url' => '/my-article',
             'published' => '2020-05-08T00:00:00+00:00', // Should be ignored
-            'images' => null,
+            'description' => null,
+            'image' => null,
             'seoTitle' => 'Seo Title',
             'seoDescription' => 'Seo Description',
             'seoCanonicalUrl' => 'https://sulu.io/',
@@ -71,7 +72,7 @@ class ArticleControllerTest extends SuluTestCase
 
         $response = $this->client->getResponse();
         $content = \json_decode((string) $response->getContent(), true);
-        /** @var int $id */
+        /** @var string $id */
         $id = $content['id'] ?? null; // @phpstan-ignore-line
 
         $this->assertResponseSnapshot('article_post_publish.json', $response, 201);
@@ -86,7 +87,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(200, $response);
         $content = $response->getContent();
         $this->assertIsString($content);
-        $this->assertStringContainsString('EXAMPLE 2 TEMPLATE', $content);
+        $this->assertStringContainsString('Test Article', $content);
 
         return $id;
     }
@@ -94,7 +95,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * @depends testPostPublish
      */
-    public function testPostTriggerUnpublish(int $id): void
+    public function testPostTriggerUnpublish(string $id): void
     {
         $this->client->request('POST', '/admin/api/articles/' . $id . '?locale=en&action=unpublish');
 
@@ -111,7 +112,7 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertHttpStatusCode(404, $response);
     }
 
-    public function testPost(): int
+    public function testPost(): string
     {
         self::purgeDatabase();
 
@@ -145,7 +146,7 @@ class ArticleControllerTest extends SuluTestCase
         $routeRepository = $this->getContainer()->get('sulu.repository.route');
         $this->assertCount(0, $routeRepository->findAll());
 
-        /** @var int $id */
+        /** @var string $id */
         $id = \json_decode((string) $response->getContent(), true)['id'] ?? null; // @phpstan-ignore-line
 
         return $id;
@@ -154,7 +155,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * @depends testPost
      */
-    public function testGet(int $id): void
+    public function testGet(string $id): void
     {
         $this->client->request('GET', '/admin/api/articles/' . $id . '?locale=en');
         $response = $this->client->getResponse();
@@ -172,7 +173,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * @depends testPost
      */
-    public function testGetGhostLocale(int $id): void
+    public function testGetGhostLocale(string $id): void
     {
         $this->client->request('GET', '/admin/api/articles/' . $id . '?locale=de');
         $response = $this->client->getResponse();
@@ -190,7 +191,7 @@ class ArticleControllerTest extends SuluTestCase
     /**
      * @depends testPost
      */
-    public function testPostTriggerCopyLocale(int $id): void
+    public function testPostTriggerCopyLocale(string $id): void
     {
         $this->client->request('POST', '/admin/api/articles/' . $id . '?locale=de&action=copy-locale&src=en&dest=de');
 
@@ -203,13 +204,13 @@ class ArticleControllerTest extends SuluTestCase
      * @depends testPost
      * @depends testGet
      */
-    public function testPut(int $id): void
+    public function testPut(string $id): void
     {
         $this->client->request('PUT', '/admin/api/articles/' . $id . '?locale=en', [], [], [], \json_encode([
             'template' => 'article',
             'title' => 'Test Article 2',
             'url' => '/my-article-2',
-            'article' => '<p>Test Article 2</p>',
+            'description' => '<p>Test Article 2</p>',
             'seoTitle' => 'Seo Title 2',
             'seoDescription' => 'Seo Description 2',
             'seoCanonicalUrl' => 'https://sulu.io/2',
@@ -225,7 +226,7 @@ class ArticleControllerTest extends SuluTestCase
             'excerptIcon' => null,
             'excerptMedia' => null,
             'authored' => '2020-06-09T00:00:00+00:00',
-            'mainWebspace' => 'sulu-io2',
+            'mainWebspace' => 'sulu-io',
         ]) ?: null);
 
         $response = $this->client->getResponse();
@@ -252,7 +253,7 @@ class ArticleControllerTest extends SuluTestCase
      * @depends testPost
      * @depends testGetList
      */
-    public function testDelete(int $id): void
+    public function testDelete(string $id): void
     {
         $this->client->request('DELETE', '/admin/api/articles/' . $id . '?locale=en');
         $response = $this->client->getResponse();

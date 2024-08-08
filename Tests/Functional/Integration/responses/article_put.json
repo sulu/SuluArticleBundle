@@ -1,7 +1,6 @@
 {
     "author": null,
     "authored": "2020-06-09T00:00:00+00:00",
-    "article": "<p>Test Article 2</p>",
     "availableLocales": [
         "en",
         "de"
@@ -10,8 +9,7 @@
         "en",
         "de"
     ],
-    "blocks": null,
-    "description": null,
+    "description": "<p>Test Article 2</p>",
     "excerptCategories": [],
     "excerptDescription": "Excerpt Description 2",
     "excerptIcon": null,
@@ -23,7 +21,7 @@
     ],
     "excerptTitle": "Excerpt Title 2",
     "ghostLocale": "en",
-    "id": "@integer@",
+    "id": "@string@",
     "image": null,
     "locale": "en",
     "published": null,
@@ -39,9 +37,9 @@
     "shadowLocales": [],
     "shadowOn": false,
     "stage": "draft",
-    "template": "default",
-    "title": "Test Example 2",
-    "url": "/my-example-2",
+    "template": "article",
+    "title": "Test Article 2",
+    "url": "/my-article-2",
     "workflowPlace": "unpublished",
-    "mainWebspace": "sulu-io2"
+    "mainWebspace": "sulu-io"
 }
