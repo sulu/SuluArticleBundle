@@ -1,0 +1,8 @@
+version: 2
+
+jobs:
+    build:
+        docker:
+            - image: circleci/php:8.1-node-browsers
+        steps:
+            - run: echo "Circle CI is not longer used on 3.0 can be removed when support for 2.x is removed"
