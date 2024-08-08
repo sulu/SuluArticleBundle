@@ -39,7 +39,6 @@
         "jackalope/jackalope-doctrine-dbal": "^1.0 || ^2.0",
         "jangregor/phpstan-prophecy": "^1.0",
         "php-cs-fixer/shim": "^3.0",
-        "phpcr/phpcr-shell": "^1.1",
         "phpspec/prophecy": "^1.15",
         "phpstan/phpstan": "^1.0",
         "phpstan/phpstan-doctrine": "^1.0",
