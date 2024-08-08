@@ -46,7 +46,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpstan/phpstan-symfony": "^1.0",
         "phpstan/phpstan-webmozart-assert": "^1.0",
-        "phpunit/phpunit": "^9.6.5 || ^10.5.29",
+        "phpunit/phpunit": "^10.5.29",
         "sulu/automation-bundle": "^2.0 || ^2.1@dev",
         "sulu/content-bundle": "^0.8.1 || ^0.8.1@dev",
         "sulu/messenger": "^0.1 || ^0.2@dev",
