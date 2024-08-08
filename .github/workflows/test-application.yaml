@@ -76,11 +76,9 @@ jobs:
 
             - name: Bootstrap test environment
               run: composer bootstrap-test-environment
-              env: ${{ matrix.env }}
 
             - name: Execute test cases
               run: time composer test
-              env: ${{ matrix.env }}
 
     lint:
         name: "PHP Lint"
