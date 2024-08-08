@@ -37,7 +37,6 @@
     },
     "require-dev": {
         "coduo/php-matcher": "^6.0",
-        "friendsofphp/php-cs-fixer": "^3.0",
         "handcraftedinthealps/zendsearch": "^2.0",
         "jackalope/jackalope-doctrine-dbal": "^1.0 || ^2.0",
         "jangregor/phpstan-prophecy": "^1.0",
@@ -63,10 +62,10 @@
     },
     "conflict": {
         "doctrine/doctrine-bundle": "2.3.0",
-        "sulu/automation-bundle": "<2.0, >=3.0",
-        "sulu/content-bundle": "<0.7, >=0.9",
-        "sulu/headless-bundle": "<0.8, >=0.11",
-        "sulu/messenger": "<0.1, >=0.3"
+        "sulu/automation-bundle": "<2.0 || >=3.0",
+        "sulu/content-bundle": "<0.7 || >=0.9",
+        "sulu/headless-bundle": "<0.8 || >=0.11",
+        "sulu/messenger": "<0.1 || >=0.3"
     },
     "suggest": {
         "sulu/automation-bundle": "Allows publish automation and outsource long-running route update processes."
@@ -108,8 +107,8 @@
         "php-cs": "@php vendor/bin/php-cs-fixer fix --verbose --diff --dry-run",
         "php-cs-fix": "@php vendor/bin/php-cs-fixer fix",
         "lint-composer": "@composer validate --strict",
-        "lint-twig": "@php tests/Application/bin/adminconsole lint:twig Resources/doc",
-        "lint-yaml": "@php tests/Application/bin/adminconsole lint:yaml Resources/config tests/Application/config",
+        "lint-twig": "@php tests/Application/bin/adminconsole lint:twig tests/Application/templates",
+        "lint-yaml": "@php tests/Application/bin/adminconsole lint:yaml config tests/Application/config",
         "lint-container": [
             "@php tests/Application/bin/adminconsole lint:container --env dev",
             "@php tests/Application/bin/websiteconsole lint:container --env dev",

@@ -17,8 +17,6 @@ use Sulu\Bundle\TestBundle\Kernel\SuluTestKernel;
 use Sulu\Component\HttpKernel\SuluKernel;
 use Sulu\Messenger\Infrastructure\Symfony\HttpKernel\SuluMessengerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * AppKernel for functional tests.
