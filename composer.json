@@ -51,7 +51,6 @@
         "phpunit/phpunit": "^9.6.5 || ^10.5.29",
         "sulu/automation-bundle": "^2.0 || ^2.1@dev",
         "sulu/content-bundle": "^0.8.1 || ^0.8.1@dev",
-        "sulu/headless-bundle": "^0.8 || ^0.9 || ^0.10@dev",
         "sulu/messenger": "^0.1 || ^0.2@dev",
         "symfony/browser-kit": "^6.4 || ^7.0",
         "symfony/dotenv": "^6.4 || ^7.0",
@@ -64,7 +63,6 @@
         "doctrine/doctrine-bundle": "2.3.0",
         "sulu/automation-bundle": "<2.0 || >=3.0",
         "sulu/content-bundle": "<0.8.1 || >=0.9",
-        "sulu/headless-bundle": "<0.8 || >=0.11",
         "sulu/messenger": "<0.1 || >=0.3"
     },
     "suggest": {
