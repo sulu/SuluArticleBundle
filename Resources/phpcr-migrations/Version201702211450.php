@@ -14,17 +14,29 @@ namespace Sulu\Bundle\ArticleBundle;
 use Jackalope\Node;
 use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
+use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Removes the property `i18n:<locale>-authors` and adds `i18n:<locale>-author`.
  */
 class Version201702211450 implements VersionInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(?ContainerInterface $container = null): void
+    {
+        if (null === $container) {
+            throw new \RuntimeException('Container is required to run this migration.');
+        }
+
+        $this->container = $container;
+    }
 
     public function up(SessionInterface $session)
     {

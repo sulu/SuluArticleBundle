@@ -13,15 +13,28 @@ namespace Sulu\Bundle\ArticleBundle;
 
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
 final class Version202210140922 implements VersionInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(?ContainerInterface $container = null): void
+    {
+        if (null === $container) {
+            throw new \RuntimeException('Container is required to run this migration.');
+        }
+
+        $this->container = $container;
+    }
+
 
     public function up(SessionInterface $session)
     {

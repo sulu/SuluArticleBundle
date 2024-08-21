@@ -17,15 +17,27 @@ use PHPCR\Migrations\VersionInterface;
 use PHPCR\NodeInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Removes the property `sulu:author(ed)` and adds `i18n:<locale>-author(ed)`.
  */
 class Version201712041018 implements VersionInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(?ContainerInterface $container = null): void
+    {
+        if (null === $container) {
+            throw new \RuntimeException('Container is required to run this migration.');
+        }
+
+        $this->container = $container;
+    }
 
     public const AUTHOR_PROPERTY_NAME = 'sulu:author';
 

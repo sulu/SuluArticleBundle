@@ -17,8 +17,8 @@ use PHPCR\Migrations\VersionInterface;
 use PHPCR\NodeInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Removes the property `mainWebspace` and adds `i18n:<locale>-mainWebspace`.
@@ -26,7 +26,19 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  */
 class Version201811091000 implements VersionInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(?ContainerInterface $container = null): void
+    {
+        if (null === $container) {
+            throw new \RuntimeException('Container is required to run this migration.');
+        }
+
+        $this->container = $container;
+    }
 
     public const MAIN_WEBSPACE_PROPERTY_NAME = 'mainWebspace';
 

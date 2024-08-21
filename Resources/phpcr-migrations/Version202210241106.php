@@ -15,12 +15,25 @@ use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Version202210241106 implements VersionInterface, ContainerAwareInterface
 {
-    use ContainerAwareTrait;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    public function setContainer(?ContainerInterface $container = null): void
+    {
+        if (null === $container) {
+            throw new \RuntimeException('Container is required to run this migration.');
+        }
+
+        $this->container = $container;
+    }
+
 
     public function up(SessionInterface $session)
     {
