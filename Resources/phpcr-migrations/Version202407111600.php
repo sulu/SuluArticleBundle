@@ -89,6 +89,9 @@ class Version202407111600 implements VersionInterface, ContainerAwareInterface
             /** @var Row<mixed> $row */
             foreach ($rows as $row) {
                 $node = $row->getNode();
+                if (!$node->hasProperty($templateKey)) {
+                    continue;
+                }
                 $structureType = $node->getPropertyValue($templateKey);
                 $routePathPropertyName = $this->getRoutePathPropertyName($structureType, $locale);
 
@@ -114,6 +117,9 @@ class Version202407111600 implements VersionInterface, ContainerAwareInterface
             foreach ($rows as $row) {
                 $node = $row->getNode();
                 $propertyName = $this->propertyEncoder->localizedContentName(RoutableSubscriber::ROUTE_FIELD_NAME, $locale);
+                if (!$node->hasProperty($propertyName)) {
+                    continue;
+                }
                 $node->setProperty($propertyName, null);
             }
         }
