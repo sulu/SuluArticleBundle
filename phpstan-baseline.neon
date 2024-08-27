@@ -81,11 +81,6 @@ parameters:
 			path: Command/ReindexCommand.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataItem\\:\\:getImage\\(\\) should return string but empty return statement found\\.$#"
-			count: 1
-			path: Content/ArticleDataItem.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataItem\\:\\:getResource\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Content/ArticleDataItem.php
@@ -171,11 +166,6 @@ parameters:
 			path: Content/ArticleDataProvider.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleDataProvider\\:\\:resolveDatasource\\(\\) should return Sulu\\\\Component\\\\SmartContent\\\\DatasourceItemInterface but empty return statement found\\.$#"
-			count: 1
-			path: Content/ArticleDataProvider.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: Content/ArticleDataProvider.php
@@ -253,11 +243,6 @@ parameters:
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\PageTreeArticleDataProvider\\:\\:createSearch\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
 			count: 1
-			path: Content/PageTreeArticleDataProvider.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\PageTreeArticleDataProvider\\:\\:resolveDatasource\\(\\) should return Sulu\\\\Component\\\\SmartContent\\\\DatasourceItemInterface but returns null\\.$#"
-			count: 2
 			path: Content/PageTreeArticleDataProvider.php
 
 		-
@@ -1906,11 +1891,6 @@ parameters:
 			path: Export/ArticleExport.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Export\\\\ArticleExport\\:\\:__construct\\(\\) has parameter \\$formatFilePaths with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Export/ArticleExport.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Export\\\\ArticleExport\\:\\:getDocuments\\(\\) should return Sulu\\\\Component\\\\DocumentManager\\\\Collection\\\\QueryResultCollection but returns mixed\\.$#"
 			count: 1
 			path: Export/ArticleExport.php
@@ -2036,9 +2016,19 @@ parameters:
 			path: Import/ImportResult.php
 
 		-
+			message: "#^Parameter \\#1 \\$articleIds of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Infrastructure\\\\Sulu\\\\Headless\\\\DataProviderResolver\\\\AbstractArticleDataProviderResolver\\:\\:loadArticleStructures\\(\\) expects array\\<string\\>, array\\<int\\<0, max\\>, int\\|string\\> given\\.$#"
+			count: 1
+			path: Infrastructure/Sulu/Headless/DataProviderResolver/AbstractArticleDataProviderResolver.php
+
+		-
 			message: "#^Parameter \\#1 \\$filters of method Sulu\\\\Component\\\\SmartContent\\\\DataProviderInterface\\:\\:resolveResourceItems\\(\\) expects array\\{dataSource\\?\\: int\\|string\\|null, sortMethod\\?\\: 'asc'\\|'desc', sortBy\\?\\: string, tags\\?\\: array\\<string\\>, tagOperator\\?\\: 'and'\\|'or', types\\?\\: array\\<string\\>, categories\\?\\: array\\<int\\>, categoryOperator\\?\\: 'and'\\|'or', \\.\\.\\.\\}, array given\\.$#"
 			count: 1
 			path: Infrastructure/Sulu/Headless/DataProviderResolver/AbstractArticleDataProviderResolver.php
+
+		-
+			message: "#^Parameter \\#1 \\$articleIds of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Infrastructure\\\\SuluHeadlessBundle\\\\DataProviderResolver\\\\AbstractArticleDataProviderResolver\\:\\:loadArticleStructures\\(\\) expects array\\<string\\>, array\\<int\\<0, max\\>, int\\|string\\> given\\.$#"
+			count: 1
+			path: Infrastructure/SuluHeadlessBundle/DataProviderResolver/AbstractArticleDataProviderResolver.php
 
 		-
 			message: "#^Parameter \\#1 \\$filters of method Sulu\\\\Component\\\\SmartContent\\\\DataProviderInterface\\:\\:resolveResourceItems\\(\\) expects array\\{dataSource\\?\\: int\\|string\\|null, sortMethod\\?\\: 'asc'\\|'desc', sortBy\\?\\: string, tags\\?\\: array\\<string\\>, tagOperator\\?\\: 'and'\\|'or', types\\?\\: array\\<string\\>, categories\\?\\: array\\<int\\>, categoryOperator\\?\\: 'and'\\|'or', \\.\\.\\.\\}, array given\\.$#"
