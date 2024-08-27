@@ -13,7 +13,6 @@ namespace Sulu\Bundle\ArticleBundle;
 
 use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
-use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use PHPCR\SessionInterface;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;

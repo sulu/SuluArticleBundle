@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Sulu.
+ *
+ * (c) Sulu GmbH
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 $header = <<<EOF
 This file is part of Sulu.
 
@@ -10,8 +19,10 @@ with this source code in the file LICENSE.
 EOF;
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(['Tests/Application/var/cache'])
-    ->in(__DIR__);
+    ->in(__DIR__)
+    ->ignoreDotFiles(false)
+    ->exclude(['Tests/Application/var'])
+;
 
 $config = new PhpCsFixer\Config();
 $config->setRiskyAllowed(true)

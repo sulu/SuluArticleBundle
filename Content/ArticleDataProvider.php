@@ -225,7 +225,7 @@ class ArticleDataProvider implements DataProviderInterface, DataProviderAliasInt
 
     public function resolveDatasource($datasource, array $propertyParameter, array $options)
     {
-        return;
+        return null;
     }
 
     private function getWebspaceKey(array $propertyParameter, array $options): ?string
