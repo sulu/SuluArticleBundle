@@ -13,7 +13,6 @@ namespace Sulu\Bundle\ArticleBundle;
 
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
-use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Version202005250920 implements VersionInterface, ContainerAwareInterface

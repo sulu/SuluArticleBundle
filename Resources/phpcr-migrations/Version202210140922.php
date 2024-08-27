@@ -12,7 +12,6 @@
 namespace Sulu\Bundle\ArticleBundle;
 
 use PHPCR\Migrations\VersionInterface;
-use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use PHPCR\SessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

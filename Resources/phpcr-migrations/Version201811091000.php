@@ -15,7 +15,6 @@ use Jackalope\Node;
 use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\NodeInterface;
-use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
 

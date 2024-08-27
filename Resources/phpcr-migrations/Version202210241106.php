@@ -15,7 +15,6 @@ use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-use PHPCR\PhpcrMigrationsBundle\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Version202210241106 implements VersionInterface, ContainerAwareInterface
