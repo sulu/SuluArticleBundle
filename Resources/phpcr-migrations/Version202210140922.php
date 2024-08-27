@@ -15,7 +15,6 @@ use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
@@ -34,7 +33,6 @@ final class Version202210140922 implements VersionInterface, ContainerAwareInter
 
         $this->container = $container;
     }
-
 
     public function up(SessionInterface $session)
     {

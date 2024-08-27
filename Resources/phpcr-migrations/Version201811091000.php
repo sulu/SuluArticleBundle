@@ -17,7 +17,6 @@ use PHPCR\Migrations\VersionInterface;
 use PHPCR\NodeInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

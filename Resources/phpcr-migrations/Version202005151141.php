@@ -31,7 +31,6 @@ class Version202005151141 implements VersionInterface, ContainerAwareInterface
         $this->container = $container;
     }
 
-
     public function up(SessionInterface $session)
     {
         $liveSession = $this->container->get('sulu_document_manager.live_session');
