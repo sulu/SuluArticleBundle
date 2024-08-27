@@ -9,11 +9,12 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle;
+namespace Sulu\Bundle\ArticleBundle\PHPCR\Migrations;
 
 use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
+use Sulu\Bundle\ArticleBundle\ContainerAwareInterface;
 use Sulu\Bundle\ArticleBundle\Document\Subscriber\RoutableSubscriber;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\DocumentManager\PropertyEncoder;

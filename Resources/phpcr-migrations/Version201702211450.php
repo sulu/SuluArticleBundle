@@ -9,7 +9,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle;
+namespace Sulu\Bundle\ArticleBundle\PHPCR\Migrations;
 
 use Jackalope\Node;
 use Jackalope\Query\Row;
@@ -17,6 +17,7 @@ use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
 use Sulu\Component\Localization\Localization;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Sulu\Bundle\ArticleBundle\ContainerAwareInterface;
 
 /**
  * Removes the property `i18n:<locale>-authors` and adds `i18n:<locale>-author`.
