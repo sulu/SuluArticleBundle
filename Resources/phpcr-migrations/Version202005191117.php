@@ -9,10 +9,11 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Sulu\Bundle\ArticleBundle;
+namespace Sulu\Bundle\ArticleBundle\PHPCR\Migrations;
 
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
+use Sulu\Bundle\ArticleBundle\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Version202005191117 implements VersionInterface, ContainerAwareInterface
