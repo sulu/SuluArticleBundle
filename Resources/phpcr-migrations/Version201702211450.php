@@ -15,9 +15,9 @@ use Jackalope\Node;
 use Jackalope\Query\Row;
 use PHPCR\Migrations\VersionInterface;
 use PHPCR\SessionInterface;
+use Sulu\Bundle\ArticleBundle\ContainerAwareInterface;
 use Sulu\Component\Localization\Localization;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Sulu\Bundle\ArticleBundle\ContainerAwareInterface;
 
 /**
  * Removes the property `i18n:<locale>-authors` and adds `i18n:<locale>-author`.
