@@ -21,7 +21,7 @@ EOF;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->ignoreDotFiles(false)
-    ->exclude(['tests/Application/var'])
+    ->exclude(['Tests/Application/var'])
 ;
 
 $config = new PhpCsFixer\Config();
