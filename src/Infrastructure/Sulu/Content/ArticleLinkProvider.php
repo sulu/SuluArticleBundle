@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace Sulu\Article\Infrastructure\Sulu\Content;
 
-use Sulu\Article\Domain\Model\ArticleDimensionContentInterface;
 use Sulu\Article\Domain\Model\ArticleInterface;
 use Sulu\Article\Domain\Repository\ArticleRepositoryInterface;
 use Sulu\Bundle\ContentBundle\Content\Application\ContentManager\ContentManagerInterface;
 use Sulu\Bundle\ContentBundle\Content\Domain\Model\DimensionContentInterface;
-use Sulu\Bundle\ContentBundle\Content\Infrastructure\Sulu\Link\ContentLinkProvider;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfiguration;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkConfigurationBuilder;
 use Sulu\Bundle\MarkupBundle\Markup\Link\LinkItem;
@@ -26,9 +24,6 @@ use Sulu\Bundle\MarkupBundle\Markup\Link\LinkProviderInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @extends ContentLinkProvider<ArticleDimensionContentInterface, ArticleInterface>
- */
 class ArticleLinkProvider implements LinkProviderInterface
 {
     public function __construct(
@@ -69,8 +64,9 @@ class ArticleLinkProvider implements LinkProviderInterface
             $dimensionContent = $this->contentManager->resolve($article, $dimensionAttributes);
             $this->articleReferenceStore->add($article->getId());
 
+            /** @var string|null $url */
             $url = $dimensionContent->getTemplateData()['url'] ?? null;
-            if (!$url) {
+            if (null === $url) {
                 // TODO what to do when there is no url?
                 continue;
             }
@@ -78,7 +74,7 @@ class ArticleLinkProvider implements LinkProviderInterface
             $result[] = new LinkItem(
                 $article->getUuid(),
                 (string) $dimensionContent->getTitle(),
-                (string) $dimensionContent->getTemplateData()['url'],
+                $url,
                 $published
             );
         }
