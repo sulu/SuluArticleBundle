@@ -49,7 +49,7 @@ Execute the following [composer](https://getcomposer.org/) commands to add the b
 project:
 
 ```bash
-composer require "elasticsearch/elasticsearch:7.9.*" # should match version of your elasticsearch installation
+composer require "elasticsearch/elasticsearch:7.17.*" # should match version of your elasticsearch installation
 composer require sulu/article-bundle
 ```
 
