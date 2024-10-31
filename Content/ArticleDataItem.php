@@ -21,6 +21,7 @@ use Sulu\Component\SmartContent\ItemInterface;
  *
  * @ExclusionPolicy("all")
  */
+#[ExclusionPolicy('all')]
 class ArticleDataItem implements ItemInterface
 {
     /**
@@ -28,6 +29,7 @@ class ArticleDataItem implements ItemInterface
      *
      * @Expose
      */
+    #[Expose]
     private $id;
 
     /**
@@ -35,6 +37,7 @@ class ArticleDataItem implements ItemInterface
      *
      * @Expose
      */
+    #[Expose]
     private $title;
 
     /**
