@@ -1461,11 +1461,6 @@ parameters:
 			path: Document/Structure/ContentProxyFactory.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: Document/Structure/ContentProxyFactory.php
-
-		-
 			message: "#^Parameter \\#1 \\$webspace of method Sulu\\\\Component\\\\Content\\\\Compat\\\\StructureInterface\\:\\:setWebspaceKey\\(\\) expects string, string\\|null given\\.$#"
 			count: 2
 			path: Document/Structure/ContentProxyFactory.php
