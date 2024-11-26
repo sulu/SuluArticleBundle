@@ -17,6 +17,7 @@ use ProxyManager\Proxy\VirtualProxyInterface;
 use Sulu\Component\Content\Compat\StructureInterface;
 use Sulu\Component\Content\ContentTypeManagerInterface;
 use Sulu\Component\Webspace\Analyzer\Attributes\RequestAttributes;
+use Sulu\Component\Webspace\Webspace;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -42,7 +43,7 @@ class ContentProxyFactory
     public function __construct(
         ContentTypeManagerInterface $contentTypeManager,
         LazyLoadingValueHolderFactory $proxyFactory,
-        RequestStack $requestStack
+        RequestStack $requestStack,
     ) {
         $this->contentTypeManager = $contentTypeManager;
         $this->proxyFactory = $proxyFactory;
@@ -63,7 +64,7 @@ class ContentProxyFactory
                 LazyLoadingInterface $proxy,
                 $method,
                 array $parameters,
-                &$initializer
+                &$initializer,
             ) use ($structure, $data) {
                 $initializer = null;
                 $wrappedObject = new \ArrayObject($this->resolveContent($structure, $data));
@@ -107,7 +108,7 @@ class ContentProxyFactory
                 LazyLoadingInterface $proxy,
                 $method,
                 array $parameters,
-                &$initializer
+                &$initializer,
             ) use ($structure, $data) {
                 $initializer = null;
                 $wrappedObject = new \ArrayObject($this->resolveView($structure, $data));
@@ -144,12 +145,24 @@ class ContentProxyFactory
             return null;
         }
 
-        /** @var RequestAttributes $attributes */
         $attributes = $request->attributes->get('_sulu');
-        if (!$attributes) {
+        if (!$attributes instanceof RequestAttributes) {
             return null;
         }
 
-        return $attributes->getAttribute('webspaceKey') ?? $attributes->getAttribute('webspace')->getKey();
+        if ($attributes->hasAttribute('webspaceKey')) {
+            return $attributes->getAttribute('webspaceKey');
+        }
+
+        if ($attributes->hasAttribute('webspace')) {
+            $webspace = $attributes->getAttribute('webspace');
+            if ($webspace instanceof Webspace) {
+                return $webspace->getKey();
+            } elseif (\is_string($webspace) && '' !== $webspace) {
+                return $webspace;
+            }
+        }
+
+        return null;
     }
 }
