@@ -199,10 +199,22 @@ class ReindexCommand extends Command
         $progressBar = new ProgressBar($output, $count);
         $progressBar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s% %memory:6s%');
         $progressBar->start();
+        $count = 0;
 
         foreach ($documents as $document) {
             $indexer->index($document);
             $progressBar->advance();
+
+            ++$count;
+
+            if (0 === ($count % 100)) {
+                $indexer->flush();
+                $this->documentManager->clear();
+            }
+
+            if (0 === ($count % 500)) {
+                \gc_collect_cycles();
+            }
         }
 
         $indexer->flush();
