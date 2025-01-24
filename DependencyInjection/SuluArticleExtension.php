@@ -189,7 +189,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     ],
                     'forms' => [
                         'directories' => [
-                            \class_exists(LocalizedLastModifiedBehavior::class)
+                            \interface_exists(LocalizedLastModifiedBehavior::class)
                                 ? __DIR__ . '/../Resources/config/forms'
                                 : __DIR__ . '/../Resources/config/forms_sulu_25_or_lower',
                         ],
