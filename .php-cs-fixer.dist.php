@@ -45,7 +45,7 @@ $config->setRiskyAllowed(true)
         'phpdoc_to_comment' => [
             'ignored_tags' => ['todo', 'var', 'see', 'phpstan-ignore-next-line'],
         ],
-        'trailing_comma_in_multiline' => false,
+        'trailing_comma_in_multiline' => ['after_heredoc' => true, 'elements' => ['array_destructuring', 'arrays', 'match']],
     ])
     ->setFinder($finder);
 

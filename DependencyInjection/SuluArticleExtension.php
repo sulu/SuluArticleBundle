@@ -15,17 +15,16 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
-use Sulu\Bundle\ArticleBundle\Document\LocalizedLastModifiedBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
+use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
 
 /**
  * This is the class that loads and manages article bundle configuration.
