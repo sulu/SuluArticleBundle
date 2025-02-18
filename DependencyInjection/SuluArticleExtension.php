@@ -15,11 +15,11 @@ use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticleDocumentType;
 use Sulu\Bundle\ArticleBundle\Document\Form\ArticlePageDocumentType;
-use Sulu\Bundle\ArticleBundle\Document\LocalizedLastModifiedBehavior;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticleBridge;
 use Sulu\Bundle\ArticleBundle\Document\Structure\ArticlePageBridge;
 use Sulu\Bundle\ArticleBundle\Exception\ArticlePageNotFoundException;
 use Sulu\Bundle\ArticleBundle\Exception\ParameterNotAllowedException;
+use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -189,7 +189,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     ],
                     'forms' => [
                         'directories' => [
-                            \class_exists(LocalizedLastModifiedBehavior::class)
+                            \interface_exists(SuluLocalizedLastModifiedBehavior::class)
                                 ? __DIR__ . '/../Resources/config/forms'
                                 : __DIR__ . '/../Resources/config/forms_sulu_25_or_lower',
                         ],
