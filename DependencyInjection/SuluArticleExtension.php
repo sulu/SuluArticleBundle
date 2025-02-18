@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
 
 /**
  * This is the class that loads and manages article bundle configuration.
@@ -189,7 +190,7 @@ class SuluArticleExtension extends Extension implements PrependExtensionInterfac
                     ],
                     'forms' => [
                         'directories' => [
-                            \class_exists(LocalizedLastModifiedBehavior::class)
+                            \interface_exists(SuluLocalizedLastModifiedBehavior::class)
                                 ? __DIR__ . '/../Resources/config/forms'
                                 : __DIR__ . '/../Resources/config/forms_sulu_25_or_lower',
                         ],

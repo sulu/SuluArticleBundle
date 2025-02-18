@@ -11,11 +11,11 @@
 
 namespace Sulu\Bundle\ArticleBundle\Document;
 
-use Sulu\Component\DocumentManager\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
+use Sulu\Component\Content\Document\Behavior\LocalizedLastModifiedBehavior as SuluLocalizedLastModifiedBehavior;
 
 if (\interface_exists(SuluLocalizedLastModifiedBehavior::class)) {
     /**
-     * @internal BC Layer for Sulu <2.6
+     * @internal BC Layer for Sulu >=2.6
      */
     interface LocalizedLastModifiedBehavior extends SuluLocalizedLastModifiedBehavior
     {

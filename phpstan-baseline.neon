@@ -11,11 +11,6 @@ parameters:
 			path: Admin/ArticleAdmin.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\ArticleAdmin\\:\\:getSecurityContexts\\(\\) should return array\\<string, array\\<string, array\\<string, array\\<string\\>\\>\\>\\> but returns array\\<string, array\\<string, array\\<int\\|string, array\\<int, string\\>\\>\\>\\>\\.$#"
-			count: 1
-			path: Admin/ArticleAdmin.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\ArticleAdmin\\:\\:getTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Admin/ArticleAdmin.php
@@ -39,11 +34,6 @@ parameters:
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\Helper\\\\WebspaceSelect\\:\\:getValues\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Admin/Helper/WebspaceSelect.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Builder\\\\ArticleIndexBuilder\\:\\:getDependencies\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Builder/ArticleIndexBuilder.php
 
 		-
 			message: "#^Strict comparison using \\=\\=\\= between 0 and bool will always evaluate to false\\.$#"
@@ -956,11 +946,6 @@ parameters:
 			path: Document/Index/ArticleIndexer.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getDocumentInspector\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getViewDocumentIds\\(\\) has parameter \\$uuids with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Document/Index/ArticleIndexer.php
@@ -1086,52 +1071,7 @@ parameters:
 			path: Document/Index/DocumentFactory.php
 
 		-
-			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Cannot access offset 'id' on mixed\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Cannot access offset 'key' on mixed\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Cannot access offset 'keyword' on mixed\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Cannot access offset 'name' on mixed\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Cannot cast mixed to int\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\Factory\\\\CategoryCollectionFactory\\:\\:__construct\\(\\) has parameter \\$categoryRepository with generic class Doctrine\\\\ORM\\\\EntityRepository but does not specify its types\\: TEntityClass$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Property Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\CategoryViewObject\\:\\:\\$key \\(string\\) does not accept mixed\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Property Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\CategoryViewObject\\:\\:\\$keywords \\(array\\<string\\>\\) does not accept array\\.$#"
-			count: 1
-			path: Document/Index/Factory/CategoryCollectionFactory.php
-
-		-
-			message: "#^Property Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\CategoryViewObject\\:\\:\\$name \\(string\\) does not accept mixed\\.$#"
 			count: 1
 			path: Document/Index/Factory/CategoryCollectionFactory.php
 
@@ -1734,11 +1674,6 @@ parameters:
 			message: "#^Property Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\RoutableSubscriber\\:\\:\\$conflictResolver is never read, only written\\.$#"
 			count: 1
 			path: Document/Subscriber/RoutableSubscriber.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Subscriber\\\\WebspaceSubscriber\\:\\:getDocumentInspector\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Subscriber/WebspaceSubscriber.php
 
 		-
 			message: "#^Parameter \\#1 \\$additionalWebspaces of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Behavior\\\\WebspaceBehavior\\:\\:setAdditionalWebspaces\\(\\) expects array\\<string\\>\\|null, mixed given\\.$#"
