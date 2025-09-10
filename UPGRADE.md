@@ -26,6 +26,23 @@ Run the following command after upgrading:
 bin/adminconsole phpcr:migrations:migrate
 ```
 
+### Deprecate usage of fos rest routing
+
+We are no longer considering the [fos rest routing](https://github.com/handcraftedinthealps/RestRoutingBundle) as a best practice.
+All bundles should use the Symfony routing system instead.
+
+Inside your `config/routes/sulu_admin.yaml` you can remove the fos rest routing configuration.
+First, remove all instances of `type: rest` and also replace `.yml` with `.yaml`:
+
+```diff
+# config/routes/sulu_admin.yaml`
+ sulu_article_api:
+-    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
++    resource: "@SuluArticleBundle/Resources/config/routing_api.yaml"
+-    type: rest
+     prefix: /admin/api
+```
+
 ## 2.5.2
 
 ### Rename WebsiteArticleController::renderBlock to WebsiteArticleController::renderBlockView
