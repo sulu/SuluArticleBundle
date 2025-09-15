@@ -214,6 +214,11 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 ->setSearchField('route_path.value')
                 ->setSearchability(FieldDescriptor::SEARCHABILITY_YES)
                 ->build(),
+            'contentFields' => ElasticSearchFieldDescriptor::create('contentFields')
+                ->setVisibility(FieldDescriptorInterface::VISIBILITY_NEVER)
+                ->setSearchField('content_fields')
+                ->setSearchability(FieldDescriptor::SEARCHABILITY_YES)
+                ->build(),
         ];
     }
 

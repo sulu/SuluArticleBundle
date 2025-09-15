@@ -237,7 +237,7 @@ class ArticlePageDocument implements UuidBehavior,
     {
         $this->route = $route;
 
-        return $this;
+        return $this; // @phpstan-ignore-line
     }
 
     public function removeRoute(): RoutablePageBehavior

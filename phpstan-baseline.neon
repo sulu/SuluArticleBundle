@@ -586,11 +586,6 @@ parameters:
 			path: Document/ArticleDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setRoute\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setShadowLocale\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/ArticleDocument.php
@@ -697,11 +692,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setParent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticlePageDocument.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setRoute\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/ArticlePageDocument.php
 
