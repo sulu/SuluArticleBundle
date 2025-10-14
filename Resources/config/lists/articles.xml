@@ -27,6 +27,13 @@
             translation="sulu_admin.title"
         />
         <property
+            name="mainWebspace"
+            visibility="no"
+            translation="sulu_article.main_webspace"
+        >
+            <filter type="select"/>
+        </property>
+        <property
             name="creatorFullName"
             visibility="no"
             translation="sulu_admin.creator"

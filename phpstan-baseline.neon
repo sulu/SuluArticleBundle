@@ -286,11 +286,6 @@ parameters:
 			path: Controller/ArticleController.php
 
 		-
-			message: "#^Cannot access offset '_source' on mixed\\.$#"
-			count: 1
-			path: Controller/ArticleController.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\ArticleController\\:\\:getViewDocumentIds\\(\\) has parameter \\$uuids with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Controller/ArticleController.php
@@ -326,11 +321,6 @@ parameters:
 			path: Controller/ArticleController.php
 
 		-
-			message: "#^Parameter \\#1 \\$document of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\ArticleController\\:\\:normalize\\(\\) expects array, mixed given\\.$#"
-			count: 1
-			path: Controller/ArticleController.php
-
-		-
 			message: "#^Parameter \\#1 \\$pages of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Controller\\\\ArticleController\\:\\:orderPages\\(\\) expects array, string given\\.$#"
 			count: 1
 			path: Controller/ArticleController.php
@@ -357,7 +347,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#2 \\$value of class ONGR\\\\ElasticsearchDSL\\\\Query\\\\TermLevel\\\\TermQuery constructor expects bool\\|float\\|int\\|string, mixed given\\.$#"
-			count: 3
+			count: 2
 			path: Controller/ArticleController.php
 
 		-
