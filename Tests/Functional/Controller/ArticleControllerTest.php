@@ -1857,4 +1857,92 @@ class ArticleControllerTest extends SuluTestCase
     {
         return '/articles/' . Urlizer::urlize($title);
     }
+
+    public function testCGetFilterByMainWebspace()
+    {
+        // Create article with custom webspace
+        $article1 = $this->testPost('Article in sulu_io');
+        $this->client->jsonRequest(
+            'PUT',
+            '/api/articles/' . $article1['id'] . '?locale=de',
+            [
+                'title' => 'Article in sulu_io',
+                'template' => 'default',
+                'mainWebspace' => 'sulu_io',
+            ]
+        );
+        $this->flush();
+
+        // Create article with test webspace
+        $article2 = $this->testPost('Article in test');
+        $this->client->jsonRequest(
+            'PUT',
+            '/api/articles/' . $article2['id'] . '?locale=de',
+            [
+                'title' => 'Article in test',
+                'template' => 'default',
+                'mainWebspace' => 'test',
+            ]
+        );
+        $this->flush();
+
+        // Filter by sulu_io webspace
+        $this->client->jsonRequest('GET', '/api/articles?locale=de&mainWebspace=sulu_io&fields=title,mainWebspace');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+        $this->assertEquals($article1['id'], $response['_embedded']['articles'][0]['id']);
+
+        // Filter by test webspace
+        $this->client->jsonRequest('GET', '/api/articles?locale=de&mainWebspace=test&fields=title,mainWebspace');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertCount(1, $response['_embedded']['articles']);
+        $this->assertEquals($article2['id'], $response['_embedded']['articles'][0]['id']);
+    }
+
+    public function testCGetMainWebspaceField()
+    {
+        $article = $this->testPost('Test Article');
+        $this->client->jsonRequest(
+            'PUT',
+            '/api/articles/' . $article['id'] . '?locale=de',
+            [
+                'title' => 'Test Article',
+                'template' => 'default',
+                'mainWebspace' => 'sulu_io',
+            ]
+        );
+        $this->flush();
+
+        // Request with mainWebspace field
+        $this->client->jsonRequest('GET', '/api/articles?locale=de&fields=id,title,mainWebspace');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(1, $response['total']);
+        $this->assertArrayHasKey('mainWebspace', $response['_embedded']['articles'][0]);
+
+        // mainWebspace should contain the webspace name, not the key
+        $this->assertIsString($response['_embedded']['articles'][0]['mainWebspace']);
+    }
+
+    public function testCGetMainWebspaceWithNonExistentWebspace()
+    {
+        // Create article with custom webspace
+        $article = $this->testPost('Test Article');
+        $this->flush();
+
+        // Filter by non-existent webspace
+        $this->client->jsonRequest('GET', '/api/articles?locale=de&mainWebspace=nonexistent&fields=title,mainWebspace');
+        $this->assertHttpStatusCode(200, $this->client->getResponse());
+        $response = \json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertEquals(0, $response['total']);
+        $this->assertCount(0, $response['_embedded']['articles']);
+    }
 }

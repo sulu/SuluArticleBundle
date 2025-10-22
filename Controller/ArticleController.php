@@ -50,6 +50,7 @@ use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
 use Sulu\Component\Security\Authorization\SecurityCondition;
 use Sulu\Component\Security\SecuredControllerInterface;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -119,6 +120,11 @@ class ArticleController extends AbstractRestController implements ClassResourceI
      */
     private $documentInspector;
 
+    /**
+     * @var WebspaceManagerInterface|null
+     */
+    private $webspaceManager;
+
     public function __construct(
         ViewHandlerInterface $viewHandler,
         DocumentManagerInterface $documentManager,
@@ -132,7 +138,8 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         SecurityCheckerInterface $securityChecker,
         bool $displayTabAll,
         ?TokenStorageInterface $tokenStorage = null,
-        ?DocumentInspector $documentInspector = null
+        ?DocumentInspector $documentInspector = null,
+        ?WebspaceManagerInterface $webspaceManager = null
     ) {
         parent::__construct($viewHandler, $tokenStorage);
 
@@ -147,9 +154,14 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $this->securityChecker = $securityChecker;
         $this->displayTabAll = $displayTabAll;
         $this->documentInspector = $documentInspector;
+        $this->webspaceManager = $webspaceManager;
 
         if (null === $this->documentInspector) {
             @trigger_deprecation('sulu/article-bundle', '2.5', 'Instantiating the ArticleController without the $documentInspector argument is deprecated!');
+        }
+
+        if (null === $this->webspaceManager) {
+            @trigger_deprecation('sulu/article-bundle', '2.6', 'Instantiating the ArticleController without the $webspaceManager argument is deprecated!');
         }
     }
 
@@ -176,6 +188,9 @@ class ArticleController extends AbstractRestController implements ClassResourceI
                 ->setSortField('title.raw')
                 ->setSearchField('title')
                 ->setSearchability(FieldDescriptor::SEARCHABILITY_YES)
+                ->build(),
+            'mainWebspace' => ElasticSearchFieldDescriptor::create('mainWebspace', 'public.main_webspace')
+                ->setSearchability(FieldDescriptor::SEARCHABILITY_NO)
                 ->build(),
             'creatorFullName' => ElasticSearchFieldDescriptor::create('creatorFullName', 'sulu_article.list.creator')
                 ->setSortField('creatorFullName.raw')
@@ -246,6 +261,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
          *     tagId?: string,
          *     pageId?: string,
          *     publishedState?: string,
+         *     mainWebspace?: string,
          *  } $filter */
         $filter = $request->query->all()['filter'] ?? [];
 
@@ -312,12 +328,18 @@ class ArticleController extends AbstractRestController implements ClassResourceI
             $search->addQuery(new TermQuery('excerpt.tags.id', $tagId), BoolQuery::MUST);
         }
 
-        if ($pageId = $request->get('pageId', $filter['pageId'] ?? null)) {
-            $search->addQuery(new TermQuery('parent_page_uuid', $pageId), BoolQuery::MUST);
+        $pageIdFilter = $request->get('pageId', $filter['pageId'] ?? null);
+        if (\is_string($pageIdFilter) && '' !== $pageIdFilter) {
+            $search->addQuery(new TermQuery('parent_page_uuid', $pageIdFilter), BoolQuery::MUST);
         }
 
         if ($workflowStage = $request->get('workflowStage', $filter['publishedState'] ?? null)) {
             $search->addQuery(new TermQuery('published_state', 'published' === $workflowStage), BoolQuery::MUST);
+        }
+
+        $mainWebspaceFilter = $request->get('mainWebspace', $filter['mainWebspace'] ?? null);
+        if (\is_string($mainWebspaceFilter) && '' !== $mainWebspaceFilter) {
+            $search->addQuery(new TermQuery('main_webspace', $mainWebspaceFilter), BoolQuery::MUST);
         }
 
         if ($this->getBooleanRequestParameter($request, 'exclude-shadows', false, false)) {
@@ -376,8 +398,18 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $searchResult = $repository->findRaw($search);
         $result = [];
         foreach ($searchResult as $document) {
-            $documentData = $this->normalize($document['_source'], $fieldDescriptors);
+            if (!\is_array($document) || !isset($document['_source'])) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $source */
+            $source = $document['_source'];
+            $documentData = $this->normalize($source, $fieldDescriptors);
             $documentData['ghostLocale'] = 'ghost' == $documentData['localizationState']['state'] ? $documentData['localizationState']['locale'] : null;
+
+            $mainWebspace = $source['main_webspace'] ?? null;
+            $webspace = $this->webspaceManager && \is_string($mainWebspace) ? $this->webspaceManager->getWebspaceCollection()->getWebspace($mainWebspace) : null;
+            $documentData['mainWebspace'] = $webspace ? $webspace->getName() : $mainWebspace;
 
             if (false !== ($index = \array_search($documentData['id'], $ids))) {
                 $result[$index] = $documentData;

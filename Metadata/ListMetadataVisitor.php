@@ -15,6 +15,7 @@ use Sulu\Bundle\AdminBundle\Metadata\ListMetadata\ListMetadata;
 use Sulu\Bundle\AdminBundle\Metadata\ListMetadata\ListMetadataVisitorInterface;
 use Sulu\Component\Content\Compat\Structure\StructureBridge;
 use Sulu\Component\Content\Compat\StructureManagerInterface;
+use Sulu\Component\Webspace\Manager\WebspaceManagerInterface;
 
 /**
  * @final
@@ -31,6 +32,11 @@ class ListMetadataVisitor implements ListMetadataVisitorInterface
     private $structureManager;
 
     /**
+     * @var WebspaceManagerInterface
+     */
+    private $webspaceManager;
+
+    /**
      * @var array<string, array{
      *      translation_key: string,
      * }>
@@ -42,9 +48,13 @@ class ListMetadataVisitor implements ListMetadataVisitorInterface
      *      translation_key: string,
      * }> $articleTypeConfigurations
      */
-    public function __construct(StructureManagerInterface $structureManager, array $articleTypeConfigurations)
-    {
+    public function __construct(
+        StructureManagerInterface $structureManager,
+        WebspaceManagerInterface $webspaceManager,
+        array $articleTypeConfigurations
+    ) {
         $this->structureManager = $structureManager;
+        $this->webspaceManager = $webspaceManager;
         $this->articleTypeConfigurations = $articleTypeConfigurations;
     }
 
@@ -54,6 +64,30 @@ class ListMetadataVisitor implements ListMetadataVisitorInterface
             return;
         }
 
+        $this->addMainWebspaceFilter($listMetadata);
+        $this->adaptTypeFilter($listMetadata);
+    }
+
+    protected function addMainWebspaceFilter(ListMetadata $listMetadata): void
+    {
+        $webspaceField = $listMetadata->getField('mainWebspace');
+
+        $webspaces = [];
+        foreach ($this->webspaceManager->getWebspaceCollection() as $webspace) {
+            $webspaces[$webspace->getKey()] = $webspace->getName();
+        }
+
+        if (1 === \count($webspaces)) {
+            $listMetadata->removeField('mainWebspace');
+
+            return;
+        }
+
+        $webspaceField->setFilterTypeParameters(['options' => $webspaces]);
+    }
+
+    protected function adaptTypeFilter(ListMetadata $listMetadata): void
+    {
         $typeField = $listMetadata->getField('type');
 
         $types = $this->getTypes();
