@@ -1945,4 +1945,37 @@ class ArticleControllerTest extends SuluTestCase
         $this->assertEquals(0, $response['total']);
         $this->assertCount(0, $response['_embedded']['articles']);
     }
+
+    public function testRoutePathNameIsWrittenOnPersist(): void
+    {
+        $document = $this->documentManager->create('article');
+        $document->setTitle('Route-Path-Name-Test');
+        $document->setStructureType('default');
+
+        $this->documentManager->persist($document, 'de');
+        $this->documentManager->flush();
+
+        $session = $this->getContainer()->get('sulu_document_manager.default_session');
+        $node = $session->getNodeByIdentifier($document->getUuid());
+
+        $this->assertTrue($node->hasProperty('i18n:de-routePathName'));
+        $this->assertSame('i18n:de-routePath', $node->getPropertyValue('i18n:de-routePathName'));
+    }
+
+    public function testRoutePathNameIsWrittenOnPublish(): void
+    {
+        $document = $this->documentManager->create('article');
+        $document->setTitle('Route-Path-Name-Publish-Test');
+        $document->setStructureType('default');
+
+        $this->documentManager->persist($document, 'de');
+        $this->documentManager->publish($document, 'de');
+        $this->documentManager->flush();
+
+        $liveSession = $this->getContainer()->get('sulu_document_manager.live_session');
+        $liveNode = $liveSession->getNodeByIdentifier($document->getUuid());
+
+        $this->assertTrue($liveNode->hasProperty('i18n:de-routePathName'));
+        $this->assertSame('i18n:de-routePath', $liveNode->getPropertyValue('i18n:de-routePathName'));
+    }
 }
