@@ -100,13 +100,13 @@ class WebsiteArticleController extends AbstractController
                     \array_merge($data, $parameters),
                     $this->createResponse($request)
                 );
-            } else {
-                return $this->render(
-                    $viewTemplate,
-                    $data,
-                    $this->createResponse($request)
-                );
             }
+
+            return $this->render(
+                $viewTemplate,
+                $data,
+                $this->createResponse($request)
+            );
         } catch (\InvalidArgumentException $exception) {
             // template not found
             throw new HttpException(406, 'Error encountered when rendering content', $exception);

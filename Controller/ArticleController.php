@@ -586,7 +586,7 @@ class ArticleController extends AbstractRestController implements ClassResourceI
         $deleteLocale = $this->getBooleanRequestParameter($request, 'deleteLocale', false, false);
 
         $document = $this->documentManager->find($id);
-        if ($deleteLocale) {
+        if ($deleteLocale && null !== $locale) {
             $this->documentManager->removeLocale($document, $locale);
         } else {
             $this->documentManager->remove($document);

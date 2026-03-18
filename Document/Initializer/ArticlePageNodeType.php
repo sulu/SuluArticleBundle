@@ -52,7 +52,7 @@ class ArticlePageNodeType implements NodeTypeDefinitionInterface
 
     public function getPrimaryItemName()
     {
-        return;
+        return '';
     }
 
     public function getDeclaredPropertyDefinitions()
