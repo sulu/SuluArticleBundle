@@ -18,14 +18,14 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^8.2",
         "ext-json": "*",
         "elasticsearch/elasticsearch": "^5.0 || ^6.0 || ^7.0",
         "handcraftedinthealps/elasticsearch-bundle": "^5.2.6.4 || ^5.2.6.4@dev",
         "handcraftedinthealps/elasticsearch-dsl": "^5.0.7.1 || ^6.2.0.1 || ^7.2.0.1",
         "jms/serializer": "^3.3",
         "jms/serializer-bundle": "^3.3 || ^4.0 || ^5.0",
-        "sulu/sulu": "~2.4.13 || ^2.5.9@dev",
+        "sulu/sulu": "^2.6",
         "symfony/config": "^4.3 || ^5.0 || ^6.0 || ^7.0",
         "symfony/dependency-injection": "^4.3 || ^5.0 || ^6.0 || ^7.0",
         "symfony/http-foundation": "^4.3 || ^5.0 || ^6.0 || ^7.0",
