@@ -31,6 +31,11 @@ parameters:
 			path: Admin/ArticleAdmin.php
 
 		-
+			message: "#^Parameter \\#2 \\$locale of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:removeLocale\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: Controller/ArticleController.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\Helper\\\\WebspaceSelect\\:\\:getValues\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Admin/Helper/WebspaceSelect.php
@@ -1101,11 +1106,6 @@ parameters:
 			path: Document/Initializer/ArticleInitializer.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticleNodeType\\:\\:getPrimaryItemName\\(\\) should return string but empty return statement found\\.$#"
-			count: 1
-			path: Document/Initializer/ArticleNodeType.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getDeclaringNodeType\\(\\) should return PHPCR\\\\NodeType\\\\NodeTypeInterface but returns null\\.$#"
 			count: 1
 			path: Document/Initializer/ArticlePageNodeDefinition.php
@@ -1129,11 +1129,6 @@ parameters:
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeDefinition\\:\\:getRequiredPrimaryTypes\\(\\) should return array\\<PHPCR\\\\NodeType\\\\NodeTypeInterface\\> but returns null\\.$#"
 			count: 1
 			path: Document/Initializer/ArticlePageNodeDefinition.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticlePageNodeType\\:\\:getPrimaryItemName\\(\\) should return string but empty return statement found\\.$#"
-			count: 1
-			path: Document/Initializer/ArticlePageNodeType.php
 
 		-
 			message: "#^Property Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\LocalizationStateViewObject\\:\\:\\$locale \\(string\\) does not accept string\\|null\\.$#"

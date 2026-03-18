@@ -102,7 +102,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
-        if (!($article instanceof ArticleDocument)) {
+        if (!$article instanceof ArticleDocument) {
             return;
         }
 
@@ -122,7 +122,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
-        if (!($article instanceof ArticleDocument)) {
+        if (!$article instanceof ArticleDocument) {
             return;
         }
 
@@ -154,7 +154,7 @@ class ArticleSubscriber implements EventSubscriberInterface
         /** @var SerializationVisitorInterface $visitor */
         $visitor = $event->getVisitor();
 
-        if (!($article instanceof ArticleViewDocumentInterface)) {
+        if (!$article instanceof ArticleViewDocumentInterface) {
             return;
         }
 
