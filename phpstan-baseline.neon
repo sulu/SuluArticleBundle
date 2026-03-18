@@ -31,6 +31,11 @@ parameters:
 			path: Admin/ArticleAdmin.php
 
 		-
+			message: "#^Parameter \\#2 \\$locale of method Sulu\\\\Component\\\\DocumentManager\\\\DocumentManagerInterface\\:\\:removeLocale\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: Controller/ArticleController.php
+
+		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Admin\\\\Helper\\\\WebspaceSelect\\:\\:getValues\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Admin/Helper/WebspaceSelect.php
