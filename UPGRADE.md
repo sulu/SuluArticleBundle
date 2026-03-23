@@ -1,5 +1,23 @@
 # Upgrade
 
+## 2.6.10
+
+### Minimum PHP 8.2, Sulu 2.6 and Elasticsearch 6 required
+
+Support for PHP 7.3, 7.4, 8.0, and 8.1 has been dropped. The bundle now requires PHP `^8.2`,
+`sulu/sulu: ^2.6` and `elasticsearch/elasticsearch: ^6.0 || ^7.0`.
+
+### RoutePathName migration
+
+The `routePathName` property on article PHPCR nodes was not being written correctly.
+A PHPCR migration is included to backfill the property on all existing article nodes.
+
+Run the following command after upgrading:
+
+```bash
+bin/adminconsole phpcr:migrations:migrate
+```
+
 ## 2.5.2
 
 ### Rename WebsiteArticleController::renderBlock to WebsiteArticleController::renderBlockView
