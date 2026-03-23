@@ -2,7 +2,7 @@
 
 ### ElasticSearch
 
-The SuluArticleBundle requires a running elasticsearch `^5.0`, `^6.0` or `^7.0`.
+The SuluArticleBundle requires a running elasticsearch `^6.0` or `^7.0`.
 
 ## Install dependencies
 
