@@ -1,5 +1,13 @@
 # Upgrade
 
+## 2.6.11
+
+### Minimum Sulu 2.6.11 required
+
+The `ArticleLinkProvider` now returns the `LinkConfigurationBuilder` from its `getConfiguration()`
+method instead of the built `LinkConfiguration`, so projects can more easily add custom link
+targets. This requires `sulu/sulu: ^2.6.11`, which is able to handle the returned builder.
+
 ## 2.6.10
 
 ### Minimum PHP 8.2, Sulu 2.6 and Elasticsearch 6 required

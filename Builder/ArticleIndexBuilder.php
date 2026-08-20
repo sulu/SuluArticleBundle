@@ -31,8 +31,10 @@ class ArticleIndexBuilder extends SuluBuilder
 
     public function build()
     {
-        $this->buildForManager($this->container->get('es.manager.live'), $this->input->getOption('destroy'));
-        $this->buildForManager($this->container->get('es.manager.default'), $this->input->getOption('destroy'));
+        $destroy = (bool) $this->input->getOption('destroy');
+
+        $this->buildForManager($this->container->get('es.manager.live'), $destroy);
+        $this->buildForManager($this->container->get('es.manager.default'), $destroy);
     }
 
     /**
