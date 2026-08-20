@@ -143,7 +143,7 @@ ongr_elasticsearch:
 sulu_article:
     documents:
         article:
-            view: AppBundle\Document\ArticleViewDocument
+            view: App\Document\ArticleViewDocument
 ```
 
 #### 3. Add listener to set custom value
@@ -178,4 +178,10 @@ class ArticleIndexListener
 <service id="app.sulu_article.index_listener" class="App\EventListener\ArticleIndexListener">
     <tag name="kernel.event_listener" event="sulu_article.index" method="onIndex"/>
 </service>
+```
+
+```yaml
+App\EventListener\ArticleIndexListener:
+    tags:
+            - { name: kernel.event_listener, event: sulu_article.index, method: onIndex }
 ```
