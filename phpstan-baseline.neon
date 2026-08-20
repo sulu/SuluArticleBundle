@@ -231,11 +231,6 @@ parameters:
 			path: Content/ArticleSelectionContentType.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\ArticleSelectionContentType\\:\\:preResolve\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Content/ArticleSelectionContentType.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\PageTreeArticleDataProvider\\:\\:createSearch\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Content/PageTreeArticleDataProvider.php
@@ -257,11 +252,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\SingleArticleSelectionContentType\\:\\:getViewDocumentIds\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Content/SingleArticleSelectionContentType.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Content\\\\SingleArticleSelectionContentType\\:\\:preResolve\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Content/SingleArticleSelectionContentType.php
 
@@ -561,22 +551,7 @@ parameters:
 			path: Document/ArticleDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setLocale\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setOriginalLocale\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setPages\\(\\) has parameter \\$pages with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setParent\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/ArticleDocument.php
 
@@ -592,16 +567,6 @@ parameters:
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setStructureType\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setTitle\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/ArticleDocument.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleDocument\\:\\:setVersions\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Document/ArticleDocument.php
 
@@ -676,17 +641,17 @@ parameters:
 			path: Document/ArticlePageDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setLocale\\(\\) has no return type specified\\.$#"
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setLocale\\(\\) with return type void returns \\$this\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\) but should not return anything\\.$#"
 			count: 1
 			path: Document/ArticlePageDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setOriginalLocale\\(\\) has no return type specified\\.$#"
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setOriginalLocale\\(\\) with return type void returns \\$this\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\) but should not return anything\\.$#"
 			count: 1
 			path: Document/ArticlePageDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setParent\\(\\) has no return type specified\\.$#"
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setParent\\(\\) with return type void returns \\$this\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\) but should not return anything\\.$#"
 			count: 1
 			path: Document/ArticlePageDocument.php
 
@@ -706,7 +671,7 @@ parameters:
 			path: Document/ArticlePageDocument.php
 
 		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setTitle\\(\\) has no return type specified\\.$#"
+			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\:\\:setTitle\\(\\) with return type void returns \\$this\\(Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticlePageDocument\\) but should not return anything\\.$#"
 			count: 1
 			path: Document/ArticlePageDocument.php
 
@@ -1094,11 +1059,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: Document/Index/Factory/TagCollectionFactory.php
-
-		-
-			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticleInitializer\\:\\:initialize\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Document/Initializer/ArticleInitializer.php
 
 		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Initializer\\\\ArticleInitializer\\:\\:initialize\\(\\) has parameter \\$purge with no type specified\\.$#"

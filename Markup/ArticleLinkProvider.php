@@ -101,8 +101,7 @@ class ArticleLinkProvider implements LinkProviderInterface
             ->setDisplayProperties(['title'])
             ->setOverlayTitle($this->translator->trans('sulu_article.single_selection_overlay_title', [], 'admin'))
             ->setEmptyText($this->translator->trans('sulu_article.no_article_selected', [], 'admin'))
-            ->setIcon('su-newspaper')
-            ->getLinkConfiguration();
+            ->setIcon('su-newspaper');
     }
 
     public function preload(array $hrefs, $locale, $published = true)
