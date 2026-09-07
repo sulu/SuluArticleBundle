@@ -80,6 +80,46 @@ class ArticleReferenceProviderTest extends SuluTestCase
         self::assertSame((string) $media->getId(), $references[0]->getResourceId());
     }
 
+    public function testUpdateArticleSelectionReferences(): void
+    {
+        if (!\interface_exists(ReferenceRefresherInterface::class)) {
+            $this->markTestSkipped('References did not exist in Sulu <2.6.');
+        }
+
+        /** @var \Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticleDocument $targetArticle */
+        $targetArticle = $this->documentManager->create('article');
+        $targetArticle->setTitle('Target article');
+        $targetArticle->setStructureType('default_image');
+        $this->documentManager->persist($targetArticle, 'en');
+        $this->documentManager->publish($targetArticle, 'en');
+        $this->documentManager->flush();
+
+        /** @var \Sulu\Bundle\ArticleBundle\Tests\TestExtendBundle\Document\ArticleDocument $article */
+        $article = $this->documentManager->create('article');
+        $article->setTitle('Example article');
+        $article->setStructureType('default_image');
+        $article->getStructure()->bind([
+            'article' => $targetArticle->getUuid(),
+            'articles' => [$targetArticle->getUuid()],
+        ]);
+        $this->documentManager->persist($article, 'en');
+        $this->documentManager->publish($article, 'en');
+        $this->documentManager->flush();
+
+        $this->articleReferenceProvider->updateReferences($article, 'en', 'test');
+        $this->getEntityManager()->flush();
+
+        /** @var Reference[] $references */
+        $references = $this->referenceRepository->findBy(['referenceContext' => 'test'], ['referenceProperty' => 'ASC']);
+
+        // one reference from the single_article_selection, one from the article_selection, both pointing at the target article
+        $this->assertCount(2, $references);
+        foreach ($references as $reference) {
+            self::assertSame(ArticleDocument::RESOURCE_KEY, $reference->getResourceKey());
+            self::assertSame($targetArticle->getUuid(), $reference->getResourceId());
+        }
+    }
+
     public function testUpdateUnpublishedReferences(): void
     {
         if (!\interface_exists(ReferenceRefresherInterface::class)) {
