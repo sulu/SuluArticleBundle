@@ -1,5 +1,18 @@
 # Upgrade
 
+## 2.6.12
+
+### Reference tracking for article selections
+
+The `single_article_selection` and `article_selection` content types now register their selected
+articles in the reference table, like the snippet and media selections in core already do. Content
+that uses these types only gets reference rows on its next publish, so refresh existing content once
+after upgrading:
+
+```bash
+bin/console sulu:reference:refresh
+```
+
 ## 2.6.11
 
 ### Minimum Sulu 2.6.11 required

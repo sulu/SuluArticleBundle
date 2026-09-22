@@ -15,5 +15,7 @@
         <property name="title" type="text_line" mandatory="true"/>
         <property name="pageTitle" type="text_line"/>
         <property name="image" type="single_media_selection"/>
+        <property name="article" type="single_article_selection"/>
+        <property name="articles" type="article_selection"/>
     </properties>
 </template>

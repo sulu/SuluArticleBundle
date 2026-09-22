@@ -12,7 +12,10 @@
 namespace Sulu\Bundle\ArticleBundle\Content;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Metadata\ArticleViewDocumentIdTrait;
+use Sulu\Bundle\ReferenceBundle\Application\Collector\ReferenceCollectorInterface;
+use Sulu\Bundle\ReferenceBundle\Infrastructure\Sulu\ContentType\ReferenceContentTypeInterface;
 use Sulu\Bundle\WebsiteBundle\ReferenceStore\ReferenceStoreInterface;
 use Sulu\Component\Content\Compat\PropertyInterface;
 use Sulu\Component\Content\PreResolvableContentTypeInterface;
@@ -21,7 +24,7 @@ use Sulu\Component\Content\SimpleContentType;
 /**
  * Provides article_selection content-type.
  */
-class SingleArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface
+class SingleArticleSelectionContentType extends SimpleContentType implements PreResolvableContentTypeInterface, ReferenceContentTypeInterface
 {
     use ArticleViewDocumentIdTrait;
 
@@ -74,5 +77,19 @@ class SingleArticleSelectionContentType extends SimpleContentType implements Pre
         }
 
         $this->referenceStore->add($uuid);
+    }
+
+    public function getReferences(PropertyInterface $property, ReferenceCollectorInterface $referenceCollector, string $propertyPrefix = ''): void
+    {
+        $uuid = $property->getValue();
+        if (!\is_string($uuid) || '' === $uuid) {
+            return;
+        }
+
+        $referenceCollector->addReference(
+            ArticleDocument::RESOURCE_KEY,
+            $uuid,
+            $propertyPrefix . $property->getName()
+        );
     }
 }
