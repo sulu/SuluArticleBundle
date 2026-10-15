@@ -69,8 +69,7 @@ ELASTICSEARCH_INDEX=su_myproject
 # config/routes/sulu_admin.yaml
 
 sulu_article_api:
-    resource: "@SuluArticleBundle/Resources/config/routing_api.yml"
-    type: rest
+    resource: "@SuluArticleBundle/Resources/config/routing_api.yaml"
     prefix: /admin/api
 ```
 

@@ -1,0 +1,104 @@
+sulu_article.get_articles:
+    path: /articles.{_format}'
+    methods: GET
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::cgetAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.get_article:
+    path: /articles/{id}.{_format}'
+    methods: GET
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::getAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.post_article:
+    path: /articles.{_format}'
+    methods: POST
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::postAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.put_article:
+    path: /articles/{id}.{_format}'
+    methods: PUT
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::putAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.delete_articles:
+    path: /articles.{_format}'
+    methods: DELETE
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::cdeleteAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.delete_article:
+    path: /articles/{id}.{_format}'
+    methods: DELETE
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::deleteAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.post_article_trigger:
+    path: /articles/{id}.{_format}'
+    methods: POST
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticleController::postTriggerAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.get_article_page:
+    path: /articles/{articleUuid}/pages/{uuid}.{_format}'
+    methods: GET
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticlePageController::getAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.post_article_page:
+    path: /articles/{articleUuid}/pages.{_format}'
+    methods: POST
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticlePageController::postAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.put_article_page:
+    path: /articles/{articleUuid}/pages/{uuid}.{_format}'
+    methods: PUT
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticlePageController::putAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.delete_article_page:
+    path: /articles/{articleUuid}/pages/{uuid}.{_format}'
+    methods: DELETE
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\ArticlePageController::deleteAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.get_article_versions:
+    path: /articles/{id}/versions.{_format}'
+    methods: GET
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\VersionController::cgetAction'
+    format: json
+    requirements:
+        _format: json|csv
+
+sulu_article.post_article_version_trigger:
+    path: /articles/{id}/versions/{version}.{_format}'
+    methods: POST
+    controller: 'Sulu\Bundle\ArticleBundle\Controller\VersionController::postTriggerAction'
+    format: json
+    requirements:
+        _format: json|csv
+
