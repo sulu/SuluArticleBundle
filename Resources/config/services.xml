@@ -123,6 +123,7 @@
             <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
             <argument type="service" id="sulu_core.webspace.webspace_manager"/>
+            <argument type="service" id="logger" on-invalid="null"/>
         </service>
         <service id="sulu_article.elastic_search.article_live_indexer"
                  class="Sulu\Bundle\ArticleBundle\Document\Index\ArticleIndexer">
@@ -139,6 +140,7 @@
             <argument type="service" id="sulu_document_manager.document_inspector" />
             <argument type="service" id="sulu_article.resolver.webspaces" />
             <argument>%sulu_article.types%</argument>
+            <argument type="service" id="logger" on-invalid="null"/>
         </service>
 
         <service id="sulu_article.elastic_search.factory.seo"
