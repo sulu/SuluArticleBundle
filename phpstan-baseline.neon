@@ -846,31 +846,6 @@ parameters:
 			path: Document/Index/ArticleGhostIndexer.php
 
 		-
-			message: "#^Parameter \\#1 \\$document of method ONGR\\\\ElasticsearchBundle\\\\Service\\\\Manager\\:\\:persist\\(\\) expects object, Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\|null given\\.$#"
-			count: 1
-			path: Document/Index/ArticleGhostIndexer.php
-
-		-
-			message: "#^Parameter \\#2 \\$article of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:dispatchIndexEvent\\(\\) expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface, Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\|null given\\.$#"
-			count: 1
-			path: Document/Index/ArticleGhostIndexer.php
-
-		-
-			message: "#^Cannot call method getPropertyByTagName\\(\\) on Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata\\|null\\.$#"
-			count: 2
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Cannot call method hasPropertyWithTagName\\(\\) on Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata\\|null\\.$#"
-			count: 2
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Cannot call method setLocalizationState\\(\\) on Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\|null\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
 			message: "#^Method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:__construct\\(\\) has parameter \\$typeConfiguration with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Document/Index/ArticleIndexer.php
@@ -926,17 +901,7 @@ parameters:
 			path: Document/Index/ArticleIndexer.php
 
 		-
-			message: "#^Parameter \\#1 \\$document of method ONGR\\\\ElasticsearchBundle\\\\Service\\\\Manager\\:\\:persist\\(\\) expects object, Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\|null given\\.$#"
-			count: 3
-			path: Document/Index/ArticleIndexer.php
-
-		-
 			message: "#^Parameter \\#1 \\$document of method ONGR\\\\ElasticsearchBundle\\\\Service\\\\Manager\\:\\:remove\\(\\) expects object, mixed given\\.$#"
-			count: 2
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Parameter \\#1 \\$metadata of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getType\\(\\) expects Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata, Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata\\|null given\\.$#"
 			count: 2
 			path: Document/Index/ArticleIndexer.php
 
@@ -947,11 +912,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$routePath of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\:\\:setRoutePath\\(\\) expects string, string\\|null given\\.$#"
-			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Parameter \\#1 \\$structure of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getContentFields\\(\\) expects Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata, Sulu\\\\Component\\\\Content\\\\Metadata\\\\StructureMetadata\\|null given\\.$#"
 			count: 1
 			path: Document/Index/ArticleIndexer.php
 
@@ -968,11 +928,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$type of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:getTypeTranslation\\(\\) expects string, mixed given\\.$#"
 			count: 1
-			path: Document/Index/ArticleIndexer.php
-
-		-
-			message: "#^Parameter \\#2 \\$article of method Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\Index\\\\ArticleIndexer\\:\\:dispatchIndexEvent\\(\\) expects Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface, Sulu\\\\Bundle\\\\ArticleBundle\\\\Document\\\\ArticleViewDocumentInterface\\|null given\\.$#"
-			count: 2
 			path: Document/Index/ArticleIndexer.php
 
 		-

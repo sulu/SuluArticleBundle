@@ -12,6 +12,7 @@
 namespace Sulu\Bundle\ArticleBundle\Document\Index;
 
 use ONGR\ElasticsearchBundle\Service\Manager;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\ExcerptFactory;
 use Sulu\Bundle\ArticleBundle\Document\Index\Factory\SeoFactory;
@@ -56,7 +57,8 @@ class ArticleGhostIndexer extends ArticleIndexer
         DocumentInspector $inspector,
         WebspaceResolver $webspaceResolver,
         array $typeConfiguration,
-        WebspaceManagerInterface $webspaceManager
+        WebspaceManagerInterface $webspaceManager,
+        ?LoggerInterface $logger = null
     ) {
         parent::__construct(
             $structureMetadataFactory,
@@ -71,7 +73,8 @@ class ArticleGhostIndexer extends ArticleIndexer
             $documentManager,
             $inspector,
             $webspaceResolver,
-            $typeConfiguration
+            $typeConfiguration,
+            $logger
         );
 
         $this->webspaceManager = $webspaceManager;
@@ -87,6 +90,10 @@ class ArticleGhostIndexer extends ArticleIndexer
         }
 
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
+        if (!$article) {
+            return;
+        }
+
         $this->updateShadows($document);
         $this->createOrUpdateGhosts($document);
         $this->dispatchIndexEvent($document, $article);

@@ -16,6 +16,7 @@ use ONGR\ElasticsearchBundle\Service\Manager;
 use ONGR\ElasticsearchDSL\Query\Compound\BoolQuery;
 use ONGR\ElasticsearchDSL\Query\MatchAllQuery;
 use ONGR\ElasticsearchDSL\Query\TermLevel\TermQuery;
+use Psr\Log\LoggerInterface;
 use Sulu\Bundle\ArticleBundle\Document\ArticleDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageDocument;
 use Sulu\Bundle\ArticleBundle\Document\ArticlePageViewObject;
@@ -36,6 +37,7 @@ use Sulu\Bundle\SecurityBundle\UserManager\UserManager;
 use Sulu\Component\Content\Document\Extension\ExtensionContainer;
 use Sulu\Component\Content\Document\LocalizationState;
 use Sulu\Component\Content\Document\WorkflowStage;
+use Sulu\Component\Content\Metadata\Factory\Exception\StructureTypeNotFoundException;
 use Sulu\Component\Content\Metadata\Factory\StructureMetadataFactoryInterface;
 use Sulu\Component\Content\Metadata\PropertyMetadata;
 use Sulu\Component\Content\Metadata\StructureMetadata;
@@ -118,6 +120,11 @@ class ArticleIndexer implements IndexerInterface
      */
     protected $typeConfiguration;
 
+    /**
+     * @var LoggerInterface|null
+     */
+    protected $logger;
+
     public function __construct(
         StructureMetadataFactoryInterface $structureMetadataFactory,
         UserManager $userManager,
@@ -131,7 +138,8 @@ class ArticleIndexer implements IndexerInterface
         DocumentManagerInterface $documentManager,
         DocumentInspector $inspector,
         WebspaceResolver $webspaceResolver,
-        array $typeConfiguration
+        array $typeConfiguration,
+        ?LoggerInterface $logger = null
     ) {
         $this->structureMetadataFactory = $structureMetadataFactory;
         $this->userManager = $userManager;
@@ -146,6 +154,7 @@ class ArticleIndexer implements IndexerInterface
         $this->inspector = $inspector;
         $this->webspaceResolver = $webspaceResolver;
         $this->typeConfiguration = $typeConfiguration;
+        $this->logger = $logger;
     }
 
     /**
@@ -172,15 +181,29 @@ class ArticleIndexer implements IndexerInterface
         string $locale,
         string $localizationState = LocalizationState::LOCALIZED
     ): ?ArticleViewDocumentInterface {
+        try {
+            $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
+                'article',
+                $document->getStructureType()
+            );
+        } catch (StructureTypeNotFoundException $exception) {
+            $structureMetadata = null;
+        }
+        if (!$structureMetadata) {
+            $this->logger?->warning(\sprintf(
+                'Structure "%s" not found, skipping indexing of article "%s" in locale "%s".',
+                $document->getStructureType(),
+                $document->getUuid(),
+                $locale
+            ));
+
+            return null;
+        }
+
         $article = $this->findOrCreateViewDocument($document, $locale, $localizationState);
         if (!$article) {
             return null;
         }
-
-        $structureMetadata = $this->structureMetadataFactory->getStructureMetadata(
-            'article',
-            $document->getStructureType()
-        );
 
         $article->setTitle($document->getTitle());
         $article->setRoutePath($document->getRoutePath());
@@ -453,6 +476,10 @@ class ArticleIndexer implements IndexerInterface
     {
         // overwrite removed locale with properties from original locale
         $article = $this->createOrUpdateArticle($document, $locale);
+        if (!$article) {
+            return;
+        }
+
         $article->setLocalizationState(new LocalizationStateViewObject(LocalizationState::GHOST, $document->getOriginalLocale()));
 
         $repository = $this->manager->getRepository($this->documentFactory->getClass('article'));
@@ -523,6 +550,9 @@ class ArticleIndexer implements IndexerInterface
         }
 
         $article = $this->createOrUpdateArticle($document, $document->getLocale());
+        if (!$article) {
+            return;
+        }
 
         $this->dispatchIndexEvent($document, $article);
         $this->manager->persist($article);
@@ -542,6 +572,10 @@ class ArticleIndexer implements IndexerInterface
         );
 
         $article = $this->createOrUpdateArticle($shadowDocument, $document->getOriginalLocale(), LocalizationState::SHADOW);
+        if (!$article) {
+            return;
+        }
+
         $this->dispatchIndexEvent($shadowDocument, $article);
         $this->manager->persist($article);
     }
